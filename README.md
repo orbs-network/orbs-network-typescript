@@ -19,3 +19,9 @@ This wrapper project will set up a full working environment including all sub pr
 > This will start a few services with some chatter
 
 `./simulate.sh`
+
+## Develop
+
+It's recommended to work on all sub projects directly inside the folder `./projects`.
+
+> IMPORTANT: don't forget to commit and push your changes, they're all separate git repos.
