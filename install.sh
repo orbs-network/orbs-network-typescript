@@ -1,7 +1,7 @@
 pushd .
 cd build
 npm install
-npm run build
+npm run cleanslate
 popd
 
 pushd .
