@@ -1,0 +1,11 @@
+{
+  "name": "transaction-pool",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:50051",
+  "project": "transaction-pool-service-typescript",
+  "peers": [
+    {
+      "endpoint": "0.0.0.0:50052"
+    }
+  ]
+}

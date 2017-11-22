@@ -1,0 +1,22 @@
+{
+  "name": "orbs-network-build",
+  "version": "0.1.0",
+  "description": "orbs-network-build",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
+  "author": "Orbs Team",
+  "license": "MIT",
+  "scripts": {
+    "clean": "node src/clean.js",
+    "clone": "node src/clone.js",
+    "build": "npm run clean && npm run clone && npm run rebuild",
+    "rebuild": "npm run build-ts",
+    "build-ts": "node src/build-ts.js"
+  },
+  "devDependencies": {
+    "nodegit": "^0.20.3",
+    "shelljs": "^0.7.7"
+  }
+}

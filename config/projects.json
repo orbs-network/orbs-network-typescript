@@ -1,0 +1,18 @@
+{
+  "architecture": {
+    "type": "static",
+    "runtime": "protobuf",
+    "repo": "https://github.com/orbs-network/architecture.git"
+  },
+  "common-service-typescript": {
+    "type": "library",
+    "runtime": "typescript",
+    "repo": "https://github.com/orbs-network/common-service-typescript.git"
+  },
+  "transaction-pool-service-typescript": {
+    "type": "service",
+    "service": "transaction-pool",
+    "runtime": "typescript",
+    "repo": "https://github.com/orbs-network/transaction-pool-service-typescript.git"
+  }
+}
