@@ -1,4 +1,4 @@
 pushd .
 cd build
-npm run build
+npm run watch
 popd
