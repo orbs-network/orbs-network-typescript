@@ -11,7 +11,7 @@
   "scripts": {
     "clean": "node src/clean.js",
     "clone": "node src/clone.js",
-    "install": "npm run clean && npm run clone && npm run build",
+    "cleanslate": "npm run clean && npm run clone && npm run build",
     "build": "node src/build-ts.js",
     "rebuild": "node src/rebuild-ts.js",
     "watch": "node src/watch-ts.js"
