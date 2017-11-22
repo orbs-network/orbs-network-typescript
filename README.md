@@ -6,15 +6,28 @@ This wrapper project will set up a full working environment including all sub pr
 
 > Run when you want a fresh start. This will git clone all sub projects into `./projects`.
 
-Make sure you have node 8+ and npm 5+ installed before building.
+`./install.sh`
+
+* Make sure you have node 8+ and npm 5+ installed before building.
+* This command will delete `./projects` so make sure all changes are committed.
+
+## Build (slow)
+
+> Run when you made a big change in one of the sub projects and you want to fully build all of them.
 
 `./build.sh`
 
-## Rebuild
+* This will `npm install` all the sub projects which is a little slow but safer.
+* This will also lint your code which is a little slow but safer.
 
-> Run when you changed one of the sub projects and you want to rebuild all of them.
+## Rebuild (faster)
+
+> Run when you made a small code change in one of the sub projects and you want to rebuild quickly.
 
 `./rebuild.sh`
+
+* This will not `npm install` and will not lint your code.
+* If you suspect your change did not go in, run `./build.sh` instead, it's more thorough.
 
 ## Run Simulation
 
@@ -22,8 +35,13 @@ Make sure you have node 8+ and npm 5+ installed before building.
 
 `./simulate.sh`
 
-## Develop
+* The network topology for the simulation is found at `./config/topology`.
 
-It's recommended to work on all sub projects directly inside the folder `./projects`.
+## Develop Effectively
 
-> IMPORTANT: don't forget to commit and push your changes, they're all separate git repos.
+> After installing, when developing services actively, use this to make your life easier.
+
+`./watch.sh`
+
+* This will watch for file changes on all typescript sub projects and recompile automatically.
+* Work directly on all sub projects inside the folder `./projects`, they're separate git repos.
