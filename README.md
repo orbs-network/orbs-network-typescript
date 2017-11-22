@@ -4,7 +4,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 ## Installation
 
-> Run when you want a fresh start. This will git clone all sub projects into `./projects`.
+> Run when you want a fresh start. This will git clone all sub projects into `./projects`:
 
 `./install.sh`
 
@@ -13,7 +13,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 ## Build (slow)
 
-> Run when you made a big change in one of the sub projects and you want to fully build all of them.
+> Run when you made a big change in one of the sub projects and you want to fully build all of them:
 
 `./build.sh`
 
@@ -22,7 +22,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 ## Rebuild (faster)
 
-> Run when you made a small code change in one of the sub projects and you want to rebuild quickly.
+> Run when you made a small code change in one of the sub projects and you want to rebuild quickly:
 
 `./rebuild.sh`
 
@@ -31,7 +31,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 ## Run Simulation
 
-> This will start a few services with some chatter
+> This will start a few services with some chatter:
 
 `./simulate.sh`
 
@@ -39,7 +39,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 ## Develop Effectively
 
-> After installing, when developing services actively, use this to make your life easier.
+> After installing, when developing services actively, use this to make your life easier:
 
 `./watch.sh`
 
