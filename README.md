@@ -6,6 +6,8 @@ This wrapper project will set up a full working environment including all sub pr
 
 > Run when you want a fresh start. This will git clone all sub projects into `./projects`.
 
+Make sure you have node 8+ and npm 5+ installed before building.
+
 `./build.sh`
 
 ## Rebuild
