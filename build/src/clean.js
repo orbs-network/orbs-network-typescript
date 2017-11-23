@@ -1,8 +1,9 @@
 const path = require("path");
 const shell = require("shelljs");
+require("colors");
 
 async function main() {
-  console.log("\033[1;32m * Cleaning all sub projects\n\033[0m");
+  console.log("* Cleaning all sub projects\n".green);
   shell.rm("-rf", path.resolve(__dirname, "../../projects/*"));
 }
 

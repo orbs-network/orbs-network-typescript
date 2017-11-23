@@ -17,6 +17,7 @@
     "watch": "node src/watch-ts.js"
   },
   "devDependencies": {
+    "colors": "^1.1.2",
     "nodegit": "^0.20.3",
     "shelljs": "^0.7.7"
   }
