@@ -13,11 +13,6 @@
       "endpoint": "0.0.0.0:51252"
     }
   ],
-  "gossip-endpoint": "0.0.0.0:60002",
-  "gossip-peers": [
-    {
-      "service": "gossip",
-      "endpoint": "0.0.0.0:60001"
-    }
-  ]
+  "gossipPort": "60002",
+  "gossipPeers": [ "ws://localhost:60001" ]
 }
