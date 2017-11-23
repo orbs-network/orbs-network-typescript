@@ -1,0 +1,23 @@
+{
+  "name": "node1-gossip",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:51153",
+  "project": "gossip-service-typescript",
+  "peers": [
+    {
+      "service": "public-api",
+      "endpoint": "0.0.0.0:51151"
+    },
+    {
+      "service": "transaction-pool",
+      "endpoint": "0.0.0.0:51152"
+    }
+  ],
+  "gossip-endpoint": "0.0.0.0:60001",
+  "gossip-peers": [
+    {
+      "service": "gossip",
+      "endpoint": "0.0.0.0:60002"
+    }
+  ]
+}
