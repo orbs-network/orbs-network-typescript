@@ -2,5 +2,5 @@
 
 pushd .
 cd simulate
-npm run simulate
+npm run simulate $@
 popd

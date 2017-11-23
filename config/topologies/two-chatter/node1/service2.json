@@ -1,8 +1,8 @@
 {
-  "name": "broadcast",
+  "name": "chatter2",
   "version": "2.0.0",
   "endpoint": "0.0.0.0:50052",
-  "project": "transaction-pool-service-typescript",
+  "project": "chatter-service-typescript",
   "peers": [
     {
       "endpoint": "0.0.0.0:50051"

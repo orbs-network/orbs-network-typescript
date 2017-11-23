@@ -9,10 +9,28 @@
     "runtime": "typescript",
     "repo": "https://github.com/orbs-network/common-library-typescript.git"
   },
+  "chatter-service-typescript": {
+    "type": "service",
+    "service": "chatter",
+    "runtime": "typescript",
+    "repo": "https://github.com/orbs-network/chatter-service-typescript.git"
+  },
+  "public-api-service-typescript": {
+    "type": "service",
+    "service": "public-api",
+    "runtime": "typescript",
+    "repo": "https://github.com/orbs-network/public-api-service-typescript.git"
+  },
   "transaction-pool-service-typescript": {
     "type": "service",
     "service": "transaction-pool",
     "runtime": "typescript",
     "repo": "https://github.com/orbs-network/transaction-pool-service-typescript.git"
+  },
+  "gossip-service-typescript": {
+    "type": "service",
+    "service": "gossip",
+    "runtime": "typescript",
+    "repo": "https://github.com/orbs-network/gossip-service-typescript.git"
   }
 }
