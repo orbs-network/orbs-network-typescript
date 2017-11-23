@@ -9,12 +9,13 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "clean": "node src/clean.js",
-    "clone": "node src/clone.js",
+    "clean": "node build/src/clean.js",
+    "clone": "node build/src/clone.js",
     "cleanslate": "npm run clean && npm run clone && npm run build",
-    "build": "node src/build-ts.js",
-    "rebuild": "node src/rebuild-ts.js",
-    "watch": "node src/watch-ts.js"
+    "build": "node build/src/build-ts.js",
+    "rebuild": "node build/src/rebuild-ts.js",
+    "watch": "node build/src/watch-ts.js",
+    "simulate": "node simulate/src/index.js"
   },
   "devDependencies": {
     "colors": "^1.1.2",
