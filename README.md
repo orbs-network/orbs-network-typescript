@@ -33,9 +33,10 @@ This wrapper project will set up a full working environment including all sub pr
 
 > This will start a few services with some chatter:
 
-`./simulate.sh`
+`./simulate.sh two-chatter`
 
 * The network topology for the simulation is found at `./config/topology`.
+* To see the available list of simulations run `./simulate.sh` without an argument.
 
 ## Develop Effectively
 
