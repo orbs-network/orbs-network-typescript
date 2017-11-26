@@ -7,7 +7,7 @@ async function main() {
   for (const projectName in projects) {
     const project = projects[projectName];
     project.path = path.resolve(__dirname, "../../projects/", projectName);
-    if (project.runtime === "typescript") {
+    if (project.runtime === "typescript" || project.runtime === "protobuf") {
       console.log(` * Rebuilding ${projectName}\n`.green);
       shell.cd(project.path);
       shell.exec("./rebuild.sh");
