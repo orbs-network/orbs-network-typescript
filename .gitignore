@@ -27,3 +27,7 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Configuration files
+config/production.json
+config/staging.json
