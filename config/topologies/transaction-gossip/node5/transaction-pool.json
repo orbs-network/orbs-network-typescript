@@ -1,0 +1,16 @@
+{
+  "name": "node5-transaction-pool",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:51552",
+  "project": "transaction-pool-service-typescript",
+  "peers": [
+    {
+      "service": "public-api",
+      "endpoint": "0.0.0.0:51551"
+    },
+    {
+      "service": "gossip",
+      "endpoint": "0.0.0.0:51553"
+    }
+  ]
+}

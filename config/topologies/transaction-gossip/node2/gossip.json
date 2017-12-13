@@ -18,5 +18,5 @@
     }
   ],
   "gossipPort": "60002",
-  "gossipPeers": [ "ws://localhost:60001" ]
+  "gossipPeers": [ "ws://localhost:60001", "ws://localhost:60003", "ws://localhost:60004", "ws://localhost:60005", "ws://localhost:60006"  ]
 }

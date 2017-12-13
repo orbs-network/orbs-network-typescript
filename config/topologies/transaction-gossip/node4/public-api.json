@@ -1,0 +1,20 @@
+{
+  "name": "node4-public-api",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:51451",
+  "project": "public-api-service-typescript",
+  "peers": [
+    {
+      "service": "transaction-pool",
+      "endpoint": "0.0.0.0:51452"
+    },
+    {
+      "service": "gossip",
+      "endpoint": "0.0.0.0:51453"
+    },
+    {
+      "service": "consensus",
+      "endpoint": "0.0.0.0:51454"
+    }
+  ]
+}
