@@ -1,0 +1,13 @@
+import "primitives/all.proto";
+
+service JournalStorage {
+  rpc ClosedBlockReceived (ClosedBlockReceivedInput) returns (ClosedBlockReceivedOutput);
+}
+
+message ClosedBlockReceivedInput {
+  ClosedBlock closedBlock;
+}
+
+message ClosedBlockReceivedOutput {
+  // empty
+}

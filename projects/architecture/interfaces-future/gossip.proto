@@ -1,0 +1,45 @@
+import "primitives/all.proto";
+
+service Gossip {
+  rpc AnnounceTransaction (AnnounceTransactionInput) returns (AnnounceTransactionOutput);
+  rpc TransactionAnnounced (AnnounceTransactionInput) returns (AnnounceTransactionOutput);
+  rpc AnnounceNextBlock (AnnounceNextBlockInput) returns (AnnounceNextBlockOutput);
+  rpc NextBlockAnnounced (AnnounceNextBlockInput) returns (AnnounceNextBlockOutput);
+  rpc AnnounceBlockValidation (AnnounceBlockValidationInput) returns (AnnounceBlockValidationOutput);
+  rpc BlockValidationAnnounced (AnnounceBlockValidationInput) returns (AnnounceBlockValidationInput);
+  rpc AnnounceClosedBlock (AnnounceClosedBlockInput) returns (AnnounceClosedBlockOutput);
+  rpc ClosedBlockAnnounced (AnnounceClosedBlockInput) returns (AnnounceClosedBlockOutput);
+}
+
+message AnnounceTransactionInput {
+  Transaction transaction;
+}
+
+message AnnounceTransactionOutput {
+  // empty
+}
+
+message AnnounceNextBlockInput {
+  Block block;
+}
+
+message AnnounceNextBlockOutput {
+  // empty
+}
+
+message AnnounceBlockValidationInput {
+  BlockId blockId;
+  ClosedBlockSignature validatorSignature;
+}
+
+message AnnounceBlockValidationOutput {
+  // empty
+}
+
+message AnnounceClosedBlockInput {
+  ClosedBlock closedBlock;
+}
+
+message AnnounceClosedBlockOutput {
+  // empty
+}

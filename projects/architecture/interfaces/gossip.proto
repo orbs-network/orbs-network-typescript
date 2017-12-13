@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "primitives/heartbeat.proto";
+import "primitives/transactions.proto";
+
+service Gossip {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+  rpc BroadcastMessage (BroadcastMessageInput) returns (BroadcastMessageOutput);
+  rpc UnicastMessage (UnicastMessageInput) returns (UnicastMessageOutput);
+}
+
+enum Recipient {
+  Gossip = 1;
+  Consensus = 2;
+}
+
+message BroadcastMessageInput {
+  string BroadcastGroup=1;
+  string MessageType=2;
+  bytes Buffer = 3;
+  bool Immediate = 4;
+}
+message BroadcastMessageOutput {
+  // empty
+}
+
+message UnicastMessageInput {
+  string Recipient=1;
+  string BroadcastGroup=2;
+  string MessageType=3;
+  bytes Buffer = 4;
+  bool Immediate = 5;
+}
+message UnicastMessageOutput {
+  // empty
+}

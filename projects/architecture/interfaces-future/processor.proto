@@ -1,0 +1,16 @@
+import "primitives/all.proto";
+
+service Processor {
+  rpc ExecuteContractMethod (ExecuteContractMethodInput) returns (ExecuteContractMethodOutput);
+}
+
+message ExecuteContractMethodInput {
+  ExecutionContext executionContext;
+  ContractMethod contractMethod;
+  MethodArguments methodArguments;
+  Caller caller;
+}
+
+message ExecuteContractMethodOutput {
+  // empty
+}

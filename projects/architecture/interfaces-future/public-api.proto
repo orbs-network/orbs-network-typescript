@@ -1,0 +1,13 @@
+import "primitives/all.proto";
+
+service PublicApi {
+  rpc TransactionReceived (TransactionReceivedInput) returns (TransactionReceivedOutput);
+}
+
+message TransactionReceivedInput {
+  Transaction transaction;
+}
+
+message TransactionReceivedOutput {
+  // empty
+}
