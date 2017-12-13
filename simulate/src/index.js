@@ -1,31 +1,27 @@
 const path = require('path');
 const shell = require('shelljs');
 
+function self(x) {
+  return x;
+}
+
 function getTopologies() {
   const topologiesPath = path.resolve(__dirname, '../../config/topologies');
-  const res = [];
-  shell.ls(topologiesPath).forEach((topology) => {
-    res.push(topology);
-  });
-  return res;
+  return shell.ls(topologiesPath).map(self);
 }
 
 function getNodes(topologyName) {
   const nodesPath = path.resolve(__dirname, '../../config/topologies', topologyName);
-  const res = [];
-  shell.ls(nodesPath).forEach((node) => {
-    res.push(node);
-  });
-  return res;
+  return shell.ls(nodesPath).map(self);
+}
+
+function notConfig(fileName) {
+  return fileName !== "config";
 }
 
 function getServices(topologyName, nodeName) {
   const servicesPath = path.resolve(__dirname, '../../config/topologies', topologyName, nodeName);
-  const res = [];
-  shell.ls(servicesPath).forEach((service) => {
-    res.push(service);
-  });
-  return res;
+  return shell.ls(servicesPath).map(self).filter(notConfig);
 }
 
 function getServiceTopologyConfigPath(topologyName, nodeName, serviceName) {

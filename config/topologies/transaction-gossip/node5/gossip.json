@@ -1,0 +1,22 @@
+{
+  "name": "node5-gossip",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:51553",
+  "project": "gossip-service-typescript",
+  "peers": [
+    {
+      "service": "public-api",
+      "endpoint": "0.0.0.0:51551"
+    },
+    {
+      "service": "transaction-pool",
+      "endpoint": "0.0.0.0:51552"
+    },
+    {
+      "service": "consensus",
+      "endpoint": "0.0.0.0:51554"
+    }
+  ],
+  "gossipPort": "60005",
+  "gossipPeers": [ "ws://localhost:60001", "ws://localhost:60002", "ws://localhost:60003", "ws://localhost:60004", "ws://localhost:60006"  ]
+}
