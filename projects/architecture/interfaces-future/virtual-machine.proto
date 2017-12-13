@@ -1,0 +1,43 @@
+import "primitives/all.proto";
+
+service VirtualMachine {
+  rpc ExecuteBlock (ExecuteBlockInput) returns (ExecuteBlockOutput);
+  rpc ReadStateBlob (ReadStateBlobInput) returns (ReadStateBlobOutput);
+  rpc WriteStateBlob (WriteStateBlobInput) returns (WriteStateBlobOutput);
+  rpc ContractMethodExecutionFinished (ContractMethodExecutionFinishedInput) returns (ContractMethodExecutionFinishedOutput);
+}
+
+message ExecuteBlockInput {
+  Block block;
+}
+
+message ExecuteBlockOutput {
+  StateDiff stateDiff;
+}
+
+message ReadStateBlobInput {
+  ExecutionContext executionContext;
+  BlobId blobId;
+}
+
+message ReadStateBlobOutput {
+  Blob blob;
+}
+
+message WriteStateBlobInput {
+  ExecutionContext executionContext;
+  Blob blob;
+}
+
+message WriteStateBlobOutput {
+  // empty
+}
+
+message ContractMethodExecutionFinishedInput {
+  ExecutionContext executionContext;
+  ExecutionResult result;
+}
+
+message ContractMethodExecutionFinishedOutput {
+  // empty
+}

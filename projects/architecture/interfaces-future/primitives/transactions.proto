@@ -1,0 +1,13 @@
+message TransactionId {
+  bytes hash;
+}
+
+message Transaction {
+  ContractMethodId contractMethodId;
+  MethodArguments methodArguments;
+  TransactionSignature signature;
+}
+
+message TransactionSignature {
+  bytes signature;
+}

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message GossipListenerInput {
+  string FromAddress = 1;
+  string BroadcastGroup = 2; // null for unicast messages
+  string MessageType = 3;
+  bytes Buffer = 4;
+}
+
+message GossipListenerOutput {
+
+}

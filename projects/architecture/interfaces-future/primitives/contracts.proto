@@ -1,0 +1,33 @@
+message ContractId {
+  bytes address;
+}
+
+message MethodId {
+  bytes address;
+}
+
+message ContractMethodId {
+  ContractId contractId;
+  MethodId methodId;
+}
+
+message MethodArguments {
+  // todo
+}
+
+message ContractMethod {
+  ContractMethodId contractMethodId;
+  bytes codeBlob;
+}
+
+message Caller {
+  // todo
+}
+
+message ExecutionContext {
+  bytes hash;
+}
+
+message ExecutionResult {
+  // todo
+}

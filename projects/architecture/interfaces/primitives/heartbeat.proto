@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message GetHeartbeatInput {
+  string requesterName = 1;
+  string requesterVersion = 2;
+}
+
+message GetHeartbeatOutput {
+  string responderName = 1;
+  string responderVersion = 2;
+}

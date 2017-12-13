@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+import "primitives/heartbeat.proto";
+
+service PublicApi {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+}

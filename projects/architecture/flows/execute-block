@@ -1,0 +1,14 @@
+// repeat per transaction
+VirtualMachine: TransactionPool.IsTransactionAlreadyConfirmed
+VirtualMachine: StateStorage.GetImmutableStateBlob
+VirtualMachine: Processor.ExecuteContractMethod
+
+// optional per instruction
+Processor: VirtualMachine.ReadStateBlob
+VirtualMachine: StateStorage.GetMutableStateBlob
+
+// optional per instruction
+Processor: VirtualMachine.WriteStateBlob
+
+// repeat per transaction continued
+VirtualMachine.ContractMethodExecutionFinished

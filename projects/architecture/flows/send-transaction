@@ -1,0 +1,16 @@
+// end-user client
+App: Client.CreateTransaction
+App: Client.SendTransaction
+
+... (public protocol)
+
+// node receiving transaction from client
+PublicApi: PublicApi.TransactionReceived
+PublicApi: TransactionPool.AddNewPendingTransaction
+TransactionPool: Gossip.AnnounceTransaction
+
+... (gossip protocol)
+
+// all other nodes
+Gossip: Gossip.TransactionAnnounced
+Gossip: TransactionPool.AddExistingPendingTransaction
