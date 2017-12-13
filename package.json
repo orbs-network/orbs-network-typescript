@@ -9,9 +9,6 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "clean": "node build/src/clean.js",
-    "clone": "node build/src/clone.js",
-    "cleanslate": "npm run clean && npm run clone && npm run build",
     "build": "node build/src/build-ts.js",
     "rebuild": "node build/src/rebuild-ts.js",
     "watch": "node build/src/watch-ts.js",
