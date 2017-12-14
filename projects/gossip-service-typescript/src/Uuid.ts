@@ -22,15 +22,15 @@ export class Uuid {
   }
 
   static fromString(str: string) {
-    return new Uuid(null, str);
+    return new Uuid(undefined, str);
   }
 
   static fromBuffer(buf: Buffer) {
-    return new Uuid(buf, null);
+    return new Uuid(buf, undefined);
   }
 
   static create() {
-    return new Uuid(null, null);
+    return new Uuid(undefined, undefined);
   }
 
   public toString(): string {
