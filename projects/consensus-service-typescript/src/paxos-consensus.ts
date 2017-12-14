@@ -78,7 +78,7 @@ class Voter {
       Recipient: fromAddress,
       BroadcastGroup: "consensus",
       MessageType: "PaxosPrepareAck",
-      Buffer: encodeObject({MaxBallot: this.committed.get(prepare.slotNumber)}), Immediate: true})
+      Buffer: encodeObject({MaxBallot: this.committed.get(prepare.slotNumber)}), Immediate: true});
   }
 }
 
