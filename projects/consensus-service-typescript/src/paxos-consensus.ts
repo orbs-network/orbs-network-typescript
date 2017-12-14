@@ -1,5 +1,5 @@
 import { types, topology, topologyPeers } from "orbs-common-library";
-import { EventEmitter } from 'typed-event-emitter';
+import { EventEmitter } from "typed-event-emitter";
 
 const PROPOSITION_REJECTED: number = 100;
 let nextSlot = 0;
