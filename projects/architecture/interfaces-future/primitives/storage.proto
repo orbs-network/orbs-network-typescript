@@ -1,0 +1,9 @@
+message BlobId {
+  bytes namespace;
+  bytes address;
+}
+
+message Blob {
+  BlobId blobId;
+  bytes data;
+}

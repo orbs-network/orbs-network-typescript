@@ -1,0 +1,24 @@
+import "primitives/all.proto";
+
+service Consensus {
+  rpc ValidateBlock (ValidateBlockInput) returns (ValidateBlockOutput);
+  rpc BlockValidationReceived (BlockValidationReceivedInput) returns (BlockValidationReceivedOutput);
+}
+
+message ValidateBlockInput {
+  Block block;
+}
+
+message ValidateBlockOutput {
+  // empty
+}
+
+message BlockValidationReceivedInput {
+  BlockId blockId;
+  BlockSignature blockSignature;
+  StateDiffSignature stateDiffSignature;
+}
+
+message BlockValidationReceivedOutput {
+  // empty
+}

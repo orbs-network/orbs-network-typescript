@@ -1,0 +1,63 @@
+{
+  "name": "orbs-common-library",
+  "version": "0.1.0",
+  "description": "orbs-common-library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/common-library-typescript.git"
+  },
+  "author": "Orbs Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "npm run build && npm run watch",
+    "build": "npm run build-ts && npm run tslint",
+    "rebuild": "npm run build-ts",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\"",
+    "test": "jest --forceExit",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
+  },
+  "jest": {
+    "globals": {
+      "__TS_CONFIG__": "tsconfig.json"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
+    },
+    "testMatch": [
+      "**/test/**/*.test.(ts|js)"
+    ],
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "@types/crypto-js": "^3.1.38",
+    "@types/node-forge": "^0.6.11",
+    "bind-decorator": "^1.0.11",
+    "grpc-caller": "^0.3.0",
+    "lodash": "^4.17.4",
+    "mali": "^0.4.0",
+    "nconf": "^0.9.1",
+    "orbs-interfaces": "file:../architecture",
+    "ursa": "^0.9.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^19.2.2",
+    "@types/lodash": "^4.14.63",
+    "@types/nconf": "0.0.35",
+    "@types/node": "^7.0.12",
+    "@types/protobufjs": "^5.0.31",
+    "concurrently": "^3.4.0",
+    "jest": "^19.0.2",
+    "shelljs": "^0.7.7",
+    "ts-jest": "^19.0.8",
+    "tslint": "^5.0.0",
+    "typescript": "^2.4.0"
+  }
+}
