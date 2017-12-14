@@ -82,7 +82,6 @@ class Voter {
   }
 }
 
-
 export default class PaxosConsensus extends EventEmitter {
   gossip: types.GossipClient;
   coordinator: Coordinator;
