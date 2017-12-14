@@ -1,0 +1,31 @@
+import "primitives/all.proto";
+
+service StateStorage {
+  rpc GetImmutableStateBlob (GetImmutableStateBlobInput) returns (GetImmutableStateBlobOutput);
+  rpc GetMutableStateBlob (GetMutableStateBlobInput) returns (GetMutableStateBlobOutput);
+  rpc ClosedBlockReceived (ClosedBlockReceivedInput) returns (ClosedBlockReceivedOutput);
+}
+
+message GetImmutableStateBlobInput {
+  BlobId blobId;
+}
+
+message GetImmutableStateBlobOutput {
+  Blob blob;
+}
+
+message GetMutableStateBlobInput {
+  BlobId blobId;
+}
+
+message GetMutableStateBlobOutput {
+  Blob blob;
+}
+
+message ClosedBlockReceivedInput {
+  ClosedBlock closedBlock;
+}
+
+message ClosedBlockReceivedOutput {
+  // empty
+}

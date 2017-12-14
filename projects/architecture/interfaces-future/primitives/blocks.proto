@@ -1,0 +1,33 @@
+message BlockId {
+  uint64 blockNumber;
+}
+
+message Block {
+  BlockId blockId;
+  repeated Transaction transactions;
+  BlockSignature signature;
+}
+
+message BlockSignature {
+  bytes signature;
+}
+
+message StateDiff {
+  // todo
+  StateDiffSignature signature;
+}
+
+message StateDiffSignature {
+  bytes signature;
+}
+
+message ClosedBlock {
+  Block block;
+  StateDiff stateDiff;
+  repeated ClosedBlockSignature validatorSignatures;
+}
+
+message ClosedBlockSignature {
+  BlockSignature blockSignature;
+  StateDiffSignature stateDiffSignature;
+}

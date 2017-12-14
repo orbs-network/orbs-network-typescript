@@ -1,41 +1,34 @@
 {
   "architecture": {
     "type": "static",
-    "runtime": "protobuf",
-    "repo": "https://github.com/orbs-network/architecture.git"
+    "runtime": "protobuf"
   },
   "common-library-typescript": {
     "type": "library",
-    "runtime": "typescript",
-    "repo": "https://github.com/orbs-network/common-library-typescript.git"
+    "runtime": "typescript"
   },
   "consensus-service-typescript": {
     "type": "library",
-    "runtime": "typescript",
-    "repo": "https://github.com/orbs-network/consensus-service-typescript.git"
+    "runtime": "typescript"
   },
   "chatter-service-typescript": {
     "type": "service",
     "service": "chatter",
-    "runtime": "typescript",
-    "repo": "https://github.com/orbs-network/chatter-service-typescript.git"
+    "runtime": "typescript"
   },
   "public-api-service-typescript": {
     "type": "service",
     "service": "public-api",
-    "runtime": "typescript",
-    "repo": "https://github.com/orbs-network/public-api-service-typescript.git"
+    "runtime": "typescript"
   },
   "transaction-pool-service-typescript": {
     "type": "service",
     "service": "transaction-pool",
-    "runtime": "typescript",
-    "repo": "https://github.com/orbs-network/transaction-pool-service-typescript.git"
+    "runtime": "typescript"
   },
   "gossip-service-typescript": {
     "type": "service",
     "service": "gossip",
-    "runtime": "typescript",
-    "repo": "https://github.com/orbs-network/gossip-service-typescript.git"
+    "runtime": "typescript"
   }
 }

@@ -1,0 +1,30 @@
+// leader node
+Consensus: TransactionPool.GetNextPendingTransactionBatch
+Consensus: Gossip.AnnounceNextBlock
+Consensus: VirtualMachine.ExecuteBlock // see flows/execute-block
+
+... (gossip protocol)
+
+// all other nodes as validators
+Gossip: Gossip.NextBlockAnnounced
+Gossip: Consensus.ValidateBlock
+Consensus: VirtualMachine.ExecuteBlock // see flows/execute-block
+Consensus: Gossip.AnnounceBlockValidation
+
+... (gossip protocol)
+
+// leader node
+Gossip: Gossip.BlockValidationAnnounced
+Gossip: Consensus.BlockValidationReceived
+
+// leader node after enough validations
+Consensus: Gossip.AnnounceClosedBlock
+Consensus: StateStorage.ClosedBlockReceived
+Consensus: JournalStorage.ClosedBlockReceived
+
+... (gossip protocol)
+
+// all other nodes
+Gossip: Gossip.ClosedBlockAnnounced
+Gossip: StateStorage.ClosedBlockReceived
+Gossip: JournalStorage.ClosedBlockReceived

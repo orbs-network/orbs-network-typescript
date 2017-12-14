@@ -1,0 +1,7 @@
+message ClientSecret {
+  bytes privateKey;
+}
+
+message Timestamp {
+  // todo
+}

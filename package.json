@@ -9,9 +9,6 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "clean": "node build/src/clean.js",
-    "clone": "node build/src/clone.js",
-    "cleanslate": "npm run clean && npm run clone && npm run build",
     "build": "node build/src/build-ts.js",
     "rebuild": "node build/src/rebuild-ts.js",
     "watch": "node build/src/watch-ts.js",
@@ -24,7 +21,6 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.5.1",
-    "nodegit": "^0.20.3",
     "shelljs": "^0.7.7"
   }
 }

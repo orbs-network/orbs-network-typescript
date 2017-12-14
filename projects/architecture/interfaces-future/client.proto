@@ -1,0 +1,24 @@
+import "primitives/all.proto";
+
+service Client {
+  rpc CreateTransaction (CreateTransactionInput) returns (CreateTransactionOutput);
+  rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
+}
+
+message CreateTransactionInput {
+  ClientSecret clientSecret;
+  ContractMethodId contractMethodId;
+  MethodArguments methodArguments;
+}
+
+message CreateTransactionOutput {
+  Transaction transaction;
+}
+
+message SendTransactionInput {
+  Transaction transaction;
+}
+
+message SendTransactionOutput {
+  TransactionId transactionId;
+}

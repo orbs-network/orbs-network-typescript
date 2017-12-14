@@ -1,0 +1,41 @@
+import "primitives/all.proto";
+
+service TransactionPool {
+  rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
+  rpc AddExistingPendingTransaction (AddExistingPendingTransactionInput) returns (AddExistingPendingTransactionOutput);
+  rpc GetNextPendingTransactionBatch (GetNextPendingTransactionBatchInput) returns (GetNextPendingTransactionBatchOutput);
+  rpc IsTransactionAlreadyConfirmed (IsTransactionAlreadyConfirmedInput) returns (IsTransactionAlreadyConfirmedOutput);
+}
+
+message AddNewPendingTransactionInput {
+  Transaction transaction;
+}
+
+message AddNewPendingTransactionOutput {
+  // empty
+}
+
+message AddExistingPendingTransactionInput {
+  Transaction transaction;
+  Timestamp timestamp;
+}
+
+message AddExistingPendingTransactionOutput {
+  // empty
+}
+
+message GetNextPendingTransactionBatchInput {
+  int32 limit;
+}
+
+message GetNextPendingTransactionBatchOutput {
+  repeated Transaction transactions;
+}
+
+message IsTransactionAlreadyConfirmedInput {
+  TransactionId transactionId;
+}
+
+message IsTransactionAlreadyConfirmedOutput {
+  bool confirmed;
+}
