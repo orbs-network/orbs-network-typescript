@@ -68,7 +68,7 @@ export class CryptoUtils {
   constructor(nodeKey?: any, networkKeys?: any) {
     if (nodeKey === undefined && networkKeys === undefined) {
       const configDir = `${path.dirname(process.argv[2])}/config`;
-      this.privateKey = base58.decode(fs.readFileSync(`${configDir}/private-key`, "utf8"));
+      this.privateKey = base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
       this.myName = fs.readFileSync(`${configDir}/name`, "utf8").trim();
 
       for (const node of fs.readdirSync(`${configDir}/network`)) {
