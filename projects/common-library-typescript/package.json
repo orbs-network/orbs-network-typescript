@@ -40,12 +40,13 @@
     "@types/crypto-js": "^3.1.38",
     "@types/node-forge": "^0.6.11",
     "bind-decorator": "^1.0.11",
+    "bs58": "^4.0.1",
     "grpc-caller": "^0.3.0",
     "lodash": "^4.17.4",
     "mali": "^0.4.0",
     "nconf": "^0.9.1",
     "orbs-interfaces": "file:../architecture",
-    "ursa": "^0.9.4"
+    "secp256k1": "^3.4.0"
   },
   "devDependencies": {
     "@types/jest": "^19.2.2",

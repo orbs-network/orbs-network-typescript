@@ -4,8 +4,9 @@ import * as fs from "fs";
 import * as assert from "assert";
 import * as path from "path";
 
-const ursa = require("ursa");
 const crypto = require("crypto");
+const ec = require("secp256k1");
+const base58 = require("bs58");
 
 export class QuorumVerifier {
   private promise: Promise<Iterable<string>>;
@@ -56,9 +57,8 @@ export class QuorumVerifier {
   }
 }
 
-type PemFile = string;
-type PrivateKey = any;
-type PublicKey = any;
+type PrivateKey = Buffer;
+type PublicKey = Buffer;
 
 export class CryptoUtils {
   private privateKey: PrivateKey;
@@ -68,19 +68,18 @@ export class CryptoUtils {
   constructor(nodeKey?: any, networkKeys?: any) {
     if (nodeKey === undefined && networkKeys === undefined) {
       const configDir = `${path.dirname(process.argv[2])}/config`;
-      const privateKey: PemFile = fs.readFileSync(`${configDir}/private-key`, "utf8");
-
+      this.privateKey = base58.decode(fs.readFileSync(`${configDir}/private-key`, "utf8"));
       this.myName = fs.readFileSync(`${configDir}/name`, "utf8").trim();
-      this.privateKey = ursa.createPrivateKey(privateKey);
+
       for (const node of fs.readdirSync(`${configDir}/network`)) {
-        const nodeKey: PemFile = fs.readFileSync(`${configDir}/network/${node}`, "utf8");
-        this.nodePublicKeys.set(node, ursa.createPublicKey(nodeKey));
+        const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
+        this.nodePublicKeys.set(node, nodeKey);
       }
       if (! this.nodePublicKeys.has(this.myName)) {
-        this.nodePublicKeys.set(this.myName, ursa.createPublicKey(this.privateKey.toPublicPem()));
+        this.nodePublicKeys.set(this.myName, ec.publicKeyCreate(this.privateKey));
       }
 
-      assert(ursa.matchingPublicKeys(this.privateKey, this.nodePublicKeys.get(this.myName)));
+      assert(ec.publicKeyCreate(this.privateKey).equals(this.nodePublicKeys.get(this.myName)), `public key for node ${this.myName} should match private; ${base58.encode(this.privateKey)}->${base58.encode(ec.publicKeyCreate(this.privateKey))} != ${base58.encode(this.nodePublicKeys.get(this.myName))}`);
     }
   }
 
@@ -90,12 +89,17 @@ export class CryptoUtils {
       return false;
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
-    return publicKey.hashAndVerify("SHA256", dataBuf, signature, "base64");
+    const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
+    console.log(`verifying ${base58.encode(digest)} sig ${signature}`);
+    return ec.verify(digest, base58.decode(signature), publicKey);
   }
 
   public sign(data: Buffer | string): string {
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
-    const signature = this.privateKey.hashAndSign("SHA256", dataBuf, undefined, "base64");
+    const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
+
+    const signature: string = base58.encode(ec.sign(digest, this.privateKey).signature);
+    console.log(`signature for ${data} digest ${base58.encode(digest)} signature ${JSON.stringify(ec.sign(digest, this.privateKey))}`);
     assert(this.verifySignature(this.myName, dataBuf, signature));
     return signature;
   }
