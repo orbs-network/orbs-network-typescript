@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "primitives/heartbeat.proto";
+
+service VirtualMachine {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+  rpc ExecuteTransaction (ExecuteTransactionInput) returns (ExecuteTransactionOutput);
+}
+
+message ExecuteTransactionInput {
+  string contractAddress = 1;
+  string argumentsJson = 2;
+  repeated string prefetchAddresses = 3;
+}
+
+message ExecuteTransactionOutput {
+  bool success = 1;
+  map<string, string> modifiedAddressesJson = 2;
+}

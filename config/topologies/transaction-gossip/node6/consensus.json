@@ -5,16 +5,12 @@
   "project": "consensus-service-typescript",
   "peers": [
     {
-      "service": "public-api",
-      "endpoint": "0.0.0.0:51651"
-    },
-    {
       "service": "gossip",
       "endpoint": "0.0.0.0:51653"
     },
     {
-      "service": "transaction-pool",
-      "endpoint": "0.0.0.0:51652"
+      "service": "virtual-machine",
+      "endpoint": "0.0.0.0:51655"
     }
   ]
 }

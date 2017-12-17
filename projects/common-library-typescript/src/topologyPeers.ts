@@ -25,6 +25,10 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         res.consensus = grpc.consensusClient({ endpoint: peer.endpoint });
         break;
       }
+      case "virtual-machine": {
+        res.virtualMachine = grpc.virtualMachineClient({ endpoint: peer.endpoint });
+        break;
+      }
       default: {
         throw `Undefined peer service: ${peer.service}`;
       }

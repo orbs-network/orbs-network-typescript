@@ -6,6 +6,7 @@ const crypto = new CryptoUtils(undefined, undefined);
 export default class PbftConsensus {
   private leader: string = undefined;
   private gossip = topologyPeers(topology.peers).gossip;
+  private vm = topologyPeers(topology.peers).virtualMachine;
   private pendingTransactions: Map<number, [QuorumVerifier, QuorumVerifier]> = new Map();
   private highestSlotNumber = 0;
 
@@ -35,7 +36,6 @@ export default class PbftConsensus {
   }
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
-    console.log("Handling", messageType);
     switch (messageType) {
       case "Transaction": {
         return await this.proposeChange(<types.Transaction>message);
@@ -90,14 +90,23 @@ export default class PbftConsensus {
     qv.verify(`prepare:${message.slotNumber},${message.txHash}`, message.signer, message.signature);
     if (message.signer === await this.getLeader()) {
       // if the message is sent by the leader (pre-prepare), verify the transaction
-      // ...
-
-      // broadcast prepare
-      this.gossip.broadcastMessage({
-        BroadcastGroup: "consensus",
-        MessageType: "PbftPrepare",
-        Buffer: new Buffer(JSON.stringify(this.createPrepare(message.slotNumber, message.tx, message.txHash))),
-        Immediate: true});
+      const vmResult = await this.vm.executeTransaction({
+        contractAddress: message.tx.contractAddress,
+        argumentsJson: message.tx.argumentsJson,
+        prefetchAddresses: message.tx.prefetchAddresses
+      });
+      if (vmResult.success) {
+        // broadcast prepare
+        this.gossip.broadcastMessage({
+          BroadcastGroup: "consensus",
+          MessageType: "PbftPrepare",
+          Buffer: new Buffer(JSON.stringify(this.createPrepare(message.slotNumber, message.tx, message.txHash))),
+          Immediate: true
+        });
+      }
+      else {
+        console.log("Invalid transaction", message.slotNumber,"- not sending my own prepare");
+      }
     }
 
     // wait for others' verifications
