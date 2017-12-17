@@ -43,6 +43,10 @@ export namespace grpc {
     server("gossip.proto", "Gossip", endpoint, service);
   }
 
+  export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
+    server("vm.proto", "VirtualMachine", endpoint, service);
+  }
+
   export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
     return client("chatter.proto", "Chatter", endpoint);
   }
@@ -61,6 +65,10 @@ export namespace grpc {
 
   export function gossipClient({ endpoint }: { endpoint: string }): types.GossipClient {
     return client("gossip.proto", "Gossip", endpoint);
+  }
+
+  export function virtualMachineClient({ endpoint }: { endpoint: string }): types.VirtualMachineClient {
+    return client("vm.proto", "VirtualMachine", endpoint);
   }
 
 }

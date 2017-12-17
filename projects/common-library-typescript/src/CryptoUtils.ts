@@ -90,7 +90,6 @@ export class CryptoUtils {
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
     const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
-    console.log(`verifying ${base58.encode(digest)} sig ${signature}`);
     return ec.verify(digest, base58.decode(signature), publicKey);
   }
 
@@ -99,7 +98,6 @@ export class CryptoUtils {
     const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
 
     const signature: string = base58.encode(ec.sign(digest, this.privateKey).signature);
-    console.log(`signature for ${data} digest ${base58.encode(digest)} signature ${JSON.stringify(ec.sign(digest, this.privateKey))}`);
     assert(this.verifySignature(this.myName, dataBuf, signature));
     return signature;
   }

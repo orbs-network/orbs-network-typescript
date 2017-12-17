@@ -37,6 +37,7 @@
   },
   "virtual-machine-service-typescript": {
     "type": "service",
-    "service": "virtual-machine"
+    "service": "virtual-machine",
+    "runtime": "typescript"
   }
 }

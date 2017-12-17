@@ -40,10 +40,18 @@ function exportMessage(name, json) {
     if (TYPE_REPLACEMENTS[type]) {
       type = TYPE_REPLACEMENTS[type];
     }
+    if ("keyType" in value) {
+      let keyType = value.keyType;
+      if (TYPE_REPLACEMENTS[keyType]) {
+        keyType = TYPE_REPLACEMENTS[keyType];
+      }
+      type = `Map<${keyType}, ${type}>`;
+    }
     let modifier = "";
     if (_.get(value, "rule") === "repeated") {
       modifier = "[]";
     }
+    // console.log(`  ${key}: ${type}${modifier}; // was: ${JSON.stringify(value)}`);
     console.log(`  ${key}: ${type}${modifier};`);
   });
   console.log(`}`);

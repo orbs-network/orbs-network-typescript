@@ -1,0 +1,8 @@
+{
+  "name": "node6-virtual-machine",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:51655",
+  "project": "virtual-machine-service-typescript",
+  "peers": [
+  ]
+}
