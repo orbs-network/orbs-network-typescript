@@ -22,6 +22,8 @@ message Address {
 
 message Transaction {
   string sender = 1;
+  string contractAddress = 2;
+  string argumentsJson = 3;
   string recipient = 2;
   fixed128 amount = 3;
   string id = 4;

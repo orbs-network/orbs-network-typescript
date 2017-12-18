@@ -1,10 +1,10 @@
 {
-  "name": "orbs-virtual-machine-service",
+  "name": "orbs-state-storage-service",
   "version": "0.1.0",
-  "description": "orbs-virtual-machine-service",
+  "description": "orbs-state-storage-service",
   "repository": {
     "type": "git",
-    "url": "https://github.com/orbs-network/virtual-machine-service-typescript.git"
+    "url": "https://github.com/orbs-network/state-storage-service-typescript.git"
   },
   "author": "Orbs Team",
   "license": "MIT",
