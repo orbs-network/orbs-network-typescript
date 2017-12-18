@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+import "primitives/heartbeat.proto";
+
+service StateStorage {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+  rpc ReadKeys (ReadKeysInput) returns (ReadKeysOutput);
+}
+
+message ReadKeysInput {
+  string address = 1;
+  repeated string keys = 2;
+}
+
+message ReadKeysOutput {
+  map<string, string> values = 1;
+}

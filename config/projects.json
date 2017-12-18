@@ -39,5 +39,10 @@
     "type": "service",
     "service": "virtual-machine",
     "runtime": "typescript"
+  },
+  "state-storage-service-typescript": {
+    "type": "service",
+    "service": "state-storage",
+    "runtime": "typescript"
   }
 }

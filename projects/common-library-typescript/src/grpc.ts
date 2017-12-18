@@ -47,6 +47,10 @@ export namespace grpc {
     server("vm.proto", "VirtualMachine", endpoint, service);
   }
 
+  export function stateStorageServer({ endpoint, service }: { endpoint: string, service: types.StateStorageServer }) {
+    server("state-storage.proto", "StateStorage", endpoint, service);
+  }
+
   export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
     return client("chatter.proto", "Chatter", endpoint);
   }
@@ -69,6 +73,10 @@ export namespace grpc {
 
   export function virtualMachineClient({ endpoint }: { endpoint: string }): types.VirtualMachineClient {
     return client("vm.proto", "VirtualMachine", endpoint);
+  }
+
+  export function stateStorageClient({ endpoint }: { endpoint: string }): types.StateStorageClient {
+    return client("state-storage.proto", "StateStorage", endpoint);
   }
 
 }
