@@ -27,7 +27,6 @@ export default class StateStorageService {
   }
 
   askForHeartbeats() {
-    this.askForHeartbeat(this.peers.publicApi);
     this.askForHeartbeat(this.peers.gossip);
   }
 
