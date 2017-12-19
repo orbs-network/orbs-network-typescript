@@ -1,6 +1,5 @@
-import { topology, topologyPeers, types } from "orbs-common-library";
+import { topology, topologyPeers, types, CryptoUtils } from "orbs-common-library";
 import bind from "bind-decorator";
-import { CryptoUtils } from "../../common-library-typescript/src/CryptoUtils";
 
 export default class PublicApiService {
 

@@ -17,12 +17,13 @@ export default class PbftConsensus {
       this.gossip.unicastMessage({
         Recipient: leader,
         BroadcastGroup: "consensus",
-        MessageType: "Transaction",
-        Buffer: new Buffer(JSON.stringify(tx)),
+        MessageType: "SendTransactionInput",
+        Buffer: new Buffer(JSON.stringify({transaction: tx, transactionAppendi: txAppendix})),
         Immediate: true});
     }
     else {
       // I am the leader
+      console.log("Leader got tx", tx);
       const slotNumber = ++this.highestSlotNumber;
       this.initPending(slotNumber);
       const txHash = crypto.shortHash(`tx:${tx.sender},${tx.contractAddress},${tx.argumentsJson}`);
