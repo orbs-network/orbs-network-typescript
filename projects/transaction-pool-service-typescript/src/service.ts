@@ -17,10 +17,10 @@ export default class TransactionPoolService {
   @bind
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
     console.log(`${topology.name}: addNewPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
-    if (!this.pendingTransactions.has(rpc.req.transaction.id)) {
-      this.pendingTransactions.set(rpc.req.transaction.id, rpc.req.transaction);
-      console.log(`${topology.name}: after adding we have ${this.pendingTransactions.size} pending transactions`);
-    }
+    // if (!this.pendingTransactions.has(rpc.req.transaction.id)) {
+    //   this.pendingTransactions.set(rpc.req.transaction.id, rpc.req.transaction);
+    //   console.log(`${topology.name}: after adding we have ${this.pendingTransactions.size} pending transactions`);
+    // }
     // For example:
     // await this.peers.gossip.announceTransaction({ transaction: rpc.req.transaction });
     rpc.res = {};
@@ -28,11 +28,11 @@ export default class TransactionPoolService {
 
   @bind
   public async addExistingPendingTransaction(rpc: types.AddExistingPendingTransactionContext) {
-    console.log(`${topology.name}: addExistingPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
-    if (!this.pendingTransactions.has(rpc.req.transaction.id)) {
-      this.pendingTransactions.set(rpc.req.transaction.id, rpc.req.transaction);
-      console.log(`${topology.name}: after adding we have ${this.pendingTransactions.size} pending transactions`);
-    }
+    // console.log(`${topology.name}: addExistingPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
+    // if (!this.pendingTransactions.has(rpc.req.transaction.id)) {
+    //   this.pendingTransactions.set(rpc.req.transaction.id, rpc.req.transaction);
+    //   console.log(`${topology.name}: after adding we have ${this.pendingTransactions.size} pending transactions`);
+    // }
     rpc.res = {};
   }
 

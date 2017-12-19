@@ -1,5 +1,6 @@
 import { topology, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
+import { CryptoUtils } from "../../common-library-typescript/src/CryptoUtils";
 
 export default class PublicApiService {
 
@@ -26,17 +27,24 @@ export default class PublicApiService {
   }
 
   async generateRandomTransaction() {
-    const sender = `user${Math.floor((Math.random() * 10) + 1)}`;
-    const recipient = `user${Math.floor((Math.random() * 10) + 1)}`;
+    const senderCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
+    const sender = senderCrypto.getPublicKey();
+    const recipientCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
+    const recipient = recipientCrypto.getPublicKey();
     const amount = {long1: 0, long2: Math.floor((Math.random() * 1000) + 1)};
     const id = `${Math.floor((Math.random() * 1e9))}${Math.floor((Math.random() * 1e9))}`;
-    const signature = {long1: 0, long2: 0, long3: 0, long4: 0};
-    await this.peers.consensus.sendTransaction({ transaction: {sender, recipient, amount, id, signature} });
+    const contractAddress = "0";
+    const argumentsJson: string =  JSON.stringify({recipient, amount, id});
+    const signature = senderCrypto.sign(`tx:${contractAddress},${argumentsJson}`);
+    await this.peers.consensus.sendTransaction({
+      transaction: {sender, contractAddress, argumentsJson, signature},
+      transactionAppendix: {prefetchAddresses: [sender, recipient]}
+    });
   }
 
   async main() {
     this.peers = topologyPeers(topology.peers);
-    // setInterval(() => this.askForHeartbeats(), 5000);
+    setInterval(() => this.askForHeartbeats(), 5000);
     setInterval(() => this.generateRandomTransaction(), Math.ceil(Math.random() * 30000));
   }
 
@@ -44,11 +52,11 @@ export default class PublicApiService {
     console.log(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
     process.on("uncaughtException", (err: Error) => {
-      console.error(`Caught exception: ${err}`);
+      console.error(`${__filename}: Caught exception: ${err}`);
       console.error(err.stack);
     });
     process.on("unhandledRejection", (err: Error) => {
-      console.error(`Unhandled rejection: ${err}`);
+      console.error(`${__filename}: Unhandled rejection: ${err}`);
       console.error(err.stack);
     });
 
