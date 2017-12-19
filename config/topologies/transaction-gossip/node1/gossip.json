@@ -9,10 +9,6 @@
       "endpoint": "0.0.0.0:51151"
     },
     {
-      "service": "transaction-pool",
-      "endpoint": "0.0.0.0:51152"
-    },
-    {
       "service": "consensus",
       "endpoint": "0.0.0.0:51154"
     }

@@ -21,11 +21,6 @@
     "service": "public-api",
     "runtime": "typescript"
   },
-  "transaction-pool-service-typescript": {
-    "type": "service",
-    "service": "transaction-pool",
-    "runtime": "typescript"
-  },
   "gossip-service-typescript": {
     "type": "service",
     "service": "gossip",
