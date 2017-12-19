@@ -4,7 +4,6 @@ import bind from "bind-decorator";
 export default class VirtualMachineService {
 
   peers: types.ClientMap;
-  pendingTransactions = new Map<string, types.Transaction>();
 
   // rpc interface
 
@@ -17,7 +16,7 @@ export default class VirtualMachineService {
   @bind
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
     console.log(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
-    rpc.res = { success: Math.random()>0.1, modifiedAddressesJson: new Map<string,string>() };
+    rpc.res = { success: Math.random() > 0.1, modifiedAddressesJson: new Map<string, string>() };
   }
   // service logic
 
@@ -26,9 +25,11 @@ export default class VirtualMachineService {
     console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
-  askForHeartbeats() {
-    this.askForHeartbeat(this.peers.publicApi);
-    this.askForHeartbeat(this.peers.gossip);
+  async askForHeartbeats() {
+    return await Promise.all([
+      this.askForHeartbeat(this.peers.publicApi),
+      this.askForHeartbeat(this.peers.gossip)
+    ]);
   }
 
   async main() {

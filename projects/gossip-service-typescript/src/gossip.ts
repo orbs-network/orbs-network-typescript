@@ -9,7 +9,7 @@ function stringToBuffer(str: string): Buffer {
   return buf;
 }
 
-const crypto = new CryptoUtils(undefined, undefined);
+const crypto = CryptoUtils.loadFromConfiguration();
 
 
 export default class Gossip {

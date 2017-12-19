@@ -18,7 +18,7 @@ export default class ConsensusService {
   @bind
   public async sendTransaction(rpc: types.SendTransactionContext) {
     console.log(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
-    await this.consensus.proposeChange(rpc.req.transaction);
+    await this.consensus.proposeChange(rpc.req.transaction, rpc.req.transactionAppendix);
     rpc.res = {};
   }
 
@@ -38,11 +38,11 @@ export default class ConsensusService {
     console.log(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
     process.on("uncaughtException", (err: Error) => {
-      console.error(`Caught exception: ${err}`);
+      console.error(`${__filename}: Caught exception: ${err}`);
       console.error(err.stack);
     });
     process.on("unhandledRejection", (err: Error) => {
-      console.error(`Unhandled rejection: ${err}`);
+      console.error(`${__filename}: Unhandled rejection: ${err}`);
       console.error(err.stack);
     });
 

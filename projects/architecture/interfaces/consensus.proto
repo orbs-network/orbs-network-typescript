@@ -12,6 +12,7 @@ service Consensus {
 
 message SendTransactionInput {
   Transaction transaction = 1;
+  TransactionAppendix transactionAppendix = 2;
 }
 
 message SendTransactionOutput {
@@ -51,9 +52,10 @@ message PaxosDecision {
 message PbftPrepare {
     uint64 slotNumber = 1;
     Transaction tx = 2;
-    string txHash = 3;
-    string signer = 4;
-    string signature = 5;
+    TransactionAppendix txAppendix = 3;
+    string txHash = 4;
+    string signer = 5;
+    string signature = 6;
 }
 
 message PbftCommit {

@@ -4,7 +4,6 @@ import bind from "bind-decorator";
 export default class StateStorageService {
 
   peers: types.ClientMap;
-  pendingTransactions = new Map<string, types.Transaction>();
 
   // rpc interface
 

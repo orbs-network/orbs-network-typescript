@@ -1,7 +1,7 @@
 import { types, topology, topologyPeers, QuorumVerifier, CryptoUtils } from "orbs-common-library";
 
 
-const crypto = new CryptoUtils(undefined, undefined);
+const crypto = CryptoUtils.loadFromConfiguration();
 
 export default class PbftConsensus {
   private leader: string = undefined;
@@ -10,7 +10,7 @@ export default class PbftConsensus {
   private pendingTransactions: Map<number, [QuorumVerifier, QuorumVerifier]> = new Map();
   private highestSlotNumber = 0;
 
-  async proposeChange(tx: types.Transaction): Promise<void> {
+  async proposeChange(tx: types.Transaction, txAppendix: types.TransactionAppendix): Promise<void> {
     const leader = await this.getLeader();
     if (leader !== crypto.whoAmI()) {
       // I am not the leader
@@ -25,10 +25,11 @@ export default class PbftConsensus {
       // I am the leader
       const slotNumber = ++this.highestSlotNumber;
       this.initPending(slotNumber);
+      const txHash = crypto.shortHash(`tx:${tx.sender},${tx.contractAddress},${tx.argumentsJson}`);
       this.gossip.broadcastMessage({
         BroadcastGroup: "consensus",
         MessageType: "PbftPrepare",
-        Buffer: new Buffer(JSON.stringify(this.createPrepare(slotNumber, tx, "00000000"))),
+        Buffer: new Buffer(JSON.stringify(this.createPrepare(slotNumber, tx, txAppendix, txHash))),
         Immediate: true
       }); // pre-prepare
 
@@ -38,7 +39,7 @@ export default class PbftConsensus {
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
     switch (messageType) {
       case "Transaction": {
-        return await this.proposeChange(<types.Transaction>message);
+        return await this.proposeChange(message.transaction, message.transactionAppendix);
       }
       case "PbftPrepare": {
         return await this.onPrepare(fromAddress, <types.PbftPrepare>message);
@@ -57,12 +58,12 @@ export default class PbftConsensus {
     }
   }
 
-  private createPrepare(slotNumber: number, tx: types.Transaction, txHash: string): types.PbftPrepare {
+  private createPrepare(slotNumber: number, tx: types.Transaction, txAppendix: types.TransactionAppendix, txHash: string): types.PbftPrepare {
     const signer: string = crypto.whoAmI();
     const verificationString: string = `prepare:${slotNumber},${txHash}`;
     const signature: string = crypto.sign(verificationString);
     this.pendingTransactions.get(slotNumber)[0].verify(verificationString, signer, signature);
-    return {slotNumber, tx, txHash, signer, signature};
+    return {slotNumber, tx, txAppendix, txHash, signer, signature};
   }
 
   private createCommit(slotNumber: number, txHash: string): types.PbftCommit {
@@ -93,19 +94,19 @@ export default class PbftConsensus {
       const vmResult = await this.vm.executeTransaction({
         contractAddress: message.tx.contractAddress,
         argumentsJson: message.tx.argumentsJson,
-        prefetchAddresses: message.tx.prefetchAddresses
+        prefetchAddresses: message.txAppendix.prefetchAddresses
       });
       if (vmResult.success) {
         // broadcast prepare
         this.gossip.broadcastMessage({
           BroadcastGroup: "consensus",
           MessageType: "PbftPrepare",
-          Buffer: new Buffer(JSON.stringify(this.createPrepare(message.slotNumber, message.tx, message.txHash))),
+          Buffer: new Buffer(JSON.stringify(this.createPrepare(message.slotNumber, message.tx, message.txAppendix, message.txHash))),
           Immediate: true
         });
       }
       else {
-        console.log("Invalid transaction", message.slotNumber,"- not sending my own prepare");
+        console.log("Invalid transaction", message.slotNumber, "- not sending my own prepare");
       }
     }
 

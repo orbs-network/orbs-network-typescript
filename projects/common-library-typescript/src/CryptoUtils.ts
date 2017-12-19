@@ -62,25 +62,40 @@ type PublicKey = Buffer;
 
 export class CryptoUtils {
   private privateKey: PrivateKey;
-  private nodePublicKeys: Map<string, PublicKey> = new Map();
+  private nodePublicKeys: Map<string, PublicKey>;
   private myName: string;
 
-  constructor(nodeKey?: any, networkKeys?: any) {
-    if (nodeKey === undefined && networkKeys === undefined) {
-      const configDir = `${path.dirname(process.argv[2])}/config`;
-      this.privateKey = base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
-      this.myName = fs.readFileSync(`${configDir}/name`, "utf8").trim();
+  private constructor(privateKey: PrivateKey, nodePublicKeys: Map<string, PublicKey>, myName: string) {
+    this.privateKey = privateKey;
+    this.nodePublicKeys = new Map(nodePublicKeys);
+    this.myName = myName;
+  }
 
-      for (const node of fs.readdirSync(`${configDir}/network`)) {
-        const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
-        this.nodePublicKeys.set(node, nodeKey);
-      }
-      if (! this.nodePublicKeys.has(this.myName)) {
-        this.nodePublicKeys.set(this.myName, ec.publicKeyCreate(this.privateKey));
-      }
+  public static loadFromConfiguration(): CryptoUtils {
+    const configDir = `${path.dirname(process.argv[2])}/config`;
+    const privateKey: PrivateKey = base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
+    const myName: string = fs.readFileSync(`${configDir}/name`, "utf8").trim();
+    const nodePublicKeys: Map<string, PublicKey> = new Map();
 
-      assert(ec.publicKeyCreate(this.privateKey).equals(this.nodePublicKeys.get(this.myName)), `public key for node ${this.myName} should match private; ${base58.encode(this.privateKey)}->${base58.encode(ec.publicKeyCreate(this.privateKey))} != ${base58.encode(this.nodePublicKeys.get(this.myName))}`);
+    for (const node of fs.readdirSync(`${configDir}/network`)) {
+      const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
+      nodePublicKeys.set(node, nodeKey);
     }
+    if (! nodePublicKeys.has(myName)) {
+      nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
+    }
+
+    assert(ec.publicKeyCreate(privateKey).equals(nodePublicKeys.get(myName)), `public key for node ${myName} should match private; ${base58.encode(privateKey)}->${base58.encode(ec.publicKeyCreate(privateKey))} != ${base58.encode(nodePublicKeys.get(myName))}`);
+    return new CryptoUtils(privateKey, nodePublicKeys, myName);
+  }
+
+  public static initializeTestCrypto(nodeName: string): CryptoUtils {
+    const hash = crypto.createHash("sha256");
+    hash.update(nodeName);
+    const privateKey: PrivateKey = hash.digest();
+    const nodePublicKeys: Map<string, PublicKey> = new Map();
+    nodePublicKeys.set(nodeName, ec.publicKeyCreate(privateKey));
+    return new CryptoUtils(privateKey, nodePublicKeys, nodeName);
   }
 
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
@@ -121,5 +136,9 @@ export class CryptoUtils {
     const hash = crypto.createHash("sha256");
     hash.update(buf);
     return hash.digest("base64");
+  }
+
+  public getPublicKey(): string {
+    return base58.encode(this.nodePublicKeys.get(this.myName));
   }
 }

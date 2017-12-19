@@ -1,32 +1,12 @@
 syntax = "proto3";
 
-message fixed128 {
-    uint64 long1 = 1;
-    uint64 long2 = 2;
-}
-
-message fixed256 {
-    uint64 long1 = 1;
-    uint64 long2 = 2;
-    uint64 long3 = 3;
-    uint64 long4 = 4;
-}
-
-message Address {
-    uint64 long1 = 1;
-    uint64 long2 = 2;
-    uint64 long3 = 3;
-    uint64 long4 = 4;
-}
-
-
 message Transaction {
   string sender = 1;
   string contractAddress = 2;
   string argumentsJson = 3;
-  string recipient = 2;
-  fixed128 amount = 3;
-  string id = 4;
-  fixed256 signature = 5;
+  string signature = 4;
 }
 
+message TransactionAppendix {
+  repeated string prefetchAddresses = 1;
+}
