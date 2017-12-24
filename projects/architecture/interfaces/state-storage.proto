@@ -13,5 +13,5 @@ message ReadKeysInput {
 }
 
 message ReadKeysOutput {
-  map<string, string> values = 1;
+  map<string,string> values = 1;
 }

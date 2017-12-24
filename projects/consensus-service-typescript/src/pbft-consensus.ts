@@ -33,7 +33,6 @@ export default class PbftConsensus {
         Buffer: new Buffer(JSON.stringify(this.createPrepare(slotNumber, tx, txAppendix, txHash))),
         Immediate: true
       }); // pre-prepare
-
     }
   }
 
@@ -94,6 +93,7 @@ export default class PbftConsensus {
       // if the message is sent by the leader (pre-prepare), verify the transaction
       const vmResult = await this.vm.executeTransaction({
         contractAddress: message.tx.contractAddress,
+        sender: message.tx.sender,
         argumentsJson: message.tx.argumentsJson,
         prefetchAddresses: message.txAppendix.prefetchAddresses
       });
@@ -107,7 +107,7 @@ export default class PbftConsensus {
         });
       }
       else {
-        console.log("Invalid transaction", message.slotNumber, "- not sending my own prepare");
+        console.log("Invalid transaction", message.slotNumber, "- cdnot sending my own prepare");
       }
     }
 

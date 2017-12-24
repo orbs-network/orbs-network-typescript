@@ -45,7 +45,7 @@ function exportMessage(name, json) {
       if (TYPE_REPLACEMENTS[keyType]) {
         keyType = TYPE_REPLACEMENTS[keyType];
       }
-      type = `Map<${keyType}, ${type}>`;
+      type = `{[id: ${keyType}]: ${type}}`;
     }
     let modifier = "";
     if (_.get(value, "rule") === "repeated") {

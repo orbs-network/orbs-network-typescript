@@ -1,9 +1,13 @@
 import { topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
+import MemoryKVStore from "./kvstore/memory-kvstore";
+import * as _ from "lodash";
 
 export default class StateStorageService {
 
   peers: types.ClientMap;
+
+  kvstore = new MemoryKVStore();
 
   // rpc interface
 
@@ -16,10 +20,14 @@ export default class StateStorageService {
   @bind
   public async readKeys(rpc: types.ReadKeysContext) {
     console.log(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
-    rpc.res = { values: new Map<string, string>() } ;
+
+    const values = await this.kvstore.getMany(rpc.req.address, rpc.req.keys);
+
+    rpc.res = {values: _.fromPairs([...values])};
+
   }
 
-  // service logic
+    // service logic
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
@@ -27,12 +35,14 @@ export default class StateStorageService {
   }
 
   askForHeartbeats() {
+/*
     this.askForHeartbeat(this.peers.gossip);
+*/
   }
 
   async main() {
     this.peers = topologyPeers(topology.peers);
-    // setInterval(() => this.askForHeartbeats(), 5000);
+    setInterval(() => this.askForHeartbeats(), 5000);
   }
 
   constructor() {
