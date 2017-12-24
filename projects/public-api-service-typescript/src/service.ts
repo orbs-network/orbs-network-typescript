@@ -21,18 +21,24 @@ export default class PublicApiService {
   }
 
   askForHeartbeats() {
-    this.askForHeartbeat(this.peers.transactionPool);
+    // this.askForHeartbeat(this.peers.transactionPool);
     this.askForHeartbeat(this.peers.gossip);
   }
 
   async generateRandomTransaction() {
     const senderCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
     const sender = senderCrypto.getPublicKey();
+
+
     const recipientCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
     const recipient = recipientCrypto.getPublicKey();
-    const amount = {long1: 0, long2: Math.floor((Math.random() * 1000) + 1)};
+    const amount = Math.floor((Math.random() * 1000) + 1);
     const id = `${Math.floor((Math.random() * 1e9))}${Math.floor((Math.random() * 1e9))}`;
     const contractAddress = "0";
+
+    const senderBalanceKey = `${sender}-balance`;
+    const initialSenderBalance = amount + 1;
+
     const argumentsJson: string =  JSON.stringify({recipient, amount, id});
     const signature = senderCrypto.sign(`tx:${contractAddress},${argumentsJson}`);
     await this.peers.consensus.sendTransaction({

@@ -8,12 +8,13 @@ service VirtualMachine {
 }
 
 message ExecuteTransactionInput {
-  string contractAddress = 1;
-  string argumentsJson = 2;
-  repeated string prefetchAddresses = 3;
+  string sender = 1;
+  string contractAddress = 2;
+  string argumentsJson = 3;
+  repeated string prefetchAddresses = 4;
 }
 
 message ExecuteTransactionOutput {
   bool success = 1;
-  map<string, string> modifiedAddressesJson = 2;
+  string modifiedAddressesJson = 2;
 }

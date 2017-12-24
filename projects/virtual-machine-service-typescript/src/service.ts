@@ -1,9 +1,12 @@
 import { topology, grpc, topologyPeers, types } from "orbs-common-library";
+import * as _ from "lodash";
 import bind from "bind-decorator";
 
 export default class VirtualMachineService {
 
   peers: types.ClientMap;
+  private stateStorage = topologyPeers(topology.peers).stateStorage;
+
 
   // rpc interface
 
@@ -16,8 +19,50 @@ export default class VirtualMachineService {
   @bind
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
     console.log(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
-    rpc.res = { success: Math.random() > 0.1, modifiedAddressesJson: new Map<string, string>() };
+
+    const args = JSON.parse(rpc.req.argumentsJson);
+
+    // currently only a "simple" contract type is supported
+    try {
+        const modifiedAddresses = await this.simulateSimpleContract(rpc.req.contractAddress, rpc.req.sender, args);
+        rpc.res = {success: true, modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedAddresses]))};
+    } catch (err) {
+        console.log("simulateSimpleContract() error: " + err);
+        rpc.res = {success: false, modifiedAddressesJson: undefined};
+    }
   }
+
+  async simulateSimpleContract(address: string, sender: string, args: any) {
+
+    const senderBalanceKey =  `${sender}-balance`;
+    const recipientBalanceKey = `${args.recipient}-balance`;
+
+    const {values} = await this.stateStorage.readKeys({address: address, keys: [senderBalanceKey, recipientBalanceKey]});
+
+
+    if (args.amount <= 0) {
+        throw new Error("transaction amount must be > 0");
+    }
+
+    const senderBalance = Number.parseFloat(values.senderBalanceKey) || 0;
+    if (senderBalance < args.amount) {
+        throw new Error(`balance is not sufficient ${senderBalance} < ${args.amount}`);
+    }
+    // TODO: no integer overflow protection
+    // TODO: conversion of float to string is lossy
+
+    const modifiedAddresses = new Map<string, string>();
+    modifiedAddresses.set(senderBalanceKey, (senderBalance + args.amount).toString());
+
+    const recipientBalance = Number.parseFloat(values.recipientBalanceKey) || 0;
+    modifiedAddresses.set(recipientBalanceKey, (recipientBalance - args.amount).toString());
+
+    console.log(`${topology.name}: transaction verified ${sender} -> ${args.recipient}, amount: ${args.amount}`);
+
+    return modifiedAddresses;
+  }
+
+
   // service logic
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
