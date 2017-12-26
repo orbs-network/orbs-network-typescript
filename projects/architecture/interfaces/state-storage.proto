@@ -10,6 +10,7 @@ service StateStorage {
 message ReadKeysInput {
   string address = 1;
   repeated string keys = 2;
+  uint32 lastBlockId = 3;
 }
 
 message ReadKeysOutput {

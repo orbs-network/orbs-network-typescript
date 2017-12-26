@@ -5,7 +5,8 @@ const _ = require("lodash");
 
 const TYPE_REPLACEMENTS = {
   "string": "string",
-  "uint64": "number", // todo: should be Long from https://github.com/dcodeIO/long.js
+  "uint64": "string", // todo: should be Long from https://github.com/dcodeIO/long.js
+  "uint32": "number",
   "bytes": "Buffer",
   "bool": "boolean"
 };

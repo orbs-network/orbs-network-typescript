@@ -7,8 +7,10 @@ export default class PbftConsensus {
   private leader: string = undefined;
   private gossip = topologyPeers(topology.peers).gossip;
   private vm = topologyPeers(topology.peers).virtualMachine;
-  private pendingTransactions: Map<number, [QuorumVerifier, QuorumVerifier]> = new Map();
+  private blockStorage = topologyPeers(topology.peers).blockStorage;
+  private pendingTransactions: Map<number, {qv1: QuorumVerifier, qv2: QuorumVerifier, tx: types.Transaction, modifiedAddressesJson: string}> = new Map();
   private highestSlotNumber = 0;
+  private lastCommittedSlotNumber = 0;
 
   async proposeChange(tx: types.Transaction, txAppendix: types.TransactionAppendix): Promise<void> {
     const leader = await this.getLeader();
@@ -18,7 +20,7 @@ export default class PbftConsensus {
         Recipient: leader,
         BroadcastGroup: "consensus",
         MessageType: "SendTransactionInput",
-        Buffer: new Buffer(JSON.stringify({transaction: tx, transactionAppendi: txAppendix})),
+        Buffer: new Buffer(JSON.stringify({transaction: tx, transactionAppendix: txAppendix})),
         Immediate: true});
     }
     else {
@@ -62,7 +64,7 @@ export default class PbftConsensus {
     const signer: string = crypto.whoAmI();
     const verificationString: string = `prepare:${slotNumber},${txHash}`;
     const signature: string = crypto.sign(verificationString);
-    this.pendingTransactions.get(slotNumber)[0].verify(verificationString, signer, signature);
+    this.pendingTransactions.get(slotNumber).qv1.verify(verificationString, signer, signature);
     return {slotNumber, tx, txAppendix, txHash, signer, signature};
   }
 
@@ -70,34 +72,41 @@ export default class PbftConsensus {
     const signer: string = crypto.whoAmI();
     const verificationString: string = `commit:${slotNumber}`;
     const signature: string = crypto.sign(verificationString);
-    this.pendingTransactions.get(slotNumber)[1].verify(verificationString, signer, signature);
+    this.pendingTransactions.get(slotNumber).qv2.verify(verificationString, signer, signature);
     return {slotNumber, signer, signature};
   }
 
   private initPending(slotNumber: number) {
     if (! this.pendingTransactions.has(slotNumber)) {
-      this.pendingTransactions.set(slotNumber,
-        [
-          crypto.quorumVerifier(2.0 / 3.0, 1, 5000),
-          crypto.quorumVerifier(2.0 / 3.0, 1, 10000)
-        ]);
+      this.pendingTransactions.set(slotNumber,  {
+          qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 5000),
+          qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 10000),
+          tx: undefined,
+          modifiedAddressesJson: undefined
+      });
     }
   }
 
   private async onPrepare(fromAddress: string, message: types.PbftPrepare) {
     this.initPending(message.slotNumber);
 
-    const qv = this.pendingTransactions.get(message.slotNumber)[0];
-    qv.verify(`prepare:${message.slotNumber},${message.txHash}`, message.signer, message.signature);
+    const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
+
+    pendingTransaction.qv1.verify(`prepare:${message.slotNumber},${message.txHash}`, message.signer, message.signature);
     if (message.signer === await this.getLeader()) {
       // if the message is sent by the leader (pre-prepare), verify the transaction
       const vmResult = await this.vm.executeTransaction({
         contractAddress: message.tx.contractAddress,
         sender: message.tx.sender,
         argumentsJson: message.tx.argumentsJson,
-        prefetchAddresses: message.txAppendix.prefetchAddresses
+        prefetchAddresses: message.txAppendix.prefetchAddresses,
+        lastBlockId: this.lastCommittedSlotNumber
       });
       if (vmResult.success) {
+        // store modified addressess
+        pendingTransaction.tx = message.tx;
+        pendingTransaction.modifiedAddressesJson = vmResult.modifiedAddressesJson;
+
         // broadcast prepare
         this.gossip.broadcastMessage({
           BroadcastGroup: "consensus",
@@ -112,7 +121,7 @@ export default class PbftConsensus {
     }
 
     // wait for others' verifications
-    if (await qv.awaitFirst()) {
+    if (await pendingTransaction.qv1.awaitFirst()) {
       // Got sufficient quorum; broadcast commit
       this.gossip.broadcastMessage({
         BroadcastGroup: "consensus",
@@ -124,9 +133,23 @@ export default class PbftConsensus {
   }
 
   private async onCommit(fromAddress: string, message: types.PbftCommit) {
-    const qv = this.pendingTransactions.get(message.slotNumber)[1];
-    await qv.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
-    console.log("Writing transaction to log: ", message);
+    const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
+    const {qv2, tx, modifiedAddressesJson} = pendingTransaction;
+
+    const verified = await qv2.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
+
+    if (verified && message.slotNumber > this.lastCommittedSlotNumber && tx != undefined) {
+      console.log("Writing transaction to log: ", message);
+      await this.blockStorage.addBlock({
+          block: {
+              tx: tx,
+              modifiedAddressesJson: modifiedAddressesJson,
+              id: message.slotNumber,
+              prevBlockId: this.lastCommittedSlotNumber
+          }
+      });
+      this.lastCommittedSlotNumber = message.slotNumber;
+    }
   }
 
   private async getLeader(): Promise<string> {
