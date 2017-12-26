@@ -20,29 +20,29 @@ message SendTransactionOutput {
 }
 
 message PaxosPropose {
-  uint64 slotNumber = 1;
+  uint32 slotNumber = 1;
   Transaction tx = 2;
 }
 
 message PaxosPrepare {
-  uint64 slotNumber = 1;
-  uint64 ballotNumber = 2;
+  uint32 slotNumber = 1;
+  uint32 ballotNumber = 2;
 }
 
 message PaxosPrepareAck {
-  uint64 maxBallot = 1;
-  uint64 slot = 2;
+  uint32 maxBallot = 1;
+  uint32 slot = 2;
   Transaction tx = 3;
 }
 
 message PaxosAccept {
-  uint64 ballotNumber = 1;
-  uint64 slot = 2;
+  uint32 ballotNumber = 1;
+  uint32 slot = 2;
   Transaction tx = 3;
 }
 
 message PaxosAcceptAck {
-  uint64 maxBallot = 1;
+  uint32 maxBallot = 1;
 }
 
 message PaxosDecision {
@@ -50,7 +50,7 @@ message PaxosDecision {
 }
 
 message PbftPrepare {
-    uint64 slotNumber = 1;
+    uint32 slotNumber = 1;
     Transaction tx = 2;
     TransactionAppendix txAppendix = 3;
     string txHash = 4;
@@ -59,7 +59,7 @@ message PbftPrepare {
 }
 
 message PbftCommit {
-    uint64 slotNumber = 1;
+    uint32 slotNumber = 1;
     // fixed64 txHash = 2;
     string signer = 3;
     string signature = 4;

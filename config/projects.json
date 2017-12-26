@@ -39,5 +39,11 @@
     "type": "service",
     "service": "state-storage",
     "runtime": "typescript"
+  },
+  "block-storage-service-typescript": {
+    "type": "service",
+    "service": "block-storage",
+    "runtime": "typescript"
   }
+
 }

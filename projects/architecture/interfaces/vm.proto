@@ -12,6 +12,7 @@ message ExecuteTransactionInput {
   string contractAddress = 2;
   string argumentsJson = 3;
   repeated string prefetchAddresses = 4;
+  uint32 lastBlockId = 5;
 }
 
 message ExecuteTransactionOutput {

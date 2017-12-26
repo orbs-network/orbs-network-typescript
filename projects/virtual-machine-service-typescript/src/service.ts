@@ -24,27 +24,29 @@ export default class VirtualMachineService {
 
     // currently only a "simple" contract type is supported
     try {
-        const modifiedAddresses = await this.simulateSimpleContract(rpc.req.contractAddress, rpc.req.sender, args);
+        const modifiedAddresses = await this.executeTestContract(rpc.req.contractAddress, rpc.req.sender, rpc.req.lastBlockId, args);
         rpc.res = {success: true, modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedAddresses]))};
     } catch (err) {
-        console.log("simulateSimpleContract() error: " + err);
+        console.log("executeTestContract() error: " + err);
         rpc.res = {success: false, modifiedAddressesJson: undefined};
     }
   }
 
-  async simulateSimpleContract(address: string, sender: string, args: any) {
-
+  async executeTestContract(address: string, sender: string, lastBlockId: number, args: any) {
     const senderBalanceKey =  `${sender}-balance`;
     const recipientBalanceKey = `${args.recipient}-balance`;
 
-    const {values} = await this.stateStorage.readKeys({address: address, keys: [senderBalanceKey, recipientBalanceKey]});
-
+    const {values} = await this.stateStorage.readKeys({
+        address: address,
+        keys: [senderBalanceKey, recipientBalanceKey],
+        lastBlockId: lastBlockId
+    });
 
     if (args.amount <= 0) {
         throw new Error("transaction amount must be > 0");
     }
 
-    const senderBalance = Number.parseFloat(values.senderBalanceKey) || 0;
+    const senderBalance = Math.random() * 1000; // Number.parseFloat(values.senderBalanceKey) || 0;
     if (senderBalance < args.amount) {
         throw new Error(`balance is not sufficient ${senderBalance} < ${args.amount}`);
     }
@@ -52,10 +54,10 @@ export default class VirtualMachineService {
     // TODO: conversion of float to string is lossy
 
     const modifiedAddresses = new Map<string, string>();
-    modifiedAddresses.set(senderBalanceKey, (senderBalance + args.amount).toString());
+    modifiedAddresses.set(senderBalanceKey, (senderBalance - args.amount).toString());
 
     const recipientBalance = Number.parseFloat(values.recipientBalanceKey) || 0;
-    modifiedAddresses.set(recipientBalanceKey, (recipientBalance - args.amount).toString());
+    modifiedAddresses.set(recipientBalanceKey, (recipientBalance + args.amount).toString());
 
     console.log(`${topology.name}: transaction verified ${sender} -> ${args.recipient}, amount: ${args.amount}`);
 

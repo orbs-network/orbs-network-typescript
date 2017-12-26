@@ -33,6 +33,10 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         res.stateStorage = grpc.stateStorageClient({ endpoint: peer.endpoint });
         break;
       }
+      case "block-storage": {
+        res.blockStorage = grpc.blockStorageClient({ endpoint: peer.endpoint });
+        break;
+      }
       default: {
         throw `Undefined peer service: ${peer.service}`;
       }

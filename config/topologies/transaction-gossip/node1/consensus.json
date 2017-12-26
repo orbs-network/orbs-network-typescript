@@ -11,6 +11,10 @@
     {
       "service": "virtual-machine",
       "endpoint": "0.0.0.0:51155"
+    },
+    {
+      "service": "block-storage",
+      "endpoint": "0.0.0.0:51157"
     }
   ]
 }
