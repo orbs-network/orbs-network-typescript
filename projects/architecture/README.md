@@ -45,7 +45,7 @@
   * `VirtualMachine` - Owns execution of smart contracts and holds the transient state for a pre-final execution.
     * `Processor` - The actual runtime environments for a smart contract in various languages (Python / JS / etc).
   * `StateStorage` - Holds all state (mutable and immutable) updated for the latest closed block.
-  * `JournalStorage` - Holds incremental long-term storage used to generate the state (all past closed blocks).
+  * `BlockStorage` - Holds incremental long-term storage used to generate the state (all past closed blocks).
   * `TimeSync` - Synchronizes clocks, required to run on every machine that runs       *TransactionPool* or *Consensus*.
 
 ## Libraries
