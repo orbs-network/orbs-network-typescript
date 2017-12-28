@@ -82,7 +82,7 @@
     <th style="width:16%;borders:none;background:green;font-weight:100">Layer III<br>blockchain</th>
   </tr>
   <tr>
-    <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black">JournalStorage</td>
+    <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black">BlockStorage</td>
     <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black" colspan="3">StateStorage</td>
     <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black" class="not-implemented">SidechainConnector</td>
     <th style="width:16%;borders:none;background:green;font-weight:100">Layer II<br>high-level storage</th>
