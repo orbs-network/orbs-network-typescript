@@ -15,7 +15,6 @@
     "build": "npm run build-ts && npm run tslint",
     "rebuild": "npm run build-ts",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\"",
-    "test": "jest --forceExit",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
@@ -33,15 +32,12 @@
     "secp256k1": "^3.4.0"
   },
   "devDependencies": {
-    "@types/jest": "^19.2.2",
     "@types/lodash": "^4.14.63",
     "@types/nconf": "0.0.35",
     "@types/node": "^7.0.12",
     "@types/protobufjs": "^5.0.31",
     "concurrently": "^3.4.0",
-    "jest": "^19.0.2",
     "shelljs": "^0.7.7",
-    "ts-jest": "^19.0.8",
     "tslint": "^5.0.0",
     "typescript": "^2.4.0"
   }

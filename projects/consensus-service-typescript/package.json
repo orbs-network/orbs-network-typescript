@@ -14,7 +14,6 @@
     "rebuild": "npm run build-ts",
     "serve": "nodemon dist/index.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve\"",
-    "test": "jest --forceExit",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -30,16 +29,13 @@
     "typescript-collections": "^1.2.5"
   },
   "devDependencies": {
-    "@types/jest": "^19.2.2",
     "@types/lodash": "^4.14.63",
     "@types/node": "^7.0.12",
     "@types/supertest": "^2.0.0",
     "concurrently": "^3.4.0",
-    "jest": "^19.0.2",
     "nodemon": "^1.11.0",
     "shelljs": "^0.7.7",
     "supertest": "^2.0.1",
-    "ts-jest": "^19.0.8",
     "tslint": "^5.0.0",
     "typescript": "^2.4.0"
   }
