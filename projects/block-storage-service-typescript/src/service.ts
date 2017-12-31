@@ -2,18 +2,20 @@ import { topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import * as _ from "lodash";
 
+
+// TODO: support a head block which refers to a NULL prev block
+const DEFAULT_GENESIS_BLOCK: types.Block = {
+    id: 0,
+    prevBlockId: -1,
+    tx: {contractAddress: "0", sender: "", signature: "", argumentsJson: "{}"},
+    modifiedAddressesJson: "{}"
+};
+
 export default class BlockStorageService {
 
   peers: types.ClientMap;
 
-  genesisBlock: types.Block = {
-      id: 0,
-      prevBlockId: -1,
-      tx: {contractAddress: "0", sender: "", signature: "", argumentsJson: "{}"},
-      modifiedAddressesJson: "{}"
-  };
-
-  storedBlocks: types.Block[];
+  storedBlocks: types.Block[] = [DEFAULT_GENESIS_BLOCK];
 
   // rpc interface
 
@@ -62,7 +64,6 @@ export default class BlockStorageService {
 
   async main() {
     this.peers = topologyPeers(topology.peers);
-    this.storedBlocks = [this.genesisBlock];
     setInterval(() => this.askForHeartbeats(), 5000);
   }
 
