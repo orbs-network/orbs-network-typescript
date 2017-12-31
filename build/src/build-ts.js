@@ -1,23 +1,23 @@
-const path = require("path");
-const shell = require("shelljs");
-const projects = require("../../config/projects.json");
-require("colors");
+const path = require('path');
+const shell = require('shelljs');
+const projects = require('../../config/projects.json');
+require('colors');
 
 async function main() {
-  for (const projectName in projects) {
+  Object.keys(projects).forEach((projectName) => {
     const project = projects[projectName];
-    project.path = path.resolve(__dirname, "../../projects/", projectName);
-    if (project.runtime === "typescript" || project.runtime === "protobuf") {
+    const projectPath = path.resolve(__dirname, '../../projects/', projectName);
+    if (project.runtime === 'typescript' || project.runtime === 'protobuf') {
       console.log(`* Building ${projectName}\n`.green);
-      shell.cd(project.path);
-      var shellStringOutput = shell.exec("./build.sh");
-      if (shellStringOutput.code !== 0)  {
-        console.error(`Error ${shellStringOutput.code} in ${project.path}\n`.red);
-        return;
-      };
+      shell.cd(projectPath);
+      const shellStringOutput = shell.exec('./build.sh');
+      if (shellStringOutput.code !== 0) {
+        console.error(`Error ${shellStringOutput.code} in ${projectPath}\n`.red);
+      }
     }
-  }
-  console.log(" * Done\n".green);
+  });
+
+  console.log(' * Done\n'.green);
 }
 
 main();
