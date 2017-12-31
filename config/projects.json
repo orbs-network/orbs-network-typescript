@@ -36,6 +36,11 @@
     "service": "state-storage",
     "type": "service"
   },
+  "transaction-pool-service-typescript": {
+    "runtime": "typescript",
+    "service": "transaction-pool",
+    "type": "service"
+  },
   "virtual-machine-service-typescript": {
     "runtime": "typescript",
     "service": "virtual-machine",
