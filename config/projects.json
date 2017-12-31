@@ -26,10 +26,6 @@
     "service": "gossip",
     "runtime": "typescript"
   },
-  "processor-service-typescript": {
-    "type": "service",
-    "service": "processor"
-  },
   "virtual-machine-service-typescript": {
     "type": "service",
     "service": "virtual-machine",
