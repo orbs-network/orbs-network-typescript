@@ -1,44 +1,44 @@
 {
   "architecture": {
-    "type": "static",
-    "runtime": "protobuf"
-  },
-  "common-library-typescript": {
-    "type": "library",
-    "runtime": "typescript"
-  },
-  "consensus-service-typescript": {
-    "type": "library",
-    "runtime": "typescript"
-  },
-  "chatter-service-typescript": {
-    "type": "service",
-    "service": "chatter",
-    "runtime": "typescript"
-  },
-  "public-api-service-typescript": {
-    "type": "service",
-    "service": "public-api",
-    "runtime": "typescript"
-  },
-  "gossip-service-typescript": {
-    "type": "service",
-    "service": "gossip",
-    "runtime": "typescript"
-  },
-  "virtual-machine-service-typescript": {
-    "type": "service",
-    "service": "virtual-machine",
-    "runtime": "typescript"
-  },
-  "state-storage-service-typescript": {
-    "type": "service",
-    "service": "state-storage",
-    "runtime": "typescript"
+    "runtime": "protobuf",
+    "type": "static"
   },
   "block-storage-service-typescript": {
-    "type": "service",
+    "runtime": "typescript",
     "service": "block-storage",
-    "runtime": "typescript"
+    "type": "service"
+  },
+  "chatter-service-typescript": {
+    "runtime": "typescript",
+    "service": "chatter",
+    "type": "service"
+  },
+  "common-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "consensus-service-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "gossip-service-typescript": {
+    "runtime": "typescript",
+    "service": "gossip",
+    "type": "service"
+  },
+  "public-api-service-typescript": {
+    "runtime": "typescript",
+    "service": "public-api",
+    "type": "service"
+  },
+  "state-storage-service-typescript": {
+    "runtime": "typescript",
+    "service": "state-storage",
+    "type": "service"
+  },
+  "virtual-machine-service-typescript": {
+    "runtime": "typescript",
+    "service": "virtual-machine",
+    "type": "service"
   }
 }
