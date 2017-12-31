@@ -16,7 +16,7 @@ function getNodes(topologyName) {
 }
 
 function notConfig(fileName) {
-  return fileName !== "config";
+  return fileName !== 'config';
 }
 
 function getServices(topologyName, nodeName) {
@@ -29,7 +29,7 @@ function getServiceTopologyConfigPath(topologyName, nodeName, serviceName) {
 }
 
 function showUsage() {
-  console.log(`Usage: simulate <topology-name>`);
+  console.log('Usage: simulate <topology-name>');
   console.log(`Available topologies: ${getTopologies()}`);
   console.log();
 }
@@ -38,7 +38,7 @@ function runService(topologyPath) {
   const topology = require(topologyPath);
   const projectPath = path.resolve(__dirname, '../../projects/', topology.project);
   shell.cd(projectPath);
-  shell.exec(`node dist/index.js ${topologyPath}`, {async: true});
+  shell.exec(`node dist/index.js ${topologyPath}`, { async: true });
 }
 
 function runTopology(topologyName) {
