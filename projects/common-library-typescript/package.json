@@ -20,8 +20,6 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "@types/crypto-js": "^3.1.38",
-    "@types/node-forge": "^0.6.11",
     "bind-decorator": "^1.0.11",
     "bs58": "^4.0.1",
     "grpc-caller": "^0.3.0",
@@ -32,9 +30,11 @@
     "secp256k1": "^3.4.0"
   },
   "devDependencies": {
+    "@types/crypto-js": "^3.1.38",
     "@types/lodash": "^4.14.63",
     "@types/nconf": "0.0.35",
     "@types/node": "^7.0.12",
+    "@types/node-forge": "^0.6.11",
     "@types/protobufjs": "^5.0.31",
     "concurrently": "^3.4.0",
     "shelljs": "^0.7.7",
