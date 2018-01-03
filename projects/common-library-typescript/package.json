@@ -27,7 +27,8 @@
     "mali": "^0.4.0",
     "nconf": "^0.9.1",
     "orbs-interfaces": "file:../architecture",
-    "secp256k1": "^3.4.0"
+    "secp256k1": "^3.4.0",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
     "@types/crypto-js": "^3.1.38",
@@ -36,6 +37,7 @@
     "@types/node": "^7.0.12",
     "@types/node-forge": "^0.6.11",
     "@types/protobufjs": "^5.0.31",
+    "@types/winston": "^2.3.7",
     "concurrently": "^3.4.0",
     "shelljs": "^0.7.7",
     "tslint": "^5.0.0",
