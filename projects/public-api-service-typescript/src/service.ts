@@ -1,4 +1,4 @@
-import { topology, topologyPeers, types, CryptoUtils } from "orbs-common-library";
+import { logger, topology, topologyPeers, types, CryptoUtils } from "orbs-common-library";
 import bind from "bind-decorator";
 
 export default class PublicApiService {
@@ -9,7 +9,7 @@ export default class PublicApiService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
@@ -17,7 +17,7 @@ export default class PublicApiService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
@@ -54,7 +54,7 @@ export default class PublicApiService {
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
     process.on("uncaughtException", (err: Error) => {
       console.error(`${__filename}: Caught exception: ${err}`);
