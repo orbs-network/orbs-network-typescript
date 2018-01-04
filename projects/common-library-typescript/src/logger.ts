@@ -17,6 +17,9 @@ export class Logger {
   private _logger: winston.LoggerInstance;
 
   constructor() {
+    // Create the directory, if it does not exist.
+    this.mkdir();
+
     this._logger = new winston.Logger({
       level: this.getLogLevel(),
       transports: [
@@ -51,6 +54,13 @@ export class Logger {
     return this._logger.error(msg, ...meta);
   }
 
+  private mkdir(): void {
+    // Create the directory, if it does not exist.
+    const logsDir = Logger.resolvePath(path.dirname(this.getFileName()));
+    if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir);
+    }
+  }
 
   private static resolvePath(pathname: string): string {
     return path.resolve(path.join("../../", pathname));
