@@ -1,6 +1,7 @@
-import config from "./config";
+import { config } from "./config";
 import * as winston from "winston";
 import * as path from "path";
+import * as fs from "fs";
 
 export class Logger {
   public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
