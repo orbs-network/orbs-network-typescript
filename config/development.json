@@ -1,6 +1,6 @@
 {
   "logger": {
-    "level": "info",
+    "level": "debug",
     "fileName": "logs/development.log",
     "maxSize": 1024000,
     "maxFiles": 4
