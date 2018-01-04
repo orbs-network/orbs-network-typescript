@@ -1,5 +1,5 @@
 import * as WebSocket from "ws";
-import { topology, topologyPeers } from "orbs-common-library";
+import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
 
 function stringToBuffer(str: string): Buffer {
@@ -35,7 +35,7 @@ export default class Gossip {
 
     ws.on("terminate", () => {
       if (remoteAddress) {
-        console.log("*** remote", remoteAddress, "disconnected.");
+        logger.info("*** remote", remoteAddress, "disconnected.");
         this.clients.delete(remoteAddress);
       }
     });
@@ -55,7 +55,7 @@ export default class Gossip {
         // 'hello' message
         remoteAddress = sender;
         this.clients.set(sender, ws);
-        console.log("Registering connection", this.localAddress, "->", sender);
+        logger.info("Registering connection", this.localAddress, "->", sender);
         return;
       }
       const [recipient, broadcastGroup, objectType, objectRaw] = [readString(message), readString(message), readString(message), message.slice(offset)];
