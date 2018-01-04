@@ -1,4 +1,4 @@
-import { topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
@@ -12,13 +12,13 @@ export default class VirtualMachineService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
-    console.log(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
+    logger.info(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
 
     const args = JSON.parse(rpc.req.argumentsJson);
 
@@ -27,7 +27,7 @@ export default class VirtualMachineService {
         const modifiedAddresses = await this.executeTestContract(rpc.req.contractAddress, rpc.req.sender, rpc.req.lastBlockId, args);
         rpc.res = {success: true, modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedAddresses]))};
     } catch (err) {
-        console.log("executeTestContract() error: " + err);
+      logger.error("executeTestContract() error: " + err);
         rpc.res = {success: false, modifiedAddressesJson: undefined};
     }
   }
@@ -59,17 +59,16 @@ export default class VirtualMachineService {
     const recipientBalance = Number.parseFloat(values.recipientBalanceKey) || 0;
     modifiedAddresses.set(recipientBalanceKey, (recipientBalance + args.amount).toString());
 
-    console.log(`${topology.name}: transaction verified ${sender} -> ${args.recipient}, amount: ${args.amount}`);
+    logger.info(`${topology.name}: transaction verified ${sender} -> ${args.recipient}, amount: ${args.amount}`);
 
     return modifiedAddresses;
   }
-
 
   // service logic
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   async askForHeartbeats() {
@@ -85,8 +84,7 @@ export default class VirtualMachineService {
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
   }
-
 }

@@ -1,3 +1,4 @@
+import { logger } from "orbs-common-library";
 import BaseKVStore from "./base-kvstore";
 
 export default class MemoryKVStore extends BaseKVStore  {
@@ -39,7 +40,7 @@ export default class MemoryKVStore extends BaseKVStore  {
     setSync(contractAddress: string, key: string, value: string) {
         const mapKey = this.generateMapKeyString(contractAddress, key);
         this.storeMap.set(mapKey, value);
-        console.log(`stored ${contractAddress}.${key} with value ${value}`);
+        logger.info(`stored ${contractAddress}.${key} with value ${value}`);
     }
 
     generateMapKeyString(contractAddress: string, key: string) {
