@@ -21,7 +21,7 @@ export class Logger {
       level: this.getLogLevel(),
       transports: [
         new winston.transports.File({
-          filename: path.resolve(path.join("../../", this.getFileName())),
+          filename: path.resolve(Logger.resolvePath(this.getFileName())),
           maxsize: this.getMaxSize(),
           maxFiles: this.getMaxFiles(),
           prettyPrint: true,
@@ -49,6 +49,11 @@ export class Logger {
 
   public readonly error: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
     return this._logger.error(msg, ...meta);
+  }
+
+
+  private static resolvePath(pathname: string): string {
+    return path.resolve(path.join("../../", pathname));
   }
 
   private getLogLevel(): string {
