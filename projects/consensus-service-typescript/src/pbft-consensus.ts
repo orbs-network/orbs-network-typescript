@@ -1,5 +1,4 @@
-import { types, topology, topologyPeers, QuorumVerifier, CryptoUtils } from "orbs-common-library";
-
+import { logger, types, topology, topologyPeers, QuorumVerifier, CryptoUtils } from "orbs-common-library";
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
@@ -25,7 +24,7 @@ export default class PbftConsensus {
     }
     else {
       // I am the leader
-      console.log("Leader got tx", tx);
+      logger.info("Leader got tx", tx);
       const slotNumber = ++this.highestSlotNumber;
       this.initPending(slotNumber);
       const txHash = crypto.shortHash(`tx:${tx.sender},${tx.contractAddress},${tx.argumentsJson}`);
@@ -116,7 +115,7 @@ export default class PbftConsensus {
         });
       }
       else {
-        console.log("Invalid transaction", message.slotNumber, "- cdnot sending my own prepare");
+        logger.error("Invalid transaction", message.slotNumber, "- cdnot sending my own prepare");
       }
     }
 
@@ -139,7 +138,7 @@ export default class PbftConsensus {
     const verified = await qv2.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
 
     if (verified && message.slotNumber > this.lastCommittedSlotNumber && tx != undefined) {
-      console.log("Writing transaction to log: ", message);
+      logger.info("Writing transaction to log: ", message);
       await this.blockStorage.addBlock({
           block: {
               tx: tx,

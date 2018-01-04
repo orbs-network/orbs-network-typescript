@@ -1,4 +1,4 @@
-import { topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import Gossip from "./gossip";
 import bind from "bind-decorator";
 
@@ -11,20 +11,20 @@ export default class GossipService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    console.log(`${topology.name}: broadcastMessage ${JSON.stringify(rpc.req)}`);
+    logger.info(`${topology.name}: broadcastMessage ${JSON.stringify(rpc.req)}`);
     this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
 
   @bind
   public async unicastMessage(rpc: types.UnicastMessageContext) {
-    console.log(`${topology.name}: unicastMessage ${JSON.stringify(rpc.req)}`);
+    logger.info(`${topology.name}: unicastMessage ${JSON.stringify(rpc.req)}`);
     this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
@@ -33,7 +33,7 @@ export default class GossipService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
@@ -55,12 +55,10 @@ export default class GossipService {
       console.error(`${__filename}: Unhandled rejection: ${err}`);
       console.error(err.stack);
     });
-
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
   }
-
 }
