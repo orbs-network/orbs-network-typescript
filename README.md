@@ -44,7 +44,7 @@ This wrapper project will set up a full working environment including all sub pr
     "maxFiles": 4,
     "logzio": {
       "enabled": false,
-      "apiKey" API_KEY
+      "apiKey": "API_KEY"
     }
   }
 }
