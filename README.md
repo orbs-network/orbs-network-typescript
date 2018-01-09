@@ -11,6 +11,45 @@ This wrapper project will set up a full working environment including all sub pr
 * Make sure you have node 8+ and npm 5+ installed before building.
 * This command will delete `./projects` so make sure all changes are committed.
 
+## Configuration
+
+> You can use the exported `Config` singleton, from the `common-library-typescript` library, in order to access the configuration key-value store. As a convention, it'll look for the configuration file based on the environment type:
+
+* Development (default): `config/development.json`.
+* Test (`NODE_ENV=test`): `config/test.json`.
+* Staging/Production (`NODE_ENV=production`): `config/production.json`.
+
+### Configuration Keys
+
+#### `logger`
+
+> Global logger configuration:
+
+* `level`: The level of messages that should be logged. Possible values are: `debug`, `info`, `warn`, `error`. Default is `info`.
+* `fileName`: The filename of the log file to write the output to. Default is `logs/default.log`.
+* `maxSize`: The max size (in bytes) of the log file. If the size is exceeded then a new file is created and a counter will become a suffix of the log file. Default is `10MB`.
+* `maxFiles`: The limit of the number of files created when the size of the log file is exceeded. Default is `10`.
+* `logzio`: Logz.io configuration:
+  * `enabled`: Whether shipping logs to Logz.io should be enabled.
+  * `apiKey`: The Logz.io API key (i.e., account token).
+
+> For example:
+
+```json
+{
+  "logger": {
+    "level": "debug",
+    "fileName": "logs/development.log",
+    "maxSize": 1024000,
+    "maxFiles": 4,
+    "logzio": {
+      "enabled": false,
+      "apiKey" API_KEY
+    }
+  }
+}
+```
+
 ## Build (slow)
 
 > Run when you made a big change in one of the sub projects and you want to fully build all of them:
