@@ -28,7 +28,8 @@
     "nconf": "^0.9.1",
     "orbs-interfaces": "file:../architecture",
     "secp256k1": "^3.4.0",
-    "winston": "^2.4.0"
+    "winston": "^2.4.0",
+    "winston-logzio": "^1.0.6"
   },
   "devDependencies": {
     "@types/crypto-js": "^3.1.38",
