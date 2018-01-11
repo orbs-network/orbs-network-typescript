@@ -3,6 +3,9 @@
     "level": "debug",
     "fileName": "logs/development.log",
     "maxSize": 1024000,
-    "maxFiles": 4
+    "maxFiles": 4,
+    "logzio": {
+      "enabled": false
+    }
   }
 }

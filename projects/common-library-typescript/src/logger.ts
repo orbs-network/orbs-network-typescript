@@ -1,5 +1,6 @@
 import { config } from "./config";
 import * as winston from "winston";
+import * as winstonLogzioTransport from "winston-logzio";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -7,12 +8,17 @@ export class Logger {
   public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
   public static readonly DEFAULT_LOG_LEVEL = "info";
   public static readonly DEFAULT_FILE_NAME = "logs/default.log";
-  public static readonly DEFAULT_MAX_SIZE = 10 * 1024 * 1000;
+  public static readonly DEFAULT_MAX_SIZE = 10 * 1024 * 1024;
   public static readonly DEFAULT_MAX_FILES = 20;
-  private static readonly CONFIG_LOG_LEVEL = "logger:level";
-  private static readonly CONFIG_FILE_NAME = "logger:fileName";
-  private static readonly CONFIG_MAX_SIZE = "logger:maxSize";
-  private static readonly CONFIG_MAX_FILES = "logger:maxFiles";
+  private static readonly CONFIG_LOG = "logger";
+  private static readonly CONFIG_LOG_LEVEL = `${Logger.CONFIG_LOG}:level`;
+  private static readonly CONFIG_FILE_NAME = `${Logger.CONFIG_LOG}:fileName`;
+  private static readonly CONFIG_MAX_SIZE = `${Logger.CONFIG_LOG}:maxSize`;
+  private static readonly CONFIG_MAX_FILES = `${Logger.CONFIG_LOG}:maxFiles`;
+  private static readonly CONFIG_LOGZIO = `${Logger.CONFIG_LOG}:logzio`;
+  private static readonly CONFIG_LOGZIO_ENABLED = `${Logger.CONFIG_LOGZIO}:enabled`;
+  private static readonly CONFIG_LOGZIO_API_KEY = `${Logger.CONFIG_LOGZIO}:apiKey`;
+  private static readonly LOGZIO_HOST = "listener.logz.io";
 
   private _logger: winston.LoggerInstance;
 
@@ -33,9 +39,13 @@ export class Logger {
       ]
     });
 
+    // Enable console output, during development.
     if (config.isDevelopment()) {
       this.enableConsole();
     }
+
+    // Enable log shipping to Logz.io (according to the configuration).
+    this.enableLogzio();
   }
 
   public readonly debug: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
@@ -91,6 +101,22 @@ export class Logger {
       json: false,
       colorize: true,
       timestamp: true
+    });
+  }
+
+  private enableLogzio(): void {
+    if (!config.get(Logger.CONFIG_LOGZIO_ENABLED)) {
+      return;
+    }
+
+    const apiKey: string = config.get(Logger.CONFIG_LOGZIO_API_KEY);
+    if (!apiKey) {
+      throw new Error("Missing API key!");
+    }
+
+    this._logger.add(winstonLogzioTransport, {
+      token: apiKey,
+      host: Logger.LOGZIO_HOST,
     });
   }
 }
