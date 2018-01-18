@@ -44,6 +44,6 @@ export default class MemoryKVStore extends BaseKVStore  {
 
     generateMapKeyString(contractAddress: string, key: string) {
         // TODO: not sure this approach gurarantees uniqueness of the key. insecure!
-        return [contractAddress, key].join(".");
+        return [contractAddress, key].join("|");
     }
 }

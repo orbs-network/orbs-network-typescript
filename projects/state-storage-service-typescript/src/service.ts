@@ -1,4 +1,4 @@
-import { topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { topology, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import MemoryKVStore from "./kvstore/memory-kvstore";
 import * as _ from "lodash";
@@ -23,12 +23,14 @@ export default class StateStorageService {
   public async readKeys(rpc: types.ReadKeysContext) {
     console.log(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
-    // TODO: wait until last block keys are processed
-    await this.waitForBlockState(rpc.req.lastBlockId);
+    if (rpc.req.lastBlockId)
+      await this.waitForBlockState(rpc.req.lastBlockId.value);
 
     const values = await this.kvstore.getMany(rpc.req.address, rpc.req.keys);
 
     rpc.res = {values: _.fromPairs([...values])};
+
+    console.log(`${topology.name}: readKeys returning ${JSON.stringify(rpc.res)}`);
 
   }
 

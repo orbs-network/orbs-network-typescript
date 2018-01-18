@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "primitives/heartbeat.proto";
+import "primitives/wrappers.proto";
 
 service StateStorage {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
@@ -10,7 +11,7 @@ service StateStorage {
 message ReadKeysInput {
   string address = 1;
   repeated string keys = 2;
-  uint32 lastBlockId = 3;
+  UInt32Value lastBlockId = 3;
 }
 
 message ReadKeysOutput {
