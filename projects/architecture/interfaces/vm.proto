@@ -5,6 +5,7 @@ import "primitives/heartbeat.proto";
 service VirtualMachine {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc ExecuteTransaction (ExecuteTransactionInput) returns (ExecuteTransactionOutput);
+  rpc CallContract (CallContractInput) returns (CallContractOutput);
 }
 
 message ExecuteTransactionInput {
@@ -18,4 +19,14 @@ message ExecuteTransactionInput {
 message ExecuteTransactionOutput {
   bool success = 1;
   string modifiedAddressesJson = 2;
+}
+
+message CallContractInput {
+  string sender = 1;
+  string contractAddress = 2;
+  string argumentsJson = 3;
+}
+
+message CallContractOutput {
+  string resultJson = 1;
 }

@@ -1,12 +1,13 @@
 import { topology, grpc, topologyPeers, types } from "orbs-common-library";
 import * as _ from "lodash";
 import bind from "bind-decorator";
+import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 
 export default class VirtualMachineService {
 
   peers: types.ClientMap;
   private stateStorage = topologyPeers(topology.peers).stateStorage;
-
+  processor: HardCodedSmartContractProcessor;
 
   // rpc interface
 
@@ -20,48 +21,33 @@ export default class VirtualMachineService {
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
     console.log(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
 
-    const args = JSON.parse(rpc.req.argumentsJson);
-
-    // currently only a "simple" contract type is supported
-    try {
-        const modifiedAddresses = await this.executeTestContract(rpc.req.contractAddress, rpc.req.sender, rpc.req.lastBlockId, args);
-        rpc.res = {success: true, modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedAddresses]))};
-    } catch (err) {
-        console.log("executeTestContract() error: " + err);
-        rpc.res = {success: false, modifiedAddressesJson: undefined};
-    }
-  }
-
-  async executeTestContract(address: string, sender: string, lastBlockId: number, args: any) {
-    const senderBalanceKey =  `${sender}-balance`;
-    const recipientBalanceKey = `${args.recipient}-balance`;
-
-    const {values} = await this.stateStorage.readKeys({
-        address: address,
-        keys: [senderBalanceKey, recipientBalanceKey],
-        lastBlockId: lastBlockId
+    const modifiedKeys = await this.processor.processTransaction({
+      sender: rpc.req.sender,
+      contractAddress: rpc.req.contractAddress,
+      lastBlockId: rpc.req.lastBlockId,
+      argumentsJson: rpc.req.argumentsJson
     });
 
-    if (args.amount <= 0) {
-        throw new Error("transaction amount must be > 0");
-    }
+    rpc.res = {
+      success: true, // TODO: why do we need a success param?
+      modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedKeys].map(
+        ([{contractAddress, key}, value]) => [key, value])))
+    };
+  }
 
-    const senderBalance = Math.random() * 1000; // Number.parseFloat(values.senderBalanceKey) || 0;
-    if (senderBalance < args.amount) {
-        throw new Error(`balance is not sufficient ${senderBalance} < ${args.amount}`);
-    }
-    // TODO: no integer overflow protection
-    // TODO: conversion of float to string is lossy
+  @bind
+  public async callContract(rpc: types.CallContractContext) {
+    console.log(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
 
-    const modifiedAddresses = new Map<string, string>();
-    modifiedAddresses.set(senderBalanceKey, (senderBalance - args.amount).toString());
+    const result = await this.processor.call({
+      sender: rpc.req.sender,
+      contractAddress: rpc.req.contractAddress,
+      argumentsJson: rpc.req.argumentsJson
+    });
 
-    const recipientBalance = Number.parseFloat(values.recipientBalanceKey) || 0;
-    modifiedAddresses.set(recipientBalanceKey, (recipientBalance + args.amount).toString());
-
-    console.log(`${topology.name}: transaction verified ${sender} -> ${args.recipient}, amount: ${args.amount}`);
-
-    return modifiedAddresses;
+    rpc.res = {
+      resultJson: JSON.stringify(result)
+    };
   }
 
 
@@ -81,6 +67,7 @@ export default class VirtualMachineService {
 
   async main() {
     this.peers = topologyPeers(topology.peers);
+    this.processor = new HardCodedSmartContractProcessor(this.stateStorage);
     // setInterval(() => this.askForHeartbeats(), 5000);
   }
 

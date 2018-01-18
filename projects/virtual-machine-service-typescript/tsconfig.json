@@ -2,6 +2,10 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
+    "types": [
+      "mocha",
+      "node"
+    ],
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
@@ -18,5 +22,8 @@
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.spec.*"    
   ]
 }
