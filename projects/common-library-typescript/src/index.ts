@@ -1,3 +1,5 @@
+export * from "./config";
+export * from "./logger";
 export * from "./topology";
 export * from "./grpc";
 export * from "./topologyPeers";

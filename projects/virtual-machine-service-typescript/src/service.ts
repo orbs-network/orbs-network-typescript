@@ -1,4 +1,4 @@
-import { topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import * as _ from "lodash";
 import bind from "bind-decorator";
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
@@ -13,26 +13,32 @@ export default class VirtualMachineService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
-    console.log(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
+    logger.info(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
 
-    const modifiedKeys = await this.processor.processTransaction({
-      sender: rpc.req.sender,
-      contractAddress: rpc.req.contractAddress,
-      lastBlockId: rpc.req.lastBlockId,
-      argumentsJson: rpc.req.argumentsJson
-    });
 
-    rpc.res = {
-      success: true, // TODO: why do we need a success param?
-      modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedKeys].map(
-        ([{contractAddress, key}, value]) => [key, value])))
-    };
+    // currently only a "simple" contract type is supported
+    try {
+      const modifiedKeys = await this.processor.processTransaction({
+        sender: rpc.req.sender,
+        contractAddress: rpc.req.contractAddress,
+        lastBlockId: rpc.req.lastBlockId,
+        argumentsJson: rpc.req.argumentsJson
+      });
+      rpc.res = {
+        success: true,
+        modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedKeys].map(
+          ([{contractAddress, key}, value]) => [key, value])))
+      };
+    } catch (err) {
+      logger.error("processTransaction() error: " + err);
+      rpc.res = {success: false, modifiedAddressesJson: undefined};
+    }
   }
 
   @bind
@@ -50,12 +56,11 @@ export default class VirtualMachineService {
     };
   }
 
-
   // service logic
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   async askForHeartbeats() {
@@ -72,8 +77,7 @@ export default class VirtualMachineService {
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
   }
-
 }

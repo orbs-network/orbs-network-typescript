@@ -1,4 +1,4 @@
-import { topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import * as _ from "lodash";
 
@@ -12,7 +12,6 @@ const DEFAULT_GENESIS_BLOCK: types.Block = {
 };
 
 export default class BlockStorageService {
-
   peers: types.ClientMap;
 
   storedBlocks: types.Block[] = [DEFAULT_GENESIS_BLOCK];
@@ -21,7 +20,7 @@ export default class BlockStorageService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
@@ -35,7 +34,7 @@ export default class BlockStorageService {
       }
 
       this.storedBlocks.push(block);
-      console.log("Added new block. stored blocks:", this.storedBlocks);
+      logger.info("Added new block. stored blocks:", this.storedBlocks);
   }
 
   @bind
@@ -44,7 +43,7 @@ export default class BlockStorageService {
 
       rpc.res = {blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex)};
 
-      // console.log(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
+      // logger.info(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
 
   }
 
@@ -52,7 +51,7 @@ export default class BlockStorageService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
@@ -68,8 +67,7 @@ export default class BlockStorageService {
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
   }
-
 }

@@ -25,6 +25,7 @@ bower_components
 .history
 .vscode
 *.iml
+.vscode
 
 # OS metadata
 .DS_Store
