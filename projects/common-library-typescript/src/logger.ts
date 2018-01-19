@@ -114,7 +114,7 @@ export class Logger {
       throw new Error("Missing API key!");
     }
 
-    this._logger.add(winstonLogzioTransport, {
+    this._logger.add(winston.transports.Logzio, {
       token: apiKey,
       host: Logger.LOGZIO_HOST,
     });
