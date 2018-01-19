@@ -43,7 +43,7 @@ export default class VirtualMachineService {
 
   @bind
   public async callContract(rpc: types.CallContractContext) {
-    console.log(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
+    logger.info(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
 
     const result = await this.processor.call({
       sender: rpc.req.sender,
