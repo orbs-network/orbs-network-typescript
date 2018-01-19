@@ -1,4 +1,4 @@
-import { types, topology, topologyPeers } from "orbs-common-library";
+import { logger, types, topology, topologyPeers } from "orbs-common-library";
 import { EventEmitter } from "typed-event-emitter";
 
 const PROPOSITION_REJECTED: number = 100;
@@ -47,7 +47,7 @@ class Coordinator {
 
   async propose(slotNumber: number, tx: types.Transaction) {
     const proposedBallotNumber = ++this.highestBallotNumber;
-    console.log("Proposed", proposedBallotNumber);
+    logger.info("Proposed", proposedBallotNumber);
     await new Promise(
       (resolve, reject) => {
         this.pendingSlots.set(slotNumber, new CoordinatorPendingSlot(tx, resolve, reject));

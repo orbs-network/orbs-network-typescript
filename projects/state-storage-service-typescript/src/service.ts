@@ -1,4 +1,4 @@
-import { topology, topologyPeers, types } from "orbs-common-library";
+import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import MemoryKVStore from "./kvstore/memory-kvstore";
 import * as _ from "lodash";
@@ -15,13 +15,13 @@ export default class StateStorageService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async readKeys(rpc: types.ReadKeysContext) {
-    console.log(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
+    logger.info(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
     if (rpc.req.lastBlockId)
       await this.waitForBlockState(rpc.req.lastBlockId.value);
@@ -29,9 +29,6 @@ export default class StateStorageService {
     const values = await this.kvstore.getMany(rpc.req.address, rpc.req.keys);
 
     rpc.res = {values: _.fromPairs([...values])};
-
-    console.log(`${topology.name}: readKeys returning ${JSON.stringify(rpc.res)}`);
-
   }
 
   async waitForBlockState(blockId: number, timeout = 5000) {
@@ -53,7 +50,7 @@ export default class StateStorageService {
     // service logic
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   async pollBlockStorage() {
@@ -88,8 +85,7 @@ export default class StateStorageService {
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
   }
-
 }
