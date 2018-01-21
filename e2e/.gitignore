@@ -13,6 +13,9 @@ logs
 results
 tmp
 
+#Build
+public/css/main.css
+
 # API keys and secrets
 .env
 
@@ -22,14 +25,11 @@ bower_components
 
 # Editors
 .idea
-.history
-.vscode
 *.iml
 
 # OS metadata
 .DS_Store
 Thumbs.db
 
-# Configuration files
-config/production.json
-config/staging.json
+# Ignore built ts files
+dist/**/*

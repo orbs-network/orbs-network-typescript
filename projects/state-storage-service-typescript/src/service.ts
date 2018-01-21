@@ -23,8 +23,8 @@ export default class StateStorageService {
   public async readKeys(rpc: types.ReadKeysContext) {
     logger.info(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
-    // TODO: wait until last block keys are processed
-    await this.waitForBlockState(rpc.req.lastBlockId);
+    if (rpc.req.lastBlockId)
+      await this.waitForBlockState(rpc.req.lastBlockId.value);
 
     const values = await this.kvstore.getMany(rpc.req.address, rpc.req.keys);
 
