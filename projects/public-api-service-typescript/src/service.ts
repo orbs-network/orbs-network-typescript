@@ -25,32 +25,31 @@ export default class PublicApiService {
     this.askForHeartbeat(this.peers.gossip);
   }
 
-  async generateRandomTransaction() {
-    const senderCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
-    const sender = senderCrypto.getPublicKey();
+  @bind
+  async sendTransaction(rpc: types.SendTransactionContext) {
+    console.log(`${topology.name}: send transaction ${JSON.stringify(rpc.req)}`);
 
+    await this.peers.consensus.sendTransaction(rpc.req);
+  }
 
-    const recipientCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
-    const recipient = recipientCrypto.getPublicKey();
-    const amount = Math.floor((Math.random() * 1000) + 1);
-    const id = `${Math.floor((Math.random() * 1e9))}${Math.floor((Math.random() * 1e9))}`;
-    const contractAddress = "0";
-
-    const senderBalanceKey = `${sender}-balance`;
-    const initialSenderBalance = amount + 1;
-
-    const argumentsJson: string =  JSON.stringify({recipient, amount, id});
-    const signature = senderCrypto.sign(`tx:${contractAddress},${argumentsJson}`);
-    await this.peers.consensus.sendTransaction({
-      transaction: {sender, contractAddress, argumentsJson, signature},
-      transactionAppendix: {prefetchAddresses: [sender, recipient]}
+  @bind
+  async call(rpc: types.CallContext) {
+    const {resultJson} = await this.peers.virtualMachine.callContract({
+      sender: rpc.req.sender,
+      argumentsJson: rpc.req.argumentsJson,
+      contractAddress: rpc.req.contractAddress
     });
+
+    console.log(`${topology.name}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
+
+    rpc.res = {
+      resultJson: resultJson
+    };
   }
 
   async main() {
     this.peers = topologyPeers(topology.peers);
     setInterval(() => this.askForHeartbeats(), 5000);
-    setInterval(() => this.generateRandomTransaction(), Math.ceil(Math.random() * 30000));
   }
 
   constructor() {

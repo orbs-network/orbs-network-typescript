@@ -11,6 +11,10 @@
     {
       "service": "consensus",
       "endpoint": "0.0.0.0:51454"
+    },
+    {
+      "service": "virtual-machine",
+      "endpoint": "0.0.0.0:51455"
     }
   ]
 }

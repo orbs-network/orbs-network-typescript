@@ -22,11 +22,13 @@
   "dependencies": {
     "bind-decorator": "^1.0.11",
     "bs58": "^4.0.1",
+    "grpc": "^1.8.4",
     "grpc-caller": "^0.3.0",
     "lodash": "^4.17.4",
-    "mali": "^0.4.0",
+    "mali": "git+https://github.com/malijs/mali.git#v0.6.0",
     "nconf": "^0.9.1",
     "orbs-interfaces": "file:../architecture",
+    "protobufjs": "^6.8.4",
     "secp256k1": "^3.4.0",
     "winston": "^2.4.0",
     "winston-logzio": "^1.0.6"

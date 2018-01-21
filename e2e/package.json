@@ -1,11 +1,7 @@
 {
-  "name": "orbs-virtual-machine-service",
+  "name": "orbs-e2e",
   "version": "0.1.0",
-  "description": "orbs-virtual-machine-service",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/orbs-network/virtual-machine-service-typescript.git"
-  },
+  "description": "Orbs end-to-end tests",
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
@@ -14,7 +10,7 @@
     "rebuild": "npm run build-ts",
     "serve": "nodemon dist/index.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve\"",
-    "test": "ts-mocha src/test/**/*.spec.ts",
+    "test": "ts-mocha src/*.spec.ts",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
@@ -22,19 +18,40 @@
     "serve-debug": "nodemon --inspect dist/index.js",
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
+  "jest": {
+    "globals": {
+      "__TS_CONFIG__": "tsconfig.json"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
+    },
+    "testMatch": [
+      "**/test/**/*.test.(ts|js)"
+    ],
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "bind-decorator": "^1.0.11",
-    "lodash": "^4.17.4",
-    "orbs-common-library": "file:../common-library-typescript"
+    "bluebird": "^3.5.1",
+    "orbs-common-library": "file:../projects/common-library-typescript",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.19",
     "@types/chai": "^4.1.0",
+    "@types/expect": "^1.20.2",
     "@types/lodash": "^4.14.63",
     "@types/mocha": "^2.2.46",
-    "@types/node": "^7.0.12",
+    "@types/node": "^7.0.52",
     "@types/supertest": "^2.0.0",
+    "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
     "concurrently": "^3.4.0",
+    "jest": "^19.0.2",
     "mocha": "^4.1.0",
     "nodemon": "^1.11.0",
     "shelljs": "^0.7.7",
