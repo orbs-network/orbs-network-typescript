@@ -1,6 +1,7 @@
 FROM node:9-alpine
 
-RUN apk --no-cache add bash python build-base
+RUN apk --no-cache add bash git
+# python build-base
 # remove python and build-base when grpc-prebuilt will be up again
 
 ADD . /opt/orbs
