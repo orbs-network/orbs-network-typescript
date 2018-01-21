@@ -22,8 +22,6 @@ export default class BarSmartContract extends BaseSmartContract {
     }
 
     public async initBalance(account: string, amount: number) {
-        // if (this.sender != BarSmartContract.SUPERUSER)
-        //     throw new Error("Not a super user");
         this.setBalance(account, amount);
     }
 
@@ -43,6 +41,4 @@ export default class BarSmartContract extends BaseSmartContract {
     private getAccountBalanceKey(account: string) {
         return `balances.${account}`;
     }
-
-
 }
