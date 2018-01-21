@@ -1,0 +1,3 @@
+basic-simulation:
+  build: .
+  command: node simulate/src/index.js transaction-gossip
