@@ -5,7 +5,7 @@ import { types } from "orbs-common-library";
 export default class EthereumConnector {
     private web3;
 
-    public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterace, parameters: Object[], block?: Block) {
+    public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[], block?: Block) {
         if (block == undefined)
             block = await this.getEarlierBlock();
 

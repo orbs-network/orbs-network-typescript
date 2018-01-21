@@ -13,7 +13,7 @@ message EthereumFunctionParameter {
     string type = 2;
 }
 
-message EthereumFunctionInterace {
+message EthereumFunctionInterface {
     string name = 1;
     repeated EthereumFunctionParameter inputs = 2;
     repeated EthereumFunctionParameter outputs = 3;
@@ -21,7 +21,7 @@ message EthereumFunctionInterace {
 
 message CallEthereumContractInput {
   string contractAddress = 1;
-  EthereumFunctionInterace functionInterface = 2;
+  EthereumFunctionInterface functionInterface = 2;
   repeated string parameters = 3;
 // string blockNumber = 5;
 }
