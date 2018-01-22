@@ -1,3 +1,3 @@
-#!/bin/bash -e
+#!/usr/bin/env bash -e
 
 npm run build
