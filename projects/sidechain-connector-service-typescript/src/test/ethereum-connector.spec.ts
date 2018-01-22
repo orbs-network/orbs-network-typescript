@@ -65,10 +65,8 @@ describe("Ethereum connector", () => {
             it("should return the value passed to the contract constructor", () => {
                 expect(res).to.own.property("result", randomInt.toString());
             });
-            it("should return a valid block", () => {
+            it("should return a valid block with a recent timestamp", () => {
                 expect(res.block).to.exist;
-            });
-            it("should have a very recent timestamp (from last 10 min)", () => {
                 expect(res.block).to.own.property("timestamp");
                 const now = Date.now() / 1000;
                 expect(res.block.timestamp).to.be.gt(now - 600);
