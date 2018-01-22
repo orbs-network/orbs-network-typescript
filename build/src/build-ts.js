@@ -4,7 +4,7 @@ const projects = require('../../config/projects.json');
 require('colors');
 
 async function main() {
-  Object.keys(projects).forEach((projectName) => {
+  projects.order.forEach((projectName) => {
     const project = projects[projectName];
     const projectPath = path.resolve(__dirname, '../../projects/', projectName);
     if (project.runtime === 'typescript' || project.runtime === 'protobuf') {

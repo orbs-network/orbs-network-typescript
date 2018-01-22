@@ -10,7 +10,7 @@
     },
     {
       "service": "consensus",
-      "endpoint": "0.0.0.0:51254"
+      "endpoint": "0.0.0.0:51154"
     },
     {
       "service": "virtual-machine",

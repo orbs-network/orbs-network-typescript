@@ -1,0 +1,5 @@
+basic-simulation:
+  build: .
+  command: node simulate/src/index.js transaction-gossip
+#  volumes:
+#    - ./config:/opt/orbs/config
