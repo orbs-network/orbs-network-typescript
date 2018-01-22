@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -e
+#!/bin/bash -e
 
 npm link ../architecture
 # needs unsafe permissions to install node grpc extensions

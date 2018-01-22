@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -e
+#!/bin/bash -e
 
 npm link ../common-library-typescript
 npm install
