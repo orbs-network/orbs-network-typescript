@@ -1,0 +1,3 @@
+orbs-network:
+  image: 506367651493.dkr.ecr.us-west-2.amazonaws.com/orbs-network:master
+  mem_limit: 2147483648
