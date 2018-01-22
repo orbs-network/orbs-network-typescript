@@ -1,11 +1,17 @@
 import { topology, topologyPeers, types, logger } from "orbs-common-library";
 import bind from "bind-decorator";
 import EthereumConnector from "./ethereum-connector";
+import { SidechainConnectorClient } from "../../architecture/dist/index";
+
+export interface SidechainConnectorServiceOptions {
+  ethereumNodeHttpAddress?: string;
+}
 
 export default class SidechainConnectorService {
 
   peers: types.ClientMap;
   ethereumConnector: EthereumConnector;
+  options: SidechainConnectorServiceOptions;
 
   // rpc interface
 
@@ -36,13 +42,20 @@ export default class SidechainConnectorService {
       };
   }
 
+  private createEthereumConnector(): EthereumConnector {
+    const address = this.options.ethereumNodeHttpAddress || "http://localhost:8545";
+    logger.info(`setting up connector to ethereum node on address ${address}`);
+    return EthereumConnector.createHttpConnector(address);
+  }
+
   async main() {
     this.peers = topologyPeers(topology.peers);
-    this.ethereumConnector = EthereumConnector.createHttpConnector("http://localhost:8545"); // TODO: should not be hard-coded
+    this.ethereumConnector = this.createEthereumConnector();
     setInterval(() => this.askForHeartbeats(), 5000);
   }
 
-  constructor() {
+  constructor(options: SidechainConnectorServiceOptions = {}) {
+    this.options = options;
     logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
     process.on("uncaughtException", (err: Error) => {
