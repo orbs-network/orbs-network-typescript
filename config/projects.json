@@ -45,5 +45,10 @@
     "runtime": "typescript",
     "service": "virtual-machine",
     "type": "service"
-  }
+  },
+  "sidechain-connector-service-typescript": {
+    "runtime": "typescript",
+    "service": "sidechain-connector",
+    "type": "service"
+  }  
 }
