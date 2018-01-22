@@ -1,4 +1,4 @@
-import { topology, grpc } from "";
+import { topology, grpc } from "orbs-common-library";
 import SidechainConnectorService, { SidechainConnectorServiceOptions } from "./service";
 
 const server = grpc.sidechainConnectorServer({
