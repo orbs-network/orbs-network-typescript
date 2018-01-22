@@ -11,7 +11,7 @@ export default class EthereumConnector {
 
         const callData = this.web3.eth.abi.encodeFunctionCall(functionInterface, parameters);
 
-        const outputHexString = await this.web3.eth.call({to: contractAddress, data: callData}, block.number);
+        const outputHexString = await this.web3.eth.call({to: contractAddress, data: callData}, block && block.number);
 
         const output = this.web3.eth.abi.decodeParameters(functionInterface.outputs as any, outputHexString);
 
@@ -27,7 +27,7 @@ export default class EthereumConnector {
 
     async getEarlierBlock(numOfBlocksBack: number = 100) {
         const latestBlockNumber = await this.web3.eth.getBlockNumber();
-        return this.web3.eth.getBlock(latestBlockNumber - numOfBlocksBack);
+        return this.web3.eth.getBlock(Math.max(latestBlockNumber - numOfBlocksBack, 0));
     }
 
     static createHttpConnector(httpAddress: string) {
