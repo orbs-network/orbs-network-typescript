@@ -1,4 +1,4 @@
-import { topology, topologyPeers, types } from "orbs-common-library";
+import { topology, topologyPeers, types, logger } from "orbs-common-library";
 import bind from "bind-decorator";
 import EthereumConnector from "./ethereum-connector";
 
@@ -11,7 +11,7 @@ export default class SidechainConnectorService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    console.log(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
@@ -19,7 +19,7 @@ export default class SidechainConnectorService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    console.log(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
@@ -43,15 +43,15 @@ export default class SidechainConnectorService {
   }
 
   constructor() {
-    console.log(`${topology.name}: service started`);
+    logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
     process.on("uncaughtException", (err: Error) => {
-      console.error(`${__filename}: Caught exception: ${err}`);
-      console.error(err.stack);
+      logger.error(`${__filename}: Caught exception: ${err}`);
+      logger.error(err.stack);
     });
     process.on("unhandledRejection", (err: Error) => {
-      console.error(`${__filename}: Unhandled rejection: ${err}`);
-      console.error(err.stack);
+      logger.error(`${__filename}: Unhandled rejection: ${err}`);
+      logger.error(err.stack);
     });
 
   }
