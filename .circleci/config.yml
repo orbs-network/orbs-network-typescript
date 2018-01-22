@@ -1,24 +1,8 @@
 version: 2
 jobs:
-  build:
-    docker:
-      - image: circleci/node:8.9
-
-    working_directory: ~/repo
-
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          - v1-dependencies-
-
-      - run: npm install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-
-      - run: echo "Hello world!"
+ build:
+   machine: true
+   steps:
+     - checkout
+     - run: docker build -t orbs/orbs-network:$CIRCLE_BRANCH .
+     - run: docker run -ti orbs/orbs-network:$CIRCLE_BRANCH bash -x test.sh
