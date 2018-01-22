@@ -1,8 +1,10 @@
 version: 2
 jobs:
- build:
+  build:
    machine: true
    steps:
      - checkout
-     - run: docker build -t orbs/orbs-network:$CIRCLE_BRANCH .
-     - run: docker run -ti orbs/orbs-network:$CIRCLE_BRANCH bash -x test.sh
+     - run: docker build -t 506367651493.dkr.ecr.us-west-2.amazonaws.com/orbs-network:$CIRCLE_BRANCH .
+     - run: docker run -ti 506367651493.dkr.ecr.us-west-2.amazonaws.com/orbs-network:$CIRCLE_BRANCH bash -x test.sh
+     - run: $(aws ecr get-login --no-include-email --region us-west-2)
+     - run: docker push 506367651493.dkr.ecr.us-west-2.amazonaws.com/orbs-network:$CIRCLE_BRANCH
