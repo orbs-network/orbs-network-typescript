@@ -1,6 +1,6 @@
 const Web3 = require("web3");
-import { Block } from "web3/types.d";
 import { types } from "orbs-common-library";
+import { Block } from "./types/web3";
 
 export default class EthereumConnector {
     private web3;
@@ -31,7 +31,11 @@ export default class EthereumConnector {
     }
 
     static createHttpConnector(httpAddress: string) {
-        const web3 = new Web3(new Web3.providers.HttpProvider(httpAddress));
+        return this.createFromWeb3Provider(new Web3.providers.HttpProvider(httpAddress));
+    }
+
+    static createFromWeb3Provider(web3Provider) {
+        const web3 = new Web3(web3Provider);
         return new this(web3);
     }
 }

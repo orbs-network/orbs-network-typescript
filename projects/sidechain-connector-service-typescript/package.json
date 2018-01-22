@@ -19,6 +19,7 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
+    "bignumber.js": "^5.0.0",
     "bind-decorator": "^1.0.11",
     "orbs-common-library": "file:../common-library-typescript",
     "types-bn": "0.0.1",
@@ -34,7 +35,7 @@
     "chai": "^4.1.2",
     "concurrently": "^3.4.0",
     "ganache-cli": "^6.0.3",
-    "mocha": "^5.0.0",
+    "mocha": "^4.1.0",
     "nodemon": "^1.11.0",
     "shelljs": "^0.7.7",
     "solc": "^0.4.19",
