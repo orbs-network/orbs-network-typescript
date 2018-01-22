@@ -19,7 +19,7 @@ function changeTime(filePath) {
 }
 
 async function main() {
-  Object.keys(projects).forEach((projectName) => {
+  projects.order.forEach((projectName) => {
     const project = projects[projectName];
     const projectPath = path.resolve(__dirname, '../../projects/', projectName);
     if (changeTime(`${projectPath}/${srcDirs[project.runtime]}`) <= changeTime(`${projectPath}/dist`)) {
