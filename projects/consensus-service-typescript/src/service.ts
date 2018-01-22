@@ -1,6 +1,5 @@
 import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
-import PaxosConsensus from "./paxos-consensus";
 import PbftConsensus from "./pbft-consensus";
 
 export default class ConsensusService {
