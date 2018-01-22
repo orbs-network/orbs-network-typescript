@@ -85,3 +85,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 * This will watch for file changes on all typescript sub projects and recompile automatically.
 * Work directly on all sub projects inside the folder `./projects`, they're separate git repos.
+
+## Run inside of Docker
+
+`docker-compose up` will build an image and start a simulation of `transaction-gossip` topography.
