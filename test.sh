@@ -1,4 +1,4 @@
- #!/usr/bin/env bash -e 
+ #!/bin/bash -e 
 
 node simulate/src/index.js transaction-gossip  &
 sleep 20

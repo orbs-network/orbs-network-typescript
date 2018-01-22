@@ -1,3 +1,3 @@
-#!/usr/bin/env bash -e
+#!/bin/bash -e
 
 npm run simulate $@
