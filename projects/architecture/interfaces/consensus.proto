@@ -19,36 +19,6 @@ message SendTransactionOutput {
   // empty
 }
 
-message PaxosPropose {
-  uint32 slotNumber = 1;
-  Transaction tx = 2;
-}
-
-message PaxosPrepare {
-  uint32 slotNumber = 1;
-  uint32 ballotNumber = 2;
-}
-
-message PaxosPrepareAck {
-  uint32 maxBallot = 1;
-  uint32 slot = 2;
-  Transaction tx = 3;
-}
-
-message PaxosAccept {
-  uint32 ballotNumber = 1;
-  uint32 slot = 2;
-  Transaction tx = 3;
-}
-
-message PaxosAcceptAck {
-  uint32 maxBallot = 1;
-}
-
-message PaxosDecision {
-
-}
-
 message PbftPrepare {
     uint32 slotNumber = 1;
     Transaction tx = 2;
