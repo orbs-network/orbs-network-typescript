@@ -12,7 +12,7 @@ async function main() {
       shell.cd(projectPath);
       const shellStringOutput = shell.exec('./build.sh');
       if (shellStringOutput.code !== 0) {
-        console.error(`Error ${shellStringOutput.code} in ${projectPath}\n`.red);
+        throw new Error(`Error ${shellStringOutput.code} in ${projectPath}\n`.red);
       }
     }
   });
