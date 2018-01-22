@@ -1,8 +1,7 @@
 FROM node:9-alpine
 
-RUN apk --no-cache add bash git
-# python build-base
-# remove python and build-base when grpc-prebuilt will be up again
+RUN apk --no-cache add bash git python build-base
+# last two enable gyp-rebuild for secp256k1
 
 ADD . /opt/orbs
 
