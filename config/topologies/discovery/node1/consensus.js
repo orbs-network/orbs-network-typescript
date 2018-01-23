@@ -1,5 +1,5 @@
-{
-  "name": "node1-consensus",
+module.exports = {
+  "name": `${require('os').hostname()}-consensus`,
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51154",
   "project": "consensus-service-typescript",

@@ -21,7 +21,6 @@ export default class Gossip {
   peers: any = topologyPeers(topology.peers);
 
   constructor(port: number) {
-    logger.info('Starting gossip node', {port});
     this.server = new WebSocket.Server({ port });
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);

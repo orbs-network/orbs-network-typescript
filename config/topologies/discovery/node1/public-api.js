@@ -1,5 +1,5 @@
-{
-  "name": "node1-public-api",
+module.exports = {
+  "name": `${require('os').hostname()}-public-api`,
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51151",
   "project": "public-api-service-typescript",

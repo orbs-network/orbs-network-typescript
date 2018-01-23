@@ -1,5 +1,5 @@
-{
-  "name": "node1-virtual-machine",
+module.exports = {
+  "name": `${require('os').hostname()}-virtual-machine`,
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51155",
   "project": "virtual-machine-service-typescript",
