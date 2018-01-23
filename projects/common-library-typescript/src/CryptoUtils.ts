@@ -3,10 +3,12 @@ import TimeoutError from "./timeoutError";
 import * as fs from "fs";
 import * as assert from "assert";
 import * as path from "path";
+import { config } from "src";
 
 const crypto = require("crypto");
 const ec = require("secp256k1");
 const base58 = require("bs58");
+const os = require('os');
 
 export class QuorumVerifier {
   private promise: Promise<Iterable<string>>;
@@ -71,10 +73,26 @@ export class CryptoUtils {
     this.myName = myName;
   }
 
+  public static getName(configDir: string) {
+    try {
+      return fs.readFileSync(`${configDir}/name`, "utf8").trim();
+    } catch (e) {
+      return os.hostname();
+    }
+  }
+
+  public static getPrivateKey(configDir: string) {
+    try {
+      return base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
+    } catch (e) {
+      return crypto.randomBytes(32);
+    }
+  }
+
   public static loadFromConfiguration(): CryptoUtils {
     const configDir = `${path.dirname(process.argv[2])}/config`;
-    const privateKey: PrivateKey = base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
-    const myName: string = fs.readFileSync(`${configDir}/name`, "utf8").trim();
+    const privateKey: PrivateKey = this.getPrivateKey(configDir);
+    const myName: string = this.getName(configDir);
     const nodePublicKeys: Map<string, PublicKey> = new Map();
 
     for (const node of fs.readdirSync(`${configDir}/network`)) {
