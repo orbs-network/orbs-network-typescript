@@ -2,6 +2,8 @@ import * as WebSocket from "ws";
 import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
 import { range, isObject, map } from "lodash";
+import { platform, networkInterfaces } from "os";
+import CIDR from "ip-cidr" ;
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
@@ -18,7 +20,7 @@ export default class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  peers: any = topologyPeers(topology.peers);
+  peers: any = topologyPeers([]);
 
   constructor(port: number) {
     this.server = new WebSocket.Server({ port });
@@ -108,27 +110,51 @@ export default class Gossip {
     }
   }
 
-  async ping(address: string):Promise<any> {
+  networkInterface(): any {
+    const [eth, lo] = platform() == "darwin" ? ["en0", "lo0"] : ["eth0", "lo"];
+    return networkInterfaces()[topology.global ? eth : lo][0];
+  }
+
+  public ip(): string {
+    return this.networkInterface().address;
+  }
+
+  public subnet(): string[] {
+    if (this.ip() == "127.0.0.1") {
+      return map(range(60000, 60010, 1), (portNumber) => {
+        return `127.0.0.1:${portNumber}`;
+      });
+    }
+
+    return new CIDR(this.networkInterface().cidr).toArray().slice(0, 255).map((address: string) => {
+      return `${address}:60000`;
+    });
+  }
+
+  async ping(address: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       const ws: WebSocket = new WebSocket(address);
 
-      ws.on('message', (data: Buffer) => {
+      ws.on("message", (data: Buffer) => {
         ws.close();
         resolve({name: data.toString(), address});
       });
 
       setTimeout(reject, 3000);
     });
-  };
+  }
 
-  async discoverPeers(iface: string, self: string) {
-    return Promise.all(range(60000, 60010, 1).map((port: number) => {
-      return this.ping(`ws://${iface}:${port}`).catch((err) => {
+  async discoverPeers() {
+    const ip = this.ip(),
+      subnet = this.subnet();
+
+    return Promise.all(subnet.map((address: string) => {
+      return this.ping(`ws://${address}`).catch((err) => {
         // console.log(port, err);
         return;
       });
     })).then((peers: any[]) => {
-      return map(peers.filter((peer) => isObject(peer) && peer.name != this.helloMessage().toString()), 'address');
+      return map(peers.filter((peer) => isObject(peer) && peer.name != this.helloMessage().toString()), "address");
     });
   }
 }

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "colors": "^1.1.2",
+    "ip-cidr": "^1.1.2",
     "shelljs": "^0.7.7"
   },
   "devDependencies": {
