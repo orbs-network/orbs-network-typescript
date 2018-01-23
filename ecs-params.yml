@@ -1,7 +1,7 @@
 version: 1
 task_definition:
   ecs_network_mode: none
-  task_role_arn: arn:aws:iam::506367651493:role/orbs-network 
+  task_role_arn: ${TASK_ROLE_ARN}
   memory: 2048
   memoryReservation: 2048
   task_size:
