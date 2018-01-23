@@ -1,0 +1,20 @@
+{
+  "name": "node2-public-api",
+  "version": "1.0.0",
+  "endpoint": "0.0.0.0:51251",
+  "project": "public-api-service-typescript",
+  "peers": [
+    {
+      "service": "gossip",
+      "endpoint": "0.0.0.0:51253"
+    },
+    {
+      "service": "consensus",
+      "endpoint": "0.0.0.0:51154"
+    },
+    {
+      "service": "virtual-machine",
+      "endpoint": "0.0.0.0:51255"
+    }      
+  ]
+}
