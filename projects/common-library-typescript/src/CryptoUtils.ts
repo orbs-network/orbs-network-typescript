@@ -3,12 +3,12 @@ import TimeoutError from "./timeoutError";
 import * as fs from "fs";
 import * as assert from "assert";
 import * as path from "path";
-import { config } from "src";
+import * as config from "./config";
 
 const crypto = require("crypto");
 const ec = require("secp256k1");
 const base58 = require("bs58");
-const os = require('os');
+const os = require("os");
 
 export class QuorumVerifier {
   private promise: Promise<Iterable<string>>;

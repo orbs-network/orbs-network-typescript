@@ -46,7 +46,7 @@ export default class GossipService {
 
     setInterval(() => this.askForHeartbeats(), 5000);
     setTimeout(() => {
-      this.gossip.discoverPeers('127.0.0.1', this.gossip.helloMessage().toString()).then((gossipPeers) => {
+      this.gossip.discoverPeers().then((gossipPeers) => {
         logger.info(`Found gossip peers`, {peers: gossipPeers});
         this.gossip.connect(gossipPeers);
       }).catch(logger.error);

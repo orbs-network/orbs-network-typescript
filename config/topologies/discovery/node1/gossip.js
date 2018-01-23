@@ -13,5 +13,6 @@ module.exports = {
       "endpoint": "0.0.0.0:51154"
     }
   ],
-  "gossipPort": "60001"
+  "gossipPort": "60001",
+  "global": true
 }
