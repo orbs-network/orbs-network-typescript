@@ -1,6 +1,7 @@
 import * as WebSocket from "ws";
 import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
+import { range, isObject, map } from "lodash";
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
@@ -20,6 +21,7 @@ export default class Gossip {
   peers: any = topologyPeers(topology.peers);
 
   constructor(port: number) {
+    logger.info('Starting gossip node', {port});
     this.server = new WebSocket.Server({ port });
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
@@ -50,6 +52,8 @@ export default class Gossip {
         return str;
       }
 
+      logger.info('Received message', readString(message));
+
       const sender = readString(message);
       if (offset === message.length) {
         // 'hello' message
@@ -73,7 +77,6 @@ export default class Gossip {
     });
     ws.send(this.helloMessage());
   }
-
 
   connect(peers: string[]) {
     for (const peer of peers) {
@@ -104,4 +107,27 @@ export default class Gossip {
     }
   }
 
+  async ping(address: string):Promise<any> {
+    return new Promise<any>((resolve, reject) => {
+      const ws: WebSocket = new WebSocket(address);
+
+      ws.on('message', (data: Buffer) => {
+        ws.close();
+        resolve({name: data.toString(), address});
+      });
+
+      setTimeout(reject, 3000);
+    });
+  };
+
+  async discoverPeers(iface: string, self: string) {
+    return Promise.all(range(60000, 60010, 1).map((port: number) => {
+      return this.ping(`ws://${iface}:${port}`).catch((err) => {
+        // console.log(port, err);
+        return;
+      });
+    })).then((peers: any[]) => {
+      return map(peers.filter((peer) => isObject(peer) && peer.name != this.helloMessage().toString()), 'address');
+    });
+  }
 }
