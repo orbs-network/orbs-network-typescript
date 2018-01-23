@@ -52,8 +52,6 @@ export default class Gossip {
         return str;
       }
 
-      logger.info('Received message', readString(message));
-
       const sender = readString(message);
       if (offset === message.length) {
         // 'hello' message
@@ -73,8 +71,12 @@ export default class Gossip {
         }
         this.listeners.set(broadcastGroup, peer);
       }
+
+      logger.info(`${this.localAddress} received message from ${recipient}`);
+
       this.listeners.get(broadcastGroup).gossipMessageReceived({FromAddress: sender.toString(), BroadcastGroup: broadcastGroup, MessageType: objectType, Buffer: objectRaw});
     });
+
     ws.send(this.helloMessage());
   }
 

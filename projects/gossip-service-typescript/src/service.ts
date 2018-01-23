@@ -42,12 +42,13 @@ export default class GossipService {
   }
 
   async main() {
-    // setInterval(() => this.askForHeartbeats(), 5000);
+    this.peers = topologyPeers(topology.peers);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
     setTimeout(() => {
-      this.gossip.discoverPeers('127.0.0.1', this.gossip.helloMessage().toString()).then((peers) => {
-        logger.info(`Found peers`, {peers});
-        this.peers = topologyPeers(peers);
-        this.gossip.connect(peers);
+      this.gossip.discoverPeers('127.0.0.1', this.gossip.helloMessage().toString()).then((gossipPeers) => {
+        logger.info(`Found gossip peers`, {peers: gossipPeers});
+        this.gossip.connect(gossipPeers);
       }).catch(logger.error);
     }, Math.ceil(Math.random() * 3000));
     process.on("uncaughtException", (err: Error) => {
