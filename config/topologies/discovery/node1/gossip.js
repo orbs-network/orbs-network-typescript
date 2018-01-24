@@ -14,5 +14,6 @@ module.exports = {
     }
   ],
   "gossipPort": "60001",
-  "global": true
+  "global": true,
+  "cidr": "172.1.1.0/24"
 }

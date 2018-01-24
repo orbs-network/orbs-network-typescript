@@ -1,5 +1,18 @@
-basic-simulation:
-  build: .
-  command: node simulate/src/index.js transaction-gossip
-#  volumes:
-#    - ./config:/opt/orbs/config
+version: '2.1'
+services:
+  basic-simulation:
+    build: .
+    command: node simulate/src/index.js discovery
+    volumes:
+      - ./config:/opt/orbs/config/
+    networks:
+      basic-network:
+
+networks:
+  basic-network:
+    driver: bridge
+    enable_ipv6: false
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.1.1.0/24
