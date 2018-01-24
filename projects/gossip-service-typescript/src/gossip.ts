@@ -147,7 +147,7 @@ export default class Gossip {
   }
 
   public activePeers() {
-    return Object.keys(this.clients);
+    return this.clients.keys();
   }
 
   async discoverPeers(): Promise<string[]> {

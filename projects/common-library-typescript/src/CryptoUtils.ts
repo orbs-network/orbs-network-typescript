@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as assert from "assert";
 import * as path from "path";
 import * as config from "./config";
+import { networkInterfaces } from "os";
 
 const crypto = require("crypto");
 const ec = require("secp256k1");
@@ -77,16 +78,28 @@ export class CryptoUtils {
     try {
       return fs.readFileSync(`${configDir}/name`, "utf8").trim();
     } catch (e) {
+      /**
+       * FIXME relative path
+       */
+      const consensus = require(`${configDir}/../consensus`);
+      /**
+       * FIXME linux-specific
+       */
+      try {
+        const ip = networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
+        if (consensus.leader === ip) {
+          console.log("I AM THE LEADER", ip)
+          return "node1";
+        }
+      } catch (e) {}
+      
+
       return os.hostname();
     }
   }
 
   public static getPrivateKey(configDir: string) {
-    try {
-      return base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
-    } catch (e) {
-      return crypto.randomBytes(32);
-    }
+    return base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
   }
 
   public static loadFromConfiguration(): CryptoUtils {
@@ -94,14 +107,20 @@ export class CryptoUtils {
     const privateKey: PrivateKey = this.getPrivateKey(configDir);
     const myName: string = this.getName(configDir);
     const nodePublicKeys: Map<string, PublicKey> = new Map();
-
+    
     for (const node of fs.readdirSync(`${configDir}/network`)) {
       const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
       nodePublicKeys.set(node, nodeKey);
     }
+
     if (! nodePublicKeys.has(myName)) {
       nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
     }
+
+    /** 
+     * FIXME remove dummy keys 
+     */
+    nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
 
     assert(ec.publicKeyCreate(privateKey).equals(nodePublicKeys.get(myName)), `public key for node ${myName} should match private; ${base58.encode(privateKey)}->${base58.encode(ec.publicKeyCreate(privateKey))} != ${base58.encode(nodePublicKeys.get(myName))}`);
     return new CryptoUtils(privateKey, nodePublicKeys, myName);
@@ -117,7 +136,10 @@ export class CryptoUtils {
   }
 
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
-    const publicKey: PublicKey = this.nodePublicKeys.get(signer);
+    /**
+     * FIXME remove dummy keys
+     */
+    const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
     if (! publicKey) {
       return false;
     }
@@ -158,5 +180,13 @@ export class CryptoUtils {
 
   public getPublicKey(): string {
     return base58.encode(this.nodePublicKeys.get(this.myName));
+  }
+
+  public static getDummyPublicKey(configDir: string) {
+    try {
+      return base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
+    } catch (e) {
+      return;
+    }
   }
 }

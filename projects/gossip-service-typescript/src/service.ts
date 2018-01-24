@@ -48,7 +48,14 @@ export default class GossipService {
 
     setInterval(() => {
       const activePeers = this.gossip.activePeers();
-      logger.info(`${this.gossip.localAddress} has ${activePeers.length} peers`, {peers: activePeers});
+
+      if (!activePeers.next) {
+        logger.info(`${this.gossip.localAddress} has no peers`);
+      }
+
+      for (const peer of activePeers) {
+        logger.info(`${this.gossip.localAddress} has a peer`, {peer});
+      }
     }, 5000);
 
     setTimeout(() => {
