@@ -89,3 +89,24 @@ This wrapper project will set up a full working environment including all sub pr
 ## Run inside of Docker
 
 `docker-compose up` will build an image and start a simulation of `transaction-gossip` topography.
+
+### Docker on AWS ECS
+
+Install `ecs-cli`
+
+```
+sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-darwin-amd64-latest
+chmod +x /usr/local/bin/ecs-cli
+```
+
+If you want to pull images, log into AWS Elastic Container Registry.
+
+```
+$(aws ecr get-login --no-include-email --region us-west-2)
+```
+
+Deploy new stack:
+
+```
+ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
+```
