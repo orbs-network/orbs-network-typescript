@@ -18,7 +18,7 @@ export default class PbftConsensus {
       this.gossip.unicastMessage({
         Recipient: leader,
         BroadcastGroup: "consensus",
-        MessageType: "SendTransactionInput",
+        MessageType: "Transaction",
         Buffer: new Buffer(JSON.stringify({transaction: tx, transactionAppendix: txAppendix})),
         Immediate: true});
     }
