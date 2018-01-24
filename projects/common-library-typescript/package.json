@@ -30,6 +30,7 @@
     "orbs-interfaces": "file:../architecture",
     "protobufjs": "^6.8.4",
     "secp256k1": "^3.4.0",
+    "source-map-support": "^0.5.2",
     "winston": "^2.4.0",
     "winston-logzio": "^1.0.6"
   },

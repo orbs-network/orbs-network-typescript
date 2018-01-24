@@ -1,3 +1,6 @@
+// Adds source map support to node.js stack traces.
+import "source-map-support/register";
+
 import { config } from "./config";
 import * as winston from "winston";
 import * as winstonLogzioTransport from "winston-logzio";
