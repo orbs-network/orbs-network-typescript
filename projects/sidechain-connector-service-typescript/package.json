@@ -1,0 +1,47 @@
+{
+  "name": "orbs-sidechain-connector-service",
+  "version": "0.1.0",
+  "description": "orbs-sidechain-connector-service",
+  "author": "Orbs Team",
+  "license": "MIT",
+  "scripts": {
+    "start": "npm run build && npm run watch",
+    "build": "npm run build-ts && npm run tslint",
+    "rebuild": "npm run build-ts",
+    "serve": "nodemon dist/index.js",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve\"",
+    "test": "ts-mocha src/test/**/*.spec.ts",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "debug": "npm run build && npm run watch-debug",
+    "serve-debug": "nodemon --inspect dist/index.js",
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+  },
+  "dependencies": {
+    "bignumber.js": "^5.0.0",
+    "bind-decorator": "^1.0.11",
+    "orbs-common-library": "file:../common-library-typescript",
+    "types-bn": "0.0.1",
+    "underscore": "^1.8.3",
+    "web3": "^1.0.0-beta.20"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.63",
+    "@types/mocha": "^2.2.46",
+    "@types/node": "^7.0.12",
+    "@types/supertest": "^2.0.0",
+    "@types/underscore": "^1.8.7",
+    "chai": "^4.1.2",
+    "concurrently": "^3.4.0",
+    "ganache-cli": "^6.0.3",
+    "mocha": "^4.1.0",
+    "nodemon": "^1.11.0",
+    "shelljs": "^0.7.7",
+    "solc": "^0.4.19",
+    "supertest": "^2.0.1",
+    "ts-mocha": "^1.1.0",
+    "tslint": "^5.0.0",
+    "typescript": "^2.4.0"
+  }
+}
