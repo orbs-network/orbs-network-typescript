@@ -37,7 +37,7 @@ export default class GossipService {
   }
 
   askForHeartbeats() {
-    this.askForHeartbeat(this.peers.publicApi);
+    // this.askForHeartbeat(this.peers.publicApi);
     // this.askForHeartbeat(this.peers.transactionPool);
   }
 
@@ -45,6 +45,12 @@ export default class GossipService {
     this.peers = topologyPeers(topology.peers);
 
     setInterval(() => this.askForHeartbeats(), 5000);
+
+    setInterval(() => {
+      const activePeers = this.gossip.activePeers();
+      logger.info(`${this.gossip.localAddress} has ${activePeers.length} peers`, {peers: activePeers});
+    }, 5000);
+
     setTimeout(() => {
       this.gossip.discoverPeers().then((gossipPeers) => {
         logger.info(`Found gossip peers`, {peers: gossipPeers});

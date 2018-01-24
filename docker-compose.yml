@@ -2,9 +2,10 @@ version: '2.1'
 services:
   basic-simulation:
     build: .
-    command: node simulate/src/index.js discovery
+    command: node simulate/src/index.js transaction-gossip
     volumes:
       - ./config:/opt/orbs/config/
+      - ./projects/gossip-service-typescript/dist:/opt/orbs/projects/gossip-service-typescript/dist/
     networks:
       basic-network:
 
