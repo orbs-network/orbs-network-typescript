@@ -44,7 +44,7 @@ export namespace grpc {
   }
 
   export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
-    server("vm.proto", "VirtualMachine", endpoint, service);
+    server("virtual-machine.proto", "VirtualMachine", endpoint, service);
   }
 
   export function stateStorageServer({ endpoint, service }: { endpoint: string, service: types.StateStorageServer }) {
