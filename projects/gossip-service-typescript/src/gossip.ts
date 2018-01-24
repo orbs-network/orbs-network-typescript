@@ -3,7 +3,6 @@ import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
 import { range, isObject, map } from "lodash";
 import { platform, networkInterfaces } from "os";
-import CIDR = require("ip-cidr");
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
@@ -88,7 +87,6 @@ export default class Gossip {
     }
   }
 
-
   broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     this.clients.forEach((client: WebSocket, address: string) => {
       if (client.readyState === WebSocket.OPEN) {
@@ -119,23 +117,23 @@ export default class Gossip {
     return this.networkInterface().address;
   }
 
-  public subnet(): string[] {
-    if (this.ip() == "127.0.0.1") {
+  public possiblePeers(): string[] {
+    const ip = this.ip();
+
+    if (ip === "127.0.0.1") {
       // Hardcoded values for localhost
       return map(range(60000, 60010, 1), (portNumber) => {
         return `127.0.0.1:${portNumber}`;
       });
     }
 
-    const cidr = topology.cidr || this.networkInterface().cidr;
-    console.warn("Calculating peers possible ip addresses, it might take a while", {cidr});
-
-    return new CIDR(cidr).toArray().map((address: string) => {
+    const peers = topology.gossipPeers.filter((p: string) => p !== this.ip());
+    return peers.map((address: string) => {
       return `${address}:${topology.gossipPort}`;
     });
   }
 
-  async ping(address: string): Promise<any> {
+  async testPeerConnection(address: string): Promise<any> {
     return new Promise<any>((resolve, reject) => {
       const ws: WebSocket = new WebSocket(address);
 
@@ -148,12 +146,13 @@ export default class Gossip {
     });
   }
 
-  async discoverPeers(): Promise<string[]> {
-    const ip = this.ip(),
-      subnet = this.subnet();
+  public activePeers() {
+    return Object.keys(this.clients);
+  }
 
-    return Promise.all(subnet.map((address: string) => {
-      return this.ping(`ws://${address}`).catch((err) => {
+  async discoverPeers(): Promise<string[]> {
+    return Promise.all(this.possiblePeers().map((address: string) => {
+      return this.testPeerConnection(`ws://${address}`).catch((err) => {
         // console.log(port, err);
         return;
       });
