@@ -46,6 +46,11 @@
     "service": "virtual-machine",
     "type": "service"
   },
+  "sidechain-connector-service-typescript": {
+    "runtime": "typescript",
+    "service": "sidechain-connector",
+    "type": "service"
+  },
   "order": [
     "architecture",
     "common-library-typescript",
@@ -56,6 +61,7 @@
     "public-api-service-typescript",
     "state-storage-service-typescript",
     "transaction-pool-service-typescript",
-    "virtual-machine-service-typescript"
+    "virtual-machine-service-typescript",
+    "sidechain-connector-service-typescript"
   ]
 }
