@@ -1,6 +1,14 @@
 import { logger, types, topology, topologyPeers, QuorumVerifier, CryptoUtils } from "orbs-common-library";
 
 const crypto = CryptoUtils.loadFromConfiguration();
+import { networkInterfaces } from "os";
+
+/**
+ * linux-specific
+ */
+function ip(): string {
+  return networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
+}
 
 export default class PbftConsensus {
   private leader: string = undefined;
@@ -13,12 +21,14 @@ export default class PbftConsensus {
 
   async proposeChange(tx: types.Transaction, txAppendix: types.TransactionAppendix): Promise<void> {
     const leader = await this.getLeader();
+
+    console.warn("Propose change, I am", crypto.whoAmI(), "my leader is", leader);
     if (leader !== crypto.whoAmI()) {
       // I am not the leader
       this.gossip.unicastMessage({
         Recipient: leader,
         BroadcastGroup: "consensus",
-        MessageType: "SendTransactionInput",
+        MessageType: "Transaction",
         Buffer: new Buffer(JSON.stringify({transaction: tx, transactionAppendix: txAppendix})),
         Immediate: true});
     }
@@ -154,5 +164,4 @@ export default class PbftConsensus {
   private async getLeader(): Promise<string> {
     return "node1";
   }
-
 }

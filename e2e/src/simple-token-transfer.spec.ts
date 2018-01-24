@@ -53,7 +53,7 @@ class OrbsClient {
     crypto: CryptoUtils;
     publicApiClient: types.PublicApiClient;
 
-    constructor(crypto: CryptoUtils, endpointAddress: string = "0.0.0.0:51151") {
+constructor(crypto: CryptoUtils, endpointAddress: string = "0.0.0.0:51151") {
         this.crypto = crypto;
         this.publicApiClient = grpc.publicApiClient({endpoint: endpointAddress});
     }
