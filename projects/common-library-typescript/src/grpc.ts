@@ -60,7 +60,11 @@ export namespace grpc {
       server("sidechain-connector.proto", "SidechainConnector", endpoint, service);
   }
 
-    export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
+  export function subscriptionManagerServer({ endpoint, service }: { endpoint: string, service: types.SubscriptionManagerServer }) {
+    server("subscription-manager.proto", "SubscriptionManager", endpoint, service);
+  }
+
+  export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
     return client("chatter.proto", "Chatter", endpoint);
   }
 
@@ -96,4 +100,7 @@ export namespace grpc {
       return client("sidechain-connector.proto", "SidechainConnector", endpoint);
   }
 
+  export function subscriptionManagerClient({ endpoint }: { endpoint: string }): types.SubscriptionManagerClient {
+    return client("subscription-manager.proto", "SubscriptionManager", endpoint);
+  }
 }
