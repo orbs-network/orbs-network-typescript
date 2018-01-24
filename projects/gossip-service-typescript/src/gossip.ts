@@ -3,7 +3,7 @@ import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
 import { range, isObject, map } from "lodash";
 import { platform, networkInterfaces } from "os";
-import CIDR from "ip-cidr" ;
+import CIDR = require("ip-cidr");
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
@@ -112,7 +112,7 @@ export default class Gossip {
 
   networkInterface(): any {
     const [eth, lo] = platform() == "darwin" ? ["en0", "lo0"] : ["eth0", "lo"];
-    return networkInterfaces()[topology.global ? eth : lo][0];
+    return networkInterfaces()[topology.global ? eth : lo].filter(iface => iface.family === "IPv4")[0];
   }
 
   public ip(): string {
@@ -121,13 +121,17 @@ export default class Gossip {
 
   public subnet(): string[] {
     if (this.ip() == "127.0.0.1") {
+      // Hardcoded values for localhost
       return map(range(60000, 60010, 1), (portNumber) => {
         return `127.0.0.1:${portNumber}`;
       });
     }
 
-    return new CIDR(this.networkInterface().cidr).toArray().slice(0, 255).map((address: string) => {
-      return `${address}:60000`;
+    const cidr = topology.cidr || this.networkInterface().cidr;
+    console.warn("Calculating peers possible ip addresses, it might take a while", {cidr});
+
+    return new CIDR(cidr).toArray().map((address: string) => {
+      return `${address}:${topology.gossipPort}`;
     });
   }
 
@@ -144,7 +148,7 @@ export default class Gossip {
     });
   }
 
-  async discoverPeers() {
+  async discoverPeers(): Promise<string[]> {
     const ip = this.ip(),
       subnet = this.subnet();
 

@@ -24,6 +24,7 @@
   "dependencies": {
     "bind-decorator": "^1.0.11",
     "ip": "^1.1.5",
+    "ip-cidr": "^1.1.2",
     "lodash": "^4.17.4",
     "orbs-common-library": "file:../common-library-typescript",
     "uuid-js": "^0.7.5",
