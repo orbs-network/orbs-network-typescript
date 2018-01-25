@@ -3,6 +3,8 @@ services:
   basic-simulation:
     build: .
     command: node simulate/src/index.js discovery
+    environment:
+      E2E_PUBLIC_API_ENDPOINT: 0.0.0.0:51151
     volumes:
       - ./config:/opt/orbs/config/
       - ./projects/common-library-typescript/dist:/opt/orbs/projects/common-library-typescript/dist/

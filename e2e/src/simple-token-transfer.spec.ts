@@ -53,7 +53,7 @@ class OrbsClient {
     crypto: CryptoUtils;
     publicApiClient: types.PublicApiClient;
 
-constructor(crypto: CryptoUtils, endpointAddress: string = "0.0.0.0:51251") {
+    constructor(crypto: CryptoUtils, endpointAddress: string = "0.0.0.0:51151") {
         this.crypto = crypto;
         this.publicApiClient = grpc.publicApiClient({endpoint: endpointAddress});
     }
@@ -94,9 +94,9 @@ class Account {
     crypto: CryptoUtils;
     barContractClient: BarContractClient;
 
-    constructor(crypto: CryptoUtils) {
+    constructor(crypto: CryptoUtils, endpoint: string) {
         this.crypto = crypto;
-        this.barContractClient = new BarContractClient(new OrbsClient(crypto));
+        this.barContractClient = new BarContractClient(new OrbsClient(crypto, endpoint));
     }
 
     public async initBarBalance(bars: number) {
@@ -140,7 +140,8 @@ Assertion.addMethod("bars", assertModelBars);
 
 async function anAccountWith(input: {bars: number}) {
     const accountCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
-    const account = new Account(accountCrypto);
+    const endpoint = process.env.E2E_PUBLIC_API_ENDPOINT || "0.0.0.0:51251";
+    const account = new Account(accountCrypto, endpoint);
 
     accounts.set(account.getAddress(), account);
 
