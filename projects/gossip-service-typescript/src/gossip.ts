@@ -19,7 +19,7 @@ export default class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  peers: any = topologyPeers([]);
+  peers: any = topologyPeers(topology.peers);
 
   constructor(port: number) {
     this.server = new WebSocket.Server({ port });

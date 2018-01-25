@@ -88,11 +88,11 @@ export class CryptoUtils {
       try {
         const ip = networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
         if (consensus.leader === ip) {
-          console.log("I AM THE LEADER", ip)
+          console.log("I AM THE LEADER", ip);
           return "node1";
         }
       } catch (e) {}
-      
+
 
       return os.hostname();
     }
@@ -107,7 +107,7 @@ export class CryptoUtils {
     const privateKey: PrivateKey = this.getPrivateKey(configDir);
     const myName: string = this.getName(configDir);
     const nodePublicKeys: Map<string, PublicKey> = new Map();
-    
+
     for (const node of fs.readdirSync(`${configDir}/network`)) {
       const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
       nodePublicKeys.set(node, nodeKey);
@@ -117,8 +117,8 @@ export class CryptoUtils {
       nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
     }
 
-    /** 
-     * FIXME remove dummy keys 
+    /**
+     * FIXME remove dummy keys
      */
     nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
 
@@ -184,7 +184,7 @@ export class CryptoUtils {
 
   public static getDummyPublicKey(configDir: string) {
     try {
-      return base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
+      return base58.decode(fs.readFileSync(`${configDir}/test-public-key`, "utf8"));
     } catch (e) {
       return;
     }

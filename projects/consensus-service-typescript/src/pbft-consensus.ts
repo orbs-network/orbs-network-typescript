@@ -10,6 +10,8 @@ function ip(): string {
   return networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
 }
 
+logger.info(crypto.whoAmI(), topology);
+
 export default class PbftConsensus {
   private leader: string = undefined;
   private gossip = topologyPeers(topology.peers).gossip;
@@ -144,6 +146,8 @@ export default class PbftConsensus {
   private async onCommit(fromAddress: string, message: types.PbftCommit) {
     const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
     const {qv2, tx, modifiedAddressesJson} = pendingTransaction;
+
+    logger.info(`Trying to commit pending transaction `, tx);
 
     const verified = await qv2.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
 
