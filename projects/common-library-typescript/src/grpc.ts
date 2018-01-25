@@ -44,18 +44,23 @@ export namespace grpc {
   }
 
   export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
-    server("vm.proto", "VirtualMachine", endpoint, service);
+    server("virtual-machine.proto", "VirtualMachine", endpoint, service);
   }
 
   export function stateStorageServer({ endpoint, service }: { endpoint: string, service: types.StateStorageServer }) {
     server("state-storage.proto", "StateStorage", endpoint, service);
   }
 
+
   export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
       server("block-storage.proto", "BlockStorage", endpoint, service);
   }
 
-  export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
+  export function sidechainConnectorServer({ endpoint, service }: { endpoint: string, service: types.SidechainConnectorServer }) {
+      server("sidechain-connector.proto", "SidechainConnector", endpoint, service);
+  }
+
+    export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
     return client("chatter.proto", "Chatter", endpoint);
   }
 
@@ -86,4 +91,9 @@ export namespace grpc {
   export function blockStorageClient({ endpoint }: { endpoint: string }): types.BlockStorageClient {
       return client("block-storage.proto", "BlockStorage", endpoint);
   }
+
+  export function sidechainConnectorClient({ endpoint }: { endpoint: string }): types.SidechainConnectorClient {
+      return client("sidechain-connector.proto", "SidechainConnector", endpoint);
+  }
+
 }
