@@ -8,6 +8,7 @@ services:
       - ./projects/common-library-typescript/dist:/opt/orbs/projects/common-library-typescript/dist/
       - ./projects/consensus-service-typescript/dist:/opt/orbs/projects/consensus-service-typescript/dist/
       - ./projects/gossip-service-typescript/dist:/opt/orbs/projects/gossip-service-typescript/dist/
+      - ./projects/virtual-machine-service-typescript/dist:/opt/orbs/projects/virtual-machine-service-typescript/dist/
       - ./e2e/:/opt/orbs/e2e/
     networks:
       basic-network:
