@@ -90,7 +90,12 @@ export default class Gossip {
   broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     this.clients.forEach((client: WebSocket, address: string) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]));
+        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]), (err) => {
+          if (err) {
+            logger.error(`WebSocket error`, {err});
+            logger.error(`Error sending broadcast message to ${address} (${client.url})`);
+          }
+        });
       }
     });
   }
@@ -99,11 +104,21 @@ export default class Gossip {
     const remote: WebSocket = this.clients.get(recipientAddress);
     const message: Buffer = Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(recipientAddress), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]);
     if (remote) {
-      remote.send(message);
+      remote.send(message, (err) => {
+          if (err) {
+            logger.error(`WebSocket error`, {err});
+            logger.error(`Error sending unicast message to ${recipientAddress} (${remote.url})`);
+          }
+        });
     }
     else {
-      this.clients.forEach((remote: WebSocket) => {
-        remote.send(message);
+      this.clients.forEach((remote: WebSocket, address) => {
+        remote.send(message, (err) => {
+          if (err) {
+            logger.error(`WebSocket error`, {err});
+            logger.error(`Error sending unicast message to ${address} (${remote.url})`);
+          }
+        });
       });
     }
   }
@@ -151,13 +166,14 @@ export default class Gossip {
   }
 
   async discoverPeers(): Promise<string[]> {
-    return Promise.all(this.possiblePeers().map((address: string) => {
-      return this.testPeerConnection(`ws://${address}`).catch((err) => {
-        // console.log(port, err);
-        return;
-      });
-    })).then((peers: any[]) => {
-      return map(peers.filter((peer) => isObject(peer) && peer.name != this.helloMessage().toString()), "address");
-    });
+    return Promise.all(this.possiblePeers().map(p => `ws://${p}`));
+    // .map((address: string) => {
+    //   return this.testPeerConnection(`ws://${address}`).catch((err) => {
+    //     // console.log(port, err);
+    //     return;
+    //   });
+    // })).then((peers: any[]) => {
+    //   return map(peers.filter((peer) => isObject(peer) && peer.name != this.helloMessage().toString()), "address");
+    // });
   }
 }

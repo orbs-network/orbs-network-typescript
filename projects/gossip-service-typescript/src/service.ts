@@ -47,14 +47,12 @@ export default class GossipService {
     setInterval(() => this.askForHeartbeats(), 5000);
 
     setInterval(() => {
-      const activePeers = this.gossip.activePeers();
+      const activePeers = Array.from(this.gossip.activePeers()).sort();
 
-      if (!activePeers.next) {
-        logger.info(`${this.gossip.localAddress} has no peers`);
-      }
-
-      for (const peer of activePeers) {
-        logger.info(`${this.gossip.localAddress} has a peer`, {peer});
+      if (activePeers.length === 0) {
+        logger.info(`${this.gossip.localAddress} has no active peers`);
+      } else {
+        logger.info(`${this.gossip.localAddress} has active peers`, {activePeers});
       }
     }, 5000);
 
