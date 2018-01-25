@@ -81,7 +81,7 @@ export namespace grpc {
   }
 
   export function virtualMachineClient({ endpoint }: { endpoint: string }): types.VirtualMachineClient {
-    return client("vm.proto", "VirtualMachine", endpoint);
+    return client("virtual-machine.proto", "VirtualMachine", endpoint);
   }
 
   export function stateStorageClient({ endpoint }: { endpoint: string }): types.StateStorageClient {
