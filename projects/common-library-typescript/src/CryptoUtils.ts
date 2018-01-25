@@ -36,14 +36,18 @@ export class QuorumVerifier {
   }
 
   verify(value: Buffer | string, signer: string, signature: string): boolean {
+    console.warn("Verifying signature", signature);
     if (this.cu.verifySignature(signer, value, signature)) {
+      console.warn("Verified signature", signature);
       this.signers.add(signer);
+      console.warn(`Verified by ${this.signers.size} / ${this.requiredQuorum}`, signature);
       if (this.signers.size >= this.requiredQuorum) {
         clearTimeout(this.timeout);
         this.acceptFunction(this.signers.keys());
         return true;
       }
     }
+    console.warn(`Failed to verify signature ${signature} by ${signer}`);
     return false;
   }
 
@@ -113,14 +117,16 @@ export class CryptoUtils {
       nodePublicKeys.set(node, nodeKey);
     }
 
-    if (! nodePublicKeys.has(myName)) {
-      nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
-    }
+    // if (! nodePublicKeys.has(myName)) {
+    //   nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
+    // }
 
     /**
      * FIXME remove dummy keys
      */
+    console.log("dummy public key", base58.encode(this.getDummyPublicKey(configDir)));
     nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
+    nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
 
     assert(ec.publicKeyCreate(privateKey).equals(nodePublicKeys.get(myName)), `public key for node ${myName} should match private; ${base58.encode(privateKey)}->${base58.encode(ec.publicKeyCreate(privateKey))} != ${base58.encode(nodePublicKeys.get(myName))}`);
     return new CryptoUtils(privateKey, nodePublicKeys, myName);
@@ -140,11 +146,13 @@ export class CryptoUtils {
      * FIXME remove dummy keys
      */
     const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
+    console.log(`Got public key ${base58.encode(publicKey)} for ${signer}`);
     if (! publicKey) {
       return false;
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
     const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
+    console.log(`Got result for `, digest, signature, publicKey, ec.verify(digest, base58.decode(signature), publicKey));
     return ec.verify(digest, base58.decode(signature), publicKey);
   }
 
@@ -186,6 +194,7 @@ export class CryptoUtils {
     try {
       return base58.decode(fs.readFileSync(`${configDir}/test-public-key`, "utf8"));
     } catch (e) {
+      console.log(e)
       return;
     }
   }

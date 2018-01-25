@@ -90,8 +90,8 @@ export default class PbftConsensus {
   private initPending(slotNumber: number) {
     if (! this.pendingTransactions.has(slotNumber)) {
       this.pendingTransactions.set(slotNumber,  {
-          qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 5000),
-          qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 10000),
+          qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 200000),
+          qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 300000),
           tx: undefined,
           modifiedAddressesJson: undefined
       });
@@ -102,6 +102,8 @@ export default class PbftConsensus {
     this.initPending(message.slotNumber);
 
     const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
+
+    logger.info("Preparing pending transaction", message.tx);
 
     pendingTransaction.qv1.verify(`prepare:${message.slotNumber},${message.txHash}`, message.signer, message.signature);
     if (message.signer === await this.getLeader()) {
