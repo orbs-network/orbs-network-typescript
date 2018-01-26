@@ -8,11 +8,17 @@ export class ErrorHandler {
   public static setup(abortOnUncaught: boolean = false, gracefulShutdown?: Callback) {
     const onError = uncaughtHandler({
       logger: {
-        fatal: function fatal(message, metaObj, callback) {
-          logger.fatal(message, metaObj, () => {
-            console.log("I AM HERE!!!");
-            callback();
-          });
+        fatal: function fatal(message, meta, callback) {
+          logger.error(message, meta.error);
+          logger.error(meta.error.stack);
+
+          callback();
+        },
+      },
+      statsd: {
+        // TODO: add stats support.
+        immediateIncrement: (key, count, callback) => {
+          callback();
         },
       },
       meta: {
