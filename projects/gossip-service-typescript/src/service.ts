@@ -1,6 +1,8 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import Gossip from "./gossip";
 import bind from "bind-decorator";
+
+ErrorHandler.setup();
 
 export default class GossipService {
 
@@ -47,14 +49,6 @@ export default class GossipService {
     setTimeout(() => {
       this.gossip.connect(topology.gossipPeers);
     }, Math.ceil(Math.random() * 3000));
-    process.on("uncaughtException", (err: Error) => {
-      console.error(`${__filename}: Caught exception: ${err}`);
-      console.error(err.stack);
-    });
-    process.on("unhandledRejection", (err: Error) => {
-      console.error(`${__filename}: Unhandled rejection: ${err}`);
-      console.error(err.stack);
-    });
   }
 
   constructor() {

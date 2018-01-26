@@ -1,7 +1,9 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import MemoryKVStore from "./kvstore/memory-kvstore";
 import * as _ from "lodash";
+
+ErrorHandler.setup();
 
 export default class StateStorageService {
 
