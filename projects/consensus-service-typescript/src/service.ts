@@ -30,6 +30,5 @@ export default class ConsensusService {
 
   constructor() {
     logger.info(`${topology.name}: service started`);
-
   }
 }
