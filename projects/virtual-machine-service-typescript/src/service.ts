@@ -1,7 +1,9 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import * as _ from "lodash";
 import bind from "bind-decorator";
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
+
+ErrorHandler.setup();
 
 export default class VirtualMachineService {
 

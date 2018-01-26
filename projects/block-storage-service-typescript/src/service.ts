@@ -1,7 +1,8 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import * as _ from "lodash";
 
+ErrorHandler.setup();
 
 // TODO: support a head block which refers to a NULL prev block
 const DEFAULT_GENESIS_BLOCK: types.Block = {
@@ -16,14 +17,11 @@ export default class BlockStorageService {
 
   storedBlocks: types.Block[] = [DEFAULT_GENESIS_BLOCK];
 
-  // rpc interface
-
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
-
 
   @bind
   public async addBlock(rpc: types.AddBlockContext) {
@@ -44,10 +42,9 @@ export default class BlockStorageService {
       rpc.res = {blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex)};
 
       // logger.info(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
-
   }
 
-    // service logic
+  // service logic
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
@@ -59,7 +56,6 @@ export default class BlockStorageService {
     this.askForHeartbeat(this.peers.gossip);
      */
   }
-
 
   async main() {
     this.peers = topologyPeers(topology.peers);

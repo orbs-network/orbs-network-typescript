@@ -1,12 +1,12 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import PbftConsensus from "./pbft-consensus";
+
+ErrorHandler.setup();
 
 export default class ConsensusService {
 
   consensus = new PbftConsensus();
-
-  // rpc interface
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
@@ -28,25 +28,8 @@ export default class ConsensusService {
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
 
-  // service logic
-
-  async main() {
-  }
-
   constructor() {
     logger.info(`${topology.name}: service started`);
-    setTimeout(() => this.main(), 2000);
-    process.on("uncaughtException", (err: Error) => {
-      console.error(`${__filename}: Caught exception: ${err}`);
-      console.error(err.stack);
-    });
-    process.on("unhandledRejection", (err: Error) => {
-      console.error(`${__filename}: Unhandled rejection: ${err}`);
-      console.error(err.stack);
-    });
-
-
 
   }
-
 }
