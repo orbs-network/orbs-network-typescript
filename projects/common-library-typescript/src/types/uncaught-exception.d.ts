@@ -8,4 +8,3 @@ declare namespace uncaught_exception {
     const prototype: {
     };
 }
-

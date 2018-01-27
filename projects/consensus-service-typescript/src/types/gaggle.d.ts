@@ -13,8 +13,5 @@ declare namespace gaggle {
     namespace enhanceServerForSocketIOChannel {
         const prototype: {
         };
-
     }
-
 }
-
