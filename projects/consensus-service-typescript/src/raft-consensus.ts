@@ -62,7 +62,7 @@ export default class RaftConsensus {
 
     this.node = gaggle({
       id: crypto.whoAmI(),
-      clusterSize: 6,
+      clusterSize: consensusConfig.clusterSize,
       channel: {
         name: "custom",
         connector: this.connector
