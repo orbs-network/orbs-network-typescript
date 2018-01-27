@@ -13,6 +13,8 @@ export default class SidechainConnectorService {
   ethereumConnector: EthereumConnector;
   options: SidechainConnectorServiceOptions;
 
+  public static readonly DEFAULT_ETHEREUM_NODE_HTTP_ADDRESS = "http://localhost:8545";
+
   // rpc interface
 
   @bind
@@ -43,7 +45,7 @@ export default class SidechainConnectorService {
   }
 
   private createEthereumConnector(): EthereumConnector {
-    const address = this.options.ethereumNodeHttpAddress || "http://localhost:8545";
+    const address = this.options.ethereumNodeHttpAddress || SidechainConnectorService.DEFAULT_ETHEREUM_NODE_HTTP_ADDRESS;
     logger.info(`setting up connector to ethereum node on address ${address}`);
     return EthereumConnector.createHttpConnector(address);
   }
