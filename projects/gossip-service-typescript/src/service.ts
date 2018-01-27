@@ -19,14 +19,14 @@ export default class GossipService {
 
   @bind
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    logger.info(`${topology.name}: broadcastMessage ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: broadcastMessage ${JSON.stringify(rpc.req)}`);
     this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
 
   @bind
   public async unicastMessage(rpc: types.UnicastMessageContext) {
-    logger.info(`${topology.name}: unicastMessage ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: unicastMessage ${JSON.stringify(rpc.req)}`);
     this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
