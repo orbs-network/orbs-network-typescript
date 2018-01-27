@@ -2,7 +2,6 @@ import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
 import { logger, types, config, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
-import { Consensus } from "../../architecture/dist/index";
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
