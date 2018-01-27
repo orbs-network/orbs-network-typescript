@@ -16,7 +16,7 @@ export class Config {
     nconf.argv().env().file(path.resolve(__dirname, Config.RELATIVE_PATH, Config.getEnvironment()) + Config.EXT);
   }
 
-  public get(key: string): string {
+  public get(key: string): any {
     return nconf.get(key);
   }
 

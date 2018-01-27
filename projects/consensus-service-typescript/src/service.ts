@@ -1,12 +1,11 @@
 import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
-import PbftConsensus from "./pbft-consensus";
+import RaftConsensus from "./raft-consensus";
 
 ErrorHandler.setup();
 
 export default class ConsensusService {
-
-  consensus = new PbftConsensus();
+  private consensus: RaftConsensus;
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
@@ -17,7 +16,9 @@ export default class ConsensusService {
   @bind
   public async sendTransaction(rpc: types.SendTransactionContext) {
     logger.info(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
-    await this.consensus.proposeChange(rpc.req.transaction, rpc.req.transactionAppendix);
+
+    await this.consensus.onAppend(rpc.req.transaction, rpc.req.transactionAppendix);
+
     rpc.res = {};
   }
 
@@ -25,10 +26,13 @@ export default class ConsensusService {
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     logger.debug(`${topology.name}: gossipMessageReceived ${JSON.stringify(rpc.req)}`);
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
+
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
 
   constructor() {
     logger.info(`${topology.name}: service started`);
+
+   this.consensus = new RaftConsensus();
   }
 }
