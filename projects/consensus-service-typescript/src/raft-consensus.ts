@@ -1,7 +1,7 @@
 import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
-import { logger, types, config, topology, topologyPeers, QuorumVerifier, CryptoUtils } from "orbs-common-library";
+import { logger, types, config, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
 import { Consensus } from "../../architecture/dist/index";
 
 const crypto = CryptoUtils.loadFromConfiguration();
@@ -44,7 +44,6 @@ class RPCConnector extends EventEmitter {
 
 export default class RaftConsensus {
   private vm = topologyPeers(topology.peers).virtualMachine;
-  private consensus = topologyPeers(topology.peers).consensus;
   private blockStorage = topologyPeers(topology.peers).blockStorage;
 
   private connector: RPCConnector;
