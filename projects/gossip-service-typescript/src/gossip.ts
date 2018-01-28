@@ -1,7 +1,7 @@
 import * as WebSocket from "ws";
 import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
-import { includes } from "lodash";
+import { includes, CurriedFunction1 } from "lodash";
 import { platform, networkInterfaces } from "os";
 
 function stringToBuffer(str: string): Buffer {
@@ -13,6 +13,14 @@ function stringToBuffer(str: string): Buffer {
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
+function handleWSError(address: string, url: string) {
+  return (err: Error) => {
+    if (err) {
+      logger.error(`WebSocket error`, {err});
+      logger.error(`Error sending unicast message to ${address} (${url})`);
+    }
+  }
+}
 
 export default class Gossip {
   localAddress: string = crypto.whoAmI();
@@ -88,12 +96,7 @@ export default class Gossip {
   broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     this.clients.forEach((client: WebSocket, address: string) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]), (err) => {
-          if (err) {
-            logger.error(`WebSocket error`, {err});
-            logger.error(`Error sending broadcast message to ${address} (${client.url})`);
-          }
-        });
+        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]), handleWSError(address, client.url));
       }
     });
   }
@@ -102,21 +105,11 @@ export default class Gossip {
     const remote: WebSocket = this.clients.get(recipientAddress);
     const message: Buffer = Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(recipientAddress), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]);
     if (remote) {
-      remote.send(message, (err) => {
-          if (err) {
-            logger.error(`WebSocket error`, {err});
-            logger.error(`Error sending unicast message to ${recipientAddress} (${remote.url})`);
-          }
-        });
+      remote.send(message, handleWSError(recipientAddress, remote.url));
     }
     else {
       this.clients.forEach((remote: WebSocket, address) => {
-        remote.send(message, (err) => {
-          if (err) {
-            logger.error(`WebSocket error`, {err});
-            logger.error(`Error sending unicast message to ${address} (${remote.url})`);
-          }
-        });
+        remote.send(message, handleWSError(recipientAddress, remote.url));
       });
     }
   }
