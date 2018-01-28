@@ -111,16 +111,19 @@ export class CryptoUtils {
       nodePublicKeys.set(node, nodeKey);
     }
 
-    // if (! nodePublicKeys.has(myName)) {
-    //   nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
-    // }
-
     /**
-     * FIXME remove dummy keys
+     * FIXME remove dummy keys after we can exchange keys
      */
-    console.log("Using dummy public key", base58.encode(this.getDummyPublicKey(configDir)));
-    nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
-    nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
+
+    const dummyPubicKey = this.getDummyPublicKey(configDir);
+
+    if (dummyPubicKey) {
+      console.log("Using dummy public key", base58.encode(dummyPubicKey));
+      nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
+      nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
+    } else {
+      nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
+    }
 
     assert(ec.publicKeyCreate(privateKey).equals(nodePublicKeys.get(myName)), `public key for node ${myName} should match private; ${base58.encode(privateKey)}->${base58.encode(ec.publicKeyCreate(privateKey))} != ${base58.encode(nodePublicKeys.get(myName))}`);
     return new CryptoUtils(privateKey, nodePublicKeys, myName);
@@ -187,7 +190,6 @@ export class CryptoUtils {
     try {
       return base58.decode(fs.readFileSync(`${configDir}/test-public-key`, "utf8"));
     } catch (e) {
-      console.log(e)
       return;
     }
   }
