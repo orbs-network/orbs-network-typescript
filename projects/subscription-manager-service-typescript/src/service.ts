@@ -1,9 +1,15 @@
 import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
+import ERCBillingContractProxy from "./erc-billing-contract-proxy";
 
+class SusbcriptionManagerServiceConfiguration {
+  ethereumContractAddress?: string;
+}
 export default class SusbcriptionManagerService {
 
   peers: types.ClientMap;
+  private contractProxy: ERCBillingContractProxy;
+  config: SusbcriptionManagerServiceConfiguration;
 
   // rpc interface
 
@@ -20,7 +26,10 @@ export default class SusbcriptionManagerService {
     logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
+  @bind
   async getSubscriptionStatus(rpc: types.GetSubscriptionStatusContext) {
+    const {id, tokens } = await this.contractProxy.getSubscription(rpc.req.subscriptionKey);
+    rpc.res = { active: tokens.greaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000};
   }
 
   askForHeartbeats() {
@@ -28,11 +37,14 @@ export default class SusbcriptionManagerService {
 
   async main() {
     this.peers = topologyPeers(topology.peers);
+    this.contractProxy = new ERCBillingContractProxy(topologyPeers(topology.peers).sidechainConnector, this.config.ethereumContractAddress);
     setInterval(() => this.askForHeartbeats(), 5000);
   }
 
-  constructor() {
+  constructor(config: SusbcriptionManagerServiceConfiguration) {
+    this.config = config;
     logger.info(`${topology.name}: service started`);
+    logger.debug(`${topology.name}: configuration = ${JSON.stringify(this.config)}`);
     setTimeout(() => this.main(), 2000);
   }
 
