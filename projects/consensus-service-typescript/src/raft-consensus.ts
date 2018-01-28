@@ -5,7 +5,8 @@ import { logger, types, config, topology, topologyPeers, CryptoUtils } from "orb
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
-// An RPC adapter to use with Gaggle's channels.
+// An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
+// for using Gaggle's "custom" channel (which we've extended ourselves).
 class RPCConnector extends EventEmitter {
   private gossip = topologyPeers(topology.peers).gossip;
 
@@ -16,6 +17,7 @@ class RPCConnector extends EventEmitter {
   }
 
   public received(originNodeId: string, message: any): void {
+    // Propagate broadcast messages or unicast messages from other nodes.
     if (message.to === undefined || message.to === crypto.whoAmI()) {
       this.emit("received", originNodeId, message);
     }
@@ -50,6 +52,7 @@ export default class RaftConsensus {
   private blockId: number;
 
   public constructor() {
+    // Get the protocol configuration from the environment settings.
     const consensusConfig = config.get("consensus");
     if (!consensusConfig) {
       throw new Error("Couldn't find consensus configuration!");
@@ -76,9 +79,12 @@ export default class RaftConsensus {
       heartbeatInterval: consensusConfig.heartbeatInterval
     });
 
+    // Nodes will emit "committed" events whenever the cluster comes to consensus about an entry
     this.node.on("committed", async (data: any) => {
       const txData = data.data;
 
+      // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
+      // committed entry.
       this.blockId++;
 
       await this.blockStorage.addBlock({
@@ -92,6 +98,8 @@ export default class RaftConsensus {
     });
   }
 
+  // Suggests new entry to be appended to the Raft log (e.g., new transaction), by first executing the transaction and
+  // then propagating the transaction with its execution outputs.
   async onAppend(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
     const vmResult = await this.vm.executeTransaction({
       contractAddress: tx.contractAddress,
