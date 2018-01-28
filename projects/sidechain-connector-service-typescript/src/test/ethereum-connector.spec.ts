@@ -1,6 +1,6 @@
 const {Assertion, expect} = require("chai");
 const Web3 = require("web3");
-const ganache = require("ganache-cli");
+const ganache = require("ganache-core");
 const path = require("path");
 const fs = require("fs");
 const solc = require("solc");
@@ -8,32 +8,50 @@ const solc = require("solc");
 import EthereumConnector from "../ethereum-connector";
 
 const SIMPLE_STORAGE_SOLIDITY_CONTRACT = `
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.19;
 contract SimpleStorage {
-  uint myVariable;
+  struct Item {
+      uint256 intValue;
+      string stringValue;
+  }
+  Item item;
 
-  function SimpleStorage(uint x) public {
-    myVariable = x;
+  function SimpleStorage(uint256 _intValue, string _stringValue) public {
+      set(_intValue, _stringValue);
   }
 
-  function set(uint x) public {
-    myVariable = x;
+  function set(uint256 _intValue, string _stringValue) private {
+    item.intValue = _intValue;
+    item.stringValue = _stringValue;
   }
 
-  function get() constant public returns (uint) {
-    return myVariable;
+  function getInt() constant public returns (uint256) {
+    return item.intValue;
+  }
+
+  function getString() constant public returns (string) {
+    return item.stringValue;
+  }
+
+  function getTuple() public view returns (Item) {
+      return item;
+  }
+
+  function getValues() public view returns (uint256 intValue, string stringValue) {
+    intValue = item.intValue;
+    stringValue = item.stringValue;
   }
 }
 `;
 
-async function deployContract(web3, initialValue: number) {
+async function deployContract(web3, intValue: number, stringValue: string) {
     // compile contract
     const output = solc.compile(SIMPLE_STORAGE_SOLIDITY_CONTRACT, 1);
     const bytecode = output.contracts[":SimpleStorage"].bytecode;
     const abi = JSON.parse(output.contracts[":SimpleStorage"].interface);
     // deploy contract
     const contract = new web3.eth.Contract(abi, {data: "0x" + bytecode});
-    const tx = contract.deploy({arguments: [initialValue]});
+    const tx = contract.deploy({arguments: [intValue, stringValue]});
     const account = (await web3.eth.getAccounts())[0];
     return tx.send({
         from: account,
@@ -50,23 +68,30 @@ describe("Ethereum connector", () => {
     const ganacheConnector = new EthereumConnector(web3);
 
         describe("call to a deployed SimpleStorage contract's get() method", () => {
-            const randomInt = Math.floor(Math.random() * 10000000);
+            const intValue = Math.floor(Math.random() * 10000000);
+            const stringValue = "foobar";
             let contractAddress;
             let res;
             before(async function() {
                 this.timeout(30000);
-                contractAddress = await deployContract(web3, randomInt);
+                contractAddress = await deployContract(web3, intValue, stringValue);
                 res = await ganacheConnector.call(
-                    contractAddress,
-                    {name: "get", inputs: [], outputs: [{name: "", type: "uint256"}]},
-                    []
-                );
+                    contractAddress, {
+                        name: "getValues",
+                        inputs: [],
+                        outputs: [
+                            {name: "intValue", type: "uint256"},
+                            {name: "stringValue", type: "string"}
+                        ]
+                    }, []);
             });
-            it("should return the value passed to the contract constructor", () => {
-                expect(res).to.own.property("result", randomInt.toString());
+            it("should return the values passed to the contract constructor", () => {
+                expect(res).to.own.property("result");
+                expect(res.result).to.own.property("intValue", intValue.toString());
+                expect(res.result).to.own.property("stringValue", stringValue);
             });
             it("should return a valid block with a recent timestamp", () => {
-                expect(res.block).to.exist;
+                expect(res).to.own.property("block");
                 expect(res.block).to.own.property("timestamp");
                 const now = Date.now() / 1000;
                 expect(res.block.timestamp).to.be.gt(now - 600);
