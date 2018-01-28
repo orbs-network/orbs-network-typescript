@@ -1,7 +1,7 @@
 import * as WebSocket from "ws";
 import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
-import { range, isObject, map } from "lodash";
+import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 
 function stringToBuffer(str: string): Buffer {
@@ -72,8 +72,6 @@ export default class Gossip {
         this.listeners.set(broadcastGroup, peer);
       }
 
-      logger.info(`${this.localAddress} received message from ${recipient}`);
-
       this.listeners.get(broadcastGroup).gossipMessageReceived({FromAddress: sender.toString(), BroadcastGroup: broadcastGroup, MessageType: objectType, Buffer: objectRaw});
     });
 
@@ -124,8 +122,8 @@ export default class Gossip {
   }
 
   networkInterface(): any {
-    const [eth, lo] = platform() == "darwin" ? ["en0", "lo0"] : ["eth0", "lo"];
-    return networkInterfaces()[topology.global ? eth : lo].filter(iface => iface.family === "IPv4")[0];
+    const eth = platform() == "darwin" ? "en0" : "eth0";
+    return networkInterfaces()[eth].filter(iface => iface.family === "IPv4")[0];
   }
 
   public ip(): string {
@@ -134,31 +132,7 @@ export default class Gossip {
 
   public possiblePeers(): string[] {
     const ip = this.ip();
-
-    if (ip === "127.0.0.1") {
-      // Hardcoded values for localhost
-      return map(range(60000, 60010, 1), (portNumber) => {
-        return `127.0.0.1:${portNumber}`;
-      });
-    }
-
-    const peers = topology.gossipPeers.filter((p: string) => p !== this.ip());
-    return peers.map((address: string) => {
-      return `${address}:${topology.gossipPort}`;
-    });
-  }
-
-  async testPeerConnection(address: string): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      const ws: WebSocket = new WebSocket(address);
-
-      ws.on("message", (data: Buffer) => {
-        ws.close();
-        resolve({name: data.toString(), address});
-      });
-
-      setTimeout(reject, 3000);
-    });
+    return topology.gossipPeers.filter((p: string) => !includes(p, ip));
   }
 
   public activePeers() {
@@ -166,14 +140,6 @@ export default class Gossip {
   }
 
   async discoverPeers(): Promise<string[]> {
-    return Promise.all(this.possiblePeers().map(p => `ws://${p}`));
-    // .map((address: string) => {
-    //   return this.testPeerConnection(`ws://${address}`).catch((err) => {
-    //     // console.log(port, err);
-    //     return;
-    //   });
-    // })).then((peers: any[]) => {
-    //   return map(peers.filter((peer) => isObject(peer) && peer.name != this.helloMessage().toString()), "address");
-    // });
+    return Promise.resolve(this.possiblePeers());
   }
 }
