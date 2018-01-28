@@ -82,21 +82,15 @@ export class CryptoUtils {
     try {
       return fs.readFileSync(`${configDir}/name`, "utf8").trim();
     } catch (e) {
-      /**
-       * FIXME relative path
-       */
-      const consensus = require(`${configDir}/../consensus`);
-      /**
-       * FIXME linux-specific
-       */
       try {
+        const leader = fs.readFileSync(`${configDir}/leader`, "utf8").trim();
         const ip = networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
-        if (consensus.leader === ip) {
-          console.log("I AM THE LEADER", ip);
+
+        if (leader === ip) {
+          console.log(`Elected leader node1 at ${ip}`);
           return "node1";
         }
       } catch (e) {}
-
 
       return os.hostname();
     }
@@ -124,7 +118,7 @@ export class CryptoUtils {
     /**
      * FIXME remove dummy keys
      */
-    console.log("dummy public key", base58.encode(this.getDummyPublicKey(configDir)));
+    console.log("Using dummy public key", base58.encode(this.getDummyPublicKey(configDir)));
     nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
     nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
 
@@ -152,7 +146,6 @@ export class CryptoUtils {
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
     const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
-    console.log(`Got result for `, digest, signature, publicKey, ec.verify(digest, base58.decode(signature), publicKey));
     return ec.verify(digest, base58.decode(signature), publicKey);
   }
 
