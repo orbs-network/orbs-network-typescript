@@ -19,7 +19,7 @@ function handleWSError(address: string, url: string) {
       logger.error(`WebSocket error`, {err});
       logger.error(`Error sending unicast message to ${address} (${url})`);
     }
-  }
+  };
 }
 
 export default class Gossip {
