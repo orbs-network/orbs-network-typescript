@@ -3,13 +3,6 @@ import { logger, types, topology, topologyPeers, QuorumVerifier, CryptoUtils } f
 const crypto = CryptoUtils.loadFromConfiguration();
 import { networkInterfaces } from "os";
 
-/**
- * linux-specific
- */
-function ip(): string {
-  return networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
-}
-
 logger.info(crypto.whoAmI(), topology);
 
 export default class PbftConsensus {
@@ -90,8 +83,8 @@ export default class PbftConsensus {
   private initPending(slotNumber: number) {
     if (! this.pendingTransactions.has(slotNumber)) {
       this.pendingTransactions.set(slotNumber,  {
-          qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 200000),
-          qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 300000),
+          qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 5000),
+          qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 10000),
           tx: undefined,
           modifiedAddressesJson: undefined
       });
@@ -149,7 +142,7 @@ export default class PbftConsensus {
     const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
     const {qv2, tx, modifiedAddressesJson} = pendingTransaction;
 
-    logger.info(`Trying to commit pending transaction `, tx);
+    logger.info("Committing pending transaction", tx);
 
     const verified = await qv2.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
 
