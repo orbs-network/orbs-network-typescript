@@ -79,7 +79,10 @@ export default class RaftConsensus {
       heartbeatInterval: consensusConfig.heartbeatInterval
     });
 
-    // Nodes will emit "committed" events whenever the cluster comes to consensus about an entry
+    // Nodes will emit "committed" events whenever the cluster comes to consensus about an entry.
+    //
+    // Note: we might consider adding transactions as the result to the "appended" event, which will require further
+    // synchronization, but will make everything a wee bit faster.
     this.node.on("committed", async (data: any) => {
       const txData = data.data;
 
