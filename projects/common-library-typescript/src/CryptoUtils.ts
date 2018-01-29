@@ -115,10 +115,7 @@ export class CryptoUtils {
       nodePublicKeys.set(node, nodeKey);
     }
 
-    /**
-     * TODO remove dummy keys after we can exchange keys
-     */
-
+    // TODO remove dummy keys after we can exchange keys
     const dummyPubicKey = this.getDummyPublicKey(configDir);
 
     if (dummyPubicKey) {
@@ -143,12 +140,10 @@ export class CryptoUtils {
   }
 
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
-    /**
-     * TODO remove dummy keys
-     */
+    // TODO remove dummy keys
     const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
     logger.debug(`Got public key ${base58.encode(publicKey)} for ${signer}`);
-    if (! publicKey) {
+    if (!publicKey) {
       return false;
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
