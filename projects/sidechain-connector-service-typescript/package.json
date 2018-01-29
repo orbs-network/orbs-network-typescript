@@ -24,7 +24,7 @@
     "orbs-common-library": "file:../common-library-typescript",
     "types-bn": "0.0.1",
     "underscore": "^1.8.3",
-    "web3": "^1.0.0-beta.20"
+    "web3": "^1.0.0-beta.29"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.63",
@@ -34,7 +34,7 @@
     "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
     "concurrently": "^3.4.0",
-    "ganache-cli": "^6.0.3",
+    "ganache-core": "^2.0.2",
     "mocha": "^4.1.0",
     "nodemon": "^1.11.0",
     "shelljs": "^0.7.7",
