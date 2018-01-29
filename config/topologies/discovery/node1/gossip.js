@@ -1,3 +1,5 @@
+const GOSSIP_PEERS = process.env.GOSSIP_PEERS ? process.env.GOSSIP_PEERS.split(',') : undefined;
+
 module.exports = {
   "name": `${require('os').hostname()}-block-gossip`,
   "version": "1.0.0",
@@ -14,7 +16,7 @@ module.exports = {
     }
   ],
   "gossipPort": "60001",
-  "gossipPeers": [
+  "gossipPeers": GOSSIP_PEERS || [
     "ws://172.1.1.2:60001",
     "ws://172.1.1.3:60001",
     "ws://172.1.1.4:60001",
