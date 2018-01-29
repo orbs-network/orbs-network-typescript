@@ -12,6 +12,9 @@ const ec = require("secp256k1");
 const base58 = require("bs58");
 const os = require("os");
 
+const GOSSIP_LEADER_IP = process.env.GOSSIP_LEADER_IP;
+const NODE_IP = process.env.NODE_IP;
+
 export class QuorumVerifier {
   private promise: Promise<Iterable<string>>;
   private cu: CryptoUtils;
@@ -84,8 +87,8 @@ export class CryptoUtils {
       return fs.readFileSync(`${configDir}/name`, "utf8").trim();
     } catch (e) {
       try {
-        const leader = fs.readFileSync(`${configDir}/leader`, "utf8").trim();
-        const ip = networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
+        const leader = GOSSIP_LEADER_IP || fs.readFileSync(`${configDir}/leader`, "utf8").trim();
+        const ip = NODE_IP || networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
 
         if (leader === ip) {
           logger.info(`Elected leader node1 at ${ip}`);

@@ -13,6 +13,8 @@ function stringToBuffer(str: string): Buffer {
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
+const NODE_IP = process.env.NODE_IP;
+
 function handleWSError(address: string, url: string) {
   return (err: Error) => {
     if (err) {
@@ -120,7 +122,7 @@ export default class Gossip {
   }
 
   public ip(): string {
-    return this.networkInterface().address;
+    return NODE_IP || this.networkInterface().address;
   }
 
   public possiblePeers(): string[] {
