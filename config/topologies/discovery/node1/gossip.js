@@ -1,7 +1,8 @@
+const NAME = process.env.NODE_NAME || process.env.NODE_IP || require('os').hostname();
 const GOSSIP_PEERS = process.env.GOSSIP_PEERS ? process.env.GOSSIP_PEERS.split(',') : undefined;
 
 module.exports = {
-  "name": `${require('os').hostname()}-block-gossip`,
+  "name": `${NAME}-block-gossip`,
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51153",
   "project": "gossip-service-typescript",
