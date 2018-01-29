@@ -101,7 +101,9 @@ export default class RaftConsensus {
     });
 
     this.node.on("leaderElected", () => {
-      logger.info(`Node ${this.node.id} was elected as a new leader!`);
+      if (this.node.isLeader()) {
+        logger.info(`Node ${this.node.id} was elected as a new leader!`);
+      }
     });
   }
 
