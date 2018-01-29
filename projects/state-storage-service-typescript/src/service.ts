@@ -1,7 +1,9 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import MemoryKVStore from "./kvstore/memory-kvstore";
 import * as _ from "lodash";
+
+ErrorHandler.setup();
 
 export default class StateStorageService {
 
@@ -28,37 +30,37 @@ export default class StateStorageService {
 
     const values = await this.kvstore.getMany(rpc.req.address, rpc.req.keys);
 
-    rpc.res = {values: _.fromPairs([...values])};
+    rpc.res = { values: _.fromPairs([...values]) };
   }
 
   async waitForBlockState(blockId: number, timeout = 5000) {
-      return new Promise((resolve, reject) => {
-          if (blockId < this.lastBlockId)
-              reject(new Error(`attempt to read old state (${blockId} != ${this.lastBlockId})`));
+    return new Promise((resolve, reject) => {
+      if (blockId < this.lastBlockId)
+        reject(new Error(`attempt to read old state (${blockId} != ${this.lastBlockId})`));
 
-          if (blockId > this.lastBlockId) {
-              if (timeout < 200) {
-                  reject(new Error(`timeout in attempt to read block state (${blockId} != ${this.lastBlockId})`));
-              } else {
-                  setTimeout(() => this.waitForBlockState(blockId, timeout - 200), 200);
-              }
-          }
-          resolve();
-      });
+      if (blockId > this.lastBlockId) {
+        if (timeout < 200) {
+          reject(new Error(`timeout in attempt to read block state (${blockId} != ${this.lastBlockId})`));
+        } else {
+          setTimeout(() => this.waitForBlockState(blockId, timeout - 200), 200);
+        }
+      }
+      resolve();
+    });
   }
 
-    // service logic
+  // service logic
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
     logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   async pollBlockStorage() {
-    const {blocks} = await this.peers.blockStorage.getBlocks({lastBlockId: this.lastBlockId});
+    const { blocks } = await this.peers.blockStorage.getBlocks({ lastBlockId: this.lastBlockId });
 
     // assuming an ordered list of blocks
     for (const block of blocks) {
-        await this.processNextBlock(block);
+      await this.processNextBlock(block);
     }
 
     setTimeout(() => this.pollBlockStorage(), 200);
@@ -66,11 +68,11 @@ export default class StateStorageService {
 
   async processNextBlock(block: types.Block) {
     if (block.prevBlockId == this.lastBlockId) {
-        const modifiedArgs = new Map<string, string>(_.toPairs(JSON.parse(block.modifiedAddressesJson)));
-        await this.kvstore.setMany(block.tx.contractAddress, modifiedArgs);
-        this.lastBlockId = block.id;
+      const modifiedArgs = new Map<string, string>(_.toPairs(JSON.parse(block.modifiedAddressesJson)));
+      await this.kvstore.setMany(block.tx.contractAddress, modifiedArgs);
+      this.lastBlockId = block.id;
     } else {
-        throw new Error("block unexpected. out of sync?");
+      throw new Error("block unexpected. out of sync?");
     }
   }
 
