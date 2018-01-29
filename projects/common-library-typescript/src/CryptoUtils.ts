@@ -5,6 +5,7 @@ import * as assert from "assert";
 import * as path from "path";
 import * as config from "./config";
 import { networkInterfaces } from "os";
+import { logger } from "./logger";
 
 const crypto = require("crypto");
 const ec = require("secp256k1");
@@ -36,18 +37,18 @@ export class QuorumVerifier {
   }
 
   verify(value: Buffer | string, signer: string, signature: string): boolean {
-    console.warn("Verifying signature", signature);
+    logger.debug("Verifying signature", signature);
     if (this.cu.verifySignature(signer, value, signature)) {
-      console.warn("Verified signature", signature);
+      logger.debug("Verified signature", signature);
       this.signers.add(signer);
-      console.warn(`Verified by ${this.signers.size} / ${this.requiredQuorum}`, signature);
+      logger.debug(`Verified by ${this.signers.size} / ${this.requiredQuorum}`, signature);
       if (this.signers.size >= this.requiredQuorum) {
         clearTimeout(this.timeout);
         this.acceptFunction(this.signers.keys());
         return true;
       }
     }
-    console.warn(`Failed to verify signature ${signature} by ${signer}`);
+    logger.debug(`Failed to verify signature ${signature} by ${signer}`);
     return false;
   }
 
@@ -87,7 +88,7 @@ export class CryptoUtils {
         const ip = networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
 
         if (leader === ip) {
-          console.log(`Elected leader node1 at ${ip}`);
+          logger.info(`Elected leader node1 at ${ip}`);
           return "node1";
         }
       } catch (e) {}
@@ -112,13 +113,13 @@ export class CryptoUtils {
     }
 
     /**
-     * FIXME remove dummy keys after we can exchange keys
+     * TODO remove dummy keys after we can exchange keys
      */
 
     const dummyPubicKey = this.getDummyPublicKey(configDir);
 
     if (dummyPubicKey) {
-      console.log("Using dummy public key", base58.encode(dummyPubicKey));
+      logger.warn("Using dummy public key", base58.encode(dummyPubicKey));
       nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
       nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
     } else {
@@ -140,10 +141,10 @@ export class CryptoUtils {
 
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
     /**
-     * FIXME remove dummy keys
+     * TODO remove dummy keys
      */
     const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
-    console.log(`Got public key ${base58.encode(publicKey)} for ${signer}`);
+    logger.debug(`Got public key ${base58.encode(publicKey)} for ${signer}`);
     if (! publicKey) {
       return false;
     }

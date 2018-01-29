@@ -37,7 +37,7 @@ export default class GossipService {
   }
 
   askForHeartbeats() {
-    // this.askForHeartbeat(this.peers.publicApi);
+    this.askForHeartbeat(this.peers.publicApi);
     // this.askForHeartbeat(this.peers.transactionPool);
   }
 

@@ -5,6 +5,8 @@ import { CryptoUtils } from "orbs-common-library/src/CryptoUtils";
 import { delay } from "bluebird";
 
 
+const E2E_PUBLIC_API_ENDPOINT = process.env.E2E_PUBLIC_API_ENDPOINT || "0.0.0.0:51251";
+
 const accounts = new Map<string, Account>();
 
 type contractMethodArgs = [string | number] | undefined[];
@@ -140,8 +142,7 @@ Assertion.addMethod("bars", assertModelBars);
 
 async function anAccountWith(input: {bars: number}) {
     const accountCrypto: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
-    const endpoint = process.env.E2E_PUBLIC_API_ENDPOINT || "0.0.0.0:51251";
-    const account = new Account(accountCrypto, endpoint);
+    const account = new Account(accountCrypto, E2E_PUBLIC_API_ENDPOINT);
 
     accounts.set(account.getAddress(), account);
 

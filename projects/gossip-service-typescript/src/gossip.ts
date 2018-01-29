@@ -1,7 +1,7 @@
 import * as WebSocket from "ws";
 import { logger, topology, topologyPeers } from "orbs-common-library";
 import { CryptoUtils } from "../../common-library-typescript";
-import { includes, CurriedFunction1 } from "lodash";
+import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 
 function stringToBuffer(str: string): Buffer {
