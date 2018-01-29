@@ -1,9 +1,6 @@
 import { logger, types, topology, topologyPeers, QuorumVerifier, CryptoUtils } from "orbs-common-library";
 
 const crypto = CryptoUtils.loadFromConfiguration();
-import { networkInterfaces } from "os";
-
-logger.info(crypto.whoAmI(), topology);
 
 export default class PbftConsensus {
   private leader: string = undefined;
