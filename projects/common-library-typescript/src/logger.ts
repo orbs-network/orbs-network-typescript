@@ -67,6 +67,10 @@ export class Logger {
     return this._logger.error(msg, ...meta);
   }
 
+  public readonly fatal: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
+    return this._logger.emerg(msg, ...meta);
+  }
+
   private mkdir(): void {
     // Create the directory, if it does not exist.
     const logsDir = Logger.resolvePath(path.dirname(this.getFileName()));

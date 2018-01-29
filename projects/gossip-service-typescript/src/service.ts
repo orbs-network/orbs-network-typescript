@@ -1,6 +1,8 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import Gossip from "./gossip";
 import bind from "bind-decorator";
+
+ErrorHandler.setup();
 
 export default class GossipService {
 
@@ -17,14 +19,14 @@ export default class GossipService {
 
   @bind
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    logger.info(`${topology.name}: broadcastMessage ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: broadcastMessage ${JSON.stringify(rpc.req)}`);
     this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
 
   @bind
   public async unicastMessage(rpc: types.UnicastMessageContext) {
-    logger.info(`${topology.name}: unicastMessage ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: unicastMessage ${JSON.stringify(rpc.req)}`);
     this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
@@ -62,14 +64,6 @@ export default class GossipService {
         this.gossip.connect(gossipPeers);
       }).catch(logger.error);
     }, Math.ceil(Math.random() * 3000));
-    process.on("uncaughtException", (err: Error) => {
-      console.error(`${__filename}: Caught exception: ${err}`);
-      console.error(err.stack);
-    });
-    process.on("unhandledRejection", (err: Error) => {
-      console.error(`${__filename}: Unhandled rejection: ${err}`);
-      console.error(err.stack);
-    });
   }
 
   constructor() {
