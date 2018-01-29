@@ -27,6 +27,7 @@
     "orbs-common-library": "file:../common-library-typescript"
   },
   "devDependencies": {
+    "@types/bytebuffer": "^5.0.36",
     "@types/lodash": "^4.14.63",
     "@types/node": "^7.0.12",
     "@types/supertest": "^2.0.0",

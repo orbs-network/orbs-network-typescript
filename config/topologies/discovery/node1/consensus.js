@@ -1,5 +1,7 @@
+const NAME = process.env.NODE_NAME || process.env.NODE_IP || require('os').hostname();
+
 module.exports = {
-  "name": `${require('os').hostname()}-consensus`,
+  "name": `${NAME}-consensus`,
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51154",
   "project": "consensus-service-typescript",
