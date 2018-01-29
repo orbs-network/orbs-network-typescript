@@ -4,7 +4,8 @@ export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 associate-address --region us-west-2 --instance-id $INSTANCE_ID --allocation-id $EIP
 
 export DOCKER_IMAGE=506367651493.dkr.ecr.us-west-2.amazonaws.com/orbs-network
-export DOCKER_TAG=${DOCKER_TAG-refactor-discovery-with-cloudformation}
+# TODO replace default with master
+export DOCKER_TAG=${DOCKER_TAG-refactor-discovery}
 export GOSSIP_LEADER_IP=34.212.214.57
 export GOSSIP_PEERS="ws://34.212.214.57:60001,ws://34.216.83.89:60001,ws://35.162.45.85:60001,ws://35.164.231.84:60001,ws://52.41.174.161:60001,ws://54.69.53.169:60001"
 
