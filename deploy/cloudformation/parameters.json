@@ -1,0 +1,50 @@
+[
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "kirill"
+    },
+    {
+        "ParameterKey": "CreateWithASG",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "ORBSInstanceType",
+        "ParameterValue": "t2.small"
+    },
+    {
+        "ParameterKey": "VpcAvailabilityZones",
+        "ParameterValue": "us-west-2a, us-west-2b, us-west2-c"
+    },
+    {
+        "ParameterKey": "IamRoleInstanceProfile",
+        "ParameterValue": "orbs-network"
+    },
+    {
+        "ParameterKey": "ORBSAmiId",
+        "ParameterValue": "ami-f2d3638a"
+    },
+    {
+        "ParameterKey": "SecurityIngressFromPort",
+        "ParameterValue": "22"
+    },
+    {
+        "ParameterKey": "SecurityIngressToPort",
+        "ParameterValue": "64000"
+    },
+    {
+        "ParameterKey": "VpcCidr",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "SubnetCidr1",
+        "ParameterValue": "10.0.0.0/24"
+    },
+    {
+        "ParameterKey": "SubnetCidr2",
+        "ParameterValue": "10.0.1.0/24"
+    },
+    {
+        "ParameterKey": "ElasticIP",
+        "ParameterValue": "eipalloc-4bbf5a77"
+    }
+]
