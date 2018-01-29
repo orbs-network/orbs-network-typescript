@@ -1,5 +1,7 @@
-import { logger, topology, topologyPeers, types, CryptoUtils } from "orbs-common-library";
+import { logger, ErrorHandler, topology, topologyPeers, types, CryptoUtils } from "orbs-common-library";
 import bind from "bind-decorator";
+
+ErrorHandler.setup();
 
 export default class PublicApiService {
 
@@ -55,15 +57,5 @@ export default class PublicApiService {
   constructor() {
     logger.info(`${topology.name}: service started`);
     setTimeout(() => this.main(), 2000);
-    process.on("uncaughtException", (err: Error) => {
-      console.error(`${__filename}: Caught exception: ${err}`);
-      console.error(err.stack);
-    });
-    process.on("unhandledRejection", (err: Error) => {
-      console.error(`${__filename}: Unhandled rejection: ${err}`);
-      console.error(err.stack);
-    });
-
   }
-
 }

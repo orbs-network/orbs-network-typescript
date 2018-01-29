@@ -7,7 +7,7 @@ export default class PbftConsensus {
   private gossip = topologyPeers(topology.peers).gossip;
   private vm = topologyPeers(topology.peers).virtualMachine;
   private blockStorage = topologyPeers(topology.peers).blockStorage;
-  private pendingTransactions: Map<number, {qv1: QuorumVerifier, qv2: QuorumVerifier, tx: types.Transaction, modifiedAddressesJson: string}> = new Map();
+  private pendingTransactions: Map<number, { qv1: QuorumVerifier, qv2: QuorumVerifier, tx: types.Transaction, modifiedAddressesJson: string }> = new Map();
   private highestSlotNumber = 0;
   private lastCommittedSlotNumber = 0;
 
@@ -19,8 +19,9 @@ export default class PbftConsensus {
         Recipient: leader,
         BroadcastGroup: "consensus",
         MessageType: "Transaction",
-        Buffer: new Buffer(JSON.stringify({transaction: tx, transactionAppendix: txAppendix})),
-        Immediate: true});
+        Buffer: new Buffer(JSON.stringify({ transaction: tx, transactionAppendix: txAppendix })),
+        Immediate: true
+      });
     }
     else {
       // I am the leader
@@ -48,14 +49,14 @@ export default class PbftConsensus {
       case "PbftCommit": {
         return await this.onCommit(fromAddress, <types.PbftCommit>message);
       }
-    //   case "PbftViewChange": {
-    //     this.emit("viewChange", fromAddress, <types.PbftViewChange>message);
-    //     break;
-    //   }
-    //   case "PbftNewView": {
-    //     this.emit("newView", fromAddress, <types.PbftNewView>message);
-    //     break;
-    //   }
+      //   case "PbftViewChange": {
+      //     this.emit("viewChange", fromAddress, <types.PbftViewChange>message);
+      //     break;
+      //   }
+      //   case "PbftNewView": {
+      //     this.emit("newView", fromAddress, <types.PbftNewView>message);
+      //     break;
+      //   }
     }
   }
 
@@ -64,7 +65,7 @@ export default class PbftConsensus {
     const verificationString: string = `prepare:${slotNumber},${txHash}`;
     const signature: string = crypto.sign(verificationString);
     this.pendingTransactions.get(slotNumber).qv1.verify(verificationString, signer, signature);
-    return {slotNumber, tx, txAppendix, txHash, signer, signature};
+    return { slotNumber, tx, txAppendix, txHash, signer, signature };
   }
 
   private createCommit(slotNumber: number, txHash: string): types.PbftCommit {
@@ -72,16 +73,16 @@ export default class PbftConsensus {
     const verificationString: string = `commit:${slotNumber}`;
     const signature: string = crypto.sign(verificationString);
     this.pendingTransactions.get(slotNumber).qv2.verify(verificationString, signer, signature);
-    return {slotNumber, signer, signature};
+    return { slotNumber, signer, signature };
   }
 
   private initPending(slotNumber: number) {
-    if (! this.pendingTransactions.has(slotNumber)) {
-      this.pendingTransactions.set(slotNumber,  {
-          qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 5000),
-          qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 10000),
-          tx: undefined,
-          modifiedAddressesJson: undefined
+    if (!this.pendingTransactions.has(slotNumber)) {
+      this.pendingTransactions.set(slotNumber, {
+        qv1: crypto.quorumVerifier(2.0 / 3.0, 1, 5000),
+        qv2: crypto.quorumVerifier(2.0 / 3.0, 1, 10000),
+        tx: undefined,
+        modifiedAddressesJson: undefined
       });
     }
   }
@@ -133,19 +134,19 @@ export default class PbftConsensus {
 
   private async onCommit(fromAddress: string, message: types.PbftCommit) {
     const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
-    const {qv2, tx, modifiedAddressesJson} = pendingTransaction;
+    const { qv2, tx, modifiedAddressesJson } = pendingTransaction;
 
     const verified = await qv2.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
 
     if (verified && message.slotNumber > this.lastCommittedSlotNumber && tx != undefined) {
       logger.info("Writing transaction to log: ", message);
       await this.blockStorage.addBlock({
-          block: {
-              tx: tx,
-              modifiedAddressesJson: modifiedAddressesJson,
-              id: message.slotNumber,
-              prevBlockId: this.lastCommittedSlotNumber
-          }
+        block: {
+          tx: tx,
+          modifiedAddressesJson: modifiedAddressesJson,
+          id: message.slotNumber,
+          prevBlockId: this.lastCommittedSlotNumber
+        }
       });
       this.lastCommittedSlotNumber = message.slotNumber;
     }

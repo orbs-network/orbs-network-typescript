@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "bind-decorator": "^1.0.11",
+    "gaggle": "git+https://github.com/lbeder/gaggle.git",
     "lodash": "^4.17.4",
     "orbs-common-library": "file:../common-library-typescript",
     "typed-event-emitter": "^1.0.3",
