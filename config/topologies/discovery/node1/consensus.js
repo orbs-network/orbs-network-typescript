@@ -16,6 +16,5 @@ module.exports = {
       "service": "block-storage",
       "endpoint": "0.0.0.0:51157"
     }
-  ],
-  "leader": "172.1.1.2"
+  ]
 }
