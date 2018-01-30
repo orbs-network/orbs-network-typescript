@@ -1,12 +1,11 @@
-import { logger, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
-import PbftConsensus from "./pbft-consensus";
+import RaftConsensus from "./raft-consensus";
+
+ErrorHandler.setup();
 
 export default class ConsensusService {
-
-  consensus = new PbftConsensus();
-
-  // rpc interface
+  private consensus: RaftConsensus;
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
@@ -17,36 +16,23 @@ export default class ConsensusService {
   @bind
   public async sendTransaction(rpc: types.SendTransactionContext) {
     logger.info(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
-    await this.consensus.proposeChange(rpc.req.transaction, rpc.req.transactionAppendix);
+
+    await this.consensus.onAppend(rpc.req.transaction, rpc.req.transactionAppendix);
+
     rpc.res = {};
   }
 
   @bind
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    logger.info(`${topology.name}: gossipMessageReceived ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: gossipMessageReceived ${JSON.stringify(rpc.req)}`);
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
+
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
-  }
-
-  // service logic
-
-  async main() {
   }
 
   constructor() {
     logger.info(`${topology.name}: service started`);
-    setTimeout(() => this.main(), 2000);
-    process.on("uncaughtException", (err: Error) => {
-      console.error(`${__filename}: Caught exception: ${err}`);
-      console.error(err.stack);
-    });
-    process.on("unhandledRejection", (err: Error) => {
-      console.error(`${__filename}: Unhandled rejection: ${err}`);
-      console.error(err.stack);
-    });
 
-
-
+   this.consensus = new RaftConsensus();
   }
-
 }
