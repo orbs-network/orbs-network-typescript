@@ -3,8 +3,7 @@ orbs-network:
   command: ./simulate.sh discovery
   ports:
     - 60001:60001
+  env_file:
+    - .env
   environment:
-    NODE_IP: ${NODE_IP}
-    GOSSIP_LEADER_IP: ${GOSSIP_LEADER_IP}
-    GOSSIP_PEERS: ${GOSSIP_PEERS}
     E2E_PUBLIC_API_ENDPOINT: 0.0.0.0:51151

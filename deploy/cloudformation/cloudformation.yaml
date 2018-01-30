@@ -136,6 +136,12 @@ Parameters:
   ElasticIP:
     Type: String
     Default: ''
+  DockerTag:
+    Type: String
+    Default: 'master'
+  NodeName:
+    Type: String
+    Default: 'node1'
 Conditions:
   CreateEC2LCWithKeyPair:
     !Not [!Equals [!Ref KeyName, '']]
@@ -263,10 +269,10 @@ Resources:
         Fn::Base64: !Sub 
           - |
            #!/bin/bash -xe
-           export EIP=${EIP}
+           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME}
            aws s3 sync s3://orbs-network-config-staging/v1/ /opt/orbs/
-           bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.sh
-          - { EIP: !Ref ElasticIP}
+           bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
+          - { EIP: !Ref ElasticIP, DOCKER_TAG: !Ref DockerTag, NODE_NAME: !Ref NodeName }
   ORBSInstanceAsg:
     Type: AWS::AutoScaling::AutoScalingGroup
     Condition: CreateWithASG
@@ -288,7 +294,9 @@ Resources:
       Tags:
         -
           Key: Name
-          Value: !Sub "ORBS Instance - ${AWS::StackName}"
+          Value: !Sub
+            - "orbs-network-${NODE_NAME}" #" ${AWS::StackName}"
+            - { NODE_NAME: !Ref NodeName }
           PropagateAtLaunch: 'true'
         -
           Key: Description

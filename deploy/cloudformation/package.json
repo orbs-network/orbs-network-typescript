@@ -1,0 +1,14 @@
+{
+  "name": "cloudformation",
+  "version": "1.0.0",
+  "description": "## Template and parameters",
+  "main": "create-stacks.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "shelljs": "^0.8.1"
+  }
+}
