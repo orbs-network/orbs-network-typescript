@@ -4,6 +4,6 @@ import SubscriptionManagerService from "./service";
 const server = grpc.subscriptionManagerServer({
   endpoint: topology.endpoint,
   service: new SubscriptionManagerService({
-    ethereumContractAddress: config.get("ethereumContractAddress")
+    ethereumContractAddress: process.argv[3]
   })
 });

@@ -16,9 +16,10 @@ tmp
 # API keys and secrets
 .env
 
-# Dependency directory
+# Dependency
 node_modules
 bower_components
+package-lock.json
 
 # Editors
 .idea

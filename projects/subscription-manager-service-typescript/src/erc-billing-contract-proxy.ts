@@ -7,7 +7,7 @@ interface Subscription {
     tokens: BigNumber;
 }
 
-export default class BillingContractProxy {
+export default class ERCBillingContractProxy {
     sidechainConnectorClient: types.SidechainConnectorClient;
     contractAddress: string;
 
