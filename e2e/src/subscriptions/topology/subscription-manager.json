@@ -1,0 +1,13 @@
+{
+    "name": "node1-subscription-manager",
+    "version": "1.0.0",
+    "endpoint": "0.0.0.0:58159",
+    "project": "subscription-manager-service-typescript",
+    "peers": [
+        {
+          "service": "sidechain-connector",
+          "endpoint": "0.0.0.0:58158"
+        }
+    ]    
+}
+  
