@@ -8,7 +8,7 @@ module.exports = {
   "peers": [
     {
       "service": "state-storage",
-      "endpoint": "virtual-machine:51156"
+      "endpoint": "state-storage:51156"
     }
   ]
 }
