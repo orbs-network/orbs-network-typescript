@@ -45,9 +45,24 @@ export default class GossipService {
 
   async main() {
     this.peers = topologyPeers(topology.peers);
-    // setInterval(() => this.askForHeartbeats(), 5000);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
+
+    setInterval(() => {
+      const activePeers = Array.from(this.gossip.activePeers()).sort();
+
+      if (activePeers.length === 0) {
+        logger.info(`${this.gossip.localAddress} has no active peers`);
+      } else {
+        logger.info(`${this.gossip.localAddress} has active peers`, {activePeers});
+      }
+    }, 5000);
+
     setTimeout(() => {
-      this.gossip.connect(topology.gossipPeers);
+      this.gossip.discoverPeers().then((gossipPeers) => {
+        logger.info(`Found gossip peers`, {peers: gossipPeers});
+        this.gossip.connect(gossipPeers);
+      }).catch(logger.error);
     }, Math.ceil(Math.random() * 3000));
   }
 

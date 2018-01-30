@@ -13,6 +13,8 @@ export default class PbftConsensus {
 
   async proposeChange(tx: types.Transaction, txAppendix: types.TransactionAppendix): Promise<void> {
     const leader = await this.getLeader();
+
+    console.warn("Propose change, I am", crypto.whoAmI(), "my leader is", leader);
     if (leader !== crypto.whoAmI()) {
       // I am not the leader
       this.gossip.unicastMessage({
@@ -92,6 +94,8 @@ export default class PbftConsensus {
 
     const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
 
+    logger.info("Preparing pending transaction", message.tx);
+
     pendingTransaction.qv1.verify(`prepare:${message.slotNumber},${message.txHash}`, message.signer, message.signature);
     if (message.signer === await this.getLeader()) {
       // if the message is sent by the leader (pre-prepare), verify the transaction
@@ -136,6 +140,8 @@ export default class PbftConsensus {
     const pendingTransaction = this.pendingTransactions.get(message.slotNumber);
     const { qv2, tx, modifiedAddressesJson } = pendingTransaction;
 
+    logger.info("Committing pending transaction", tx);
+
     const verified = await qv2.verify(`commit:${message.slotNumber}`, message.signer, message.signature);
 
     if (verified && message.slotNumber > this.lastCommittedSlotNumber && tx != undefined) {
@@ -155,5 +161,4 @@ export default class PbftConsensus {
   private async getLeader(): Promise<string> {
     return "node1";
   }
-
 }
