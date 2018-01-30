@@ -3,10 +3,17 @@ import TimeoutError from "./timeoutError";
 import * as fs from "fs";
 import * as assert from "assert";
 import * as path from "path";
+import * as config from "./config";
+import { networkInterfaces } from "os";
+import { logger } from "./logger";
 
 const crypto = require("crypto");
 const ec = require("secp256k1");
 const base58 = require("bs58");
+const os = require("os");
+
+const NODE_IP = process.env.NODE_IP;
+const NODE_NAME = process.env.NODE_NAME;
 
 export class QuorumVerifier {
   private promise: Promise<Iterable<string>>;
@@ -33,14 +40,18 @@ export class QuorumVerifier {
   }
 
   verify(value: Buffer | string, signer: string, signature: string): boolean {
+    logger.debug("Verifying signature", signature);
     if (this.cu.verifySignature(signer, value, signature)) {
+      logger.debug("Verified signature", signature);
       this.signers.add(signer);
+      logger.debug(`Verified by ${this.signers.size} / ${this.requiredQuorum}`, signature);
       if (this.signers.size >= this.requiredQuorum) {
         clearTimeout(this.timeout);
         this.acceptFunction(this.signers.keys());
         return true;
       }
     }
+    logger.debug(`Failed to verify signature ${signature} by ${signer}`);
     return false;
   }
 
@@ -71,17 +82,42 @@ export class CryptoUtils {
     this.myName = myName;
   }
 
+  public static getName(configDir: string) {
+    try {
+      return fs.readFileSync(`${configDir}/name`, "utf8").trim();
+    } catch (e) {
+      try {
+        const name = NODE_NAME || NODE_IP || networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
+        return name;
+      } catch (e) {}
+
+      return os.hostname();
+    }
+  }
+
+  public static getPrivateKey(configDir: string) {
+    return base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
+  }
+
   public static loadFromConfiguration(): CryptoUtils {
     const configDir = `${path.dirname(process.argv[2])}/config`;
-    const privateKey: PrivateKey = base58.decode(fs.readFileSync(`${configDir}/test-private-key`, "utf8"));
-    const myName: string = fs.readFileSync(`${configDir}/name`, "utf8").trim();
+    const privateKey: PrivateKey = this.getPrivateKey(configDir);
+    const myName: string = this.getName(configDir);
     const nodePublicKeys: Map<string, PublicKey> = new Map();
 
     for (const node of fs.readdirSync(`${configDir}/network`)) {
       const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
       nodePublicKeys.set(node, nodeKey);
     }
-    if (! nodePublicKeys.has(myName)) {
+
+    // TODO remove dummy keys after we can exchange keys
+    const dummyPubicKey = this.getDummyPublicKey(configDir);
+
+    if (dummyPubicKey) {
+      logger.warn("Using dummy public key", base58.encode(dummyPubicKey));
+      nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
+      nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
+    } else {
       nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
     }
 
@@ -99,8 +135,10 @@ export class CryptoUtils {
   }
 
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
-    const publicKey: PublicKey = this.nodePublicKeys.get(signer);
-    if (! publicKey) {
+    // TODO remove dummy keys
+    const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
+    logger.debug(`Got public key ${base58.encode(publicKey)} for ${signer}`);
+    if (!publicKey) {
       return false;
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
@@ -140,5 +178,13 @@ export class CryptoUtils {
 
   public getPublicKey(): string {
     return base58.encode(this.nodePublicKeys.get(this.myName));
+  }
+
+  public static getDummyPublicKey(configDir: string) {
+    try {
+      return base58.decode(fs.readFileSync(`${configDir}/test-public-key`, "utf8"));
+    } catch (e) {
+      return;
+    }
   }
 }

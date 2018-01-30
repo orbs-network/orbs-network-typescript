@@ -1,5 +1,7 @@
-import { logger, topology, grpc, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, types } from "orbs-common-library";
 import bind from "bind-decorator";
+
+ErrorHandler.setup();
 
 export default class ChatterService {
 

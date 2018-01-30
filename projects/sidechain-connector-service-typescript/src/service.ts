@@ -1,7 +1,9 @@
-import { topology, topologyPeers, types, logger } from "orbs-common-library";
+import { ErrorHandler, topology, topologyPeers, types, logger } from "orbs-common-library";
 import bind from "bind-decorator";
 import EthereumConnector from "./ethereum-connector";
 import { SidechainConnectorClient } from "../../architecture/dist/index";
+
+ErrorHandler.setup();
 
 export interface SidechainConnectorServiceOptions {
   ethereumNodeHttpAddress?: string;
