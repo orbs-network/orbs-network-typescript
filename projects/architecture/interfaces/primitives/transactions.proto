@@ -9,4 +9,5 @@ message Transaction {
 
 message TransactionAppendix {
   repeated string prefetchAddresses = 1;
+  string subscriptionKey = 2;
 }
