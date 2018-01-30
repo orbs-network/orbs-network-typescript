@@ -12,3 +12,11 @@
 npm install
 ./create-stacks.sh
 ```
+
+Deployment script creates specific parameters for each stack (common `parameters.json` being updated with values from `stacks.json`) and writes them to `tmp/parameters-${stack.name}.json`.
+
+## Testing
+
+```
+ssh -t -o StrictHostKeyChecking=no ec2-user@54.69.53.169 "sudo docker exec -ti orbs_orbs-network_1 /bin/bash -c 'cd e2e && npm test'"
+```
