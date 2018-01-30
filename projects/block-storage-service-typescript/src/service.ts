@@ -32,7 +32,7 @@ export default class BlockStorageService {
       }
 
       this.storedBlocks.push(block);
-      logger.info("Added new block. stored blocks:", this.storedBlocks);
+      logger.debug("Added new block. stored blocks:", this.storedBlocks);
   }
 
   @bind
@@ -41,7 +41,7 @@ export default class BlockStorageService {
 
       rpc.res = {blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex)};
 
-      // logger.info(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
+      logger.debug(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
   }
 
   // service logic

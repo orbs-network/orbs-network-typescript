@@ -21,7 +21,7 @@ export default class VirtualMachineService {
 
   @bind
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
-    logger.info(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
 
 
     // currently only a "simple" contract type is supported
@@ -45,7 +45,7 @@ export default class VirtualMachineService {
 
   @bind
   public async callContract(rpc: types.CallContractContext) {
-    logger.info(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
 
     const result = await this.processor.call({
       sender: rpc.req.sender,

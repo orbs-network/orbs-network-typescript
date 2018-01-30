@@ -40,7 +40,7 @@ export default class MemoryKVStore extends BaseKVStore  {
     setSync(contractAddress: string, key: string, value: string) {
         const mapKey = this.generateMapKeyString(contractAddress, key);
         this.storeMap.set(mapKey, value);
-        logger.info(`stored ${contractAddress}.${key} with value ${value}`);
+        logger.debug(`stored ${contractAddress}.${key} with value ${value}`);
     }
 
     generateMapKeyString(contractAddress: string, key: string) {

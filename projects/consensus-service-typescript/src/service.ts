@@ -9,13 +9,13 @@ export default class ConsensusService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async sendTransaction(rpc: types.SendTransactionContext) {
-    logger.info(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
 
     await this.consensus.onAppend(rpc.req.transaction, rpc.req.transactionAppendix);
 
