@@ -1,8 +1,10 @@
 const {Assertion, expect} = require("chai");
 import { CryptoUtils } from "orbs-common-library/src/CryptoUtils";
 import { grpc } from "orbs-common-library/src/grpc";
-import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs";
-import { FooBarAccount } from "./foobar";
+import { types } from "orbs-common-library/src/types";
+import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
+import { FooBarAccount } from "./foobar-contract";
+import { OrbsTopology } from "./topology";
 
 const accounts = new Map<string, FooBarAccount>();
 
@@ -25,8 +27,8 @@ async function assertFooBarAccountBalance (n: number) {
 
 Assertion.addMethod("bars", assertFooBarAccountBalance);
 
-const publicApiClient = grpc.publicApiClient({ endpoint: "0.0.0.0:51251"});
-
+const topology = OrbsTopology.loadFromPath("../../config/topologies/transaction-gossip");
+const publicApiClient = topology.nodes[1].getPublicApiClient();
 
 async function aFooBarAccountWith(input: {amountOfBars: number}) {
     const orbsKeyPair: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
@@ -42,9 +44,15 @@ async function aFooBarAccountWith(input: {amountOfBars: number}) {
     return account;
 }
 
-describe("simple token transfer", function() {
+describe("simple token transfer", async function() {
+    before(async function() {
+        this.timeout(10000);
+        await topology.startAll();
+    });
+
     it("transfers 1 bar token from one account to another", async function() {
         this.timeout(400000);
+
 
         console.log("initing account1 with 2 bars");
         const account1 = await aFooBarAccountWith({amountOfBars: 2});
@@ -57,5 +65,10 @@ describe("simple token transfer", function() {
         await account1.transfer({to: account2.address, amountOfBars: 1});
         await expect(account1).to.have.bars(1);
         await expect(account2).to.have.bars(1);
+
+    });
+
+    after(async () => {
+        await topology.stopAll();
     });
 });
