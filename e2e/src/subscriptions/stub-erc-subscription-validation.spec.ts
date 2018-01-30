@@ -12,7 +12,7 @@ import { types } from "orbs-common-library/src/types";
 const ACTIVE_SUBSCRIPTION_ID = "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe";
 const INACTIVE_SUBSCRIPTION_ID = "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebd";
 
-async function deployContract(web3: any, minTokensForSubscription: number) {
+async function deployOrbsStubContract(web3: any, minTokensForSubscription: number) {
     const STUD_ORBS_TOKEN_SOLIDITY_CONTRACT = `
     pragma solidity 0.4.18;
 
@@ -71,24 +71,28 @@ class OrbsService {
         this.topologyPath = topologyPath;
     }
 
-    protected async startWithArgs(args = "") {
+    public async start(opts = {}) {
         if (this.context) {
             throw "already running";
         }
-        this.context = this.run(args);
+        this.context = this.run(opts);
         // TODO: wait by polling service state (not implemented yet in the server-side)
         await delay(7000);
     }
 
-    private run(args: string = "") {
+    private run(args = {}, streamStdout = true) {
         const topology = require(this.topologyPath);
         const projectPath = path.resolve(__dirname, "../../../projects", topology.project);
         const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
         const process = child_process.exec(
-            `node dist/index.js ${absoluteTopologyPath} ${args}`, {
+            `node dist/index.js ${absoluteTopologyPath}`, {
                 async: true,
-                cwd: projectPath
+                cwd: projectPath,
+                env: {...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
             });
+        if (streamStdout) {
+            process.stdout.on("data", console.log);
+        }
         return { process, topology };
     }
 
@@ -103,8 +107,8 @@ class OrbsSubscriptionManager extends OrbsService {
         return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
     }
 
-    public async start(contractAddress: string) {
-        return this.startWithArgs(contractAddress);
+    public async start(opts: {ethereumContractAddress: string}) {
+        return super.start(opts);
     }
 }
 
@@ -113,8 +117,8 @@ class OrbsSidechainConnector extends OrbsService {
         return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
     }
 
-    public async start(ethereumNodeAddress: string) {
-        return this.startWithArgs(`--ethereumNodeAddress=${ethereumNodeAddress}`);
+    public async start(opts: {ethereumNodeAddress: string}) {
+        return super.start(opts);
     }
 }
 
@@ -167,10 +171,10 @@ describe("subscription manager.getSubscriptionStatus() on a stub Orbs Ethereum c
     before(async function() {
         this.timeout(15000);
         await testEnvironment.ethereumNode.start(8547);
-        const contractAddress = await deployContract(testEnvironment.ethereumNode.getWeb3Client(), 100);
+        const ethereumContractAddress = await deployOrbsStubContract(testEnvironment.ethereumNode.getWeb3Client(), 100);
         await Promise.all([
-            testEnvironment.sidechainConnector.start(`http://localhost:${testEnvironment.ethereumNode.port}`),
-            testEnvironment.subscriptionManager.start(contractAddress)
+            testEnvironment.sidechainConnector.start({ethereumNodeAddress: `http://localhost:${testEnvironment.ethereumNode.port}`}),
+            testEnvironment.subscriptionManager.start({ethereumContractAddress})
         ]);
         client = testEnvironment.subscriptionManager.getClient();
     });
