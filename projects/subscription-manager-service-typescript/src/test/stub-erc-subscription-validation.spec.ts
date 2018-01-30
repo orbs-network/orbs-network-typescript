@@ -82,7 +82,7 @@ class OrbsService {
 
     private run(args = {}, streamStdout = true) {
         const topology = require(this.topologyPath);
-        const projectPath = path.resolve(__dirname, "../../../projects", topology.project);
+        const projectPath = path.resolve(__dirname, "../../..", topology.project);
         const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
         const process = child_process.exec(
             `node dist/index.js ${absoluteTopologyPath}`, {
