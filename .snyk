@@ -1,0 +1,51 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.10.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:debug:20170905':
+    - gaggle > socket.io > socket.io-client > engine.io-client > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io-client > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > engine.io > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-adapter > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-client > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io-client > socket.io-parser > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-parser > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-adapter > socket.io-parser > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-client > socket.io-parser > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io-client > engine.io-client > debug:
+        patched: '2018-01-30T02:35:11.177Z'
+  'npm:ms:20170412':
+    - gaggle > socket.io > socket.io-client > socket.io-parser > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io-client > engine.io-client > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > engine.io > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-adapter > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-client > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-client > engine.io-client > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io-client > socket.io-parser > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-parser > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io > socket.io-adapter > socket.io-parser > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
+    - gaggle > socket.io-client > debug > ms:
+        patched: '2018-01-30T02:35:11.177Z'
