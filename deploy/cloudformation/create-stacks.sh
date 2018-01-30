@@ -3,4 +3,4 @@
 rm -rf tmp
 mkdir -p tmp
 
-node create-stacks.js
+node create-stacks.js $@

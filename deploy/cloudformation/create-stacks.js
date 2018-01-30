@@ -52,4 +52,8 @@ const deployAll = () => {
     return Promise.all(stacks.map(deploy));
 }
 
-removeAll().then(console.log).then(deployAll).then(console.log, console.error);
+if (process.argv[2] === '--remove-all') {
+    removeAll().then(console.log, console.error);
+} else {
+    deployAll().then(console.log, console.error);
+}

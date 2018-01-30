@@ -6,14 +6,17 @@
 
 ## Create new stacks
 
-**THIS WILL DESTROY OLD STACKS WITH SAME NAMES**
-
 ```
-npm install
 ./create-stacks.sh
 ```
 
 Deployment script creates specific parameters for each stack (common `parameters.json` being updated with values from `stacks.json`) and writes them to `tmp/parameters-${stack.name}.json`.
+
+## Removing old stacks
+
+```
+./create-stacks.sh --remove-all
+```
 
 ## Testing
 
