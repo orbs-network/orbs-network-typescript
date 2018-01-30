@@ -19,11 +19,12 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
-    "bignumber.js": "^5.0.0",
     "bind-decorator": "^1.0.11",
-    "orbs-common-library": "file:../common-library-typescript",
     "types-bn": "0.0.1",
     "underscore": "^1.8.3",
+    "bignumber.js": "^6.0.0",
+    "lodash": "^4.17.4",
+    "orbs-common-library": "file:../common-library-typescript",
     "web3": "^1.0.0-beta.29"
   },
   "devDependencies": {
