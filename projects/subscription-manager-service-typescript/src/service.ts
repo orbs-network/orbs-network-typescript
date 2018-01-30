@@ -3,7 +3,7 @@ import bind from "bind-decorator";
 import ERCBillingContractProxy from "./erc-billing-contract-proxy";
 
 class SusbcriptionManagerServiceConfiguration {
-  ethereumContractAddress?: string;
+  ethereumContractAddress: string;
 }
 export default class SusbcriptionManagerService {
 
@@ -29,7 +29,7 @@ export default class SusbcriptionManagerService {
   @bind
   async getSubscriptionStatus(rpc: types.GetSubscriptionStatusContext) {
     const {id, tokens } = await this.contractProxy.getSubscription(rpc.req.subscriptionKey);
-    rpc.res = { active: tokens.greaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000};
+    rpc.res = { active: tokens.isGreaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000};
   }
 
   askForHeartbeats() {
@@ -37,7 +37,7 @@ export default class SusbcriptionManagerService {
 
   async main() {
     this.peers = topologyPeers(topology.peers);
-    this.contractProxy = new ERCBillingContractProxy(topologyPeers(topology.peers).sidechainConnector, this.config.ethereumContractAddress);
+    this.contractProxy = new ERCBillingContractProxy(this.peers.sidechainConnector, this.config.ethereumContractAddress);
     setInterval(() => this.askForHeartbeats(), 5000);
   }
 
