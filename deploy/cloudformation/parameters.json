@@ -54,5 +54,9 @@
     {
         "ParameterKey": "NodeName",
         "ParameterValue": "bliny"
+    },
+    {
+        "ParameterKey": "NodeEnv",
+        "ParameterValue": "staging"
     }
 ]
