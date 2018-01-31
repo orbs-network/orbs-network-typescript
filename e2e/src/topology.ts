@@ -5,6 +5,8 @@ const { delay } = require("bluebird");
 const _ = require("lodash");
 import { grpc } from "orbs-common-library/src/grpc";
 
+const ORBS_SERVICE_READY_WAIT_MS = process.env.ORBS_SERVICE_READY_WAIT_MS || 30000;
+
 export class OrbsNode {
   services: OrbsService[];
 
@@ -58,7 +60,7 @@ export class OrbsService {
       }
       this.process = this.run(opts);
       // TODO: wait by polling service state (not implemented yet in the server-side)
-      await delay(7000);
+      await delay(ORBS_SERVICE_READY_WAIT_MS);
   }
 
   private run(args = {}, streamStdout = true) {
@@ -68,7 +70,7 @@ export class OrbsService {
           `node dist/index.js ${absoluteTopologyPath}`, {
               async: true,
               cwd: projectPath,
-              env: {...args, ...{NODE_ENV: "test", ...process.env}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
+              env: {...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
           });
       if (!childProcess) {
         throw "failed to run process";
