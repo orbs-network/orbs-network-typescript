@@ -3,6 +3,7 @@ import * as path from "path";
 
 export class Config {
   private static readonly NODE_ENV: string = "NODE_ENV";
+  private static readonly TEST_ENV: string = "test";
   private static readonly DEV_ENV: string = "development";
   private static readonly PROD_ENV: string = "production";
   private static readonly RELATIVE_PATH: string = "../../../config/";
@@ -22,6 +23,10 @@ export class Config {
 
   public isDevelopment(): boolean {
     return Config.getEnvironment() === Config.DEV_ENV;
+  }
+
+  public isTest(): boolean {
+    return Config.getEnvironment() === Config.TEST_ENV;
   }
 
   public isProduction(): boolean {

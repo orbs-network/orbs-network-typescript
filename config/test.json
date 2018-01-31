@@ -1,7 +1,7 @@
 {
   "logger": {
     "level": "debug",
-    "fileName": "logs/development.log",
+    "fileName": "logs/test.log",
     "maxSize": 1024000,
     "maxFiles": 4,
     "logzio": {

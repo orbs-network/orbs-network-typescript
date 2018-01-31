@@ -43,7 +43,7 @@ export class Logger {
     });
 
     // Enable console output, during development.
-    if (config.isDevelopment()) {
+    if (config.isDevelopment() || config.isTest()) {
       this.enableConsole();
     }
 
