@@ -1,7 +1,7 @@
 const {Assertion, expect} = require("chai");
 import { grpc } from "orbs-common-library/src/grpc";
 import { types } from "orbs-common-library/src/types";
-import { CryptoUtils } from "orbs-common-library/src/CryptoUtils";
+import { CryptoUtils } from "orbs-common-library/src/cryptoUtils";
 import { delay } from "bluebird";
 
 

@@ -1,72 +1,16 @@
-import Timer = NodeJS.Timer;
-import TimeoutError from "./timeoutError";
 import * as fs from "fs";
 import * as assert from "assert";
 import * as path from "path";
-import * as config from "./config";
-import { networkInterfaces } from "os";
-import { logger } from "./logger";
+import * as os from "os";
+import * as crypto from "crypto";
+import * as ec from "secp256k1";
+import * as base58 from "bs58";
 
-const crypto = require("crypto");
-const ec = require("secp256k1");
-const base58 = require("bs58");
-const os = require("os");
+import { config } from "./config";
+import { logger } from "./logger";
 
 const NODE_IP = process.env.NODE_IP;
 const NODE_NAME = process.env.NODE_NAME;
-
-export class QuorumVerifier {
-  private promise: Promise<Iterable<string>>;
-  private cu: CryptoUtils;
-  private signers: Set<string> = new Set();
-  private requiredQuorum: number;
-  private timeout: Timer;
-  private isAwaited: boolean = false;
-  private acceptFunction: (value: Iterable<string>) => void;
-  private rejectFunction: (err: Error) => void;
-
-  constructor(cu: CryptoUtils, requiredQuorum: number, timeoutMs: number) {
-    this.promise = new Promise((accept: (value: Iterable<string>) => void, reject: (err: Error) => void) => {
-      this.acceptFunction = accept;
-      this.rejectFunction = reject;
-    });
-    this.cu = cu;
-    this.requiredQuorum = requiredQuorum;
-    this.timeout = setTimeout(() => this.timedOut(), timeoutMs);
-  }
-
-  get [Symbol.toStringTag]() {
-    return "QuorumVerifier";
-  }
-
-  verify(value: Buffer | string, signer: string, signature: string): boolean {
-    logger.debug("Verifying signature", signature);
-    if (this.cu.verifySignature(signer, value, signature)) {
-      logger.debug("Verified signature", signature);
-      this.signers.add(signer);
-      logger.debug(`Verified by ${this.signers.size} / ${this.requiredQuorum}`, signature);
-      if (this.signers.size >= this.requiredQuorum) {
-        clearTimeout(this.timeout);
-        this.acceptFunction(this.signers.keys());
-        return true;
-      }
-    }
-    logger.debug(`Failed to verify signature ${signature} by ${signer}`);
-    return false;
-  }
-
-  async awaitFirst(): Promise<Iterable<string>> {
-    if (this.isAwaited) {
-      return undefined;
-    }
-    this.isAwaited = true;
-    return await this.promise;
-  }
-
-  private timedOut(): void {
-    this.rejectFunction(new TimeoutError());
-  }
-}
 
 type PrivateKey = Buffer;
 type PublicKey = Buffer;
@@ -87,7 +31,7 @@ export class CryptoUtils {
       return fs.readFileSync(`${configDir}/name`, "utf8").trim();
     } catch (e) {
       try {
-        const name = NODE_NAME || NODE_IP || networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
+        const name = NODE_NAME || NODE_IP || os.networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
         return name;
       } catch (e) {}
 
@@ -153,11 +97,6 @@ export class CryptoUtils {
     const signature: string = base58.encode(ec.sign(digest, this.privateKey).signature);
     assert(this.verifySignature(this.myName, dataBuf, signature));
     return signature;
-  }
-
-  public quorumVerifier(groupSizeFactor: number, constantOffset: number, timeoutMs: number): QuorumVerifier {
-    const minQuorum = Math.ceil(this.nodePublicKeys.size  * groupSizeFactor + constantOffset);
-    return new QuorumVerifier(this, minQuorum, timeoutMs);
   }
 
   public whoAmI(): string {
