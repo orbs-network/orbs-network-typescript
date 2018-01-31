@@ -1,7 +1,7 @@
 [
     {
         "ParameterKey": "KeyName",
-        "ParameterValue": "kirill"
+        "ParameterValue": "orbs-network-staging-key"
     },
     {
         "ParameterKey": "CreateWithASG",
