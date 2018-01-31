@@ -40,6 +40,7 @@ export class OrbsClientSession {
     constructor(keyPair: CryptoUtils, subscriptionKey: string, orbsClient: types.PublicApiClient) {
         this.keyPair = keyPair;
         this.orbsClient = orbsClient;
+        this.subscriptionKey = subscriptionKey;
     }
 
     async sendTransaction(contractAddress: string, argumentsJson: string) {
