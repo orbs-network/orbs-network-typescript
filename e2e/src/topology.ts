@@ -64,20 +64,20 @@ export class OrbsService {
   private run(args = {}, streamStdout = true) {
       const projectPath = path.resolve(__dirname, "../../projects", this.topology.project);
       const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
-      const process = child_process.exec(
+      const childProcess = child_process.exec(
           `node dist/index.js ${absoluteTopologyPath}`, {
               async: true,
               cwd: projectPath,
-              env: {...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
+              env: {...args, ...{NODE_ENV: "test", ...process.env}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
           });
-      if (!process) {
+      if (!childProcess) {
         throw "failed to run process";
       }
       if (streamStdout) {
-          process.stdout.on("data", console.log);
-          process.stderr.on("data", console.log);
+          childProcess.stdout.on("data", console.log);
+          childProcess.stderr.on("data", console.log);
       }
-      return process;
+      return childProcess;
   }
 
   public async stop() {
