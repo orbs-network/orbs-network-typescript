@@ -46,7 +46,7 @@ async function aFooBarAccountWith(input: {amountOfBars: number}) {
 
 describe("simple token transfer", async function() {
     before(async function() {
-        this.timeout(10000);
+        this.timeout(1000000);
         await topology.startAll();
     });
 
