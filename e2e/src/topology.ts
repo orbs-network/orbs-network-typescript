@@ -70,7 +70,7 @@ export class OrbsService {
           `node dist/index.js ${absoluteTopologyPath}`, {
               async: true,
               cwd: projectPath,
-              env: {...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
+              env: {...process.env, ...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
           });
       if (!childProcess) {
         throw "failed to run process";
