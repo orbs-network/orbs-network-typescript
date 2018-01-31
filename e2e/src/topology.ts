@@ -26,8 +26,14 @@ export class OrbsNode {
     return Promise.all(this.services.map(service => service.start(optsPerService[service.getProjectName()])));
   }
 
-  async stopAll(optsPerService: { [key: string]: {}} = {}) {
-    return Promise.all(this.services.map(service => service.stop()));
+  stopAll() {
+    for (const service of this.services) {
+      try {
+        service.stop();
+      } catch (err) {
+        console.log(`failed to stop service ${service.getProjectName()}. error: ${err}`);
+      }
+    }
   }
 
   getPublicApiClient() {
@@ -66,10 +72,11 @@ export class OrbsService {
   private run(args = {}, streamStdout = true) {
       const projectPath = path.resolve(__dirname, "../../projects", this.topology.project);
       const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
-      const childProcess = child_process.exec(
-          `node dist/index.js ${absoluteTopologyPath}`, {
+      const childProcess = child_process.spawn(
+          `node dist/index.js ${absoluteTopologyPath}`, [], {
               async: true,
               cwd: projectPath,
+              shell: true,
               env: {...process.env, ...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
           });
       if (!childProcess) {
@@ -82,7 +89,7 @@ export class OrbsService {
       return childProcess;
   }
 
-  public async stop() {
+  public stop() {
       this.process.kill();
       this.process = undefined;
   }
@@ -99,8 +106,10 @@ export class OrbsTopology {
     return Promise.all(this.nodes.map(node => node.startAll(optsPerService)));
   }
 
-  async stopAll(optsPerService: { [key: string]: {}} = {}) {
-    return Promise.all(this.nodes.map(node => node.stopAll()));
+  stopAll() {
+    for (const node of this.nodes) {
+      node.stopAll();
+    }
   }
 
   static loadFromPath(topologyPath: string) {
