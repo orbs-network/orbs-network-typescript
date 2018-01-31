@@ -9,11 +9,11 @@ module.exports = {
   "peers": [
     {
       "service": "public-api",
-      "endpoint": "0.0.0.0:51151"
+      "endpoint": "public-api:51151"
     },
     {
       "service": "consensus",
-      "endpoint": "0.0.0.0:51154"
+      "endpoint": "consensus:51154"
     }
   ],
   "gossipPort": "60001",

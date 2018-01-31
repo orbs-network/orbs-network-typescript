@@ -8,15 +8,15 @@ module.exports = {
   "peers": [
     {
       "service": "gossip",
-      "endpoint": "0.0.0.0:51153"
+      "endpoint": "gossip:51153"
     },
     {
       "service": "virtual-machine",
-      "endpoint": "0.0.0.0:51155"
+      "endpoint": "virtual-machine:51155"
     },
     {
       "service": "block-storage",
-      "endpoint": "0.0.0.0:51157"
+      "endpoint": "block-storage:51157"
     }
   ]
 }
