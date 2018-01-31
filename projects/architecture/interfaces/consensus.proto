@@ -18,27 +18,3 @@ message SendTransactionInput {
 message SendTransactionOutput {
   // empty
 }
-
-message PbftPrepare {
-    uint32 slotNumber = 1;
-    Transaction tx = 2;
-    TransactionAppendix txAppendix = 3;
-    string txHash = 4;
-    string signer = 5;
-    string signature = 6;
-}
-
-message PbftCommit {
-    uint32 slotNumber = 1;
-    // fixed64 txHash = 2;
-    string signer = 3;
-    string signature = 4;
-}
-
-message PbftViewChange {
-
-}
-
-message PbftNewView {
-
-}
