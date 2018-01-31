@@ -69,15 +69,14 @@ export class OrbsService {
       await delay(ORBS_SERVICE_READY_WAIT_MS);
   }
 
-  private run(args = {}, streamStdout = true) {
+  private run(opts = {}, streamStdout = true) {
       const projectPath = path.resolve(__dirname, "../../projects", this.topology.project);
       const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
-      const childProcess = child_process.spawn(
-          `node dist/index.js ${absoluteTopologyPath}`, [], {
+      const childProcess = child_process.exec(
+          `node dist/index.js ${absoluteTopologyPath}`, {
               async: true,
               cwd: projectPath,
-              shell: true,
-              env: {...process.env, ...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
+              env: {...process.env, ...opts, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
           });
       if (!childProcess) {
         throw "failed to run process";
@@ -86,12 +85,15 @@ export class OrbsService {
           childProcess.stdout.on("data", console.log);
           childProcess.stderr.on("data", console.log);
       }
+      this.process = childProcess;
       return childProcess;
   }
 
   public stop() {
+    if (this.process) {
       this.process.kill();
       this.process = undefined;
+    }
   }
 }
 

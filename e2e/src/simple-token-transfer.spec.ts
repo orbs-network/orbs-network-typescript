@@ -5,6 +5,7 @@ import { types } from "orbs-common-library/src/types";
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
 import { FooBarAccount } from "./foobar-contract";
 import { OrbsTopology } from "./topology";
+import { delay } from "bluebird";
 
 const accounts = new Map<string, FooBarAccount>();
 
@@ -44,15 +45,20 @@ async function aFooBarAccountWith(input: {amountOfBars: number}) {
     return account;
 }
 
+async function cleanup(success: boolean) {
+    topology.stopAll();
+    await delay(10000);
+    // hack for terminating CI Alpine docker
+    process.exit(success ? 0 : -1);
+}
+
 describe("simple token transfer", async function() {
+    this.timeout(100000);
     before(async function() {
-        this.timeout(1000000);
         await topology.startAll();
     });
 
     it("transfers 1 bar token from one account to another", async function() {
-        this.timeout(400000);
-
 
         console.log("initing account1 with 2 bars");
         const account1 = await aFooBarAccountWith({amountOfBars: 2});
@@ -68,7 +74,13 @@ describe("simple token transfer", async function() {
 
     });
 
+    afterEach(async function() {
+        if (this.currentTest.state != "passed") {
+            await cleanup(false);
+        }
+    });
+
     after(async () => {
-        await topology.stopAll();
+        await cleanup(true);
     });
 });
