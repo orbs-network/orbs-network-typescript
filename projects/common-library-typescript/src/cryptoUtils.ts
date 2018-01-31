@@ -15,6 +15,12 @@ const NODE_NAME = process.env.NODE_NAME;
 type PrivateKey = Buffer;
 type PublicKey = Buffer;
 
+export enum Encoding {
+  NONE = 0,
+  BASE64 = 1,
+  HEX = 2,
+}
+
 export class CryptoUtils {
   private privateKey: PrivateKey;
   private nodePublicKeys: Map<string, PublicKey>;
@@ -65,14 +71,17 @@ export class CryptoUtils {
       nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
     }
 
-    assert(ec.publicKeyCreate(privateKey).equals(nodePublicKeys.get(myName)), `public key for node ${myName} should match private; ${base58.encode(privateKey)}->${base58.encode(ec.publicKeyCreate(privateKey))} != ${base58.encode(nodePublicKeys.get(myName))}`);
-    return new CryptoUtils(privateKey, nodePublicKeys, myName);
+    const encodedPrivateKey = base58.encode(privateKey);
+    const encodedPublicKey = base58.encode(ec.publicKeyCreate(privateKey));
+    const encodedCurrentPublicKey = base58.encode(nodePublicKeys.get(myName));
+    assert(ec.publicKeyCreate(privateKey).equals(nodePublicKeys.get(myName)), `public key for node ${myName} should ` +
+      `match private; ${encodedPrivateKey}->${encodedPublicKey} != ${encodedCurrentPublicKey}`);
+
+      return new CryptoUtils(privateKey, nodePublicKeys, myName);
   }
 
   public static initializeTestCrypto(nodeName: string): CryptoUtils {
-    const hash = crypto.createHash("sha256");
-    hash.update(nodeName);
-    const privateKey: PrivateKey = hash.digest();
+    const privateKey: PrivateKey = <Buffer>CryptoUtils.sha256(nodeName);
     const nodePublicKeys: Map<string, PublicKey> = new Map();
     nodePublicKeys.set(nodeName, ec.publicKeyCreate(privateKey));
     return new CryptoUtils(privateKey, nodePublicKeys, nodeName);
@@ -86,13 +95,13 @@ export class CryptoUtils {
       return false;
     }
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
-    const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
+    const digest: Buffer = <Buffer>CryptoUtils.sha256(dataBuf);
     return ec.verify(digest, base58.decode(signature), publicKey);
   }
 
   public sign(data: Buffer | string): string {
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
-    const digest: Buffer = crypto.createHash("SHA256").update(dataBuf).digest();
+    const digest: Buffer = <Buffer>CryptoUtils.sha256(dataBuf);
 
     const signature: string = base58.encode(ec.sign(digest, this.privateKey).signature);
     assert(this.verifySignature(this.myName, dataBuf, signature));
@@ -103,16 +112,26 @@ export class CryptoUtils {
     return this.myName;
   }
 
-  public shortHash(buf: Buffer | string): string {
-    const hash = crypto.createHash("sha1");
-    hash.update(buf);
-    return hash.digest("base64");
-  }
-
-  public longHash(buf: Buffer | string): string {
+  public static sha256(buf: Buffer | string, encoding: Encoding = Encoding.NONE): string | Buffer {
     const hash = crypto.createHash("sha256");
     hash.update(buf);
-    return hash.digest("base64");
+
+    let encodingOption;
+
+    switch (encoding) {
+      case Encoding.BASE64:
+        encodingOption = "base64";
+        break;
+
+      case Encoding.HEX:
+        encodingOption = "hex";
+        break;
+
+      default:
+        encoding = undefined;
+    }
+
+    return hash.digest(encodingOption);
   }
 
   public getPublicKey(): string {
