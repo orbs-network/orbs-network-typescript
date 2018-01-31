@@ -8,7 +8,7 @@ module.exports = {
   "peers": [
     {
       "service": "block-storage",
-      "endpoint": "0.0.0.0:51157"
+      "endpoint": "block-storage:51157"
     }
   ]
 }
