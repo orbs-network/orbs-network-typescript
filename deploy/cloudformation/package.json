@@ -1,6 +1,6 @@
 {
   "name": "cloudformation",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "## Template and parameters",
   "main": "create-stacks.js",
   "scripts": {
