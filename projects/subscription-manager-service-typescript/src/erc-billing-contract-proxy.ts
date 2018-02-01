@@ -1,6 +1,5 @@
 import { types, logger } from "orbs-common-library";
 import { BigNumber } from "bignumber.js";
-const web3 = require("web3");
 
 interface Subscription {
     id: number;

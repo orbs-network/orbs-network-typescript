@@ -1,4 +1,4 @@
-const {Assertion, expect} = require("chai");
+import { Assertion, expect } from "chai";
 import { CryptoUtils } from "orbs-common-library/src/CryptoUtils";
 import { grpc } from "orbs-common-library/src/grpc";
 import { types } from "orbs-common-library/src/types";
