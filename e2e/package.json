@@ -5,7 +5,7 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "test": "ts-mocha src/*.spec.ts",
+    "test": "NODE_ENV=test ts-mocha src/*.spec.ts",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
