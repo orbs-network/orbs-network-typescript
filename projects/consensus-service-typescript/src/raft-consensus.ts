@@ -84,7 +84,17 @@ export default class RaftConsensus {
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
     this.node.on("committed", async (data: any) => {
-      const txData = data.data;
+      const msgData = data.data;
+
+      const txData = msgData.msg;
+
+      // Verify the sending node's signature, in order to avoid internal spam or miscommunication.
+      if (crypto.verifySignature(msgData.signer, JSON.stringify(txData), msgData.signature)) {
+        logger.debug(`Verified message from ${msgData.signer}, with signature ${msgData.signature}`);
+      } else {
+        logger.error(`Failed to verify message from ${msgData.signer}, with signature ${msgData.signature}! Aborting!`);
+        return;
+      }
 
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
@@ -119,9 +129,15 @@ export default class RaftConsensus {
     });
 
     if (vmResult.success) {
-      this.node.append({
+      const msg = {
         tx: tx,
-        modifiedAddressesJson: vmResult.modifiedAddressesJson,
+        modifiedAddressesJson: vmResult.modifiedAddressesJson
+      };
+
+      this.node.append({
+        msg: msg,
+        signer: this.node.id,
+        signature: crypto.sign(JSON.stringify(msg))
       });
     }
   }
