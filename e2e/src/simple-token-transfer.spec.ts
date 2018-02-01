@@ -7,6 +7,8 @@ import { FooBarAccount } from "./foobar-contract";
 import { OrbsTopology } from "./topology";
 import { delay } from "bluebird";
 
+const E2E_TEST_ONLY = process.env.E2E_TEST_ONLY;
+
 const accounts = new Map<string, FooBarAccount>();
 
 async function assertFooBarAccountBalance (n: number) {
@@ -29,7 +31,7 @@ async function assertFooBarAccountBalance (n: number) {
 Assertion.addMethod("bars", assertFooBarAccountBalance);
 
 const topology = OrbsTopology.loadFromPath("../../config/topologies/transaction-gossip");
-const publicApiClient = topology.nodes[1].getPublicApiClient();
+const publicApiClient = process.env.E2E_PUBLIC_API_ENDPOINT ? grpc.publicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT }) : topology.nodes[1].getPublicApiClient();
 
 async function aFooBarAccountWith(input: {amountOfBars: number}) {
     const orbsKeyPair: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
@@ -55,6 +57,8 @@ async function cleanup(success: boolean) {
 describe("simple token transfer", async function() {
     this.timeout(100000);
     before(async function() {
+        if (E2E_TEST_ONLY) return;
+
         await topology.startAll();
     });
 
@@ -75,12 +79,16 @@ describe("simple token transfer", async function() {
     });
 
     afterEach(async function() {
+        if (E2E_TEST_ONLY) return;
+
         if (this.currentTest.state != "passed") {
             await cleanup(false);
         }
     });
 
     after(async () => {
+        if (E2E_TEST_ONLY) return;
+
         await cleanup(true);
     });
 });
