@@ -97,7 +97,7 @@ export class Logger {
   private getLogLevel(): string {
     const level: string = config.get(Logger.CONFIG_LOG_LEVEL);
 
-    if (!Logger.LOG_TYPES.includes(level)) {
+    if (Logger.LOG_TYPES.indexOf(level) !== -1) {
       return Logger.DEFAULT_LOG_LEVEL;
     }
 
