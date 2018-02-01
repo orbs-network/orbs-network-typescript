@@ -3,9 +3,11 @@ import "source-map-support/register";
 
 import { config } from "./config";
 import * as winston from "winston";
-import * as winstonLogzioTransport from "winston-logzio";
 import * as path from "path";
 import * as fs from "fs";
+const winstonLogzioTransport = require("winston-logzio");
+
+const { NODE_NAME, NODE_IP, NODE_ENV, SERVICE_NAME } = process.env;
 
 export class Logger {
   public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
@@ -42,8 +44,17 @@ export class Logger {
       ]
     });
 
+    this._logger.rewriters.push(function(level, msg, meta) {
+      meta.node = NODE_NAME;
+      meta.node_ip = NODE_IP;
+      meta.environment = NODE_ENV;
+      meta.service = SERVICE_NAME;
+
+      return meta;
+    });
+
     // Enable console output, during development.
-    if (config.isDevelopment() || config.isTest()) {
+    if (!config.isProduction()) {
       this.enableConsole();
     }
 
@@ -121,9 +132,10 @@ export class Logger {
       throw new Error("Missing API key!");
     }
 
-    this._logger.add(winston.transports.Logzio, {
+    this._logger.add(winstonLogzioTransport, {
       token: apiKey,
       host: Logger.LOGZIO_HOST,
+
     });
   }
 }

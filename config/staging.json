@@ -5,7 +5,7 @@
     "maxSize": 1024000,
     "maxFiles": 4,
     "logzio": {
-      "enabled": false
+      "enabled": true
     }
   },
   "consensus": {
