@@ -1,6 +1,6 @@
 import BaseSmartContract from "../base-smart-contact";
 
-export default class BarSmartContract extends BaseSmartContract {
+export default class FooBarSmartContract extends BaseSmartContract {
     static readonly SUPERUSER = "0000";
 
     public async transfer(recipient: string, amount: number) {

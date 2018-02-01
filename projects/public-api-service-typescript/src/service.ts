@@ -29,7 +29,15 @@ export default class PublicApiService {
 
   @bind
   async sendTransaction(rpc: types.SendTransactionContext) {
-    console.log(`${topology.name}: send transaction ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: send transaction ${JSON.stringify(rpc.req)}`);
+
+    const subscriptionKey = rpc.req.transactionAppendix.subscriptionKey;
+    // console.log("sendTransaction", this.peers.subscriptionManager);
+    // const { active } = await this.peers.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
+
+    // if (!active) {
+    //   throw new Error(`subscription with key [${subscriptionKey}] inactive`);
+    // }
 
     await this.peers.consensus.sendTransaction(rpc.req);
   }
@@ -42,7 +50,7 @@ export default class PublicApiService {
       contractAddress: rpc.req.contractAddress
     });
 
-    console.log(`${topology.name}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
+    logger.debug(`${topology.name}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
 
     rpc.res = {
       resultJson: resultJson

@@ -1,14 +1,13 @@
-const {Assertion, expect} = require("chai");
+import { Assertion, expect } from "chai";
 const Web3 = require("web3");
-const ganache = require("ganache-core");
-const path = require("path");
-const fs = require("fs");
-const solc = require("solc");
+import * as ganache from "ganache-core";
+import * as path from "path";
+import * as solc from "solc";
 
 import EthereumConnector from "../ethereum-connector";
 
 const SIMPLE_STORAGE_SOLIDITY_CONTRACT = `
-pragma solidity ^0.4.19;
+pragma solidity 0.4.18;
 contract SimpleStorage {
   struct Item {
       uint256 intValue;
@@ -47,6 +46,8 @@ contract SimpleStorage {
 async function deployContract(web3, intValue: number, stringValue: string) {
     // compile contract
     const output = solc.compile(SIMPLE_STORAGE_SOLIDITY_CONTRACT, 1);
+    if (output.errors)
+        throw output.errors;
     const bytecode = output.contracts[":SimpleStorage"].bytecode;
     const abi = JSON.parse(output.contracts[":SimpleStorage"].interface);
     // deploy contract

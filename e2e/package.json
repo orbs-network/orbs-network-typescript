@@ -25,10 +25,14 @@
     "testEnvironment": "node"
   },
   "dependencies": {
+    "@types/shelljs": "^0.7.7",
     "bind-decorator": "^1.0.11",
     "bluebird": "^3.5.1",
+    "ganache-core": "^2.0.2",
     "orbs-common-library": "file:../projects/common-library-typescript",
-    "underscore": "^1.8.3"
+    "solc": "^0.4.18",
+    "underscore": "^1.8.3",
+    "web3": "^1.0.0-beta.29"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
@@ -42,7 +46,7 @@
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "jest": "^22.1.4",
-    "mocha": "^5.0.0",
+    "mocha": "^4.1.0",
     "nodemon": "^1.14.11",
     "shelljs": "^0.8.1",
     "supertest": "^3.0.0",

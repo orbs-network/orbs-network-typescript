@@ -22,7 +22,8 @@ export default class HardCodedSmartContractProcessor {
     constructor(stateStorageClient: types.StateStorageClient) {
         this.stateStorageClient = stateStorageClient;
 
-        this.registerContract("bar-smart-contract", "barbar");
+        // TODO: register it only in a testing environment via configuration
+        this.registerContract("foobar-smart-contract", "foobar");
     }
 
     private registerContract(moduleName: string, toAddress: string) {
