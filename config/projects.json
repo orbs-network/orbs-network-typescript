@@ -8,11 +8,6 @@
     "service": "block-storage",
     "type": "service"
   },
-  "chatter-service-typescript": {
-    "runtime": "typescript",
-    "service": "chatter",
-    "type": "service"
-  },
   "common-library-typescript": {
     "runtime": "typescript",
     "type": "library"
@@ -59,7 +54,6 @@
     "architecture",
     "common-library-typescript",
     "block-storage-service-typescript",
-    "chatter-service-typescript",
     "consensus-service-typescript",
     "gossip-service-typescript",
     "public-api-service-typescript",

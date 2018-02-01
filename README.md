@@ -72,7 +72,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 > This will start an end to end simulation of the network with a few services:
 
-`./simulate.sh two-chatter`
+`./simulate.sh transaction-gossip`
 
 * The network topologies for the simulations are found at `./config/topologies`.
 * To see the available list of simulations run `./simulate.sh` without an argument.
@@ -110,3 +110,24 @@ Deploy new stack:
 ```
 ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
 ```
+
+## Development
+
+### Visual Studio Code
+
+#### Recommended Extensions
+
+* Docker
+* ESLint
+* Go
+* Markdown All in One
+* markdownlint
+* npm
+* npm Intellisense
+* Path Intellisense
+* Python
+* solidity
+* Spell Right
+* TODO Highlight
+* TSLint
+* vscode-proto3
