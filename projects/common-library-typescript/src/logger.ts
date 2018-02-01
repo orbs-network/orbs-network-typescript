@@ -8,7 +8,7 @@ import * as path from "path";
 import * as fs from "fs";
 
 export class Logger {
-  public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
+  public static readonly LOG_TYPES = ["debug", "info", "warn", "error", "fatal"];
   public static readonly DEFAULT_LOG_LEVEL = "info";
   public static readonly DEFAULT_FILE_NAME = "logs/default.log";
   public static readonly DEFAULT_MAX_SIZE = 10 * 1024 * 1024;
