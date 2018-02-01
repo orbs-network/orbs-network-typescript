@@ -62,16 +62,7 @@ export class CryptoUtils {
       nodePublicKeys.set(node, nodeKey);
     }
 
-    // TODO remove dummy keys after we can exchange keys
-    const dummyPubicKey = this.getDummyPublicKey(configDir);
-
-    if (dummyPubicKey) {
-      logger.warn("Using dummy public key", base58.encode(dummyPubicKey));
-      nodePublicKeys.set("dummy", this.getDummyPublicKey(configDir));
-      nodePublicKeys.set(myName, this.getDummyPublicKey(configDir));
-    } else {
-      nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
-    }
+    nodePublicKeys.set(myName, ec.publicKeyCreate(privateKey));
 
     const encodedPrivateKey = base58.encode(privateKey);
     const encodedPublicKey = base58.encode(ec.publicKeyCreate(privateKey));
@@ -90,8 +81,7 @@ export class CryptoUtils {
   }
 
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
-    // TODO remove dummy keys
-    const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
+    const publicKey: PublicKey = this.nodePublicKeys.get(signer);
 
     logger.debug(`Got public key ${base58.encode(publicKey)} for ${signer}`);
 
@@ -142,13 +132,5 @@ export class CryptoUtils {
 
   public getPublicKey(): string {
     return base58.encode(this.nodePublicKeys.get(this.myName));
-  }
-
-  public static getDummyPublicKey(configDir: string) {
-    try {
-      return base58.decode(fs.readFileSync(`${configDir}/test-public-key`, "utf8"));
-    } catch (e) {
-      logger.error(e);
-    }
   }
 }
