@@ -23,7 +23,7 @@ export default class StateStorageService {
 
   @bind
   public async readKeys(rpc: types.ReadKeysContext) {
-    logger.info(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
+    logger.debug(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
     if (rpc.req.lastBlockId)
       await this.waitForBlockState(rpc.req.lastBlockId.value);
