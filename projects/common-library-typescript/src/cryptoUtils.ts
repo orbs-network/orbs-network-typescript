@@ -90,10 +90,13 @@ export class CryptoUtils {
   public verifySignature(signer: string, data: Buffer | string, signature: string): boolean {
     // TODO remove dummy keys
     const publicKey: PublicKey = this.nodePublicKeys.get(signer) || this.nodePublicKeys.get("dummy");
+
     logger.debug(`Got public key ${base58.encode(publicKey)} for ${signer}`);
+
     if (!publicKey) {
       return false;
     }
+
     const dataBuf: Buffer = (typeof(data) === "string") ? new Buffer(data, "utf8") : data;
     const digest: Buffer = <Buffer>CryptoUtils.sha256(dataBuf);
     return ec.verify(digest, base58.decode(signature), publicKey);
@@ -105,6 +108,7 @@ export class CryptoUtils {
 
     const signature: string = base58.encode(ec.sign(digest, this.privateKey).signature);
     assert(this.verifySignature(this.myName, dataBuf, signature));
+
     return signature;
   }
 
