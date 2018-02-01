@@ -64,20 +64,18 @@ export class Logger {
   }
 
   public readonly error: winston.LeveledLogMethod = (msg: string | Error, ...meta: any[]): winston.LoggerInstance => {
-    this._logger.error(<string>msg, ...meta);
-
-    if (msg instanceof Error) {
-      this._logger.error(msg.stack, ...meta);
-    }
-
-    return this._logger;
+    return this.logError(this._logger.error, msg, ...meta);
   }
 
   public readonly fatal: winston.LeveledLogMethod = (msg: string | Error, ...meta: any[]): winston.LoggerInstance => {
-    this._logger.emerg(<string>msg, ...meta);
+    return this.logError(this._logger.emerg, msg, ...meta);
+  }
+
+  private logError(method: winston.LeveledLogMethod, msg: string | Error, ...meta: any[]): winston.LoggerInstance {
+    method(<string>msg, ...meta);
 
     if (msg instanceof Error) {
-      this._logger.emerg(msg.stack, ...meta);
+      method(msg.stack, ...meta);
     }
 
     return this._logger;
