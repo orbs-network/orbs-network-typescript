@@ -37,6 +37,14 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         res.blockStorage = grpc.blockStorageClient({ endpoint: peer.endpoint });
         break;
       }
+      case "sidechain-connector": {
+        res.sidechainConnector = grpc.sidechainConnectorClient({ endpoint: peer.endpoint });
+        break;
+      }
+      case "subscription-manager": {
+        res.subscriptionManager = grpc.subscriptionManagerClient({ endpoint: peer.endpoint });
+        break;
+      }
       default: {
         throw `Undefined peer service: ${peer.service}`;
       }
