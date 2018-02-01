@@ -19,6 +19,8 @@ This wrapper project will set up a full working environment including all sub pr
 * Test (`NODE_ENV=test`): `config/test.json`.
 * Staging/Production (`NODE_ENV=production`): `config/production.json`.
 
+You can pass values through environment, but you have to replace colon (`:`) with double underscore (`__`) for it to work. For example, `logger:logzio:apiKey` becomes `logger__logzio__apiKey`.
+
 ### Configuration Keys
 
 #### `logger`
