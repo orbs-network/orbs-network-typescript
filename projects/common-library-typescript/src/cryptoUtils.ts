@@ -39,7 +39,9 @@ export class CryptoUtils {
       try {
         const name = NODE_NAME || NODE_IP || os.networkInterfaces()["eth0"].filter(iface => iface.family === "IPv4")[0].address;
         return name;
-      } catch (e) {}
+      } catch (e) {
+        logger.error(e);
+      }
 
       return os.hostname();
     }
@@ -146,7 +148,7 @@ export class CryptoUtils {
     try {
       return base58.decode(fs.readFileSync(`${configDir}/test-public-key`, "utf8"));
     } catch (e) {
-      return;
+      logger.error(e);
     }
   }
 }

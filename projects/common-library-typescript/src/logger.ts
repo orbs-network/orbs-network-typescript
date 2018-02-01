@@ -63,12 +63,24 @@ export class Logger {
     return this._logger.warn(msg, ...meta);
   }
 
-  public readonly error: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
-    return this._logger.error(msg, ...meta);
+  public readonly error: winston.LeveledLogMethod = (msg: string | Error, ...meta: any[]): winston.LoggerInstance => {
+    this._logger.error(<string>msg, ...meta);
+
+    if (msg instanceof Error) {
+      this._logger.error(msg.stack, ...meta);
+    }
+
+    return this._logger;
   }
 
-  public readonly fatal: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
-    return this._logger.emerg(msg, ...meta);
+  public readonly fatal: winston.LeveledLogMethod = (msg: string | Error, ...meta: any[]): winston.LoggerInstance => {
+    this._logger.emerg(<string>msg, ...meta);
+
+    if (msg instanceof Error) {
+      this._logger.emerg(msg.stack, ...meta);
+    }
+
+    return this._logger;
   }
 
   private mkdir(): void {
