@@ -1,4 +1,4 @@
-import Web3 from "web3";
+const Web3 = require("web3");
 import { types } from "orbs-common-library";
 import { Block } from "./types/web3";
 
