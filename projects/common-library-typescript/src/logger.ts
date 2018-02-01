@@ -37,7 +37,8 @@ export class Logger {
           maxsize: this.getMaxSize(),
           maxFiles: this.getMaxFiles(),
           prettyPrint: true,
-          tailable: true
+          tailable: true,
+          json: false
         })
       ]
     });
