@@ -110,3 +110,24 @@ Deploy new stack:
 ```
 ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
 ```
+
+## Development
+
+### Visual Studio Code
+
+#### Recommended Extensions
+
+* Docker
+* ESLint
+* Go
+* Markdown All in One
+* markdownlint
+* npm
+* npm Intellisense
+* Path Intellisense
+* Python
+* solidity
+* Spell Right
+* TODO Highlight
+* TSLint
+* vscode-proto3
