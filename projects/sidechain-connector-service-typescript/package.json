@@ -13,7 +13,6 @@
     "test": "ts-mocha src/test/**/*.spec.ts",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
-    "test": "ts-mocha src/test/**/*.spec.ts",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "debug": "npm run build && npm run watch-debug",
     "serve-debug": "nodemon --inspect dist/index.js",
