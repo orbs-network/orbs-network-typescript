@@ -1,10 +1,10 @@
 
-const {Assertion, expect} = require("chai");
-const Web3 = require("web3");
-const ganache = require("ganache-core");
-const path = require("path");
-const solc = require("solc");
-const child_process = require("child_process");
+import { Assertion, expect } from "chai";
+import * as Web3 from "web3";
+import * as ganache from "ganache-core";
+import * as path from "path";
+import * as solc from "solc";
+import * as child_process from "child_process";
 import { delay } from "bluebird";
 import { grpc } from "orbs-common-library/src/grpc";
 import { types } from "orbs-common-library/src/types";

@@ -1,8 +1,8 @@
-const path = require("path");
-const shell = require("shelljs");
-const child_process = require("child_process");
-const { delay } = require("bluebird");
-const _ = require("lodash");
+import * as path from "path";
+import * as shell from "shelljs";
+import * as child_process from "child_process";
+import { delay } from "bluebird";
+import * as _  from "lodash";
 import { grpc } from "orbs-common-library/src/grpc";
 
 const ORBS_SERVICE_READY_WAIT_MS = process.env.ORBS_SERVICE_READY_WAIT_MS || 30000;
