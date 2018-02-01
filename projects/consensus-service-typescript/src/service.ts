@@ -9,13 +9,13 @@ export default class ConsensusService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async sendTransaction(rpc: types.SendTransactionContext) {
-    logger.info(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
 
     await this.consensus.onAppend(rpc.req.transaction, rpc.req.transactionAppendix);
 
@@ -26,7 +26,6 @@ export default class ConsensusService {
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     logger.debug(`${topology.name}: gossipMessageReceived ${JSON.stringify(rpc.req)}`);
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
-
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
 
