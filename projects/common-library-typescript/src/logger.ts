@@ -117,7 +117,7 @@ export class Logger {
   }
 
   private enableConsole(): void {
-    this. _logger.add(winston.transports.Console, {
+    this._logger.add(winston.transports.Console, {
       json: false,
       colorize: true,
       timestamp: true
