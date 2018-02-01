@@ -72,7 +72,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 > This will start an end to end simulation of the network with a few services:
 
-`./simulate.sh two-chatter`
+`./simulate.sh transaction-gossip`
 
 * The network topologies for the simulations are found at `./config/topologies`.
 * To see the available list of simulations run `./simulate.sh` without an argument.
