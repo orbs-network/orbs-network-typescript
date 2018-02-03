@@ -1,41 +1,48 @@
 // Adds source map support to node.js stack traces.
 import "source-map-support/register";
 
-import { config } from "./config";
 import * as winston from "winston";
-import * as winstonLogzioTransport from "winston-logzio";
 import * as path from "path";
 import * as fs from "fs";
+import { defaults } from "lodash";
+
+import { config } from "./config";
+
+const winstonLogzioTransport = require("winston-logzio");
 
 export class Logger {
+  public static readonly DEFAULT_OPTIONS = {
+    level: "info",
+    fileName: "logs/default.log",
+    maxSize: 10 * 1024 * 1024,
+    maxFiles: 20,
+    console: false,
+    logzio: {
+      enabled: false,
+      apiKey: undefined
+    }
+  };
+
   public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
-  public static readonly DEFAULT_LOG_LEVEL = "info";
-  public static readonly DEFAULT_FILE_NAME = "logs/default.log";
-  public static readonly DEFAULT_MAX_SIZE = 10 * 1024 * 1024;
-  public static readonly DEFAULT_MAX_FILES = 20;
+
   private static readonly CONFIG_LOG = "logger";
-  private static readonly CONFIG_LOG_LEVEL = `${Logger.CONFIG_LOG}:level`;
-  private static readonly CONFIG_FILE_NAME = `${Logger.CONFIG_LOG}:fileName`;
-  private static readonly CONFIG_MAX_SIZE = `${Logger.CONFIG_LOG}:maxSize`;
-  private static readonly CONFIG_MAX_FILES = `${Logger.CONFIG_LOG}:maxFiles`;
-  private static readonly CONFIG_LOGZIO = `${Logger.CONFIG_LOG}:logzio`;
-  private static readonly CONFIG_LOGZIO_ENABLED = `${Logger.CONFIG_LOGZIO}:enabled`;
-  private static readonly CONFIG_LOGZIO_API_KEY = `${Logger.CONFIG_LOGZIO}:apiKey`;
   private static readonly LOGZIO_HOST = "listener.logz.io";
 
   private _logger: winston.LoggerInstance;
 
-  constructor() {
+  constructor(options = {}) {
+    const opts = defaults(options, Logger.DEFAULT_OPTIONS);
+
     // Create the directory, if it does not exist.
-    this.mkdir();
+    Logger.mkdir(opts.fileName);
 
     this._logger = new winston.Logger({
-      level: this.getLogLevel(),
+      level: opts.level,
       transports: [
         new winston.transports.File({
-          filename: path.resolve(Logger.resolvePath(this.getFileName())),
-          maxsize: this.getMaxSize(),
-          maxFiles: this.getMaxFiles(),
+          filename: path.resolve(Logger.resolvePath(opts.fileName)),
+          maxsize: opts.maxSize,
+          maxFiles: opts.maxFiles,
           prettyPrint: true,
           tailable: true
         })
@@ -43,12 +50,21 @@ export class Logger {
     });
 
     // Enable console output, during development.
-    if (config.isDevelopment() || config.isTest()) {
+    if (opts.console) {
       this.enableConsole();
     }
 
     // Enable log shipping to Logz.io (according to the configuration).
-    this.enableLogzio();
+    if (opts.logzio && opts.logzio.enabled) {
+      this.enableLogzio(opts.logzio.apiKey);
+    }
+  }
+
+  public static fromConfiguration(): Logger {
+    const loggerConfig = config.get(Logger.CONFIG_LOG);
+    loggerConfig.console = config.isDevelopment() || config.isTest();
+
+    return new Logger(loggerConfig);
   }
 
   public readonly debug: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
@@ -71,9 +87,9 @@ export class Logger {
     return this._logger.emerg(msg, ...meta);
   }
 
-  private mkdir(): void {
+  private static mkdir(fileName: string): void {
     // Create the directory, if it does not exist.
-    const logsDir = Logger.resolvePath(path.dirname(this.getFileName()));
+    const logsDir = Logger.resolvePath(path.dirname(fileName));
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir);
     }
@@ -81,26 +97,6 @@ export class Logger {
 
   private static resolvePath(pathname: string): string {
     return path.resolve(path.join("../../", pathname));
-  }
-
-  private getLogLevel(): string {
-    const level: string = config.get(Logger.CONFIG_LOG_LEVEL);
-    if (!Logger.DEFAULT_LOG_LEVEL.includes(level)) {
-      return Logger.DEFAULT_LOG_LEVEL;
-    }
-    return level;
-  }
-
-  private getFileName(): string {
-    return config.get(Logger.CONFIG_FILE_NAME) || Logger.DEFAULT_FILE_NAME;
-  }
-
-  private getMaxSize(): number {
-    return Number(config.get(Logger.CONFIG_MAX_SIZE)) || Logger.DEFAULT_MAX_SIZE;
-  }
-
-  private getMaxFiles(): number {
-    return Number(config.get(Logger.CONFIG_MAX_FILES)) || Logger.DEFAULT_MAX_FILES;
   }
 
   private enableConsole(): void {
@@ -111,21 +107,12 @@ export class Logger {
     });
   }
 
-  private enableLogzio(): void {
-    if (!config.get(Logger.CONFIG_LOGZIO_ENABLED)) {
-      return;
-    }
-
-    const apiKey: string = config.get(Logger.CONFIG_LOGZIO_API_KEY);
-    if (!apiKey) {
-      throw new Error("Missing API key!");
-    }
-
-    this._logger.add(winston.transports.Logzio, {
+  private enableLogzio(apiKey: string): void {
+    this._logger.add(winstonLogzioTransport, {
       token: apiKey,
       host: Logger.LOGZIO_HOST,
     });
   }
 }
 
-export const logger = new Logger();
+export const logger = Logger.fromConfiguration();
