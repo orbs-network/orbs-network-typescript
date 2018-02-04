@@ -5,9 +5,9 @@ import { types } from "orbs-common-library/src/types";
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
 import { FooBarAccount } from "./foobar-contract";
 import { OrbsTopology } from "./topology";
-import { delay } from "bluebird";
+import * as nconf from "nconf";
 
-const E2E_TEST_ONLY = process.env.E2E_TEST_ONLY;
+nconf.env({parseValues: true});
 
 const accounts = new Map<string, FooBarAccount>();
 
@@ -30,8 +30,40 @@ async function assertFooBarAccountBalance (n: number) {
 
 Assertion.addMethod("bars", assertFooBarAccountBalance);
 
-const topology = OrbsTopology.loadFromPath("../../config/topologies/transaction-gossip");
-const publicApiClient = process.env.E2E_PUBLIC_API_ENDPOINT ? grpc.publicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT }) : topology.nodes[1].getPublicApiClient();
+
+class TestEnvironment {
+    topology: OrbsTopology;
+
+    constructor() {
+        this.topology = OrbsTopology.loadFromPath("../../config/topologies/transaction-gossip");
+    }
+
+    async start() {
+        await this.topology.startAll();
+    }
+
+    async stop() {
+        await this.topology.stopAll();
+    }
+
+    getPublicApiClient() {
+        return this.topology.nodes[1].getPublicApiClient();
+    }
+}
+
+let publicApiClient: types.PublicApiClient;
+let testEnvironment: TestEnvironment;
+
+if (nconf.get("E2E_NO_DEPLOY")) {
+    const publicApiEndpoint = nconf.get("E2E_PUBLIC_API_ENDPOINT");
+    if (!publicApiEndpoint)
+        throw "E2E_PUBLIC_API_ENDPOINT must be defined in a no-deploy configuration";
+
+    publicApiClient = grpc.publicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
+} else {
+    testEnvironment = new TestEnvironment();
+    publicApiClient = testEnvironment.getPublicApiClient();
+}
 
 async function aFooBarAccountWith(input: {amountOfBars: number}) {
     const orbsKeyPair: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
@@ -47,19 +79,14 @@ async function aFooBarAccountWith(input: {amountOfBars: number}) {
     return account;
 }
 
-async function cleanup(success: boolean) {
-    topology.stopAll();
-    await delay(10000);
-    // hack for terminating CI Alpine docker
-    process.exit(success ? 0 : -1);
-}
 
 describe("simple token transfer", async function() {
     this.timeout(100000);
     before(async function() {
-        if (E2E_TEST_ONLY) return;
-
-        await topology.startAll();
+        if (testEnvironment) {
+            console.log("starting the test environment");
+            await testEnvironment.start();
+        }
     });
 
     it("transfers 1 bar token from one account to another", async function() {
@@ -78,17 +105,9 @@ describe("simple token transfer", async function() {
 
     });
 
-    afterEach(async function() {
-        if (E2E_TEST_ONLY) return;
-
-        if (this.currentTest.state != "passed") {
-            await cleanup(false);
+    after(async function() {
+        if (testEnvironment) {
+            await testEnvironment.stop();
         }
-    });
-
-    after(async () => {
-        if (E2E_TEST_ONLY) return;
-
-        await cleanup(true);
     });
 });
