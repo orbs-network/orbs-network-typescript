@@ -24,6 +24,7 @@ export class Logger {
   };
 
   public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
+  public static readonly DEFAULT_LOG_LEVEL = "info";
 
   private static readonly CONFIG_LOG = "logger";
   private static readonly LOGZIO_HOST = "listener.logz.io";
@@ -32,6 +33,10 @@ export class Logger {
 
   constructor(options = {}) {
     const opts = defaults(options, Logger.DEFAULT_OPTIONS);
+
+    if (Logger.LOG_TYPES.indexOf(opts.level) !== -1) {
+      opts.level = Logger.DEFAULT_LOG_LEVEL;
+    }
 
     // Create the directory, if it does not exist.
     Logger.mkdir(opts.fileName);
@@ -44,7 +49,8 @@ export class Logger {
           maxsize: opts.maxSize,
           maxFiles: opts.maxFiles,
           prettyPrint: true,
-          tailable: true
+          tailable: true,
+          json: false
         })
       ]
     });
@@ -79,12 +85,22 @@ export class Logger {
     return this._logger.warn(msg, ...meta);
   }
 
-  public readonly error: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
-    return this._logger.error(msg, ...meta);
+  public readonly error: winston.LeveledLogMethod = (msg: string | Error, ...meta: any[]): winston.LoggerInstance => {
+    return this.logError(this._logger.error, msg, ...meta);
   }
 
-  public readonly fatal: winston.LeveledLogMethod = (msg: string, ...meta: any[]): winston.LoggerInstance => {
-    return this._logger.emerg(msg, ...meta);
+  public readonly fatal: winston.LeveledLogMethod = (msg: string | Error, ...meta: any[]): winston.LoggerInstance => {
+    return this.logError(this._logger.emerg, msg, ...meta);
+  }
+
+  private logError(method: winston.LeveledLogMethod, msg: string | Error, ...meta: any[]): winston.LoggerInstance {
+    method(<string>msg, ...meta);
+
+    if (msg instanceof Error) {
+      method(msg.stack, ...meta);
+    }
+
+    return this._logger;
   }
 
   private static mkdir(fileName: string): void {
@@ -100,7 +116,7 @@ export class Logger {
   }
 
   private enableConsole(): void {
-    this. _logger.add(winston.transports.Console, {
+    this._logger.add(winston.transports.Console, {
       json: false,
       colorize: true,
       timestamp: true
@@ -110,7 +126,7 @@ export class Logger {
   private enableLogzio(apiKey: string): void {
     this._logger.add(winstonLogzioTransport, {
       token: apiKey,
-      host: Logger.LOGZIO_HOST,
+      host: Logger.LOGZIO_HOST
     });
   }
 }

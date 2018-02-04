@@ -1,5 +1,5 @@
 import { Assertion, expect } from "chai";
-import { CryptoUtils } from "orbs-common-library/src/CryptoUtils";
+import { CryptoUtils } from "orbs-common-library/src/cryptoUtils";
 import { grpc } from "orbs-common-library/src/grpc";
 import { types } from "orbs-common-library/src/types";
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
