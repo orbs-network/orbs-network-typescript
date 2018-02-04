@@ -3,6 +3,8 @@ FROM node:9-alpine
 RUN apk --no-cache add bash git python build-base
 # last two enable gyp-rebuild for secp256k1
 
+VOLUME [ "/opt/orbs/logs" ]
+
 ADD . /opt/orbs
 
 WORKDIR /opt/orbs
