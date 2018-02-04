@@ -80,8 +80,6 @@ export class Logger {
 
   public static fromConfiguration(): Logger {
     const loggerConfig = config.get(Logger.CONFIG_LOG);
-    loggerConfig.console = config.isDevelopment() || config.isTest();
-
     return new Logger(loggerConfig);
   }
 
