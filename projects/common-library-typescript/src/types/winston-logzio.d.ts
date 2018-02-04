@@ -1,17 +1,21 @@
-/// <reference types="node" />
+import * as winston from 'winston';
+import { TransportInstance } from 'winston';
 
-import { TransportInstance, Transports, TransportOptions } from "winston";
-import { WinstonLogzIoTransport } from "winston-logzio";
-
-declare module "winston" {
-  export interface Transports extends WinstonLogzIoTransport { }
+export interface WinstonLogzioTransportOptions {
+  apiKey: string;
+  host: string;
 }
 
-declare module "winston-logzio" {
-  export interface WintstonLogzIoTransportInstance extends TransportInstance {
-  }
+export interface WinstonLogzioTransportInstance extends TransportInstance {
+  new(options?: WinstonLogzioTransportOptions): WinstonLogzioTransportInstance;
+}
 
-  export interface WinstonLogzIoTransport {
-    Logzio: WintstonLogzIoTransportInstance;
+export declare class Logzio extends winston.Transport implements WinstonLogzioTransportInstance {
+  constructor(options?: WinstonLogzioTransportOptions);
+}
+
+declare module "winston" {
+  interface Transports {
+    Logzio: Logzio;
   }
 }
