@@ -25,8 +25,9 @@ export default class StateStorageService {
   public async readKeys(rpc: types.ReadKeysContext) {
     logger.debug(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
-    if (rpc.req.lastBlockId)
+    if (rpc.req.lastBlockId) {
       await this.waitForBlockState(rpc.req.lastBlockId.value);
+    }
 
     const values = await this.kvstore.getMany(rpc.req.address, rpc.req.keys);
 
@@ -36,11 +37,11 @@ export default class StateStorageService {
   async waitForBlockState(blockId: number, timeout = 5000) {
     return new Promise((resolve, reject) => {
       if (blockId < this.lastBlockId)
-        reject(new Error(`attempt to read old state (${blockId} != ${this.lastBlockId})`));
+        reject(new Error(`Attempt to read old state (${blockId} != ${this.lastBlockId})`));
 
       if (blockId > this.lastBlockId) {
         if (timeout < 200) {
-          reject(new Error(`timeout in attempt to read block state (${blockId} != ${this.lastBlockId})`));
+          reject(new Error(`Timeout in attempt to read block state (${blockId} != ${this.lastBlockId})`));
         } else {
           setTimeout(() => this.waitForBlockState(blockId, timeout - 200), 200);
         }
@@ -49,16 +50,16 @@ export default class StateStorageService {
     });
   }
 
-  // service logic
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
+
     logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   async pollBlockStorage() {
     const { blocks } = await this.peers.blockStorage.getBlocks({ lastBlockId: this.lastBlockId });
 
-    // assuming an ordered list of blocks
+    // Assuming an ordered list of blocks
     for (const block of blocks) {
       await this.processNextBlock(block);
     }
