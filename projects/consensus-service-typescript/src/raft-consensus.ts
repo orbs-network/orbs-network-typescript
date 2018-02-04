@@ -1,7 +1,7 @@
 import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
-import { logger, types, config, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
+import { logger, types, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
@@ -43,6 +43,17 @@ class RPCConnector extends EventEmitter {
   }
 }
 
+export interface RaftElectionOptions {
+  min: number;
+  max: number;
+}
+
+export interface RaftConsensusOptions {
+  clusterSize: number;
+  electionTimeout: RaftElectionOptions;
+  heartbeatInterval: number;
+}
+
 export default class RaftConsensus {
   private vm = topologyPeers(topology.peers).virtualMachine;
   private blockStorage = topologyPeers(topology.peers).blockStorage;
@@ -51,19 +62,13 @@ export default class RaftConsensus {
   private node: any;
   private blockId: number;
 
-  public constructor() {
-    // Get the protocol configuration from the environment settings.
-    const consensusConfig = config.get("consensus");
-    if (!consensusConfig) {
-      throw new Error("Couldn't find consensus configuration!");
-    }
-
+  public constructor(options: RaftConsensusOptions) {
     this.blockId = 0;
     this.connector = new RPCConnector();
 
     this.node = gaggle({
       id: crypto.whoAmI(),
-      clusterSize: consensusConfig.clusterSize,
+      clusterSize: options.clusterSize,
       channel: {
         name: "custom",
         connector: this.connector
@@ -71,12 +76,12 @@ export default class RaftConsensus {
 
       // How long to wait before declaring the leader dead?
       electionTimeout: {
-        min: consensusConfig.electionTimeout.min,
-        max: consensusConfig.electionTimeout.max,
+        min: options.electionTimeout.min,
+        max: options.electionTimeout.max,
       },
 
       // How often should the leader send heartbeats?
-      heartbeatInterval: consensusConfig.heartbeatInterval
+      heartbeatInterval: options.heartbeatInterval
     });
 
     // Nodes will emit "committed" events whenever the cluster comes to consensus about an entry.
