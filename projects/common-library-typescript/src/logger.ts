@@ -12,7 +12,6 @@ const winstonLogzioTransport = require("winston-logzio");
 
 const { NODE_NAME, NODE_IP, NODE_ENV, SERVICE_NAME } = process.env;
 
-
 export class Logger {
   public static readonly DEFAULT_OPTIONS = {
     level: "info",
@@ -55,16 +54,17 @@ export class Logger {
           tailable: true,
           json: false
         })
+      ],
+      rewriters: [
+        (level, msg, meta) => {
+          meta.node = NODE_NAME;
+          meta.node_ip = NODE_IP;
+          meta.environment = NODE_ENV;
+          meta.service = SERVICE_NAME;
+
+          return meta;
+        }
       ]
-    });
-
-    this._logger.rewriters.push(function(level, msg, meta) {
-      meta.node = NODE_NAME;
-      meta.node_ip = NODE_IP;
-      meta.environment = NODE_ENV;
-      meta.service = SERVICE_NAME;
-
-      return meta;
     });
 
     // Enable console output, during development.
