@@ -24,6 +24,7 @@ export class Logger {
   };
 
   public static readonly LOG_TYPES = ["debug", "info", "warn", "error"];
+  public static readonly DEFAULT_LOG_LEVEL = "info";
 
   private static readonly CONFIG_LOG = "logger";
   private static readonly LOGZIO_HOST = "listener.logz.io";
