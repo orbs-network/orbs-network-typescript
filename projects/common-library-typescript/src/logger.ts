@@ -8,8 +8,6 @@ import { defaults } from "lodash";
 
 import { config } from "./config";
 
-const winstonLogzioTransport = require("winston-logzio");
-
 const { NODE_NAME, NODE_IP, NODE_ENV, SERVICE_NAME } = process.env;
 
 export class Logger {
@@ -134,6 +132,8 @@ export class Logger {
   }
 
   private enableLogzio(apiKey: string): void {
+    const winstonLogzioTransport = require("winston-logzio");
+
     this._logger.add(winstonLogzioTransport, {
       token: apiKey,
       host: Logger.LOGZIO_HOST
