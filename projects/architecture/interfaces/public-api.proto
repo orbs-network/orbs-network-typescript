@@ -21,7 +21,6 @@ message PublicApiCallOutput {
   string resultJson = 1;
 }
 
-
 service PublicApi {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc SendTransaction (PublicApiSendTransactionInput) returns (PublicApiSendTransactionOutput);

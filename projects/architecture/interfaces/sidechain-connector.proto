@@ -9,14 +9,14 @@ service SidechainConnector {
 }
 
 message EthereumFunctionParameter {
-    string name = 1;
-    string type = 2;
+  string name = 1;
+  string type = 2;
 }
 
 message EthereumFunctionInterface {
-    string name = 1;
-    repeated EthereumFunctionParameter inputs = 2;
-    repeated EthereumFunctionParameter outputs = 3;
+  string name = 1;
+  repeated EthereumFunctionParameter inputs = 2;
+  repeated EthereumFunctionParameter outputs = 3;
 }
 
 message CallEthereumContractInput {
@@ -31,4 +31,3 @@ message CallEthereumContractOutput {
   string blockNumber = 2;
   uint32 timestamp = 3;
 }
-
