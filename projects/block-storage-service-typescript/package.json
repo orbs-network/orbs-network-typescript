@@ -23,10 +23,14 @@
   },
   "dependencies": {
     "bind-decorator": "^1.0.11",
+    "leveldown": "^3.0.0",
+    "levelup": "^2.0.1",
     "lodash": "^4.17.4",
     "orbs-common-library": "file:../common-library-typescript"
   },
   "devDependencies": {
+    "@types/leveldown": "^1.7.0",
+    "@types/levelup": "0.0.30",
     "@types/lodash": "^4.14.99",
     "@types/node": "^9.4.0",
     "@types/supertest": "^2.0.4",
