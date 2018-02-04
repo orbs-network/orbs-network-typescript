@@ -5,8 +5,6 @@ import { delay } from "bluebird";
 import * as _  from "lodash";
 import { grpc } from "orbs-common-library/src/grpc";
 
-const ORBS_SERVICE_READY_WAIT_MS = process.env.ORBS_SERVICE_READY_WAIT_MS || 30000;
-
 export class OrbsNode {
   services: OrbsService[];
 
@@ -26,14 +24,10 @@ export class OrbsNode {
     return Promise.all(this.services.map(service => service.start(optsPerService[service.getProjectName()])));
   }
 
-  stopAll() {
-    for (const service of this.services) {
-      try {
-        service.stop();
-      } catch (err) {
-        console.log(`failed to stop service ${service.getProjectName()}. error: ${err}`);
-      }
-    }
+  async stopAll() {
+    return Promise.all(this.services.map(async (service) => {
+      await service.stop().catch(err => console.log(`failed to stop service ${service.getProjectName()}. error: ${err}`));
+    }));
   }
 
   getPublicApiClient() {
@@ -66,7 +60,15 @@ export class OrbsService {
       }
       this.process = this.run(opts);
       // TODO: wait by polling service state (not implemented yet in the server-side)
-      await delay(ORBS_SERVICE_READY_WAIT_MS);
+      await delay(30000);
+  }
+
+  public async stop() {
+    if (this.process) {
+      this.process.kill();
+      await delay(2000); // gracefully wait for process to be completely down
+      this.process = undefined;
+    }
   }
 
   private run(opts = {}, streamStdout = true) {
@@ -88,13 +90,6 @@ export class OrbsService {
       this.process = childProcess;
       return childProcess;
   }
-
-  public stop() {
-    if (this.process) {
-      this.process.kill();
-      this.process = undefined;
-    }
-  }
 }
 
 export class OrbsTopology {
@@ -108,10 +103,8 @@ export class OrbsTopology {
     return Promise.all(this.nodes.map(node => node.startAll(optsPerService)));
   }
 
-  stopAll() {
-    for (const node of this.nodes) {
-      node.stopAll();
-    }
+  async stopAll() {
+    return Promise.all(this.nodes.map(node => node.stopAll().catch(err => console.log)));
   }
 
   static loadFromPath(topologyPath: string) {
