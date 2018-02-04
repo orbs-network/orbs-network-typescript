@@ -28,8 +28,6 @@ export default class BlockStorageService {
     logger.debug(`${topology.name}: getBlocks ${JSON.stringify(rpc.req)}`);
 
     const blocks = await this.db.getBlocks(rpc.req.lastBlockId);
-
-    // rpc.res = { blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex) };
   }
 
   async main() {
