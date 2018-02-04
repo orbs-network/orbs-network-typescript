@@ -5,24 +5,8 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "test": "ts-mocha src/*.spec.ts",
+    "test": "NODE_ENV=test ts-mocha src/*.spec.ts",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
-  },
-  "jest": {
-    "globals": {
-      "__TS_CONFIG__": "tsconfig.json"
-    },
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.(ts|tsx)$": "./node_modules/ts-jest/preprocessor.js"
-    },
-    "testMatch": [
-      "**/test/**/*.test.(ts|js)"
-    ],
-    "testEnvironment": "node"
   },
   "dependencies": {
     "@types/shelljs": "^0.7.7",
@@ -45,7 +29,6 @@
     "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",
-    "jest": "^22.1.4",
     "mocha": "^4.1.0",
     "nodemon": "^1.14.11",
     "shelljs": "^0.8.1",

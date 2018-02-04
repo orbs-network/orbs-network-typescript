@@ -1,7 +1,7 @@
 import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
-import { logger, types, config, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
+import { logger, types, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
@@ -43,6 +43,17 @@ class RPCConnector extends EventEmitter {
   }
 }
 
+export interface RaftElectionOptions {
+  min: number;
+  max: number;
+}
+
+export interface RaftConsensusOptions {
+  clusterSize: number;
+  electionTimeout: RaftElectionOptions;
+  heartbeatInterval: number;
+}
+
 export default class RaftConsensus {
   private vm = topologyPeers(topology.peers).virtualMachine;
   private blockStorage = topologyPeers(topology.peers).blockStorage;
@@ -51,19 +62,13 @@ export default class RaftConsensus {
   private node: any;
   private blockId: number;
 
-  public constructor() {
-    // Get the protocol configuration from the environment settings.
-    const consensusConfig = config.get("consensus");
-    if (!consensusConfig) {
-      throw new Error("Couldn't find consensus configuration!");
-    }
-
+  public constructor(options: RaftConsensusOptions) {
     this.blockId = 0;
     this.connector = new RPCConnector();
 
     this.node = gaggle({
       id: crypto.whoAmI(),
-      clusterSize: consensusConfig.clusterSize,
+      clusterSize: options.clusterSize,
       channel: {
         name: "custom",
         connector: this.connector
@@ -71,12 +76,12 @@ export default class RaftConsensus {
 
       // How long to wait before declaring the leader dead?
       electionTimeout: {
-        min: consensusConfig.electionTimeout.min,
-        max: consensusConfig.electionTimeout.max,
+        min: options.electionTimeout.min,
+        max: options.electionTimeout.max,
       },
 
       // How often should the leader send heartbeats?
-      heartbeatInterval: consensusConfig.heartbeatInterval
+      heartbeatInterval: options.heartbeatInterval
     });
 
     // Nodes will emit "committed" events whenever the cluster comes to consensus about an entry.
@@ -84,7 +89,17 @@ export default class RaftConsensus {
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
     this.node.on("committed", async (data: any) => {
-      const txData = data.data;
+      const msgData = data.data;
+
+      const txData = msgData.msg;
+
+      // Verify the sending node's signature, in order to avoid internal spam or miscommunication.
+      if (crypto.verifySignature(msgData.signer, JSON.stringify(txData), msgData.signature)) {
+        logger.debug(`Verified message from ${msgData.signer}, with signature ${msgData.signature}`);
+      } else {
+        logger.error(`Failed to verify message from ${msgData.signer}, with signature ${msgData.signature}! Aborting!`);
+        return;
+      }
 
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
@@ -119,9 +134,15 @@ export default class RaftConsensus {
     });
 
     if (vmResult.success) {
-      this.node.append({
+      const msg = {
         tx: tx,
-        modifiedAddressesJson: vmResult.modifiedAddressesJson,
+        modifiedAddressesJson: vmResult.modifiedAddressesJson
+      };
+
+      this.node.append({
+        msg: msg,
+        signer: this.node.id,
+        signature: crypto.sign(JSON.stringify(msg))
       });
     }
   }

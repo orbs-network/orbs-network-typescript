@@ -1,4 +1,4 @@
-import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, config, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import RaftConsensus from "./raft-consensus";
 
@@ -24,7 +24,8 @@ export default class ConsensusService {
 
   @bind
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    logger.debug(`${topology.name}: gossipMessageReceived ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${topology.name}: gossipMessageReceived ${rpc.req.MessageType} from ${rpc.req.FromAddress} of ${rpc.req.BroadcastGroup}`);
+
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
@@ -32,6 +33,12 @@ export default class ConsensusService {
   constructor() {
     logger.info(`${topology.name}: service started`);
 
-   this.consensus = new RaftConsensus();
+    // Get the protocol configuration from the environment settings.
+    const consensusConfig = config.get("consensus");
+    if (!consensusConfig) {
+      throw new Error("Couldn't find consensus configuration!");
+    }
+
+    this.consensus = new RaftConsensus(consensusConfig);
   }
 }
