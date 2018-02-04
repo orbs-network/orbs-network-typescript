@@ -39,6 +39,10 @@ export class Logger {
   constructor(options = {}) {
     const opts = defaults(options, Logger.DEFAULT_OPTIONS);
 
+    if (Logger.LOG_TYPES.indexOf(opts.level) !== -1) {
+      opts.level = Logger.DEFAULT_LOG_LEVEL;
+    }
+
     // Create the directory, if it does not exist.
     Logger.mkdir(opts.fileName);
 
@@ -114,28 +118,6 @@ export class Logger {
 
   private static resolvePath(pathname: string): string {
     return path.resolve(path.join("../../", pathname));
-  }
-
-  private getLogLevel(): string {
-    const level: string = config.get(Logger.CONFIG_LOG_LEVEL);
-
-    if (Logger.LOG_TYPES.indexOf(level) !== -1) {
-      return Logger.DEFAULT_LOG_LEVEL;
-    }
-
-    return level;
-  }
-
-  private getFileName(): string {
-    return config.get(Logger.CONFIG_FILE_NAME) || Logger.DEFAULT_FILE_NAME;
-  }
-
-  private getMaxSize(): number {
-    return Number(config.get(Logger.CONFIG_MAX_SIZE)) || Logger.DEFAULT_MAX_SIZE;
-  }
-
-  private getMaxFiles(): number {
-    return Number(config.get(Logger.CONFIG_MAX_FILES)) || Logger.DEFAULT_MAX_FILES;
   }
 
   private enableConsole(): void {
