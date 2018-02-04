@@ -11,12 +11,6 @@ import { config } from "./config";
 const winstonLogzioTransport = require("winston-logzio");
 
 export class Logger {
-  public static readonly LOG_TYPES = ["debug", "info", "warn", "error", "fatal"];
-  public static readonly DEFAULT_LOG_LEVEL = "info";
-  public static readonly DEFAULT_FILE_NAME = "logs/default.log";
-  public static readonly DEFAULT_MAX_SIZE = 10 * 1024 * 1024;
-  public static readonly DEFAULT_MAX_FILES = 20;
-
   public static readonly DEFAULT_OPTIONS = {
     level: "info",
     fileName: "logs/default.log",
