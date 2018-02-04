@@ -7,30 +7,6 @@ import { FooBarAccount } from "./foobar-contract";
 import { OrbsTopology } from "./topology";
 import * as nconf from "nconf";
 
-nconf.env({parseValues: true});
-
-const accounts = new Map<string, FooBarAccount>();
-
-async function assertFooBarAccountBalance (n: number) {
-    // make sure we are working with am Account model
-    new Assertion(this._obj).to.be.instanceof(FooBarAccount);
-
-    const account = <FooBarAccount>this._obj;
-
-    const actualBars = await account.getBalance();
-
-    this.assert(
-        actualBars === n
-        , "expected #{this} to have balance #{exp} but got #{act}"
-        , "expected #{this} to not have balance #{act}"
-        , n
-        , actualBars
-    );
-}
-
-Assertion.addMethod("bars", assertFooBarAccountBalance);
-
-
 class TestEnvironment {
     topology: OrbsTopology;
 
@@ -54,6 +30,8 @@ class TestEnvironment {
 let publicApiClient: types.PublicApiClient;
 let testEnvironment: TestEnvironment;
 
+nconf.env({parseValues: true});
+
 if (nconf.get("E2E_NO_DEPLOY")) {
     const publicApiEndpoint = nconf.get("E2E_PUBLIC_API_ENDPOINT");
     if (!publicApiEndpoint)
@@ -65,6 +43,25 @@ if (nconf.get("E2E_NO_DEPLOY")) {
     publicApiClient = testEnvironment.getPublicApiClient();
 }
 
+async function assertFooBarAccountBalance (n: number) {
+    // make sure we are working with am Account model
+    new Assertion(this._obj).to.be.instanceof(FooBarAccount);
+
+    const account = <FooBarAccount>this._obj;
+
+    const actualBars = await account.getBalance();
+
+    this.assert(
+        actualBars === n
+        , "expected #{this} to have balance #{exp} but got #{act}"
+        , "expected #{this} to not have balance #{act}"
+        , n
+        , actualBars
+    );
+}
+
+Assertion.addMethod("bars", assertFooBarAccountBalance);
+
 async function aFooBarAccountWith(input: {amountOfBars: number}) {
     const orbsKeyPair: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
 
@@ -72,13 +69,10 @@ async function aFooBarAccountWith(input: {amountOfBars: number}) {
     const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
     const account = new FooBarAccount(orbsKeyPair.getPublicKey(), contractAdapter);
 
-    accounts.set(account.address, account);
-
     await account.initBalance(input.amountOfBars);
 
     return account;
 }
-
 
 describe("simple token transfer", async function() {
     this.timeout(100000);
