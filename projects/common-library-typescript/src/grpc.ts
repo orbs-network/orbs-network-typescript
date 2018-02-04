@@ -46,7 +46,6 @@ export namespace grpc {
     server("state-storage.proto", "StateStorage", endpoint, service);
   }
 
-
   export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
       server("block-storage.proto", "BlockStorage", endpoint, service);
   }
