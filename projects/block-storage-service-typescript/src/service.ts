@@ -6,10 +6,10 @@ ErrorHandler.setup();
 
 // TODO: support a head block which refers to a NULL prev block
 const DEFAULT_GENESIS_BLOCK: types.Block = {
-    id: 0,
-    prevBlockId: -1,
-    tx: {contractAddress: "0", sender: "", signature: "", argumentsJson: "{}"},
-    modifiedAddressesJson: "{}"
+  id: 0,
+  prevBlockId: -1,
+  tx: { contractAddress: "0", sender: "", signature: "", argumentsJson: "{}" },
+  modifiedAddressesJson: "{}"
 };
 
 export default class BlockStorageService {
@@ -25,23 +25,23 @@ export default class BlockStorageService {
 
   @bind
   public async addBlock(rpc: types.AddBlockContext) {
-      const {block} = rpc.req;
-      const lastBlock = this.storedBlocks[this.storedBlocks.length - 1];
-      if (block.prevBlockId != lastBlock.id) {
-          throw new Error(`expects previous block ID ${lastBlock.id}. retrieved ${block.prevBlockId} / ${block.id}. ${JSON.stringify(this.storedBlocks)}`);
-      }
+    const { block } = rpc.req;
+    const lastBlock = this.storedBlocks[this.storedBlocks.length - 1];
+    if (block.prevBlockId != lastBlock.id) {
+      throw new Error(`expects previous block ID ${lastBlock.id}. retrieved ${block.prevBlockId} / ${block.id}. ${JSON.stringify(this.storedBlocks)}`);
+    }
 
-      this.storedBlocks.push(block);
-      logger.debug("Added new block. stored blocks:", this.storedBlocks);
+    this.storedBlocks.push(block);
+    logger.debug("Added new block. stored blocks:", this.storedBlocks);
   }
 
   @bind
   public async getBlocks(rpc: types.GetBlocksContext) {
-      const firstBlockIndex = _.findIndex(this.storedBlocks, {prevBlockId: rpc.req.lastBlockId});
+    const firstBlockIndex = _.findIndex(this.storedBlocks, { prevBlockId: rpc.req.lastBlockId });
 
-      rpc.res = {blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex)};
+    rpc.res = { blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex) };
 
-      logger.debug(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
+    logger.debug(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
   }
 
   // service logic
@@ -52,9 +52,7 @@ export default class BlockStorageService {
   }
 
   askForHeartbeats() {
-    /*
-    this.askForHeartbeat(this.peers.gossip);
-     */
+    // this.askForHeartbeat(this.peers.gossip);
   }
 
   async main() {
