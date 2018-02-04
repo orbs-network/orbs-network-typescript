@@ -126,8 +126,11 @@ export default class Gossip {
   }
 
   public possiblePeers(): string[] {
-    const ip = this.ip();
-    return topology.gossipPeers.filter((p: string) => !includes(p, ip));
+    const ip = this.ip(),
+      me = crypto.whoAmI();
+
+    // TODO: better self-exclusion policy
+    return topology.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
   }
 
   public activePeers() {
