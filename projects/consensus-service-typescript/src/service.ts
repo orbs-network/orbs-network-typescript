@@ -1,4 +1,4 @@
-import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, config, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 import RaftConsensus from "./raft-consensus";
 
@@ -32,6 +32,12 @@ export default class ConsensusService {
   constructor() {
     logger.info(`${topology.name}: service started`);
 
-   this.consensus = new RaftConsensus();
+    // Get the protocol configuration from the environment settings.
+    const consensusConfig = config.get("consensus");
+    if (!consensusConfig) {
+      throw new Error("Couldn't find consensus configuration!");
+    }
+
+    this.consensus = new RaftConsensus(consensusConfig);
   }
 }
