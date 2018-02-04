@@ -77,7 +77,7 @@ export default class StateStorageService {
   }
 
   askForHeartbeats() {
-    // this.askForHeartbeat(this.peers.blockStorage);
+    this.askForHeartbeat(this.peers.blockStorage);
   }
 
   async main() {
