@@ -2,9 +2,12 @@ version: '2.1'
 services:
   basic-simulation:
     build: .
-    command: node simulate/src/index.js discovery
+    command: node simulate/src/index.js transaction-gossip
     environment:
       E2E_PUBLIC_API_ENDPOINT: 0.0.0.0:51151
+      # NODE_ENV: staging
+    # env_file:
+    #   - ./deploy/bootstrap/.env-secrets
     volumes:
       - ./config:/opt/orbs/config/
       # - ./projects/common-library-typescript/dist:/opt/orbs/projects/common-library-typescript/dist/

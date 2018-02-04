@@ -8,7 +8,7 @@ import { defaults } from "lodash";
 
 import { config } from "./config";
 
-const winstonLogzioTransport = require("winston-logzio");
+const { NODE_NAME, NODE_IP, NODE_ENV, SERVICE_NAME } = process.env;
 
 export class Logger {
   public static readonly DEFAULT_OPTIONS = {
@@ -52,6 +52,16 @@ export class Logger {
           tailable: true,
           json: false
         })
+      ],
+      rewriters: [
+        (level, msg, meta) => {
+          meta.node = NODE_NAME;
+          meta.node_ip = NODE_IP;
+          meta.environment = NODE_ENV;
+          meta.service = SERVICE_NAME;
+
+          return meta;
+        }
       ]
     });
 
@@ -68,8 +78,6 @@ export class Logger {
 
   public static fromConfiguration(): Logger {
     const loggerConfig = config.get(Logger.CONFIG_LOG);
-    loggerConfig.console = config.isDevelopment() || config.isTest();
-
     return new Logger(loggerConfig);
   }
 
@@ -124,6 +132,8 @@ export class Logger {
   }
 
   private enableLogzio(apiKey: string): void {
+    const winstonLogzioTransport = require("winston-logzio");
+
     this._logger.add(winstonLogzioTransport, {
       token: apiKey,
       host: Logger.LOGZIO_HOST

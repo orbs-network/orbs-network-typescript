@@ -8,6 +8,9 @@ services:
     restart: always
     env_file:
       - .env
+      - .env-secrets
+    environment:
+      SERVICE: consensus
     networks:
       default:
 
@@ -19,6 +22,9 @@ services:
       - 51151:51151
     env_file:
       - .env
+      - .env-secrets
+    environment:
+      SERVICE: public-api
     networks:
       default:
 
@@ -28,6 +34,9 @@ services:
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/state-storage.js
     env_file:
       - .env
+      - .env-secrets
+    environment:
+      SERVICE: state-storage
     networks:
       default:
 
@@ -37,6 +46,8 @@ services:
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/virtual-machine.js
     env_file:
       - .env
+    environment:
+      SERVICE: virtual-machine
     networks:
       default:
 
@@ -46,6 +57,8 @@ services:
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/block-storage.js
     env_file:
       - .env
+    environment:
+      SERVICE: block-storage
     networks:
       default:
 
@@ -57,6 +70,8 @@ services:
       - 60001:60001
     env_file:
       - .env
+    environment:
+      SERVICE: gossip
     networks:
       default:
 
