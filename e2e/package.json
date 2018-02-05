@@ -37,6 +37,6 @@
     "supertest": "^3.0.0",
     "ts-mocha": "^1.1.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.7.1"
   }
 }
