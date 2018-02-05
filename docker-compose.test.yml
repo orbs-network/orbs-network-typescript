@@ -82,6 +82,8 @@ services:
     networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.19
+    volumes:
+      - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
