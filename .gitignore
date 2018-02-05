@@ -37,3 +37,4 @@ config/staging.json
 
 # Databases
 db
+.ldb_history
