@@ -19,4 +19,4 @@ RUN ./build.sh
 
 RUN cd e2e && ./build.sh
 
-CMD node simulate/src/index.js transaction-gossip
+CMD echo
