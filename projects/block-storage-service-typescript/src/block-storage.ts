@@ -3,14 +3,15 @@ import * as fs from "fs";
 import * as levelup from "levelup";
 import leveldown from "leveldown";
 
-import { logger, types, topology, topologyPeers, CryptoUtils, Encoding } from "orbs-common-library";
+import { logger, config, types, topology, topologyPeers, CryptoUtils, Encoding } from "orbs-common-library";
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
 export default class BlockStorage {
+  // The path to the local LevelDB will be of the format: "../../db/[ENVIRONMENT]/blocks_[NODE].db".
   public static readonly LEVELDB_NAME: string = `blocks_${crypto.whoAmI()}.db`;
-  public static readonly LEVELDB_PATH: string = path.resolve(path.join("../../", "db", BlockStorage.LEVELDB_NAME));
-  public static readonly LAST_BLOCK_HASH_KEY: string = "last";
+  public static readonly LEVELDB_PATH: string = path.resolve(path.join("../../", "db", config.getEnvironment(),
+    BlockStorage.LEVELDB_NAME));
 
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
