@@ -5,13 +5,6 @@ import BlockStorage from "./block-storage";
 
 ErrorHandler.setup();
 
-const DEFAULT_GENESIS_BLOCK: types.Block = {
-  id: 0,
-  prevBlockId: -1,
-  tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
-  modifiedAddressesJson: "{}"
-};
-
 export default class BlockStorageService {
   private db: BlockStorage;
 
