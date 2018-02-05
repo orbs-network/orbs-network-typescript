@@ -13,7 +13,7 @@ export default class GossipService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
@@ -35,7 +35,7 @@ export default class GossipService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
@@ -52,9 +52,9 @@ export default class GossipService {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
 
       if (activePeers.length === 0) {
-        logger.info(`${this.gossip.localAddress} has no active peers`);
+        logger.debug(`${this.gossip.localAddress} has no active peers`);
       } else {
-        logger.info(`${this.gossip.localAddress} has active peers`, {activePeers});
+        logger.debug(`${this.gossip.localAddress} has active peers`, {activePeers});
       }
     }, 5000);
 
