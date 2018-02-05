@@ -21,7 +21,7 @@ export default class BlockStorage {
       id: 0,
       prevBlockId: -1
     },
-    tx: { contractAddress: "0", sender: "", signature: "", argumentsJson: "{}" },
+    tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
     modifiedAddressesJson: "{}"
   };
 
