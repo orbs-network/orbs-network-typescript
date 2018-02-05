@@ -27,7 +27,14 @@ export default class BlockStorageService {
   public async getBlocks(rpc: types.GetBlocksContext) {
     logger.debug(`${topology.name}: getBlocks ${JSON.stringify(rpc.req)}`);
 
-    const blocks = await this.db.getBlocks(rpc.req.lastBlockId);
+    rpc.res.blocks = await this.db.getBlocks(rpc.req.lastBlockId);
+  }
+
+  @bind
+  public async getLastBlockId(rpc: types.GetLastBlockIdContext) {
+    logger.debug(`${topology.name}: getLastBlockId ${JSON.stringify(rpc.req)}`);
+
+    rpc.res.blockId = await this.db.getLastBlockId();
   }
 
   async main() {
