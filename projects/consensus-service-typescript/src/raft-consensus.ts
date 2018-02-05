@@ -134,8 +134,9 @@ export default class RaftConsensus {
   // then propagating the transaction with its execution outputs.
   async onAppend(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
     const vmResult = await this.vm.executeTransaction({
+      transaction: tx,
       transactionAppendix: txAppendix,
-      lastBlockId: this.blockId
+      lastBlockId: this.lastBlockId
     });
 
     if (vmResult.success) {
