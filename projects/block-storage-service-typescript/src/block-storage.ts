@@ -19,8 +19,7 @@ export default class BlockStorage {
     header: {
       version: 0,
       id: 0,
-      prevBlockId: -1,
-      timestamp: 1514764800
+      prevBlockId: -1
     },
     tx: { contractAddress: "0", sender: "", signature: "", argumentsJson: "{}" },
     modifiedAddressesJson: "{}"
