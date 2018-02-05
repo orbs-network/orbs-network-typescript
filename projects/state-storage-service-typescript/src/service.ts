@@ -68,10 +68,11 @@ export default class StateStorageService {
   }
 
   async processNextBlock(block: types.Block) {
-    if (block.prevBlockId == this.lastBlockId) {
+    if (block.header.prevBlockId == this.lastBlockId) {
+      logger.error("Got block:", block.header.id);
       const modifiedArgs = new Map<string, string>(_.toPairs(JSON.parse(block.modifiedAddressesJson)));
       await this.kvstore.setMany(block.tx.contractAddress, modifiedArgs);
-      this.lastBlockId = block.id;
+      this.lastBlockId = block.header.id;
     } else {
       throw new Error(`Unexpected block ID: ${block.header.id}. Out of sync?`);
     }

@@ -13,11 +13,13 @@ export default class BlockStorage {
   public static readonly LEVELDB_PATH: string = path.resolve(path.join("../../", "db", config.getEnvironment(),
     BlockStorage.LEVELDB_NAME));
 
+  public static readonly LAST_BLOCK_ID_KEY: string = "last";
+
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,
       id: 0,
-      prevBlockHash: "1219bd8a4a704c42105a1a2f50d3759398f3036f38d29250828e16b5d4ed424b", // Double SHA256 of "".
+      prevBlockId: -1,
       timestamp: 1514764800
     },
     tx: { contractAddress: "0", sender: "", signature: "", argumentsJson: "{}" },
@@ -39,49 +41,51 @@ export default class BlockStorage {
   }
 
   public async load(): Promise<void> {
-    // Get the hash of the last block and use to get actual block.
-    let lastBlockHash;
+    // Get the ID of the last block and use it to get actual block.
+    let lastBlockId;
     try {
-      lastBlockHash = await this.get(BlockStorage.LAST_BLOCK_HASH_KEY);
+      lastBlockId = await this.get<number>(BlockStorage.LAST_BLOCK_ID_KEY);
     } catch (e) {
       if (e.notFound) {
-        logger.warn("Couldn't get last block hash. Restarting from the genesis block...");
+        logger.warn("Couldn't get last block ID. Restarting from the genesis block...");
 
-        lastBlockHash = BlockStorage.getBlockHash(BlockStorage.GENESIS_BLOCK);
+        lastBlockId = BlockStorage.GENESIS_BLOCK.header.id;
 
-        await this.put(BlockStorage.LAST_BLOCK_HASH_KEY, lastBlockHash);
-        await this.putBlock(lastBlockHash, BlockStorage.GENESIS_BLOCK);
+        await this.put(BlockStorage.LAST_BLOCK_ID_KEY, lastBlockId);
+        await this.putBlock(BlockStorage.GENESIS_BLOCK);
       } else {
         throw e;
       }
     }
 
-    logger.debug("Got last block hash:", lastBlockHash);
+    logger.debug("Got last block ID:", lastBlockId);
 
-    this.lastBlock = await this.getBlock(lastBlockHash);
+    this.lastBlock = await this.getBlock(lastBlockId);
   }
 
   // Adds new block to the persistent block storage.
   //
   // NOTE: this method should be only called serially.
   public async addBlock(block: types.Block) {
-    // Verify the proposed block:
-    if (block.header.id != this.lastBlock.header.id) {
-      throw new Error(`Invalid block ID of block: ${block}!`);
-    }
+    this.verifyNewBlock(block);
 
-    const prevBlockHash = CryptoUtils.sha256(JSON.stringify(this.lastBlock));
-    if (block.header.prevBlockHash !== prevBlockHash) {
-      throw new Error(`Invalid prev block hash of block: ${block}! Should have been ${prevBlockHash}`);
-    }
+    await this.putBlock(block);
+    this.lastBlock = block;
 
     logger.debug("Added new block with block ID:", block.header.id);
-
-    this.lastBlock = block;
   }
 
-  public async getBlocks(lastBlockId: number): Promise<types.Block[]> {
+  // Returns an array of blocks, starting from a specific block ID and up to the last block.
+  public async getBlocks(fromLastBlockId: number): Promise<types.Block[]> {
     const blocks: types.Block[] = [];
+
+    if (fromLastBlockId == this.lastBlock.header.id) {
+      return blocks;
+    }
+
+    for (let i = fromLastBlockId; i < this.lastBlock.header.id; ++i) {
+      blocks.push(await this.getBlock(fromLastBlockId + 1));
+    }
 
     return blocks;
   }

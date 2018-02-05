@@ -60,10 +60,10 @@ export default class RaftConsensus {
 
   private connector: RPCConnector;
   private node: any;
-  private blockId: number;
+  private lastBlockId: number;
 
   public constructor(options: RaftConsensusOptions) {
-    this.blockId = 0;
+    this.lastBlockId = -1;
     this.connector = new RPCConnector();
 
     this.node = gaggle({
@@ -103,14 +103,22 @@ export default class RaftConsensus {
 
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
-      this.blockId++;
+      if (this.lastBlockId == -1) {
+        this.lastBlockId = (await this.blockStorage.getLastBlockId({})).blockId;
+      }
+
+      this.lastBlockId++;
 
       await this.blockStorage.addBlock({
         block: {
+          header: {
+            version: 0,
+            id: this.lastBlockId,
+            prevBlockId: this.lastBlockId - 1,
+            timestamp: 12
+          },
           tx: txData.tx,
           modifiedAddressesJson: txData.modifiedAddressesJson,
-          id: this.blockId,
-          prevBlockId: this.blockId - 1,
         }
       });
     });
@@ -130,7 +138,7 @@ export default class RaftConsensus {
       sender: tx.sender,
       argumentsJson: tx.argumentsJson,
       prefetchAddresses: txAppendix.prefetchAddresses,
-      lastBlockId: this.blockId
+      lastBlockId: this.lastBlockId
     });
 
     if (vmResult.success) {
