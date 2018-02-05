@@ -73,7 +73,7 @@ export default class StateStorageService {
       await this.kvstore.setMany(block.tx.contractAddress, modifiedArgs);
       this.lastBlockId = block.id;
     } else {
-      throw new Error("block unexpected. out of sync?");
+      throw new Error(`Unexpected block ID: ${block.header.id}. Out of sync?`);
     }
   }
 
