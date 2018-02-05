@@ -49,7 +49,7 @@ export default class BlockStorage {
 
         lastBlockId = BlockStorage.GENESIS_BLOCK.header.id;
 
-        await this.put(BlockStorage.LAST_BLOCK_ID_KEY, lastBlockId);
+        await this.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, lastBlockId);
         await this.putBlock(BlockStorage.GENESIS_BLOCK);
       } else {
         throw e;
@@ -67,7 +67,9 @@ export default class BlockStorage {
   public async addBlock(block: types.Block) {
     this.verifyNewBlock(block);
 
+    await this.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, block.header.id);
     await this.putBlock(block);
+
     this.lastBlock = block;
 
     logger.debug("Added new block with block ID:", block.header.id);
