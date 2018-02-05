@@ -1,5 +1,5 @@
 import * as path from "path";
-import * as fs from "fs";
+import * as mkdirp from "mkdirp";
 import * as levelup from "levelup";
 import leveldown from "leveldown";
 
@@ -32,9 +32,7 @@ export default class BlockStorage {
   public constructor() {
     // Make sure that the DB directory exists.
     const directory = path.dirname(BlockStorage.LEVELDB_PATH);
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory);
-    }
+    mkdirp.sync(directory);
 
     // Open/create the blocks LevelDB database.
     this.db = levelup.default(leveldown(BlockStorage.LEVELDB_PATH));
