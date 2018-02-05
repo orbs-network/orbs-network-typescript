@@ -6,7 +6,6 @@ import * as _ from "lodash";
 ErrorHandler.setup();
 
 export default class StateStorageService {
-
   peers: types.ClientMap;
 
   kvstore = new MemoryKVStore();
@@ -36,8 +35,9 @@ export default class StateStorageService {
 
   async waitForBlockState(blockId: number, timeout = 5000) {
     return new Promise((resolve, reject) => {
-      if (blockId < this.lastBlockId)
+      if (blockId < this.lastBlockId) {
         reject(new Error(`Attempt to read old state (${blockId} != ${this.lastBlockId})`));
+      }
 
       if (blockId > this.lastBlockId) {
         if (timeout < 200) {
@@ -59,7 +59,7 @@ export default class StateStorageService {
   async pollBlockStorage() {
     const { blocks } = await this.peers.blockStorage.getBlocks({ lastBlockId: this.lastBlockId });
 
-    // Assuming an ordered list of blocks
+    // Assuming an ordered list of blocks.
     for (const block of blocks) {
       await this.processNextBlock(block);
     }
@@ -69,7 +69,8 @@ export default class StateStorageService {
 
   async processNextBlock(block: types.Block) {
     if (block.header.prevBlockId == this.lastBlockId) {
-      logger.error("Got block:", block.header.id);
+      logger.debug("Processing block:", block.header.id);
+
       const modifiedArgs = new Map<string, string>(_.toPairs(JSON.parse(block.modifiedAddressesJson)));
       await this.kvstore.setMany(block.tx.contractAddress, modifiedArgs);
       this.lastBlockId = block.header.id;
