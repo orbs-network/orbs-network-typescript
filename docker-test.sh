@@ -44,7 +44,7 @@ export NODE_IP=172.2.1.7
 
 generate_dockerfile
 
-docker-compose \
+docker-compose -p orbsnetwork \
     -f docker-compose.test.network.yml \
     -f docker-compose.test.yml.tmp.bliny \
     -f docker-compose.test.yml.tmp.pelmeni \
@@ -54,7 +54,7 @@ docker-compose \
     -f docker-compose.test.yml.tmp.olivier \
     up -d
 
-sleep 30
+sleep 60
 
 docker exec -ti orbsnetwork_public-api-pelmeni_1 bash -c "cd /opt/orbs/e2e/ && npm test"
 export EXIT_CODE=$?
