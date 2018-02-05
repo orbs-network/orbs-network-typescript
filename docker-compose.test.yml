@@ -7,7 +7,7 @@ services:
       service: consensus
     environment:
       NODE_NAME: _NODE_NAME_
-    networks: 
+    networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.15
     volumes:
@@ -26,7 +26,7 @@ services:
       service: public-api
     environment:
       NODE_NAME: _NODE_NAME_
-    networks: 
+    networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.16
     volumes:
@@ -45,7 +45,7 @@ services:
       service: state-storage
     environment:
       NODE_NAME: _NODE_NAME_
-    networks: 
+    networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.17
     extra_hosts:
@@ -62,7 +62,7 @@ services:
       service: virtual-machine
     environment:
       NODE_NAME: _NODE_NAME_
-    networks: 
+    networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.18
     extra_hosts:
@@ -79,7 +79,7 @@ services:
       service: block-storage
     environment:
       NODE_NAME: _NODE_NAME_
-    networks: 
+    networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.19
     extra_hosts:
@@ -97,7 +97,7 @@ services:
     environment:
       NODE_NAME: _NODE_NAME_
       NODE_IP: _NODE_IP_
-    networks: 
+    networks:
       common:
         ipv4_address: _NODE_IP_
       _NODE_NAME_:
