@@ -104,7 +104,8 @@ export default class RaftConsensus {
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
       if (this.lastBlockId == -1) {
-        this.lastBlockId = (await this.blockStorage.getLastBlockId({})).blockId;
+        const { blockId } = await this.blockStorage.getLastBlockId({});
+        this.lastBlockId = blockId;
       }
 
       this.lastBlockId++;
