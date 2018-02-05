@@ -1,138 +1,113 @@
 version: '2'
 
 services:
-  consensus-bliny:
+  consensus-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
       service: consensus
     environment:
-      NODE_NAME: bliny
+      NODE_NAME: _NODE_NAME_
     networks: 
-      bliny:
-        ipv4_address: 172.100.1.15
+      _NODE_NAME_:
+        ipv4_address: _PRIVATE_NETWORK_.15
     volumes:
-      - ./deploy/dummy-keys/private/bliny:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
+      - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
     extra_hosts:
-      - consensus:172.100.1.15
-      - public-api:172.100.1.16
-      - state-storage:172.100.1.17
-      - virtual-machine:172.100.1.18
-      - block-storage:172.100.1.19
-      - gossip:172.100.1.20
+      - consensus:_PRIVATE_NETWORK_.15
+      - public-api:_PRIVATE_NETWORK_.16
+      - state-storage:_PRIVATE_NETWORK_.17
+      - virtual-machine:_PRIVATE_NETWORK_.18
+      - block-storage:_PRIVATE_NETWORK_.19
+      - gossip:_PRIVATE_NETWORK_.20
 
-  public-api-bliny:
+  public-api-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
       service: public-api
     environment:
-      NODE_NAME: bliny
+      NODE_NAME: _NODE_NAME_
     networks: 
-      bliny:
-        ipv4_address: 172.100.1.16
+      _NODE_NAME_:
+        ipv4_address: _PRIVATE_NETWORK_.16
     volumes:
-      - ./deploy/dummy-keys/private/bliny:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
+      - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
     extra_hosts:
-      - consensus:172.100.1.15
-      - public-api:172.100.1.16
-      - state-storage:172.100.1.17
-      - virtual-machine:172.100.1.18
-      - block-storage:172.100.1.19
-      - gossip:172.100.1.20
+      - consensus:_PRIVATE_NETWORK_.15
+      - public-api:_PRIVATE_NETWORK_.16
+      - state-storage:_PRIVATE_NETWORK_.17
+      - virtual-machine:_PRIVATE_NETWORK_.18
+      - block-storage:_PRIVATE_NETWORK_.19
+      - gossip:_PRIVATE_NETWORK_.20
 
-  state-storage-bliny:
+  state-storage-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
       service: state-storage
     environment:
-      NODE_NAME: bliny
+      NODE_NAME: _NODE_NAME_
     networks: 
-      bliny:
-        ipv4_address: 172.100.1.17
+      _NODE_NAME_:
+        ipv4_address: _PRIVATE_NETWORK_.17
     extra_hosts:
-      - consensus:172.100.1.15
-      - public-api:172.100.1.16
-      - state-storage:172.100.1.17
-      - virtual-machine:172.100.1.18
-      - block-storage:172.100.1.19
-      - gossip:172.100.1.20
+      - consensus:_PRIVATE_NETWORK_.15
+      - public-api:_PRIVATE_NETWORK_.16
+      - state-storage:_PRIVATE_NETWORK_.17
+      - virtual-machine:_PRIVATE_NETWORK_.18
+      - block-storage:_PRIVATE_NETWORK_.19
+      - gossip:_PRIVATE_NETWORK_.20
 
-  virtual-machine-bliny:
+  virtual-machine-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
       service: virtual-machine
     environment:
-      NODE_NAME: bliny
+      NODE_NAME: _NODE_NAME_
     networks: 
-      bliny:
-        ipv4_address: 172.100.1.18
+      _NODE_NAME_:
+        ipv4_address: _PRIVATE_NETWORK_.18
     extra_hosts:
-      - consensus:172.100.1.15
-      - public-api:172.100.1.16
-      - state-storage:172.100.1.17
-      - virtual-machine:172.100.1.18
-      - block-storage:172.100.1.19
-      - gossip:172.100.1.20
+      - consensus:_PRIVATE_NETWORK_.15
+      - public-api:_PRIVATE_NETWORK_.16
+      - state-storage:_PRIVATE_NETWORK_.17
+      - virtual-machine:_PRIVATE_NETWORK_.18
+      - block-storage:_PRIVATE_NETWORK_.19
+      - gossip:_PRIVATE_NETWORK_.20
 
-  block-storage-bliny:
+  block-storage-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
       service: block-storage
     environment:
-      NODE_NAME: bliny
+      NODE_NAME: _NODE_NAME_
     networks: 
-      bliny:
-        ipv4_address: 172.100.1.19
+      _NODE_NAME_:
+        ipv4_address: _PRIVATE_NETWORK_.19
     extra_hosts:
-      - consensus:172.100.1.15
-      - public-api:172.100.1.16
-      - state-storage:172.100.1.17
-      - virtual-machine:172.100.1.18
-      - block-storage:172.100.1.19
-      - gossip:172.100.1.20
+      - consensus:_PRIVATE_NETWORK_.15
+      - public-api:_PRIVATE_NETWORK_.16
+      - state-storage:_PRIVATE_NETWORK_.17
+      - virtual-machine:_PRIVATE_NETWORK_.18
+      - block-storage:_PRIVATE_NETWORK_.19
+      - gossip:_PRIVATE_NETWORK_.20
 
-  gossip-bliny:
+  gossip-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
       service: gossip
     environment:
-      NODE_NAME: bliny
-      NODE_IP: 172.2.1.2
+      NODE_NAME: _NODE_NAME_
+      NODE_IP: _NODE_IP_
     networks: 
       common:
-        ipv4_address: 172.2.1.2
-      bliny:
-        ipv4_address: 172.100.1.20
+        ipv4_address: _NODE_IP_
+      _NODE_NAME_:
+        ipv4_address: _PRIVATE_NETWORK_.20
     volumes:
-      - ./deploy/dummy-keys/private/bliny:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
+      - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
     extra_hosts:
-      - consensus:172.100.1.15
-      - public-api:172.100.1.16
-      - state-storage:172.100.1.17
-      - virtual-machine:172.100.1.18
-      - block-storage:172.100.1.19
-      - gossip:172.100.1.20
-      # - block-storage-bliny:block-storage
-      # - virtual-machine-bliny:virtual-machine
-      # - state-storage-bliny:state-storage
-      # - public-api-bliny:public-api
-      # - consensus-bliny:consensus
-
-
-networks:
-  common:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 172.2.1.0/24
-  bliny:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: 172.100.1.0/24
-  node2:
-  node3:
-  node4:
-  node5:
-  node6:
+      - consensus:_PRIVATE_NETWORK_.15
+      - public-api:_PRIVATE_NETWORK_.16
+      - state-storage:_PRIVATE_NETWORK_.17
+      - virtual-machine:_PRIVATE_NETWORK_.18
+      - block-storage:_PRIVATE_NETWORK_.19
+      - gossip:_PRIVATE_NETWORK_.20
