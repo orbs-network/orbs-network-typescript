@@ -55,7 +55,7 @@ export default class BlockStorage {
       }
     }
 
-    logger.info("Got last block ID:", lastBlockId);
+    logger.info(`Got last block ID: ${lastBlockId}`);
 
     this.lastBlock = await this.getBlock(lastBlockId);
   }
@@ -71,7 +71,7 @@ export default class BlockStorage {
 
     this.lastBlock = block;
 
-    logger.info("Added new block with block ID:", block.header.id);
+    logger.info(`Added new block with block ID: ${block.header.id}`);
   }
 
   // Returns an array of blocks, starting from a specific block ID and up to the last block.
