@@ -134,11 +134,8 @@ export default class RaftConsensus {
   // then propagating the transaction with its execution outputs.
   async onAppend(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
     const vmResult = await this.vm.executeTransaction({
-      contractAddress: tx.contractAddress,
-      sender: tx.sender,
-      argumentsJson: tx.argumentsJson,
-      prefetchAddresses: txAppendix.prefetchAddresses,
-      lastBlockId: this.lastBlockId
+      transactionAppendix: txAppendix,
+      lastBlockId: this.blockId
     });
 
     if (vmResult.success) {

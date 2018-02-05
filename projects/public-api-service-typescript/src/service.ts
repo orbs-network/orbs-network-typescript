@@ -46,7 +46,7 @@ export default class PublicApiService {
   async call(rpc: types.CallContext) {
     const {resultJson} = await this.peers.virtualMachine.callContract({
       sender: rpc.req.sender,
-      argumentsJson: rpc.req.argumentsJson,
+      payload: rpc.req.payload,
       contractAddress: rpc.req.contractAddress
     });
 

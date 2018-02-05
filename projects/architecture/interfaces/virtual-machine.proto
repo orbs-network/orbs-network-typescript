@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "primitives/heartbeat.proto";
+import "primitives/transactions.proto";
 
 service VirtualMachine {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
@@ -9,10 +10,8 @@ service VirtualMachine {
 }
 
 message ExecuteTransactionInput {
-  string sender = 1;
-  string contractAddress = 2;
-  string argumentsJson = 3;
-  repeated string prefetchAddresses = 4;
+  Transaction transaction = 1;
+  TransactionAppendix transactionAppendix = 2;
   uint32 lastBlockId = 5;
 }
 
@@ -24,7 +23,7 @@ message ExecuteTransactionOutput {
 message CallContractInput {
   string sender = 1;
   string contractAddress = 2;
-  string argumentsJson = 3;
+  string payload = 3;
 }
 
 message CallContractOutput {

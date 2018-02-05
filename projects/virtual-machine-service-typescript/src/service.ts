@@ -27,10 +27,10 @@ export default class VirtualMachineService {
     // currently only a "simple" contract type is supported
     try {
       const modifiedKeys = await this.processor.processTransaction({
-        sender: rpc.req.sender,
-        contractAddress: rpc.req.contractAddress,
+        sender: rpc.req.transaction.sender,
+        contractAddress: rpc.req.transaction.contractAddress,
+        payload: rpc.req.transaction.payload,
         lastBlockId: rpc.req.lastBlockId,
-        argumentsJson: rpc.req.argumentsJson
       });
       rpc.res = {
         success: true,
@@ -50,7 +50,7 @@ export default class VirtualMachineService {
     const result = await this.processor.call({
       sender: rpc.req.sender,
       contractAddress: rpc.req.contractAddress,
-      argumentsJson: rpc.req.argumentsJson
+      payload: rpc.req.payload
     });
 
     rpc.res = {
