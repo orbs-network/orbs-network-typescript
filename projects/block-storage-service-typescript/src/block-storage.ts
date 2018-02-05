@@ -86,11 +86,18 @@ export default class BlockStorage {
     return blocks;
   }
 
-  private static getBlockHash(block: types.Block): string {
-    // We will be using two SHA256 iterations. The reason for this relates to a partial attack on the smaller but
-    // related SHA1 hash. SHA1's resistance to birthday attacks has been partially broken as of 2005 in O(2^64) vs the
-    // design O(2^80), with practical attacks having been used successfully in early 2017.
-    return <string>CryptoUtils.sha256(CryptoUtils.sha256(JSON.stringify(block), Encoding.HEX), Encoding.HEX);
+  public async getLastBlockId(): Promise<number> {
+    return this.lastBlock.header.id;
+  }
+
+  private verifyNewBlock(block: types.Block) {
+    if (block.header.id != this.lastBlock.header.id + 1) {
+      throw new Error(`Invalid block ID of block: ${block}!`);
+    }
+
+    if (block.header.prevBlockId !== this.lastBlock.header.id) {
+      throw new Error(`Invalid prev block ID of block: ${block}! Should have been ${this.lastBlock.header.id}`);
+    }
   }
 
   private get(key: string): Promise<string> {
