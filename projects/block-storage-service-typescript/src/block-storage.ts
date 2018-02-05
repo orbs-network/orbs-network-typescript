@@ -56,7 +56,7 @@ export default class BlockStorage {
       }
     }
 
-    logger.debug("Got last block ID:", lastBlockId);
+    logger.info("Got last block ID:", lastBlockId);
 
     this.lastBlock = await this.getBlock(lastBlockId);
   }
