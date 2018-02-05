@@ -1,9 +1,8 @@
 import * as path from "path";
-import * as mkdirp from "mkdirp";
-import * as levelup from "levelup";
-import leveldown from "leveldown";
 
-import { logger, config, types, topology, topologyPeers, CryptoUtils, Encoding } from "orbs-common-library";
+import { logger, config, types, CryptoUtils } from "orbs-common-library";
+
+import LevelDBDriver from "./leveldb-driver";
 
 const crypto = CryptoUtils.loadFromConfiguration();
 
@@ -26,29 +25,25 @@ export default class BlockStorage {
   };
 
   private lastBlock: types.Block;
-  private db: levelup.LevelUp;
+  private db: LevelDBDriver;
 
   public constructor() {
-    // Make sure that the DB directory exists.
-    const directory = path.dirname(BlockStorage.LEVELDB_PATH);
-    mkdirp.sync(directory);
-
     // Open/create the blocks LevelDB database.
-    this.db = levelup.default(leveldown(BlockStorage.LEVELDB_PATH));
+    this.db = new LevelDBDriver(BlockStorage.LEVELDB_PATH);
   }
 
   public async load(): Promise<void> {
     // Get the ID of the last block and use it to get actual block.
     let lastBlockId;
     try {
-      lastBlockId = await this.get<number>(BlockStorage.LAST_BLOCK_ID_KEY);
+      lastBlockId = await this.db.get<number>(BlockStorage.LAST_BLOCK_ID_KEY);
     } catch (e) {
       if (e.notFound) {
         logger.warn("Couldn't get last block ID. Restarting from the genesis block...");
 
         lastBlockId = BlockStorage.GENESIS_BLOCK.header.id;
 
-        await this.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, lastBlockId);
+        await this.db.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, lastBlockId);
         await this.putBlock(BlockStorage.GENESIS_BLOCK);
       } else {
         throw e;
@@ -66,7 +61,7 @@ export default class BlockStorage {
   public async addBlock(block: types.Block) {
     this.verifyNewBlock(block);
 
-    await this.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, block.header.id);
+    await this.db.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, block.header.id);
     await this.putBlock(block);
 
     this.lastBlock = block;
@@ -103,39 +98,11 @@ export default class BlockStorage {
     }
   }
 
-  private get<T>(key: string): Promise<T> {
-    return new Promise((resolve, reject) => {
-      this.db.get(key, (error: any, value: any) => {
-        if (error) {
-          reject(error);
-
-          return;
-        }
-
-        resolve(value);
-      });
-    });
-  }
-
-  private put<T>(key: string, value: T): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.db.put(key, value, (error: any) => {
-        if (error) {
-          reject(error);
-
-          return;
-        }
-
-        resolve();
-      });
-    });
-  }
-
   private async getBlock(id: number): Promise<types.Block> {
-    return JSON.parse(await this.get<string>(id.toString()));
+    return JSON.parse(await this.db.get<string>(id.toString()));
   }
 
   private async putBlock(block: types.Block): Promise<void> {
-    await this.put<string>(block.header.id.toString(), JSON.stringify(block));
+    await this.db.put<string>(block.header.id.toString(), JSON.stringify(block));
   }
 }
