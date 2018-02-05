@@ -4,8 +4,9 @@
     "fileName": "logs/staging.log",
     "maxSize": 1024000,
     "maxFiles": 4,
+    "console": true,
     "logzio": {
-      "enabled": false
+      "enabled": true
     }
   },
   "consensus": {

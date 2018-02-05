@@ -3,7 +3,7 @@ syntax = "proto3";
 message Transaction {
   string sender = 1;
   string contractAddress = 2;
-  string argumentsJson = 3;
+  string payload = 3;
   string signature = 4;
 }
 

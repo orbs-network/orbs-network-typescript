@@ -16,19 +16,19 @@ export class OrbsHardCodedContractAdapter {
     }
 
     public async sendTransaction(methodName: string, args: OrbsHardCodedContractMethodArgs) {
-        const argumentsJson = JSON.stringify({
+        const payload = JSON.stringify({
             method: methodName,
             args: args
         });
-        return await this.orbsSession.sendTransaction(this.contractAddress, argumentsJson);
+        return await this.orbsSession.sendTransaction(this.contractAddress, payload);
     }
 
     public async call(methodName: string, args: OrbsHardCodedContractMethodArgs) {
-        const argumentsJson = JSON.stringify({
+        const payload = JSON.stringify({
             method: methodName,
             args: args
         });
-        return this.orbsSession.call(this.contractAddress, argumentsJson);
+        return this.orbsSession.call(this.contractAddress, payload);
     }
 }
 
@@ -43,8 +43,8 @@ export class OrbsClientSession {
         this.subscriptionKey = subscriptionKey;
     }
 
-    async sendTransaction(contractAddress: string, argumentsJson: string) {
-        const signedTransaction = this.generateSignedTransaction(contractAddress, argumentsJson);
+    async sendTransaction(contractAddress: string, payload: string) {
+        const signedTransaction = this.generateSignedTransaction(contractAddress, payload);
 
         const res = await this.orbsClient.sendTransaction({
             transaction: signedTransaction,
@@ -57,21 +57,21 @@ export class OrbsClientSession {
         return res;
     }
 
-    async call(contractAddress: string, argumentsJson: string) {
+    async call(contractAddress: string, payload: string) {
         const {resultJson} = await this.orbsClient.call({
             sender: this.getAddress(),
             contractAddress: contractAddress,
-            argumentsJson: argumentsJson
+            payload: payload
         });
         return JSON.parse(resultJson);
     }
 
-    public generateSignedTransaction(contractAddress: string, argumentsJson: string): types.Transaction {
+    public generateSignedTransaction(contractAddress: string, payload: string): types.Transaction {
         return {
             sender: this.keyPair.getPublicKey(),
             contractAddress: contractAddress,
-            argumentsJson: argumentsJson,
-            signature: this.keyPair.sign(`tx:${contractAddress},${argumentsJson}`)
+            payload: payload,
+            signature: this.keyPair.sign(`tx:${contractAddress},${payload}`)
         };
     }
 

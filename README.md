@@ -19,6 +19,8 @@ This wrapper project will set up a full working environment including all sub pr
 * Test (`NODE_ENV=test`): `config/test.json`.
 * Staging/Production (`NODE_ENV=production`): `config/production.json`.
 
+You can pass values through environment, but you have to replace colon (`:`) with double underscore (`__`) for it to work. For example, `logger:logzio:apiKey` becomes `logger__logzio__apiKey`.
+
 ### Configuration Keys
 
 #### `logger`
@@ -90,7 +92,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 `docker-compose up` will build an image and start a simulation of `transaction-gossip` topography.
 
-### Docker on AWS ECS
+### Docker in AWS CloudFormation
 
 Install `ecs-cli`
 
@@ -110,6 +112,16 @@ Deploy new stack:
 ```
 ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
 ```
+
+Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/cloudformation` folder.
+
+### Run tests in staging-like environment
+
+```
+./docker-build.sh && ./docker-test.sh
+```
+
+You can supply `DOCKER_IMAGE` and `DOCKER_TAG` environment variables to `docker-test.sh` if the image is alrealy pre-built.
 
 ## Development
 

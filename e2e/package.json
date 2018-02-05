@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf ../db/test",
-    "test": "npm run clean && NODE_ENV=test ts-mocha src/*.spec.ts",
+    "test": "npm run clean && NODE_ENV=test ts-mocha src/*.spec.ts --exit",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
@@ -14,6 +14,7 @@
     "bind-decorator": "^1.0.11",
     "bluebird": "^3.5.1",
     "ganache-core": "^2.0.2",
+    "nconf": "^0.10.0",
     "orbs-common-library": "file:../projects/common-library-typescript",
     "solc": "^0.4.18",
     "underscore": "^1.8.3",
@@ -25,6 +26,7 @@
     "@types/expect": "^1.20.2",
     "@types/lodash": "^4.14.98",
     "@types/mocha": "^2.2.47",
+    "@types/nconf": "0.0.37",
     "@types/node": "^9.4.0",
     "@types/supertest": "^2.0.4",
     "@types/underscore": "^1.8.7",
