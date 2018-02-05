@@ -113,6 +113,8 @@ Deploy new stack:
 ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
 ```
 
+Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/cloudformation` folder.
+
 ## Development
 
 ### Visual Studio Code
@@ -133,4 +135,3 @@ ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --
 * TODO Highlight
 * TSLint
 * vscode-proto3
-Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/cloudformation` folder.
