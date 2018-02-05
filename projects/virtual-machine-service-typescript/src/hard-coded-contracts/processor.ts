@@ -10,7 +10,7 @@ import BaseSmartContract from "./base-smart-contact";
 
 interface CallRequest {
     sender: string;
-    argumentsJson: string;
+    payload: string;
     contractAddress: string;
     lastBlockId?: number;
 }
@@ -64,7 +64,7 @@ export default class HardCodedSmartContractProcessor {
         }
         const contract = new Contract.default(request.sender, stateAdapter);
 
-        const {method, args} = JSON.parse(request.argumentsJson);
+        const {method, args} = JSON.parse(request.payload);
 
         return contract[method](...args);
     }
