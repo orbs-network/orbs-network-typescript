@@ -12,7 +12,7 @@ service BlockStorage {
 message BlockHeader {
   uint32 version = 1;
   uint32 id = 2;
-  string prevBlockHash = 3;
+  uint32 prevBlockId = 3;
   uint32 timestamp = 4;
 }
 
