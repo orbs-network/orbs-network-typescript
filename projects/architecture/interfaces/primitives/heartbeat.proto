@@ -1,5 +1,9 @@
 syntax = "proto3";
 
+service Heardbeat {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+}
+
 message GetHeartbeatInput {
   string requesterName = 1;
   string requesterVersion = 2;
