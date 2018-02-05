@@ -31,28 +31,28 @@
 
 ## Interfaces
 
-  * Defined using [protocol-buffers](https://developers.google.com/protocol-buffers/docs/overview) version [proto3](https://developers.google.com/protocol-buffers/docs/proto3).
-  * Services communicate internally inside a node using [gRPC](https://grpc.io/).
-  * Nodes do not use gRPC to communicate among themselves externally.
-  * The external communication protocol of same service peers in different nodes is under the responsibility of the service.
+* Defined using [protocol-buffers](https://developers.google.com/protocol-buffers/docs/overview) version [proto3](https://developers.google.com/protocol-buffers/docs/proto3).
+* Services communicate internally inside a node using [gRPC](https://grpc.io/).
+* Nodes do not use gRPC to communicate among themselves externally.
+* The external communication protocol of same service peers in different nodes is under the responsibility of the service.
 
 ## Services
 
-  * `PublicApi` - Exposes public web API (such as REST or JSON-RPC) to clients.
-  * `Gossip` - Propagates information between all nodes in an efficient manner.
-  * `Consensus` - Logic for consensus algorithm allowing separate nodes achieve a shared view of the world.
-    * `TransactionPool` - Holds all pending transactions and a knowledge of past confirmed transactions.
-  * `VirtualMachine` - Owns execution of smart contracts and holds the transient state for a pre-final execution.
-    * `Processor` - The actual runtime environments for a smart contract in various languages (Python / JS / etc).
-  * `StateStorage` - Holds all state (mutable and immutable) updated for the latest closed block.
-  * `BlockStorage` - Holds incremental long-term storage used to generate the state (all past closed blocks).
-  * `TimeSync` - Synchronizes clocks, required to run on every machine that runs       *TransactionPool* or *Consensus*.
+* `PublicApi` - Exposes public web API (such as REST or JSON-RPC) to clients.
+* `Gossip` - Propagates information between all nodes in an efficient manner.
+* `Consensus` - Logic for consensus algorithm allowing separate nodes achieve a shared view of the world.
+  * `TransactionPool` - Holds all pending transactions and a knowledge of past confirmed transactions.
+* `VirtualMachine` - Owns execution of smart contracts and holds the transient state for a pre-final execution.
+  * `Processor` - The actual runtime environments for a smart contract in various languages (Python / JS / etc).
+* `StateStorage` - Holds all state (mutable and immutable) updated for the latest closed block.
+* `BlockStorage` - Holds incremental long-term storage used to generate the state (all past closed blocks).
+* `TimeSync` - Synchronizes clocks, required to run on every machine that runs       *TransactionPool* or *Consensus*.
 
 ## Libraries
 
-  * `Crypto` - Contains implementations of low-level crypto routines in native (C) with non-native fallbacks.
-  * `Client` - Client SDK for apps to connect end-users to the network through the *PublicApi* backend service.
-  
+* `Crypto` - Contains implementations of low-level crypto routines in native (C) with non-native fallbacks.
+* `Client` - Client SDK for apps to connect end-users to the network through the *PublicApi* backend service.
+
 ## Architecture Diagram
 
 <table class="arch-table" style="width:100%">
@@ -93,4 +93,3 @@
     <th style="width:16%;borders:none;background:green;font-weight:100">Layer I<br>low-level storage</th>
   </tr>
 </table>
-
