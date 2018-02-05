@@ -36,6 +36,11 @@ export class Config {
   public static getEnvironment(): string {
     return nconf.get(Config.NODE_ENV) || process.env[Config.NODE_ENV] || Config.DEV_ENV;
   }
+
+  // This is just a convenience wrapper for getting the environment name directly from an instance of the configuration.
+  public getEnvironment(): string {
+    return Config.getEnvironment();
+  }
 }
 
 export const config = new Config();
