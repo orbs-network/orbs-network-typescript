@@ -1,19 +1,12 @@
 import * as path from "path";
 
-import { logger, config, types, CryptoUtils } from "orbs-common-library";
+import { logger, types } from "orbs-common-library";
 
 import LevelDBDriver from "./leveldb-driver";
 
-const crypto = CryptoUtils.loadFromConfiguration();
-
 export default class BlockStorage {
-  // The path to the local LevelDB will be of the format: "../../db/[ENVIRONMENT]/blocks_[NODE].db".
-  public static readonly LEVELDB_NAME: string = `blocks_${crypto.whoAmI()}.db`;
-  public static readonly LEVELDB_PATH: string = path.resolve(path.join("../../", "db", config.getEnvironment(),
-    BlockStorage.LEVELDB_NAME));
-
+  public static readonly LEVELDB_PATH: string = path.resolve("../../db/blocks.db");
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
-
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,

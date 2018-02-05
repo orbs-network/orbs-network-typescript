@@ -34,7 +34,7 @@ LevelDB is a fast key-value storage library written at Google that provides an o
 
 ## Scheme
 
-Each node's DB is stored at `db/[ENVIRONMENT]/blocks_[NODE].db` (e.g., `db/test/blocks_node4.db`).
+Each node's DB is stored at `db//blocks.db`.
 
 The data is currently using following scheme:
 
