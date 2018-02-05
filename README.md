@@ -92,7 +92,7 @@ You can pass values through environment, but you have to replace colon (`:`) wit
 
 `docker-compose up` will build an image and start a simulation of `transaction-gossip` topography.
 
-### Docker on AWS ECS
+### Docker in AWS CloudFormation
 
 Install `ecs-cli`
 
@@ -112,6 +112,8 @@ Deploy new stack:
 ```
 ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
 ```
+
+Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/cloudformation` folder.
 
 ## Development
 
