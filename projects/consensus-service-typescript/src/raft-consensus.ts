@@ -115,8 +115,7 @@ export default class RaftConsensus {
           header: {
             version: 0,
             id: this.lastBlockId,
-            prevBlockId: this.lastBlockId - 1,
-            timestamp: 12
+            prevBlockId: this.lastBlockId - 1
           },
           tx: txData.tx,
           modifiedAddressesJson: txData.modifiedAddressesJson,
