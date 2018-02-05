@@ -10,7 +10,7 @@ export default class BlockStorageService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
