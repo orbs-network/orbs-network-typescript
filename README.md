@@ -115,6 +115,14 @@ ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --
 
 Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/cloudformation` folder.
 
+### Run tests in staging-like environment
+
+```
+./docker-build.sh && ./docker-test.sh
+```
+
+You can supply `DOCKER_IMAGE` and `DOCKER_TAG` environment variables to `docker-test.sh` if the image is alrealy pre-built.
+
 ## Development
 
 ### Visual Studio Code
