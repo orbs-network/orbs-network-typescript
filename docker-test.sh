@@ -54,7 +54,7 @@ docker-compose -p orbsnetwork \
     -f docker-compose.test.yml.tmp.olivier \
     up -d
 
-sleep 60
+sleep ${STARTUP_WAITING_TIME-30}
 
 docker exec -ti orbsnetwork_public-api-pelmeni_1 bash -c "cd /opt/orbs/e2e/ && npm test"
 export EXIT_CODE=$?
