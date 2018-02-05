@@ -136,7 +136,6 @@ export default class BlockStorage {
   }
 
   private async putBlock(block: types.Block): Promise<void> {
-    // Update the mapping between block's ID and its contents
     await this.put<string>(block.header.id.toString(), JSON.stringify(block));
   }
 }
