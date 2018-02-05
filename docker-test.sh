@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 function generate_dockerfile {
     cat docker-compose.test.yml \
@@ -52,5 +52,21 @@ docker-compose \
     -f docker-compose.test.yml.tmp.pirogi \
     -f docker-compose.test.yml.tmp.oladyi \
     -f docker-compose.test.yml.tmp.olivier \
-    up
+    up -d
 
+sleep 30
+
+docker exec -ti orbsnetwork_public-api-pelmeni_1 bash -c "cd /opt/orbs/e2e/ && npm test"
+export EXIT_CODE=$?
+
+docker-compose \
+    -f docker-compose.test.network.yml \
+    -f docker-compose.test.yml.tmp.bliny \
+    -f docker-compose.test.yml.tmp.pelmeni \
+    -f docker-compose.test.yml.tmp.borscht \
+    -f docker-compose.test.yml.tmp.pirogi \
+    -f docker-compose.test.yml.tmp.oladyi \
+    -f docker-compose.test.yml.tmp.olivier \
+    stop
+
+exit $EXIT_CODE
