@@ -84,7 +84,7 @@ export default class BlockStorage {
     }
 
     for (let i = fromLastBlockId; i < this.lastBlock.header.id; ++i) {
-      blocks.push(await this.getBlock(fromLastBlockId + 1));
+      blocks.push(await this.getBlock(i + 1));
     }
 
     return blocks;
