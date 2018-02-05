@@ -7,6 +7,7 @@ service BlockStorage {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc AddBlock (AddBlockInput) returns (AddBlockOutput);
   rpc GetBlocks (GetBlocksInput) returns (GetBlocksOutput);
+  rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
 }
 
 message BlockHeader {
@@ -35,4 +36,11 @@ message GetBlocksInput {
 
 message GetBlocksOutput {
   repeated Block blocks = 1;
+}
+
+message GetLastBlockIdInput {
+}
+
+message GetLastBlockIdOutput {
+  uint32 blockId = 1;
 }
