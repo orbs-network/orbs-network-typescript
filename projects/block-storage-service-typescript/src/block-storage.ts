@@ -27,7 +27,7 @@ export default class BlockStorage {
   private lastBlock: types.Block;
   private db: levelup.LevelUp;
 
-  constructor() {
+  public constructor() {
     // Make sure that the DB directory exists.
     const directory = path.dirname(BlockStorage.LEVELDB_PATH);
     if (!fs.existsSync(directory)) {
@@ -100,7 +100,7 @@ export default class BlockStorage {
     }
   }
 
-  private get(key: string): Promise<string> {
+  private get<T>(key: string): Promise<T> {
     return new Promise((resolve, reject) => {
       this.db.get(key, (error: any, value: any) => {
         if (error) {
@@ -114,7 +114,7 @@ export default class BlockStorage {
     });
   }
 
-  private put(key: string, value: any): Promise<void> {
+  private put<T>(key: string, value: T): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.put(key, value, (error: any) => {
         if (error) {
@@ -128,11 +128,12 @@ export default class BlockStorage {
     });
   }
 
-  private async getBlock(doubleHash: string): Promise<types.Block> {
-    return JSON.parse(await this.get(doubleHash));
+  private async getBlock(id: number): Promise<types.Block> {
+    return JSON.parse(await this.get<string>(id.toString()));
   }
 
-  private async putBlock(doubleHash: string, block: types.Block): Promise<void> {
-    await this.put(doubleHash, JSON.stringify(block));
+  private async putBlock(block: types.Block): Promise<void> {
+    // Update the mapping between block's ID and its contents
+    await this.put<string>(block.header.id.toString(), JSON.stringify(block));
   }
 }
