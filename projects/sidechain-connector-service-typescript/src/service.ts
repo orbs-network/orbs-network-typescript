@@ -2,6 +2,7 @@ import { ErrorHandler, topology, topologyPeers, types, logger } from "orbs-commo
 import bind from "bind-decorator";
 import EthereumConnector from "./ethereum-connector";
 import { SidechainConnectorClient } from "../../architecture/dist/index";
+import { config } from "../../common-library-typescript/dist/config";
 
 ErrorHandler.setup();
 
@@ -15,7 +16,9 @@ export default class SidechainConnectorService {
   ethereumConnector: EthereumConnector;
   options: SidechainConnectorServiceOptions;
 
-  public static readonly DEFAULT_ETHEREUM_NODE_HTTP_ADDRESS = "http://localhost:8545";
+  public static readonly ETHEREUM_NODE_HTTP_ADDRESS_KEY = "ETHEREUM_NODE_HTTP_ADDRESS";
+
+  public static readonly DEFAULT_ETHEREUM_NODE_HTTP_ADDRESS = config.get(SidechainConnectorService.ETHEREUM_NODE_HTTP_ADDRESS_KEY, "http://localhost:8545");
 
   // rpc interface
 

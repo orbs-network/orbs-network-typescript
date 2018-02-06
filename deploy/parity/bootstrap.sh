@@ -6,4 +6,4 @@ aws ec2 associate-address --region us-west-2 --instance-id $INSTANCE_ID --alloca
 yum install -y docker
 service docker start
 
-docker run -d -p 8545:8545 parity/parity:v1.8.9 --no-secretstore --rpcapi=web3 --no-ui --no-ipc --no-ws --no-jsonrpc --no-ancient-blocks
+docker run -d -p 8545:8545 -v $PARITY_LOCAL_PATH/:/root/.local/share/io.parity.ethereum/ parity/parity:v1.8.9 --no-secretstore --jsonrpc-interface all --no-ui --no-ipc --no-ws --no-ancient-blocks

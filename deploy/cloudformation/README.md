@@ -23,3 +23,17 @@ Deployment script creates specific parameters for each stack (common `parameters
 ```
 ./test.sh
 ```
+
+## Parity node
+
+Parity Etherium node is not part of ORBS network and is deployed as a separate service.
+
+TODO: extract to a different repo.
+
+```
+./create-stacks.parity.sh
+```
+
+```
+./test.parity.sh
+```
