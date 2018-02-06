@@ -1,6 +1,6 @@
 import StateCache from "../state-cache";
 import {BaseContractStateAccessor} from "../contract-state-accessor";
-import BarSmartContract from "../hard-coded-contracts/registry/bar-smart-contract";
+import BarSmartContract from "../hard-coded-contracts/registry/foobar-smart-contract";
 import BaseSmartContract from "../hard-coded-contracts/base-smart-contact";
 const {Assertion, expect} = require("chai");
 

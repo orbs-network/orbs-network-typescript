@@ -21,7 +21,8 @@
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "bind-decorator": "^1.0.11",
-    "orbs-common-library": "file:../common-library-typescript"
+    "orbs-common-library": "file:../common-library-typescript",
+    "solc": "0.4.18"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
