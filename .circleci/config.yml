@@ -8,3 +8,5 @@ jobs:
      - run: DOCKER_TAG=$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') ./docker-test.sh
      - run: $(aws ecr get-login --no-include-email --region us-west-2)
      - run: docker push ${DOCKER_IMAGE}:$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g')
+     - store_artifacts:
+          path: logs
