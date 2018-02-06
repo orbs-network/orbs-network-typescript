@@ -4,7 +4,7 @@
   "description": "orbs-virtual-machine-service",
   "repository": {
     "type": "git",
-    "url": "https://github.com/orbs-network/virtual-machine-service-typescript.git"
+    "url": "https://github.com/orbs-network/orbs-network.git"
   },
   "author": "Orbs Team",
   "license": "MIT",

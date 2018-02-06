@@ -4,7 +4,7 @@
   "description": "orbs-block-storage-service",
   "repository": {
     "type": "git",
-    "url": "https://github.com/orbs-network/block-storage-service-typescript.git"
+    "url": "https://github.com/orbs-network/orbs-network.git"
   },
   "author": "Orbs Team",
   "license": "MIT",
