@@ -1,11 +1,8 @@
-import * as path from "path";
-
 import { logger, types } from "orbs-common-library";
 
 import LevelDBDriver from "./leveldb-driver";
 
 export default class BlockStorage {
-  public static readonly LEVELDB_PATH: string = path.resolve("../../db/blocks.db");
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
@@ -20,9 +17,9 @@ export default class BlockStorage {
   private lastBlock: types.Block;
   private db: LevelDBDriver;
 
-  public constructor() {
+  public constructor(dbPath: string) {
     // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(BlockStorage.LEVELDB_PATH);
+    this.db = new LevelDBDriver(dbPath);
   }
 
   public async load(): Promise<void> {
