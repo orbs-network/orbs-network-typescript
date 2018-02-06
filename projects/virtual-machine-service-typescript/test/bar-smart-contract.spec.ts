@@ -1,8 +1,9 @@
-import StateCache from "../state-cache";
-import {BaseContractStateAccessor} from "../contract-state-accessor";
-import BarSmartContract from "../hard-coded-contracts/registry/foobar-smart-contract";
-import BaseSmartContract from "../hard-coded-contracts/base-smart-contact";
-const {Assertion, expect} = require("chai");
+import { expect } from "chai";
+
+import StateCache from "../src/state-cache";
+import { BaseContractStateAccessor } from "../src/contract-state-accessor";
+import BarSmartContract from "../src/hard-coded-contracts/registry/foobar-smart-contract";
+import BaseSmartContract from "../src/hard-coded-contracts/base-smart-contact";
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {
     lastBlockId: number;
@@ -10,15 +11,16 @@ export default class ContractStateMemCacheAccessor extends BaseContractStateAcce
 
     constructor(contractAddress: string, stateCache: StateCache) {
         super(contractAddress);
+
         this.stateCache = stateCache;
     }
 
     async load(key: string) {
-        return this.stateCache.get({contractAddress: this.contractAddress, key});
+        return this.stateCache.get({ contractAddress: this.contractAddress, key });
     }
 
     async store(key: string, value: string) {
-        this.stateCache.set({contractAddress: this.contractAddress, key}, value);
+        this.stateCache.set({ contractAddress: this.contractAddress, key }, value);
     }
 }
 
