@@ -1,6 +1,7 @@
 import * as ganache from "ganache-core";
-import Web3 from "web3";
 import * as solc from "solc";
+
+const Web3 = require("web3");
 
 export class EthereumSimulationNode {
     server: any;
