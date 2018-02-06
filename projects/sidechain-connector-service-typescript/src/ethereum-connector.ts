@@ -1,11 +1,13 @@
-import * as Web3 from "web3";
+import Web3 from "web3";
+import { Block } from "web3//types";
+
 import { types } from "orbs-common-library";
 
 export default class EthereumConnector {
     private web3;
 
     public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[],
-        block?: Web3.BlockWithTransactionData) {
+        block?: Block) {
         if (!block) {
             block = await this.getEarlierBlock();
         }
@@ -26,7 +28,7 @@ export default class EthereumConnector {
         this.web3 = web3Instance;
     }
 
-    async getEarlierBlock(numOfBlocksBack: number = 100): Promise<Web3.BlockWithTransactionData> {
+    async getEarlierBlock(numOfBlocksBack: number = 100): Promise<Block> {
         const latestBlockNumber = await this.web3.eth.getBlockNumber();
         return this.web3.eth.getBlock(Math.max(latestBlockNumber - numOfBlocksBack, 0));
     }
