@@ -15,19 +15,20 @@ enum Recipient {
 }
 
 message BroadcastMessageInput {
-  string BroadcastGroup=1;
-  string MessageType=2;
+  string BroadcastGroup = 1;
+  string MessageType = 2;
   bytes Buffer = 3;
   bool Immediate = 4;
 }
+
 message BroadcastMessageOutput {
   // empty
 }
 
 message UnicastMessageInput {
-  string Recipient=1;
-  string BroadcastGroup=2;
-  string MessageType=3;
+  string Recipient = 1;
+  string BroadcastGroup = 2;
+  string MessageType = 3;
   bytes Buffer = 4;
   bool Immediate = 5;
 }
