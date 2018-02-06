@@ -2,6 +2,10 @@
   "name": "orbs-e2e",
   "version": "0.1.0",
   "description": "Orbs end-to-end tests",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
@@ -31,9 +35,7 @@
     "@types/supertest": "^2.0.4",
     "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
-    "concurrently": "^3.5.1",
     "mocha": "^4.1.0",
-    "nodemon": "^1.14.11",
     "shelljs": "^0.8.1",
     "supertest": "^3.0.0",
     "ts-mocha": "^1.1.0",
