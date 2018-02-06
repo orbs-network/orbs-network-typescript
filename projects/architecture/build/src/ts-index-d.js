@@ -31,7 +31,6 @@ _.forEach(json, (value, key) => {
   }
 });
 exportClientMap(services);
-console.log(`export type HeardbeatClient = ChatterClient;`);
 console.log();
 
 function exportMessage(name, json) {

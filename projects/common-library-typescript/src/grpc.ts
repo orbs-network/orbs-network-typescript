@@ -22,11 +22,6 @@ function server(proto: string, name: string, endpoint: string, service: any) {
 }
 
 export namespace grpc {
-
-  export function chatterServer({ endpoint, service }: { endpoint: string, service: types.ChatterServer }) {
-    server("chatter.proto", "Chatter", endpoint, service);
-  }
-
   export function consensusServer({ endpoint, service }: { endpoint: string, service: types.ConsensusServer }) {
     server("consensus.proto", "Consensus", endpoint, service);
   }
@@ -51,7 +46,6 @@ export namespace grpc {
     server("state-storage.proto", "StateStorage", endpoint, service);
   }
 
-
   export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
       server("block-storage.proto", "BlockStorage", endpoint, service);
   }
@@ -62,10 +56,6 @@ export namespace grpc {
 
   export function subscriptionManagerServer({ endpoint, service }: { endpoint: string, service: types.SubscriptionManagerServer }) {
     server("subscription-manager.proto", "SubscriptionManager", endpoint, service);
-  }
-
-  export function chatterClient({ endpoint }: { endpoint: string }): types.ChatterClient {
-    return client("chatter.proto", "Chatter", endpoint);
   }
 
   export function consensusClient({ endpoint }: { endpoint: string }): types.ConsensusClient {

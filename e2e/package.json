@@ -5,7 +5,8 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "test": "NODE_ENV=test ts-mocha src/*.spec.ts --exit",
+    "clean": "rm -rf ../db/test",
+    "test": "npm run clean && NODE_ENV=test ts-mocha src/*.spec.ts --exit",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
