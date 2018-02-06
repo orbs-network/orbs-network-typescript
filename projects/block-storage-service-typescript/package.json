@@ -23,11 +23,15 @@
   },
   "dependencies": {
     "bind-decorator": "^1.0.11",
+    "leveldown": "^3.0.0",
+    "levelup": "^2.0.1",
     "lodash": "^4.17.4",
+    "mkdirp": "^0.5.1",
     "orbs-common-library": "file:../common-library-typescript"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.99",
+    "@types/mkdirp": "^0.5.2",
     "@types/node": "^9.4.0",
     "@types/supertest": "^2.0.4",
     "concurrently": "^3.5.1",
