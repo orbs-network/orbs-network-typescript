@@ -1,10 +1,11 @@
-import Web3 from "web3";
 import { Block, Provider } from "web3/types";
 
 import { types } from "orbs-common-library";
 
+const Web3 = require("web3");
+
 export default class EthereumConnector {
-    private web3: Web3;
+    private web3: any;
 
     public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[],
         block?: Block) {
@@ -24,7 +25,7 @@ export default class EthereumConnector {
         };
     }
 
-    constructor(web3Instance: Web3) {
+    constructor(web3Instance: any) {
         this.web3 = web3Instance;
     }
 
