@@ -18,9 +18,8 @@ export class Config {
     nconf.argv().env({ separator: "__" }).file(path.resolve(__dirname, Config.RELATIVE_PATH, Config.getEnvironment()) + Config.EXT);
   }
 
-  public get(key: string, defaultValue?: string) {
-    const value = nconf.get(key);
-    return value ? value : defaultValue;
+  public get(key: string) {
+    return nconf.get(key);
   }
 
   public isDevelopment(): boolean {
