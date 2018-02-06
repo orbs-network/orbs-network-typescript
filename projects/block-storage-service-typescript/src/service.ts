@@ -1,11 +1,15 @@
-import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import * as path from "path";
 import bind from "bind-decorator";
+
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 
 import BlockStorage from "./block-storage";
 
 ErrorHandler.setup();
 
 export default class BlockStorageService {
+  public static readonly LEVELDB_PATH: string = path.resolve("../../db/blocks.db");
+
   private db: BlockStorage;
 
   @bind
@@ -40,7 +44,7 @@ export default class BlockStorageService {
   async main() {
     logger.info(`${topology.name}: service started`);
 
-    this.db = new BlockStorage();
+    this.db = new BlockStorage(BlockStorageService.LEVELDB_PATH);
 
     await this.db.load();
   }
