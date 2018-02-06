@@ -10,7 +10,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf ../db/test",
-    "test": "npm run clean && NODE_ENV=test ts-mocha src/*.spec.ts --exit",
+    "test": "npm run clean && NODE_ENV=test ts-mocha test/**/*.spec.ts --exit",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
