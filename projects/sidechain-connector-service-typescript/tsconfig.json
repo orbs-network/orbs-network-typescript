@@ -21,8 +21,7 @@
     }
   },
   "include": [
-    "src/**/*",
-    "./node_modules/web3-typescript-typings/index.d.ts"
+    "src/**/*"
   ],
   "exclude": [
     "src/test/**/*"
