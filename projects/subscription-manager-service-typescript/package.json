@@ -13,7 +13,7 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve\"",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
-    "test": "NODE_ENV=test ts-mocha src/test/**/*.spec.ts",
+    "test": "NODE_ENV=test ts-mocha test/*.spec.ts",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
@@ -23,10 +23,12 @@
     "solc": "0.4.18"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.20",
     "@types/chai": "^4.1.2",
     "@types/mocha": "^2.2.48",
     "@types/node": "^9.4.0",
     "@types/supertest": "^2.0.4",
+    "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "ganache-core": "^2.0.2",

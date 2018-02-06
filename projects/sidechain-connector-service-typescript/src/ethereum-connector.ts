@@ -1,13 +1,17 @@
-const Web3 = require("web3");
+import { Block, Provider } from "web3/types";
+
 import { types } from "orbs-common-library";
-import { Block } from "./types/web3";
+
+const Web3 = require("web3");
 
 export default class EthereumConnector {
-    private web3;
+    private web3: any;
 
-    public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[], block?: Block) {
-        if (block == undefined)
+    public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[],
+        block?: Block) {
+        if (!block) {
             block = await this.getEarlierBlock();
+        }
 
         const callData = this.web3.eth.abi.encodeFunctionCall(functionInterface, parameters);
 
@@ -21,11 +25,11 @@ export default class EthereumConnector {
         };
     }
 
-    constructor(web3Instance) {
+    constructor(web3Instance: any) {
         this.web3 = web3Instance;
     }
 
-    async getEarlierBlock(numOfBlocksBack: number = 100) {
+    async getEarlierBlock(numOfBlocksBack: number = 100): Promise<Block> {
         const latestBlockNumber = await this.web3.eth.getBlockNumber();
         return this.web3.eth.getBlock(Math.max(latestBlockNumber - numOfBlocksBack, 0));
     }
@@ -34,7 +38,7 @@ export default class EthereumConnector {
         return this.createFromWeb3Provider(new Web3.providers.HttpProvider(httpAddress));
     }
 
-    static createFromWeb3Provider(web3Provider) {
+    static createFromWeb3Provider(web3Provider: Provider) {
         const web3 = new Web3(web3Provider);
         return new this(web3);
     }

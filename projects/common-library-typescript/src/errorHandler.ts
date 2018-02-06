@@ -8,7 +8,7 @@ export class ErrorHandler {
   public static setup(abortOnUncaught: boolean = false, gracefulShutdown?: Callback) {
     const onError = uncaughtHandler({
       logger: {
-        fatal: function fatal(message, meta, callback) {
+        fatal: (message: string, meta: any, callback: Callback) => {
           logger.error(message, meta.error);
           logger.error(meta.error.stack);
 
@@ -17,7 +17,7 @@ export class ErrorHandler {
       },
       statsd: {
         // TODO: add stats support.
-        immediateIncrement: (key, count, callback) => {
+        immediateIncrement: (key: string, count: number, callback: Callback) => {
           callback();
         },
       },
@@ -25,7 +25,7 @@ export class ErrorHandler {
         hostname: os.hostname()
       },
       abortOnUncaught: abortOnUncaught,
-      gracefulShutdown: function (callback) {
+      gracefulShutdown: (callback: Callback) => {
         gracefulShutdown ? gracefulShutdown(callback) : callback();
       }
     });
