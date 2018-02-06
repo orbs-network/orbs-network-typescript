@@ -35,7 +35,9 @@
     "winston-logzio": "^1.0.6"
   },
   "devDependencies": {
+    "@types/bs58": "^3.0.30",
     "@types/crypto-js": "^3.1.38",
+    "@types/lodash": "^4.14.101",
     "@types/nconf": "0.0.37",
     "@types/node": "^9.4.0",
     "@types/winston": "^2.3.7",
