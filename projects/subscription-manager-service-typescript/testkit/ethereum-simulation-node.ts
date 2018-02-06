@@ -1,13 +1,14 @@
 import * as ganache from "ganache-core";
-import * as Web3 from "web3";
 import * as solc from "solc";
+
+const Web3 = require("web3");
 
 export class EthereumSimulationNode {
     server: any;
     port: number;
 
     constructor() {
-        this.server = ganache.server({accounts: [{balance: "300000000000000000000"}], total_accounts: 1});
+        this.server = ganache.server({ accounts: [{ balance: "300000000000000000000" }], total_accounts: 1 });
     }
 
     start(port: number = 8545) {
@@ -59,8 +60,9 @@ export class EthereumSimulationNode {
         const bytecode = output.contracts[":stubOrbsToken"].bytecode;
         const abi = JSON.parse(output.contracts[":stubOrbsToken"].interface);
         // deploy contract
-        const contract = new web3.eth.Contract(abi, {data: "0x" + bytecode});
-        const tx = contract.deploy({arguments: [minTokensForSubscription, activeSubscriptionId]});
+        const contract = new web3.eth.Contract(abi, undefined, { data: `0x${bytecode}` });
+        const tx = contract.deploy({ arguments: [minTokensForSubscription, activeSubscriptionId], data: undefined });
+
         const account = (await web3.eth.getAccounts())[0];
         const deployedContract = await tx.send({
             from: account,

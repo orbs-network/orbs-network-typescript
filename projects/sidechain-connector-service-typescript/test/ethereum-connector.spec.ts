@@ -1,10 +1,10 @@
-import { Assertion, expect } from "chai";
+import { expect } from "chai";
 const Web3 = require("web3");
 import * as ganache from "ganache-core";
 import * as path from "path";
 import * as solc from "solc";
 
-import EthereumConnector from "../ethereum-connector";
+import EthereumConnector from "../src/ethereum-connector";
 
 const SIMPLE_STORAGE_SOLIDITY_CONTRACT = `
 pragma solidity 0.4.18;
@@ -43,7 +43,7 @@ contract SimpleStorage {
 }
 `;
 
-async function deployContract(web3, intValue: number, stringValue: string) {
+async function deployContract(web3: any, intValue: number, stringValue: string) {
     // compile contract
     const output = solc.compile(SIMPLE_STORAGE_SOLIDITY_CONTRACT, 1);
     if (output.errors)
@@ -72,7 +72,7 @@ describe("Ethereum connector", () => {
             const intValue = Math.floor(Math.random() * 10000000);
             const stringValue = "foobar";
             let contractAddress;
-            let res;
+            let res: any;
             before(async function() {
                 this.timeout(30000);
                 contractAddress = await deployContract(web3, intValue, stringValue);

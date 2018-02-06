@@ -19,7 +19,7 @@ export class Logger {
     console: false,
     logzio: {
       enabled: false,
-      apiKey: undefined
+      apiKey: ""
     }
   };
 

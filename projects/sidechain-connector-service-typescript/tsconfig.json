@@ -6,7 +6,8 @@
       "node",
       "mocha"
     ],
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSources": true,
@@ -22,8 +23,5 @@
   },
   "include": [
     "src/**/*"
-  ],
-  "exclude": [
-    "src/test/**/*"    
   ]
 }

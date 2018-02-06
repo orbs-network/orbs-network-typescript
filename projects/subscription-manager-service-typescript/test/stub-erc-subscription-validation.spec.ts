@@ -40,9 +40,8 @@ class OrbsService {
         const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
         const process = child_process.exec(
             `node dist/index.js ${absoluteTopologyPath}`, {
-                async: true,
                 cwd: projectPath,
-                env: {...args, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
+                env: { ...args, ...{ NODE_ENV: "test" } }  // TODO: passing args in env var due a bug in nconf.argv used by the services
             });
         if (streamStdout) {
             process.stdout.on("data", console.log);
@@ -51,8 +50,10 @@ class OrbsService {
     }
 
     public async stop() {
-        this.context.process.kill();
-        this.context = undefined;
+        if (this.context) {
+            this.context.process.kill();
+            this.context = undefined;
+        }
     }
 }
 
@@ -61,7 +62,7 @@ class OrbsSubscriptionManager extends OrbsService {
         return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
     }
 
-    public async start(opts: {ethereumContractAddress: string}) {
+    public async start(opts: { ethereumContractAddress: string }) {
         return super.start(opts);
     }
 }
@@ -71,7 +72,7 @@ class OrbsSidechainConnector extends OrbsService {
         return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
     }
 
-    public async start(opts: {ethereumNodeAddress: string}) {
+    public async start(opts: { ethereumNodeAddress: string }) {
         return super.start(opts);
     }
 }
@@ -92,8 +93,8 @@ class TestEnvironment {
         await this.ethereumNode.start(8547);
         const ethereumContractAddress = await this.ethereumNode.deployOrbsStubContract(100, ACTIVE_SUBSCRIPTION_ID);
         await Promise.all([
-            this.sidechainConnector.start({ethereumNodeAddress: `http://localhost:${this.ethereumNode.port}`}),
-            this.subscriptionManager.start({ethereumContractAddress})
+            this.sidechainConnector.start({ ethereumNodeAddress: `http://localhost:${this.ethereumNode.port}` }),
+            this.subscriptionManager.start({ ethereumContractAddress })
         ]);
     }
 
@@ -103,7 +104,6 @@ class TestEnvironment {
         this.ethereumNode.stop();
     }
 }
-
 
 describe("subscription manager.getSubscriptionStatus() on a stub Orbs Ethereum contract", () => {
     const testEnvironment = new TestEnvironment();
