@@ -1,10 +1,10 @@
 import Web3 from "web3";
-import { Block } from "web3//types";
+import { Block, Provider } from "web3//types";
 
 import { types } from "orbs-common-library";
 
 export default class EthereumConnector {
-    private web3;
+    private web3: Web3;
 
     public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[],
         block?: Block) {
@@ -24,7 +24,7 @@ export default class EthereumConnector {
         };
     }
 
-    constructor(web3Instance) {
+    constructor(web3Instance: Web3) {
         this.web3 = web3Instance;
     }
 
@@ -37,7 +37,7 @@ export default class EthereumConnector {
         return this.createFromWeb3Provider(new Web3.providers.HttpProvider(httpAddress));
     }
 
-    static createFromWeb3Provider(web3Provider) {
+    static createFromWeb3Provider(web3Provider: Provider) {
         const web3 = new Web3(web3Provider);
         return new this(web3);
     }
