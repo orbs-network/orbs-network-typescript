@@ -9,7 +9,7 @@ ADD . /opt/orbs
 
 WORKDIR /opt/orbs
 
-RUN npm install -g typescript@2.6.2
+RUN npm install -g typescript@2.7.1
 
 RUN ./install.sh
 
