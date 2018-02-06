@@ -48,9 +48,9 @@ export class Logger {
           filename: Logger.resolvePath(opts.fileName),
           maxsize: opts.maxSize,
           maxFiles: opts.maxFiles,
-          prettyPrint: true,
+          prettyPrint: false,
           tailable: true,
-          json: false
+          json: true
         })
       ],
       rewriters: [
