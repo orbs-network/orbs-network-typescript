@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import { Block, Provider } from "web3//types";
+import { Block, Provider } from "web3/types";
 
 import { types } from "orbs-common-library";
 
