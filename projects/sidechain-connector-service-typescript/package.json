@@ -2,6 +2,10 @@
   "name": "orbs-sidechain-connector-service",
   "version": "0.1.0",
   "description": "orbs-sidechain-connector-service",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {

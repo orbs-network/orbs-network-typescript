@@ -2,6 +2,10 @@
   "name": "subscription-manager-service",
   "version": "0.1.0",
   "description": "subscription-manager-service",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {

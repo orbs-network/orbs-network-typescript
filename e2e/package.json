@@ -2,6 +2,10 @@
   "name": "orbs-e2e",
   "version": "0.1.0",
   "description": "Orbs end-to-end tests",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
