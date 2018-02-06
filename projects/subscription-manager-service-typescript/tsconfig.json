@@ -2,7 +2,12 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
+    "types": [
+      "node",
+      "mocha"
+    ],
     "noImplicitAny": true,
+    "skipLibCheck": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSources": true,
@@ -11,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-          "node_modules/*"
+        "node_modules/*",
+        "src/types/*"
       ]
     }
   },
@@ -19,6 +25,6 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/test/**/*"    
+    "src/test/**/*"
   ]
 }
