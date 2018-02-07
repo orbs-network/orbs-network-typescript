@@ -12,10 +12,10 @@
   "consensus": {
     "clusterSize": 7,
     "electionTimeout": {
-      "min": 500,
-      "max": 1000
+      "min": 5000,
+      "max": 10000
     },
-    "heartbeatInterval": 100
+    "heartbeatInterval": 1000
   },
   "ethereumNodeAddress": "http://ethereum.services.orbs-test.com:8545"
 }

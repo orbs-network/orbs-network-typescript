@@ -12,9 +12,9 @@
   "consensus": {
     "clusterSize": 6,
     "electionTimeout": {
-      "min": 500,
-      "max": 1000
+      "min": 5000,
+      "max": 10000
     },
-    "heartbeatInterval": 100
+    "heartbeatInterval": 1000
   }
 }
