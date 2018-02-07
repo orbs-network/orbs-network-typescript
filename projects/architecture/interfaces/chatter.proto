@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-import "primitives/heartbeat.proto";
-
-service Chatter {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
-}

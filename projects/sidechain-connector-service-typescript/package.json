@@ -2,21 +2,19 @@
   "name": "orbs-sidechain-connector-service",
   "version": "0.1.0",
   "description": "orbs-sidechain-connector-service",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "start": "npm run build && npm run watch",
     "build": "npm run build-ts && npm run tslint",
-    "rebuild": "npm run build-ts",
-    "serve": "nodemon dist/index.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve\"",
-    "test": "NODE_ENV=test ts-mocha src/test/**/*.spec.ts",
+    "test": "NODE_ENV=test ts-mocha test/*.spec.ts",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "debug": "npm run build && npm run watch-debug",
-    "serve-debug": "nodemon --inspect dist/index.js",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
     "bignumber.js": "^6.0.0",
@@ -34,7 +32,6 @@
     "concurrently": "^3.5.1",
     "ganache-core": "^2.0.2",
     "mocha": "^5.0.0",
-    "nodemon": "^1.14.11",
     "solc": "0.4.18",
     "ts-mocha": "^1.1.0",
     "tslint": "^5.9.1",

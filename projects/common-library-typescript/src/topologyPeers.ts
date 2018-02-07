@@ -5,10 +5,6 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
   const res: types.ClientMap = {};
   for (const peer of topologyPeers) {
     switch (peer.service) {
-      case "chatter": {
-        res.chatter = grpc.chatterClient({ endpoint: peer.endpoint });
-        break;
-      }
       case "public-api": {
         res.publicApi = grpc.publicApiClient({ endpoint: peer.endpoint });
         break;

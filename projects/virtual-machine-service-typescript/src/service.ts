@@ -15,7 +15,7 @@ export default class VirtualMachineService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
@@ -27,10 +27,10 @@ export default class VirtualMachineService {
     // currently only a "simple" contract type is supported
     try {
       const modifiedKeys = await this.processor.processTransaction({
-        sender: rpc.req.sender,
-        contractAddress: rpc.req.contractAddress,
+        sender: rpc.req.transaction.sender,
+        contractAddress: rpc.req.transaction.contractAddress,
+        payload: rpc.req.transaction.payload,
         lastBlockId: rpc.req.lastBlockId,
-        argumentsJson: rpc.req.argumentsJson
       });
       rpc.res = {
         success: true,
@@ -50,7 +50,7 @@ export default class VirtualMachineService {
     const result = await this.processor.call({
       sender: rpc.req.sender,
       contractAddress: rpc.req.contractAddress,
-      argumentsJson: rpc.req.argumentsJson
+      payload: rpc.req.payload
     });
 
     rpc.res = {
@@ -62,7 +62,7 @@ export default class VirtualMachineService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   async askForHeartbeats() {

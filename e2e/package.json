@@ -2,10 +2,15 @@
   "name": "orbs-e2e",
   "version": "0.1.0",
   "description": "Orbs end-to-end tests",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "test": "NODE_ENV=test ts-mocha src/*.spec.ts --exit",
+    "clean": "rm -rf ../db/test",
+    "test": "npm run clean && NODE_ENV=test ts-mocha test/**/*.spec.ts --exit",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
@@ -15,7 +20,7 @@
     "ganache-core": "^2.0.2",
     "nconf": "^0.10.0",
     "orbs-common-library": "file:../projects/common-library-typescript",
-    "solc": "^0.4.18",
+    "solc": "0.4.18",
     "underscore": "^1.8.3",
     "web3": "^1.0.0-beta.29"
   },
@@ -30,14 +35,11 @@
     "@types/supertest": "^2.0.4",
     "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
-    "concurrently": "^3.5.1",
     "mocha": "^4.1.0",
-    "nodemon": "^1.14.11",
     "shelljs": "^0.8.1",
     "supertest": "^3.0.0",
-    "ts-jest": "^22.0.2",
     "ts-mocha": "^1.1.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.7.1"
   }
 }

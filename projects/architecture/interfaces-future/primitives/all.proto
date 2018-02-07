@@ -1,5 +1,0 @@
-import "primitives/general.proto";
-import "primitives/contracts.proto";
-import "primitives/transactions.proto";
-import "primitives/blocks.proto";
-import "primitives/storage.proto";

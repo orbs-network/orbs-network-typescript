@@ -11,7 +11,7 @@ export default class PublicApiService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
@@ -19,7 +19,7 @@ export default class PublicApiService {
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
@@ -46,7 +46,7 @@ export default class PublicApiService {
   async call(rpc: types.CallContext) {
     const {resultJson} = await this.peers.virtualMachine.callContract({
       sender: rpc.req.sender,
-      argumentsJson: rpc.req.argumentsJson,
+      payload: rpc.req.payload,
       contractAddress: rpc.req.contractAddress
     });
 

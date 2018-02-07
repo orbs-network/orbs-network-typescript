@@ -10,9 +10,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node build/src/build-ts.js",
-    "rebuild": "node build/src/rebuild-ts.js",
-    "watch": "node build/src/watch-ts.js",
-    "simulate": "node simulate/src/index.js"
+    "watch": "node build/src/watch-ts.js"
   },
   "dependencies": {
     "colors": "^1.1.2",
