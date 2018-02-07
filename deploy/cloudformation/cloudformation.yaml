@@ -145,6 +145,25 @@ Parameters:
   NodeEnv:
     Type: String
     Default: 'staging'
+  ORBSBootstrap:
+    Type: String
+    Default: |
+      # create dummy keys infrastructure
+      aws s3 sync s3://orbs-network-config-staging/dummy-keys/public/ /opt/keys/network/
+      aws s3 cp s3://orbs-network-config-staging/dummy-keys/private/$NODE_NAME /opt/keys/test-private-key
+
+      # copy bootstrap script, env variables and secrets
+      aws s3 sync s3://orbs-network-config-staging/v1/ /opt/orbs/
+      bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
+  EthereumBootstrap:
+    Type: String
+    Default: |
+      aws s3 sync s3://orbs-network-config-staging/parity/ /opt/parity/
+      bash /opt/parity/bootstrap.sh &>> /var/log/orbs-bootstrap.log
+  Bootstrap:
+    Type: String
+    Default: 'ORBSBootstrap'
+
 Conditions:
   CreateEC2LCWithKeyPair:
     !Not [!Equals [!Ref KeyName, '']]
@@ -167,6 +186,7 @@ Conditions:
     - !Not [!Equals [!Ref EbsVolumeType, '']]
     - !Not [!Equals [!Ref DeviceName, '']]
   CreateWithASG: !Equals [!Ref CreateWithASG, 'true']
+  DefaultBootstrap: !Equals [!Ref Bootstrap, 'ORBSBootstrap']
 Resources:
   Vpc:
     Condition: CreateSubnet1
@@ -272,17 +292,15 @@ Resources:
         Fn::Base64: !Sub 
           - |
            #!/bin/bash -xe
-           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME}
+           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV}
            hostname $NODE_NAME
 
-           # create dummy keys infrastructure
-           aws s3 sync s3://orbs-network-config-staging/dummy-keys/public/ /opt/keys/network/
-           aws s3 cp s3://orbs-network-config-staging/dummy-keys/private/$NODE_NAME /opt/keys/test-private-key
-
-           # copy bootstrap script, env variables and secrets
-           aws s3 sync s3://orbs-network-config-staging/v1/ /opt/orbs/
-           bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
-          - { EIP: !Ref ElasticIP, DOCKER_TAG: !Ref DockerTag, NODE_NAME: !Ref NodeName, NODE_ENV: !Ref NodeEnv }
+           ${BOOTSTRAP}
+          - EIP: !Ref ElasticIP
+            DOCKER_TAG: !Ref DockerTag
+            NODE_NAME: !Ref NodeName
+            NODE_ENV: !Ref NodeEnv
+            BOOTSTRAP: !If [DefaultBootstrap, !Ref ORBSBootstrap, !Ref EthereumBootstrap]
   ORBSInstanceAsg:
     Type: AWS::AutoScaling::AutoScalingGroup
     Condition: CreateWithASG

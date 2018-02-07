@@ -1,0 +1,7 @@
+parity:
+  image: parity/parity:v1.8.9
+  volumes:
+    - /mnt/data:/root/.local/share/io.parity.ethereum/
+  ports:
+    - 8545:8545
+  command: --no-secretstore --jsonrpc-interface all --no-ui --no-ipc --no-ws --no-ancient-blocks --chain ropsten
