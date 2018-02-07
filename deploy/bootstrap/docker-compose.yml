@@ -48,6 +48,7 @@ services:
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/virtual-machine.js
     env_file:
       - .env
+      - .env-secrets
     environment:
       SERVICE: virtual-machine
     networks:
@@ -59,6 +60,7 @@ services:
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/block-storage.js
     env_file:
       - .env
+      - .env-secrets
     environment:
       SERVICE: block-storage
     networks:
@@ -74,6 +76,7 @@ services:
       - 60001:60001
     env_file:
       - .env
+      - .env-secrets
     environment:
       SERVICE: gossip
     networks:
