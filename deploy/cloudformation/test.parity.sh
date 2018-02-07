@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/bash -e
 
-node parity_test.js
+node parity-test.js

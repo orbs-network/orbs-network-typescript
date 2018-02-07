@@ -9,7 +9,7 @@
     },
     {
         "ParameterKey": "ORBSInstanceType",
-        "ParameterValue": "m5.large"
+        "ParameterValue": "c5.xlarge"
     },
     {
         "ParameterKey": "VpcAvailabilityZones",
@@ -62,6 +62,14 @@
     {
         "ParameterKey": "EbsVolumeSize",
         "ParameterValue": "400"
+    },
+    {
+        "ParameterKey": "EbsVolumeType",
+        "ParameterValue": "gp2"
+    },
+    {
+        "ParameterKey": "DeviceName",
+        "ParameterValue": "/dev/xvdc"
     },
     {
         "ParameterKey": "Bootstrap",
