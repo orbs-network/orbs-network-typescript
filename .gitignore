@@ -33,7 +33,6 @@ Thumbs.db
 
 # Configuration files
 config/production.json
-config/staging.json
 
 # Docker-compose tmp files
 docker-compose.test.yml.tmp*
