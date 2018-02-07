@@ -28,7 +28,7 @@ const deploy = (stack) => {
 
         fs.writeFileSync(paramsPath, JSON.stringify(params));
 
-        shell.exec(`aws cloudformation create-stack --template-body file://${__dirname}/cloudformation.yaml --parameters "$(cat ${paramsPath})" --stack-name ${getStackName(stack)}`, (err, response) => {
+        shell.exec(`aws cloudformation create-stack --region us-west-2 --template-body file://${__dirname}/cloudformation.yaml --parameters "$(cat ${paramsPath})" --stack-name ${getStackName(stack)}`, (err, response) => {
             err ? resolve(err) : resolve(response);
         });
     });
@@ -38,7 +38,7 @@ const remove = (stack) => {
     return new Promise((resolve, reject) => {
         console.log(`Removing ${stack.name}`);
 
-        shell.exec(`aws cloudformation delete-stack --stack-name ${getStackName(stack)}`, (err, response) => {
+        shell.exec(`aws cloudformation delete-stack --region us-west-2 --stack-name ${getStackName(stack)}`, (err, response) => {
             err ? resolve(err) : resolve(response);
         });
     });
