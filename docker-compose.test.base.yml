@@ -1,45 +1,14 @@
 version: '2'
 
 services:
-  consensus:
+  base-service:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/consensus-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/consensus.js
     restart: always
-    env_file:
-      - .env-test
-
-  public-api:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/public-api-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/public-api.js
-    env_file:
-      - .env-test
-
-  state-storage:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/state-storage-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/state-storage.js
-    env_file:
-      - .env-test
-
-  virtual-machine:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/virtual-machine-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/virtual-machine.js
-    env_file:
-      - .env-test
-
-  block-storage:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/block-storage-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/block-storage.js
-    env_file:
-      - .env-test
-
-  gossip:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/gossip-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/gossip.js
-    env_file:
-      - .env-test
+    command: node dist/index.js ${NODE_CONFIG_PATH}
+    volumes:
+      - ./logs:/opt/orbs/logs
+      - ./config/topologies/discovery/node1:/opt/orbs/config/topology
+    environment:
+      NODE_NAME: ${NODE_NAME}
+      NODE_ENV: test
+      GOSSIP_PEERS: ws://172.2.1.2:60001,ws://172.2.1.3:60001,ws://172.2.1.4:60001,ws://172.2.1.5:60001,ws://172.2.1.6:60001,ws://172.2.1.7:60001
