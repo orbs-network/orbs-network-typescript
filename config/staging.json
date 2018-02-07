@@ -16,5 +16,6 @@
       "max": 1000
     },
     "heartbeatInterval": 100
-  }
+  },
+  "ethereumNodeAddress": "http://ethereum.services.orbs-test.com:8545"
 }
