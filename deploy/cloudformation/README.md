@@ -6,7 +6,7 @@
 
 ## Create new stacks
 
-```
+```bash
 ./create-stacks.sh
 ```
 
@@ -14,13 +14,13 @@ Deployment script creates specific parameters for each stack (common `parameters
 
 ## Removing old stacks
 
-```
+```bash
 ./create-stacks.sh --remove-all
 ```
 
 ## Testing
 
-```
+```bash
 ./test.sh
 ```
 
@@ -30,10 +30,10 @@ Parity Etherium node is not part of ORBS network and is deployed as a separate s
 
 TODO: extract to a different repo.
 
-```
+```bash
 ./create-stacks.parity.sh
 ```
 
-```
+```bash
 ./test.parity.sh
 ```
