@@ -2,107 +2,31 @@
 
 export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
 export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
+export NODE_CONFIG_PATH=/opt/orbs/config/topology
 
-function generate_dockerfile {
-    cat docker-compose.test.yml \
-    | sed -e "s/_NODE_NAME_/${NODE_NAME}/g" \
-    | sed -e "s/_NODE_IP_/${NODE_IP}/g" \
-    | sed -e "s/_PRIVATE_NETWORK_/${PRIVATE_NETWORK}/g" \
-      > docker-compose.test.yml.tmp.${NODE_NAME}
-}
-
-export PRIVATE_NETWORK=172.100.1
-export NODE_NAME=bliny
-export NODE_IP=172.2.1.2
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.110.1
-export NODE_NAME=pelmeni
-export NODE_IP=172.2.1.3
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.120.1
-export NODE_NAME=borscht
-export NODE_IP=172.2.1.4
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.130.1
-export NODE_NAME=pirogi
-export NODE_IP=172.2.1.5
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.140.1
-export NODE_NAME=oladyi
-export NODE_IP=172.2.1.6
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.150.1
-export NODE_NAME=olivier
-export NODE_IP=172.2.1.7
-
-generate_dockerfile
-
-if [ -z "$LOCAL" ]; then
-    export VOLUMES=docker-compose.test.volumes.yml
-else
-    export VOLUMES=docker-compose.test.volumes.local.yml
-fi
-
-if [ -z "$FORCE_RECREATE" ]; then
-    export FORCE_RECREATE_ARGUMENT=""
-else
-    export FORCE_RECREATE_ARGUMENT="--force-recreate"
-fi
-
-export UP_D=restart
-
-export DOCKER_COMPOSE=`cat <<EOF
-docker-compose -p orbsnetwork \
-        -f docker-compose.test.network.yml \
-        -f $VOLUMES \
-        -f docker-compose.test.yml.tmp.bliny \
-        -f docker-compose.test.yml.tmp.pelmeni \
-        -f docker-compose.test.yml.tmp.borscht \
-        -f docker-compose.test.yml.tmp.pirogi \
-        -f docker-compose.test.yml.tmp.oladyi \
-        -f docker-compose.test.yml.tmp.olivier
-EOF`
-
-function start() {
-    $DOCKER_COMPOSE up -d $FORCE_RECREATE_ARGUMENT
-}
-
-function restart() {
-    $DOCKER_COMPOSE restart
-}
-
-function stop() {
-    $DOCKER_COMPOSE stop
-}
-
-if [ -z "$STAY_UP" ]; then
-    start
-else
-    if ! restart ; then
-        start
-    fi
-fi
-
+# environment setup
+docker network create orbs-network --subnet 172.2.1.0/24
+PUBLIC_API_EXTERNAL_PORT=12345 PRIVATE_NETWORK=172.100.1 NODE_NAME=node1 NODE_IP=172.2.1.2 docker-compose -p orbs-node1 -f docker-compose.test.services.yml up -d
+PUBLIC_API_EXTERNAL_PORT=12346 PRIVATE_NETWORK=172.100.2 NODE_NAME=node2 NODE_IP=172.2.1.3 docker-compose -p orbs-node2 -f docker-compose.test.services.yml up -d
+PUBLIC_API_EXTERNAL_PORT=12347 PRIVATE_NETWORK=172.100.3 NODE_NAME=node3 NODE_IP=172.2.1.4 docker-compose -p orbs-node3 -f docker-compose.test.services.yml up -d
+PUBLIC_API_EXTERNAL_PORT=12348 PRIVATE_NETWORK=172.100.4 NODE_NAME=node4 NODE_IP=172.2.1.5 docker-compose -p orbs-node4 -f docker-compose.test.services.yml up -d
+PUBLIC_API_EXTERNAL_PORT=12349 PRIVATE_NETWORK=172.100.5 NODE_NAME=node5 NODE_IP=172.2.1.6 docker-compose -p orbs-node5 -f docker-compose.test.services.yml up -d
+PUBLIC_API_EXTERNAL_PORT=12350 PRIVATE_NETWORK=172.100.6 NODE_NAME=node6 NODE_IP=172.2.1.7 docker-compose -p orbs-node6 -f docker-compose.test.services.yml up -d
 
 sleep ${STARTUP_WAITING_TIME-30}
 
-docker exec -ti orbsnetwork_public-api-pelmeni_1 bash -c "cd /opt/orbs/e2e/ && npm test"
+# run e2e test
+cd ./e2e && E2E_NO_DEPLOY=true E2E_PUBLIC_API_ENDPOINT=0.0.0.0:12345 npm test
+cd ..
 export EXIT_CODE=$?
 
-docker ps -a --no-trunc > logs/docker-ps
+# cleanup
+PUBLIC_API_EXTERNAL_PORT=12345 PRIVATE_NETWORK=172.100.1 NODE_NAME=node1 NODE_IP=172.2.1.2 docker-compose -p orbs-node1 -f docker-compose.test.services.yml down
+PUBLIC_API_EXTERNAL_PORT=12346 PRIVATE_NETWORK=172.100.2 NODE_NAME=node2 NODE_IP=172.2.1.3 docker-compose -p orbs-node2 -f docker-compose.test.services.yml down
+PUBLIC_API_EXTERNAL_PORT=12347 PRIVATE_NETWORK=172.100.3 NODE_NAME=node3 NODE_IP=172.2.1.4 docker-compose -p orbs-node3 -f docker-compose.test.services.yml down
+PUBLIC_API_EXTERNAL_PORT=12348 PRIVATE_NETWORK=172.100.4 NODE_NAME=node4 NODE_IP=172.2.1.5 docker-compose -p orbs-node4 -f docker-compose.test.services.yml down
+PUBLIC_API_EXTERNAL_PORT=12349 PRIVATE_NETWORK=172.100.5 NODE_NAME=node5 NODE_IP=172.2.1.6 docker-compose -p orbs-node5 -f docker-compose.test.services.yml down
+PUBLIC_API_EXTERNAL_PORT=12350 PRIVATE_NETWORK=172.100.6 NODE_NAME=node6 NODE_IP=172.2.1.7 docker-compose -p orbs-node6 -f docker-compose.test.services.yml down
 
-if [ -z "$STAY_UP" ] ; then
-    stop
-fi
 
 exit $EXIT_CODE
