@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "shelljs": "^0.8.1"
+    "shelljs": "^0.8.1",
+    "web3": "^1.0.0-beta.29"
   }
 }
