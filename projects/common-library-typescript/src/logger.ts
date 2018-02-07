@@ -34,7 +34,7 @@ export class Logger {
   constructor(options = {}) {
     const opts = defaults(options, Logger.DEFAULT_OPTIONS);
 
-    if (Logger.LOG_TYPES.indexOf(opts.level) !== -1) {
+    if (Logger.LOG_TYPES.indexOf(opts.level) === -1) {
       opts.level = Logger.DEFAULT_LOG_LEVEL;
     }
 
