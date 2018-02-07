@@ -36,5 +36,8 @@ config/production.json
 config/staging.json
 
 # Docker-compose tmp files
-
 docker-compose.test.yml.tmp*
+
+# Databases
+db
+.ldb_history

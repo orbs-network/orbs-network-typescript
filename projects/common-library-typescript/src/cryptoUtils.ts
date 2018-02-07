@@ -53,12 +53,12 @@ export class CryptoUtils {
 
   public static loadFromConfiguration(): CryptoUtils {
     const configDir = `${path.dirname(process.argv[2])}/config`;
-    const privateKey: PrivateKey = this.getPrivateKey(configDir);
+    const privateKey: PrivateKey = new Buffer(this.getPrivateKey(configDir));
     const myName: string = this.getName(configDir);
     const nodePublicKeys: Map<string, PublicKey> = new Map();
 
     for (const node of fs.readdirSync(`${configDir}/network`)) {
-      const nodeKey: Buffer = base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8"));
+      const nodeKey: Buffer = new Buffer(base58.decode(fs.readFileSync(`${configDir}/network/${node}`, "utf8")));
       nodePublicKeys.set(node, nodeKey);
     }
 
@@ -112,7 +112,7 @@ export class CryptoUtils {
     const hash = crypto.createHash("sha256");
     hash.update(buf);
 
-    let encodingOption;
+    let encodingOption: crypto.HexBase64Latin1Encoding;
 
     switch (encoding) {
       case Encoding.BASE64:

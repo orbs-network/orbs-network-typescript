@@ -1,4 +1,7 @@
-#!/bin/bash -x
+#!/bin/bash -xe
+
+export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
+export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
 
 function generate_dockerfile {
     cat docker-compose.test.yml \
@@ -54,7 +57,7 @@ docker-compose -p orbsnetwork \
     -f docker-compose.test.yml.tmp.olivier \
     up -d
 
-sleep 60
+sleep ${STARTUP_WAITING_TIME-30}
 
 docker exec -ti orbsnetwork_public-api-pelmeni_1 bash -c "cd /opt/orbs/e2e/ && npm test"
 export EXIT_CODE=$?

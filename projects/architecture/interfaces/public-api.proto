@@ -14,13 +14,12 @@ message PublicApiSendTransactionOutput {
 message PublicApiCallInput {
   string sender = 1;
   string contractAddress = 2;
-  string argumentsJson = 3;
+  string payload = 3;
 }
 
 message PublicApiCallOutput {
   string resultJson = 1;
 }
-
 
 service PublicApi {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);

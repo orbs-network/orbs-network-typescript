@@ -2,18 +2,16 @@
   "name": "orbs-common-library",
   "version": "0.1.0",
   "description": "orbs-common-library",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/orbs-network/common-library-typescript.git"
+    "url": "https://github.com/orbs-network/orbs-network.git"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "start": "npm run build && npm run watch",
     "build": "npm run build-ts && npm run tslint",
-    "rebuild": "npm run build-ts",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\"",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
@@ -35,11 +33,11 @@
     "winston-logzio": "^1.0.6"
   },
   "devDependencies": {
+    "@types/bs58": "^3.0.30",
     "@types/crypto-js": "^3.1.38",
+    "@types/lodash": "^4.14.101",
     "@types/nconf": "0.0.37",
     "@types/node": "^9.4.0",
-    "@types/node-forge": "^0.7.2",
-    "@types/protobufjs": "^6.0.0",
     "@types/winston": "^2.3.7",
     "concurrently": "^3.5.1",
     "tslint": "^5.9.1",

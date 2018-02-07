@@ -1,67 +1,52 @@
-import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
-import * as _ from "lodash";
+
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
+
+import BlockStorage from "./block-storage";
 
 ErrorHandler.setup();
 
-// TODO: support a head block which refers to a NULL prev block
-const DEFAULT_GENESIS_BLOCK: types.Block = {
-  id: 0,
-  prevBlockId: -1,
-  tx: { contractAddress: "0", sender: "", signature: "", argumentsJson: "{}" },
-  modifiedAddressesJson: "{}"
-};
-
 export default class BlockStorageService {
-  peers: types.ClientMap;
-
-  storedBlocks: types.Block[] = [DEFAULT_GENESIS_BLOCK];
+  private db: BlockStorage;
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.info(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: topology.name, responderVersion: topology.version };
   }
 
   @bind
   public async addBlock(rpc: types.AddBlockContext) {
-    const { block } = rpc.req;
-    const lastBlock = this.storedBlocks[this.storedBlocks.length - 1];
-    if (block.prevBlockId != lastBlock.id) {
-      throw new Error(`expects previous block ID ${lastBlock.id}. retrieved ${block.prevBlockId} / ${block.id}. ${JSON.stringify(this.storedBlocks)}`);
-    }
+    logger.debug(`${topology.name}: addBlock ${JSON.stringify(rpc.req)}`);
 
-    this.storedBlocks.push(block);
-    logger.debug("Added new block. stored blocks:", this.storedBlocks);
+    await this.db.addBlock(rpc.req.block);
+
+    rpc.res = {};
   }
 
   @bind
   public async getBlocks(rpc: types.GetBlocksContext) {
-    const firstBlockIndex = _.findIndex(this.storedBlocks, { prevBlockId: rpc.req.lastBlockId });
+    logger.debug(`${topology.name}: getBlocks ${JSON.stringify(rpc.req)}`);
 
-    rpc.res = { blocks: firstBlockIndex == -1 ? [] : this.storedBlocks.slice(firstBlockIndex) };
-
-    logger.debug(`${topology.name}: getBlocks`, rpc.res, this.storedBlocks);
+    rpc.res = { blocks: await this.db.getBlocks(rpc.req.lastBlockId) };
   }
 
-  // service logic
+  @bind
+  public async getLastBlockId(rpc: types.GetLastBlockIdContext) {
+    logger.debug(`${topology.name}: getLastBlockId ${JSON.stringify(rpc.req)}`);
 
-  async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.info(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
-  }
-
-  askForHeartbeats() {
-    // this.askForHeartbeat(this.peers.gossip);
+    rpc.res = { blockId: await this.db.getLastBlockId() };
   }
 
   async main() {
-    this.peers = topologyPeers(topology.peers);
-    setInterval(() => this.askForHeartbeats(), 5000);
+    logger.info(`${topology.name}: service started`);
+
+    this.db = new BlockStorage();
+
+    await this.db.load();
   }
 
   constructor() {
-    logger.info(`${topology.name}: service started`);
-    setTimeout(() => this.main(), 2000);
+    setTimeout(() => this.main(), 0);
   }
 }
