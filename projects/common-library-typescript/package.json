@@ -20,7 +20,7 @@
   "dependencies": {
     "bs58": "^4.0.1",
     "grpc": "^1.8.4",
-    "grpc-caller": "^0.4.0",
+    "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "lodash": "^4.17.4",
     "mali": "^0.7.1",
     "nconf": "^0.10.0",
