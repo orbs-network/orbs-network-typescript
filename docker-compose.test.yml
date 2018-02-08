@@ -12,6 +12,9 @@ services:
         ipv4_address: _PRIVATE_NETWORK_.15
     volumes:
       - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
+      - ./logs/_NODE_NAME_/consensus:/opt/orbs/logs
+    volumes_from:
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -31,6 +34,9 @@ services:
         ipv4_address: _PRIVATE_NETWORK_.16
     volumes:
       - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
+      - ./logs/_NODE_NAME_/public-api:/opt/orbs/logs
+    volumes_from:
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -48,6 +54,10 @@ services:
     networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.17
+    volumes:
+      - ./logs/_NODE_NAME_/state-storage:/opt/orbs/logs
+    volumes_from:
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -65,6 +75,10 @@ services:
     networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.18
+    volumes:
+      - ./logs/_NODE_NAME_/virtual-machine:/opt/orbs/logs
+    volumes_from:
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -82,6 +96,10 @@ services:
     networks:
       _NODE_NAME_:
         ipv4_address: _PRIVATE_NETWORK_.19
+    volumes:
+      - ./logs/_NODE_NAME_/block-storage:/opt/orbs/logs
+    volumes_from:
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -104,6 +122,9 @@ services:
         ipv4_address: _PRIVATE_NETWORK_.20
     volumes:
       - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
+      - ./logs/_NODE_NAME_/gossip:/opt/orbs/logs
+    volumes_from:
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
