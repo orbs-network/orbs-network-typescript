@@ -24,8 +24,6 @@ export default class ConsensusService {
 
   @bind
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    logger.debug(`${topology.name}: gossipMessageReceived ${rpc.req.MessageType} from ${rpc.req.FromAddress} of ${rpc.req.BroadcastGroup}`);
-
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
