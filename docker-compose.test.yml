@@ -1,26 +1,6 @@
 version: '2'
 
 services:
-  shared_volumes-_NODE_NAME_:
-    image: busybox
-    volumes:
-      - ./deploy/dummy-keys/public:/opt/orbs/config/topologies/discovery/node1/config/network
-      # - ./config/test.json:/opt/orbs/config/test.json
-      # - ./e2e/dist:/opt/orbs/e2e/dist
-      # - ./e2e/src:/opt/orbs/e2e/src
-      # - ./e2e/test:/opt/orbs/e2e/test
-      # - ./projects/transaction-pool-service-typescript/dist:/opt/orbs/projects/transaction-pool-service-typescript/dist
-      # - ./projects/public-api-service-typescript/dist:/opt/orbs/projects/public-api-service-typescript/dist
-      # - ./projects/sidechain-connector-service-typescript/dist:/opt/orbs/projects/sidechain-connector-service-typescript/dist
-      # - ./projects/subscription-manager-service-typescript/dist:/opt/orbs/projects/subscription-manager-service-typescript/dist
-      # - ./projects/architecture/dist:/opt/orbs/projects/architecture/dist
-      # - ./projects/state-storage-service-typescript/dist:/opt/orbs/projects/state-storage-service-typescript/dist
-      # - ./projects/common-library-typescript/dist:/opt/orbs/projects/common-library-typescript/dist
-      # - ./projects/consensus-service-typescript/dist:/opt/orbs/projects/consensus-service-typescript/dist
-      # - ./projects/virtual-machine-service-typescript/dist:/opt/orbs/projects/virtual-machine-service-typescript/dist
-      # - ./projects/block-storage-service-typescript/dist:/opt/orbs/projects/block-storage-service-typescript/dist
-      # - ./projects/gossip-service-typescript/dist:/opt/orbs/projects/gossip-service-typescript/dist
-
   consensus-_NODE_NAME_:
     extends:
       file: docker-compose.test.base.yml
@@ -34,7 +14,7 @@ services:
       - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
       - ./logs/_NODE_NAME_/consensus:/opt/orbs/logs
     volumes_from:
-      - shared_volumes-_NODE_NAME_
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -56,7 +36,7 @@ services:
       - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
       - ./logs/_NODE_NAME_/public-api:/opt/orbs/logs
     volumes_from:
-      - shared_volumes-_NODE_NAME_
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -77,7 +57,7 @@ services:
     volumes:
       - ./logs/_NODE_NAME_/state-storage:/opt/orbs/logs
     volumes_from:
-      - shared_volumes-_NODE_NAME_
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -98,7 +78,7 @@ services:
     volumes:
       - ./logs/_NODE_NAME_/virtual-machine:/opt/orbs/logs
     volumes_from:
-      - shared_volumes-_NODE_NAME_
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -119,7 +99,7 @@ services:
     volumes:
       - ./logs/_NODE_NAME_/block-storage:/opt/orbs/logs
     volumes_from:
-      - shared_volumes-_NODE_NAME_
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
@@ -144,7 +124,7 @@ services:
       - ./deploy/dummy-keys/private/_NODE_NAME_:/opt/orbs/config/topologies/discovery/node1/config/test-private-key
       - ./logs/_NODE_NAME_/gossip:/opt/orbs/logs
     volumes_from:
-      - shared_volumes-_NODE_NAME_
+      - shared_volumes
     extra_hosts:
       - consensus:_PRIVATE_NETWORK_.15
       - public-api:_PRIVATE_NETWORK_.16
