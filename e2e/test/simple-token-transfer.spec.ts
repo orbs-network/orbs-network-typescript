@@ -64,10 +64,10 @@ async function assertFooBarAccountBalance(n: number) {
 Assertion.addMethod("bars", assertFooBarAccountBalance);
 
 async function aFooBarAccountWith(input: {amountOfBars: number}) {
-    const senderAddreess = `addr_${Math.floor(Math.random() * 100000000)}`;
-    const orbsSession = new OrbsClientSession(senderAddreess, "fooFoundation", publicApiClient);
+    const senderAddress = `addr_${Math.floor(Math.random() * 100000000)}`; // TODO: replace with a proper public key
+    const orbsSession = new OrbsClientSession(senderAddress, "fooFoundation", publicApiClient);
     const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
-    const account = new FooBarAccount(senderAddreess, contractAdapter);
+    const account = new FooBarAccount(senderAddress, contractAdapter);
 
     await account.initBalance(input.amountOfBars);
 
