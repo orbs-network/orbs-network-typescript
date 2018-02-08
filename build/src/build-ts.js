@@ -20,4 +20,4 @@ async function main() {
   console.log(' * Done\n'.green);
 }
 
-main();
+main().catch(err => process.exit(1));
