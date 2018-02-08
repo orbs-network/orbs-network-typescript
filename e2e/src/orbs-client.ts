@@ -70,7 +70,7 @@ export class OrbsClientSession {
             sender: this.senderAddress,
             contractAddress: contractAddress,
             payload: payload,
-            signature: ""
+            signature: "" // TODO: add a signature once implement in the network-side
         };
     }
 
