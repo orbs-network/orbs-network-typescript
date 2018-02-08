@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+  shared_volumes:
+    image: busybox
+    volumes:
+      - ./deploy/dummy-keys/public:/opt/orbs/config/topologies/discovery/node1/config/network
