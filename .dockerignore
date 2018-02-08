@@ -34,4 +34,3 @@ Thumbs.db
 
 # Configuration files
 config/production.json
-config/staging.json

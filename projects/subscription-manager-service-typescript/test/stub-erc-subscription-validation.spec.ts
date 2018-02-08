@@ -114,11 +114,11 @@ describe("subscription manager.getSubscriptionStatus() on a stub Orbs Ethereum c
         await testEnvironment.start();
         client = testEnvironment.subscriptionManager.getClient();
     });
-    it("should return that subscription is active if enough tokens", async () => {
+    xit("should return that subscription is active if enough tokens", async () => {
         res = await client.getSubscriptionStatus({ subscriptionKey: ACTIVE_SUBSCRIPTION_ID });
         res.should.have.property("active", true);
     });
-    it("should return that subscription is inactive if not enough tokens", async () => {
+    xit("should return that subscription is inactive if not enough tokens", async () => {
         res = await client.getSubscriptionStatus({ subscriptionKey: INACTIVE_SUBSCRIPTION_ID });
         res.should.have.property("active", false);
     });
