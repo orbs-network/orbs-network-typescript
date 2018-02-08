@@ -72,7 +72,7 @@ export class Logger {
 
     // Enable log shipping to Logz.io (according to the configuration).
     if (opts.logzio && opts.logzio.enabled) {
-      this.enableLogzio(opts.logzio.apiKey);
+      this.enableLogzio(opts.logzio.apiKey, opts.level);
     }
   }
 
@@ -131,10 +131,11 @@ export class Logger {
     });
   }
 
-  private enableLogzio(apiKey: string): void {
+  private enableLogzio(apiKey: string, level: string): void {
     const winstonLogzioTransport = require("winston-logzio");
 
     this._logger.add(winstonLogzioTransport, {
+      level: level,
       token: apiKey,
       host: Logger.LOGZIO_HOST
     });
