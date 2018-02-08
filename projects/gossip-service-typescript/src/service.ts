@@ -19,14 +19,12 @@ export default class GossipService {
 
   @bind
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    logger.debug(`${topology.name}: broadcastMessage ${rpc.req.MessageType} to ${rpc.req.BroadcastGroup}`);
     this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
 
   @bind
   public async unicastMessage(rpc: types.UnicastMessageContext) {
-    logger.debug(`${topology.name}: unicastMessage ${rpc.req.MessageType} to ${rpc.req.Recipient} from ${rpc.req.BroadcastGroup}`);
     this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
     rpc.res = {};
   }
@@ -52,9 +50,9 @@ export default class GossipService {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
 
       if (activePeers.length === 0) {
-        logger.debug(`${this.gossip.localAddress} has no active peers`);
+        logger.info(`${this.gossip.localAddress} has no active peers`);
       } else {
-        logger.debug(`${this.gossip.localAddress} has active peers`, {activePeers});
+        logger.info(`${this.gossip.localAddress} has active peers`, {activePeers});
       }
     }, 5000);
 

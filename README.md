@@ -113,7 +113,14 @@ Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/clou
 ./docker-build.sh && ./docker-test.sh
 ```
 
-You can supply `DOCKER_IMAGE` and `DOCKER_TAG` environment variables to `docker-test.sh` if the image is already pre-built.
+`docker-test.sh` has environment variables that allow you to customize its behaviour:
+* `DOCKER_IMAGE` and `DOCKER_TAG` environment variables to `docker-test.sh` if the image is already pre-built
+* `FORCE_RECREATE` recreates all containers (off by default)
+* `STAY_UP` if you do not want containers to go down (off by default)
+* `LOCAL` if you want to mount local volumes from `docker-compose.test.volumes.local.yml`
+
+Pairing `LOCAL` with `watch.sh` is highly recommended for local development.
+
 
 ## Development
 

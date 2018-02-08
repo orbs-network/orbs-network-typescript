@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 
 export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
 export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
@@ -47,15 +47,52 @@ export NODE_IP=172.2.1.7
 
 generate_dockerfile
 
+if [ -z "$LOCAL" ]; then
+    export VOLUMES=docker-compose.test.volumes.yml
+else
+    export VOLUMES=docker-compose.test.volumes.local.yml
+fi
+
+if [ -z "$FORCE_RECREATE" ]; then
+    export FORCE_RECREATE_ARGUMENT=""
+else
+    export FORCE_RECREATE_ARGUMENT="--force-recreate"
+fi
+
+export UP_D=restart
+
+export DOCKER_COMPOSE=`cat <<EOF
 docker-compose -p orbsnetwork \
-    -f docker-compose.test.network.yml \
-    -f docker-compose.test.yml.tmp.bliny \
-    -f docker-compose.test.yml.tmp.pelmeni \
-    -f docker-compose.test.yml.tmp.borscht \
-    -f docker-compose.test.yml.tmp.pirogi \
-    -f docker-compose.test.yml.tmp.oladyi \
-    -f docker-compose.test.yml.tmp.olivier \
-    up -d
+        -f docker-compose.test.network.yml \
+        -f $VOLUMES \
+        -f docker-compose.test.yml.tmp.bliny \
+        -f docker-compose.test.yml.tmp.pelmeni \
+        -f docker-compose.test.yml.tmp.borscht \
+        -f docker-compose.test.yml.tmp.pirogi \
+        -f docker-compose.test.yml.tmp.oladyi \
+        -f docker-compose.test.yml.tmp.olivier
+EOF`
+
+function start() {
+    $DOCKER_COMPOSE up -d $FORCE_RECREATE_ARGUMENT
+}
+
+function restart() {
+    $DOCKER_COMPOSE restart
+}
+
+function stop() {
+    $DOCKER_COMPOSE stop
+}
+
+if [ -z "$STAY_UP" ]; then
+    start
+else
+    if ! restart ; then
+        start
+    fi
+fi
+
 
 sleep ${STARTUP_WAITING_TIME-30}
 
@@ -64,14 +101,8 @@ export EXIT_CODE=$?
 
 docker ps -a --no-trunc > logs/docker-ps
 
-docker-compose \
-    -f docker-compose.test.network.yml \
-    -f docker-compose.test.yml.tmp.bliny \
-    -f docker-compose.test.yml.tmp.pelmeni \
-    -f docker-compose.test.yml.tmp.borscht \
-    -f docker-compose.test.yml.tmp.pirogi \
-    -f docker-compose.test.yml.tmp.oladyi \
-    -f docker-compose.test.yml.tmp.olivier \
+if [ -z "$STAY_UP" ] ; then
     stop
+fi
 
 exit $EXIT_CODE
