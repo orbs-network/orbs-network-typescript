@@ -62,9 +62,7 @@ else
     fi
 fi
 sleep ${STARTUP_WAITING_TIME-30}
-cd ./e2e
-E2E_NO_DEPLOY=true E2E_PUBLIC_API_ENDPOINT=0.0.0.0:12347 npm test
-cd ..
+cd ./e2e && npm install && E2E_NO_DEPLOY=true E2E_PUBLIC_API_ENDPOINT=0.0.0.0:12347 npm test && cd ..
 export EXIT_CODE=$?
 
 if [ -z "$STAY_UP" ] ; then
