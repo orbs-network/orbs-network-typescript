@@ -25,12 +25,11 @@ export default class Gossip {
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
   peers: any = topologyPeers(topology.peers);
-  node_ip: string;
-  node_name: string;
+  nodeIp: string;
 
-  constructor(port: number, localAddress: string, node_ip: string) {
+  constructor(port: number, localAddress: string, nodeIp: string) {
     this.server = new WebSocket.Server({ port });
-    this.node_ip = node_ip;
+    this.nodeIp = nodeIp;
     this.localAddress = localAddress;
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
@@ -121,7 +120,7 @@ export default class Gossip {
   }
 
   public ip(): string {
-    return this.node_ip || this.networkInterface().address;
+    return this.nodeIp || this.networkInterface().address;
   }
 
   public possiblePeers(): string[] {
