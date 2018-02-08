@@ -1,4 +1,4 @@
-import { logger, ErrorHandler, topology, topologyPeers, types, CryptoUtils } from "orbs-common-library";
+import { logger, ErrorHandler, topology, topologyPeers, types } from "orbs-common-library";
 import bind from "bind-decorator";
 
 ErrorHandler.setup();

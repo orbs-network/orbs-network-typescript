@@ -8,6 +8,7 @@ services:
     volumes:
       - ./logs:/opt/orbs/logs
       - ./config/topologies/discovery/node1:/opt/orbs/config/topology
+      - ./deploy/dummy-keys/public:/opt/orbs/config/topologies/discovery/node1/config/network
     environment:
       NODE_NAME: ${NODE_NAME}
       NODE_ENV: test

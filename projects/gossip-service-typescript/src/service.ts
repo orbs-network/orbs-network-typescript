@@ -1,13 +1,12 @@
-import { logger, ErrorHandler, topology, grpc, topologyPeers, types } from "orbs-common-library";
+import { logger, ErrorHandler, topology, grpc, topologyPeers, types, config } from "orbs-common-library";
 import Gossip from "./gossip";
 import bind from "bind-decorator";
 
 ErrorHandler.setup();
 
 export default class GossipService {
-
   peers: types.ClientMap;
-  gossip = new Gossip(topology.gossipPort);
+  gossip = new Gossip(topology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
 
   // rpc interface
 
