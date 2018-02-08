@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 
 export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
 export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
@@ -74,11 +74,15 @@ docker-compose -p orbsnetwork \
 EOF`
 
 function start() {
-    $($DOCKER_COMPOSE up -d $FORCE_RECREATE_ARGUMENT)
+    $DOCKER_COMPOSE up -d $FORCE_RECREATE_ARGUMENT
 }
 
 function restart() {
-    $($DOCKER_COMPOSE restart)
+    $DOCKER_COMPOSE restart
+}
+
+function stop() {
+    $DOCKER_COMPOSE stop
 }
 
 if [ -z "$STAY_UP" ]; then
@@ -98,7 +102,7 @@ export EXIT_CODE=$?
 docker ps -a --no-trunc > logs/docker-ps
 
 if [ -z "$STAY_UP" ] ; then
-    $($DOCKER_COMPOSE stop)
+    stop
 fi
 
 exit $EXIT_CODE
