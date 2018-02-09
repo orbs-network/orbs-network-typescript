@@ -3,8 +3,6 @@ import bind from "bind-decorator";
 import MemoryKVStore from "./kvstore/memory-kvstore";
 import * as _ from "lodash";
 
-ErrorHandler.setup();
-
 export default class StateStorageService {
   peers: types.ClientMap;
 
@@ -50,12 +48,6 @@ export default class StateStorageService {
     });
   }
 
-  async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-
-    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
-  }
-
   async pollBlockStorage() {
     const { blocks } = await this.peers.blockStorage.getBlocks({ lastBlockId: this.lastBlockId });
 
@@ -79,13 +71,8 @@ export default class StateStorageService {
     }
   }
 
-  askForHeartbeats() {
-    this.askForHeartbeat(this.peers.blockStorage);
-  }
-
   async main() {
-    this.peers = topologyPeers(topology.peers);
-    setInterval(() => this.askForHeartbeats(), 5000);
+
     this.pollBlockStorage();
   }
 

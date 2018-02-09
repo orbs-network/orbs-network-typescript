@@ -15,5 +15,4 @@ export default abstract class BaseKVStore {
     public async setMany(contractAddress: string, values: Map<string, string>) {
         throw "Not yet implemented";
     }
-
 }
