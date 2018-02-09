@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const path = require('path');
 const shell = require('shelljs');
 const projects = require('../../config/projects.json');

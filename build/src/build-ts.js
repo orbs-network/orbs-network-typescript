@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const path = require('path');
 const shell = require('shelljs');
 const projects = require('../../config/projects.json');
@@ -20,4 +22,4 @@ async function main() {
   console.log(' * Done\n'.green);
 }
 
-main().catch(err => process.exit(1));
+main().catch(() => process.exit(1));
