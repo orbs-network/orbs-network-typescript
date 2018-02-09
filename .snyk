@@ -1,0 +1,11 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.10.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:debug:20170905':
+    - ganache-core > mocha > debug:
+        patched: '2018-02-09T03:14:34.513Z'
+  'npm:ms:20170412':
+    - ganache-core > mocha > debug > ms:
+        patched: '2018-02-09T03:14:34.513Z'
