@@ -61,7 +61,7 @@ export interface RaftConsensusOptions {
 }
 
 export default class RaftConsensus {
-  private vm = topologyPeers(topology.peers).virtualMachine;
+  private virtualMachine = topologyPeers(topology.peers).virtualMachine;
   private storage = topologyPeers(topology.peers).storage;
 
   private connector: RPCConnector;
@@ -131,7 +131,7 @@ export default class RaftConsensus {
   // Suggests new entry to be appended to the Raft log (e.g., new transaction), by first executing the transaction and
   // then propagating the transaction with its execution outputs.
   async onAppend(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
-    const vmResult = await this.vm.executeTransaction({
+    const vmResult = await this.virtualMachine.executeTransaction({
       transaction: tx,
       transactionAppendix: txAppendix,
       lastBlockId: this.lastBlockId
