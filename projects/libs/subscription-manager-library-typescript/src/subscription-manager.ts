@@ -2,15 +2,15 @@ import { logger, types } from "orbs-common-library";
 
 import { ERCBillingContractProxy } from "./erc-billing-contract-proxy";
 
-export class SusbcriptionManagerConfiguration {
+export class SubscriptionManagerConfiguration {
   ethereumContractAddress: string;
 }
 
-export class SusbcriptionManager {
+export class SubscriptionManager {
   private contractProxy: ERCBillingContractProxy;
-  private config: SusbcriptionManagerConfiguration;
+  private config: SubscriptionManagerConfiguration;
 
-  constructor(config: SusbcriptionManagerConfiguration) {
+  constructor(config: SubscriptionManagerConfiguration) {
     this.config = config;
   }
 
