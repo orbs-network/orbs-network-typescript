@@ -1,11 +1,13 @@
 {
-  "name": "orbs-virtual-machine-service",
+  "name": "orbs-virtual-machine-library",
   "version": "0.1.0",
-  "description": "orbs-virtual-machine-service",
+  "description": "orbs-virtual-machine-library",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
