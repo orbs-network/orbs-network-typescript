@@ -22,6 +22,14 @@ function server(proto: string, name: string, endpoint: string, service: any) {
 }
 
 export namespace grpc {
+  export function storageServer({ endpoint, service }: { endpoint: string, service: types.StorageServer }) {
+    return server("storage.proto", "Storage", endpoint, service);
+  }
+
+  export function storageClient({ endpoint }: { endpoint: string }): types.StorageClient {
+    return client("state-storage.proto", "StateStorage", endpoint);
+  }
+
   export function consensusServer({ endpoint, service }: { endpoint: string, service: types.ConsensusServer }) {
     server("consensus.proto", "Consensus", endpoint, service);
   }
@@ -40,14 +48,6 @@ export namespace grpc {
 
   export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
     server("virtual-machine.proto", "VirtualMachine", endpoint, service);
-  }
-
-  export function stateStorageServer({ endpoint, service }: { endpoint: string, service: types.StateStorageServer }) {
-    server("state-storage.proto", "StateStorage", endpoint, service);
-  }
-
-  export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
-      server("block-storage.proto", "BlockStorage", endpoint, service);
   }
 
   export function sidechainConnectorServer({ endpoint, service }: { endpoint: string, service: types.SidechainConnectorServer }) {
@@ -76,14 +76,6 @@ export namespace grpc {
 
   export function virtualMachineClient({ endpoint }: { endpoint: string }): types.VirtualMachineClient {
     return client("virtual-machine.proto", "VirtualMachine", endpoint);
-  }
-
-  export function stateStorageClient({ endpoint }: { endpoint: string }): types.StateStorageClient {
-    return client("state-storage.proto", "StateStorage", endpoint);
-  }
-
-  export function blockStorageClient({ endpoint }: { endpoint: string }): types.BlockStorageClient {
-      return client("block-storage.proto", "BlockStorage", endpoint);
   }
 
   export function sidechainConnectorClient({ endpoint }: { endpoint: string }): types.SidechainConnectorClient {

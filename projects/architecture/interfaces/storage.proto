@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import "primitives/block-storage.proto";
+
+service Storage {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+
+  // Block Storage:
+  rpc AddBlock (AddBlockInput) returns (AddBlockOutput);
+  rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
+
+  // State Storage:
+  rpc ReadKeys (ReadKeysInput) returns (ReadKeysOutput);
+}
