@@ -1,7 +1,7 @@
 {
-  "name": "orbs-state-storage-service",
+  "name": "orbs-state-storage-library",
   "version": "0.1.0",
-  "description": "orbs-state-storage-service",
+  "description": "orbs-state-storage-library",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
