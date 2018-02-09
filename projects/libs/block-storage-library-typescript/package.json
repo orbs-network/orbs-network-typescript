@@ -16,7 +16,6 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "bind-decorator": "^1.0.11",
     "deferred-leveldown": "~2.0.2",
     "leveldown": "^3.0.0",
     "levelup": "^2.0.1",
