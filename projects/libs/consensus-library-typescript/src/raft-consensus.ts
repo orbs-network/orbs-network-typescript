@@ -49,18 +49,18 @@ class RPCConnector extends EventEmitter {
   }
 }
 
-export interface RaftElectionOptions {
+export interface ElectionTimeoutConfig {
   min: number;
   max: number;
 }
 
-export interface RaftConsensusOptions {
+export interface RaftConsensusConfig {
   clusterSize: number;
-  electionTimeout: RaftElectionOptions;
+  electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
 }
 
-export default class RaftConsensus {
+export class RaftConsensus {
   private virtualMachine = topologyPeers(topology.peers).virtualMachine;
   private storage = topologyPeers(topology.peers).storage;
 
@@ -68,7 +68,7 @@ export default class RaftConsensus {
   private node: any;
   private lastBlockId: number;
 
-  public constructor(options: RaftConsensusOptions) {
+  public constructor(options: RaftConsensusConfig) {
     this.lastBlockId = -1;
     this.connector = new RPCConnector(topology.name);
 
