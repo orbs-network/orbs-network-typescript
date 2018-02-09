@@ -62,7 +62,7 @@ export interface RaftConsensusOptions {
 
 export default class RaftConsensus {
   private vm = topologyPeers(topology.peers).virtualMachine;
-  private blockStorage = topologyPeers(topology.peers).blockStorage;
+  private storage = topologyPeers(topology.peers).storage;
 
   private connector: RPCConnector;
   private node: any;
@@ -102,13 +102,13 @@ export default class RaftConsensus {
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
       if (this.lastBlockId == -1) {
-        const { blockId } = await this.blockStorage.getLastBlockId({});
+        const { blockId } = await this.storage.getLastBlockId({});
         this.lastBlockId = blockId;
       }
 
       this.lastBlockId++;
 
-      await this.blockStorage.addBlock({
+      await this.storage.addBlock({
         block: {
           header: {
             version: 0,

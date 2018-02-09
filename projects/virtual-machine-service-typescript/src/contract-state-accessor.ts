@@ -18,27 +18,27 @@ export abstract class BaseContractStateAccessor {
 }
 
 export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
-    stateStorageClient: types.StateStorageClient;
+    storageClient: types.StorageClient;
     lastBlockId: number;
     stateCache: StateCache;
 
-    constructor(contractAddress: string, stateCache: StateCache, stateStorageClient: types.StateStorageClient, lastBlockId?: number) {
+    constructor(contractAddress: string, stateCache: StateCache, stateStorageClient: types.StorageClient, lastBlockId?: number) {
         super(contractAddress);
         this.stateCache = stateCache;
-        this.stateStorageClient = stateStorageClient;
+        this.storageClient = stateStorageClient;
         this.contractAddress = contractAddress;
         this.lastBlockId = lastBlockId;
     }
 
     async load(key: string) {
-        const value = this.stateCache.get({contractAddress: this.contractAddress, key});
+        const value = this.stateCache.get({ contractAddress: this.contractAddress, key });
         if (value != undefined)
             return value;
 
-        const {values} = await this.stateStorageClient.readKeys({
+        const { values } = await this.storageClient.readKeys({
             address: this.contractAddress,
             keys: [key],
-            lastBlockId: this.lastBlockId == undefined ?  undefined : { value: this.lastBlockId }
+            lastBlockId: this.lastBlockId == undefined ? undefined : { value: this.lastBlockId }
         });
         return values[key];
     }
@@ -50,6 +50,6 @@ export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
 
 export class ContractStateReadWriteAccessor extends ContractStateReadOnlyAccessor {
     async store(key: string, value: string) {
-        this.stateCache.set({contractAddress: this.contractAddress, key}, value);
+        this.stateCache.set({ contractAddress: this.contractAddress, key }, value);
     }
 }
