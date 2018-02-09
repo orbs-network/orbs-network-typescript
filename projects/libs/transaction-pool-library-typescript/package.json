@@ -1,11 +1,13 @@
 {
-  "name": "orbs-transaction-pool-service",
+  "name": "orbs-transaction-pool-library",
   "version": "0.1.0",
-  "description": "orbs-transaction-pool-service",
+  "description": "orbs-transaction-pool-library",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
