@@ -12,6 +12,4 @@ services:
       E2E_PUBLIC_API_ENDPOINT: ${PUBLIC_API_ORBS_NETWORK_IP}:51151
     networks:
       orbs-network:
-        ipv4_address: 172.2.1.18
-    volumes:
-      - ./e2e:/opt/orbs/e2e
+        ipv4_address: ${E2E_ORBS_NETWORK_IP}
