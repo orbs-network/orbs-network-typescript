@@ -32,12 +32,10 @@ export class VirtualMachine {
   }
 
   public async callContract(sender: string, contractAddress: string, payload: string) {
-    const result = await this.processor.call({
+    return await this.processor.call({
       sender: sender,
       contractAddress: contractAddress,
       payload: payload
     });
-
-    return { resultJson: JSON.stringify(result) };
   }
 }
