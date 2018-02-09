@@ -3,7 +3,7 @@ import * as Mali from "mali";
 import * as caller from "grpc-caller";
 import { types } from "./types";
 
-const PROTO_PATH = path.resolve(__dirname, "../../architecture/interfaces");
+const PROTO_PATH = path.resolve(__dirname, "../../../architecture/interfaces");
 
 function client(proto: string, name: string, endpoint: string) {
   const protoPath = path.resolve(PROTO_PATH, proto);
