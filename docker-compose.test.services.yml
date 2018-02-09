@@ -1,16 +1,5 @@
 version: '2'
 
-networks:
-  orbs-network:
-    external:
-      name: orbs-network
-  node-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-      - subnet: ${PRIVATE_NETWORK}.0/24
-
 services:
   consensus:
     extends:
@@ -38,10 +27,12 @@ services:
     working_dir: /opt/orbs/projects/public-api-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/public-api.js
     ports:
-      - ${PUBLIC_API_EXTERNAL_PORT}:51151
+      - ${PUBLIC_API_HOST_PORT}:51151
     volumes_from:
       - shared_volumes
     networks:
+      orbs-network:
+        ipv4_address: ${PUBLIC_API_ORBS_NETWORK_IP}
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.16
     extra_hosts:

@@ -1,0 +1,12 @@
+version: '2'
+
+networks:
+  orbs-network:
+    external:
+      name: orbs-network
+  node-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: ${PRIVATE_NETWORK}.0/24
