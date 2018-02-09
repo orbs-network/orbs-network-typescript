@@ -37,7 +37,7 @@
     "@types/crypto-js": "^3.1.38",
     "@types/lodash": "^4.14.101",
     "@types/nconf": "0.0.37",
-    "@types/node": "^9.4.0",
+    "@types/node": "^9.4.3",
     "@types/winston": "^2.3.7",
     "concurrently": "^3.5.1",
     "tslint": "^5.9.1",
