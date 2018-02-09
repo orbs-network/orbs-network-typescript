@@ -1,7 +1,6 @@
 import { Assertion, expect } from "chai";
 import * as nconf from "nconf";
 
-import { CryptoUtils } from "orbs-common-library/src/cryptoUtils";
 import { grpc } from "orbs-common-library/src/grpc";
 import { types } from "orbs-common-library/src/types";
 
@@ -64,12 +63,11 @@ async function assertFooBarAccountBalance(n: number) {
 
 Assertion.addMethod("bars", assertFooBarAccountBalance);
 
-async function aFooBarAccountWith(input: { amountOfBars: number }) {
-    const orbsKeyPair: CryptoUtils = CryptoUtils.initializeTestCrypto(`user${Math.floor((Math.random() * 10) + 1)}`);
-
-    const orbsSession = new OrbsClientSession(orbsKeyPair, "fooFoundation", publicApiClient);
+async function aFooBarAccountWith(input: {amountOfBars: number}) {
+    const senderAddress = `addr_${Math.floor(Math.random() * 100000000)}`; // TODO: replace with a proper public key
+    const orbsSession = new OrbsClientSession(senderAddress, "fooFoundation", publicApiClient);
     const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
-    const account = new FooBarAccount(orbsKeyPair.getPublicKey(), contractAdapter);
+    const account = new FooBarAccount(senderAddress, contractAdapter);
 
     await account.initBalance(input.amountOfBars);
 

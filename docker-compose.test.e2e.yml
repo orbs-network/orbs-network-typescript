@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  e2e:
+    extends:
+      file: docker-compose.test.base.yml
+      service: base-service
+    working_dir: /opt/orbs/e2e
+    command: npm test
+    environment:
+      E2E_NO_DEPLOY: "true"
+      E2E_PUBLIC_API_ENDPOINT: ${PUBLIC_API_ORBS_NETWORK_IP}:51151
+    networks:
+      orbs-network:
+        ipv4_address: ${E2E_ORBS_NETWORK_IP}

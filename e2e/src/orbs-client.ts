@@ -1,5 +1,4 @@
 import { types } from "orbs-common-library/src/types";
-import { CryptoUtils } from "orbs-common-library/src/CryptoUtils";
 import { grpc } from "orbs-common-library/src/grpc";
 import { delay } from "bluebird";
 
@@ -33,18 +32,18 @@ export class OrbsHardCodedContractAdapter {
 }
 
 export class OrbsClientSession {
-    keyPair: CryptoUtils;
     orbsClient: types.PublicApiClient;
     subscriptionKey: string;
+    senderAddress: string;
 
-    constructor(keyPair: CryptoUtils, subscriptionKey: string, orbsClient: types.PublicApiClient) {
-        this.keyPair = keyPair;
+    constructor(senderAddress: string, subscriptionKey: string, orbsClient: types.PublicApiClient) {
+        this.senderAddress = senderAddress;
         this.orbsClient = orbsClient;
         this.subscriptionKey = subscriptionKey;
     }
 
     async sendTransaction(contractAddress: string, payload: string) {
-        const signedTransaction = this.generateSignedTransaction(contractAddress, payload);
+        const signedTransaction = this.generateTransaction(contractAddress, payload);
 
         const res = await this.orbsClient.sendTransaction({
             transaction: signedTransaction,
@@ -66,16 +65,16 @@ export class OrbsClientSession {
         return JSON.parse(resultJson);
     }
 
-    public generateSignedTransaction(contractAddress: string, payload: string): types.Transaction {
+    public generateTransaction(contractAddress: string, payload: string): types.Transaction {
         return {
-            sender: this.keyPair.getPublicKey(),
+            sender: this.senderAddress,
             contractAddress: contractAddress,
             payload: payload,
-            signature: this.keyPair.sign(`tx:${contractAddress},${payload}`)
+            signature: "" // TODO: add a signature once implement in the network-side
         };
     }
 
     public getAddress() {
-        return this.keyPair.getPublicKey();
+        return this.senderAddress;
     }
 }

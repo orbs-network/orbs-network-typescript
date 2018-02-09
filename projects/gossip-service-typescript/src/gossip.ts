@@ -1,6 +1,5 @@
 import * as WebSocket from "ws";
 import { logger, topology, topologyPeers } from "orbs-common-library";
-import { CryptoUtils } from "../../common-library-typescript";
 import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 
@@ -10,10 +9,6 @@ function stringToBuffer(str: string): Buffer {
   buf.write(str, 1, 255, "utf8");
   return buf;
 }
-
-const crypto = CryptoUtils.loadFromConfiguration();
-
-const NODE_IP = process.env.NODE_IP;
 
 function handleWSError(address: string, url: string) {
   return (err: Error) => {
@@ -25,14 +20,17 @@ function handleWSError(address: string, url: string) {
 }
 
 export default class Gossip {
-  localAddress: string = crypto.whoAmI();
+  localAddress: string;
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
   peers: any = topologyPeers(topology.peers);
+  nodeIp: string;
 
-  constructor(port: number) {
+  constructor(port: number, localAddress: string, nodeIp: string) {
     this.server = new WebSocket.Server({ port });
+    this.nodeIp = nodeIp;
+    this.localAddress = localAddress;
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
     });
@@ -122,12 +120,12 @@ export default class Gossip {
   }
 
   public ip(): string {
-    return NODE_IP || this.networkInterface().address;
+    return this.nodeIp || this.networkInterface().address;
   }
 
   public possiblePeers(): string[] {
     const ip = this.ip(),
-      me = crypto.whoAmI();
+      me = this.localAddress;
 
     // TODO: better self-exclusion policy
     return topology.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));

@@ -4,11 +4,8 @@ services:
   shared_volumes:
     image: busybox
     volumes:
-      - ./deploy/dummy-keys/public:/opt/orbs/config/topologies/discovery/node1/config/network
       - ./config/test.json:/opt/orbs/config/test.json
-      - ./e2e/dist:/opt/orbs/e2e/dist
-      - ./e2e/src:/opt/orbs/e2e/src
-      - ./e2e/test:/opt/orbs/e2e/test
+      - ./e2e:/opt/orbs/e2e
       - ./projects/transaction-pool-service-typescript/dist:/opt/orbs/projects/transaction-pool-service-typescript/dist
       - ./projects/public-api-service-typescript/dist:/opt/orbs/projects/public-api-service-typescript/dist
       - ./projects/sidechain-connector-service-typescript/dist:/opt/orbs/projects/sidechain-connector-service-typescript/dist

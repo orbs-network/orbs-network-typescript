@@ -1,51 +1,10 @@
-#!/bin/bash -x
+#!/bin/bash -xe
 
 export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
 export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
+export NODE_CONFIG_PATH=/opt/orbs/config/topology
+export GOSSIP_PEERS=ws://172.2.1.2:60001,ws://172.2.1.3:60001,ws://172.2.1.4:60001,ws://172.2.1.5:60001,ws://172.2.1.6:60001,ws://172.2.1.7:60001
 
-function generate_dockerfile {
-    cat docker-compose.test.yml \
-    | sed -e "s/_NODE_NAME_/${NODE_NAME}/g" \
-    | sed -e "s/_NODE_IP_/${NODE_IP}/g" \
-    | sed -e "s/_PRIVATE_NETWORK_/${PRIVATE_NETWORK}/g" \
-      > docker-compose.test.yml.tmp.${NODE_NAME}
-}
-
-export PRIVATE_NETWORK=172.100.1
-export NODE_NAME=bliny
-export NODE_IP=172.2.1.2
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.110.1
-export NODE_NAME=pelmeni
-export NODE_IP=172.2.1.3
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.120.1
-export NODE_NAME=borscht
-export NODE_IP=172.2.1.4
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.130.1
-export NODE_NAME=pirogi
-export NODE_IP=172.2.1.5
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.140.1
-export NODE_NAME=oladyi
-export NODE_IP=172.2.1.6
-
-generate_dockerfile
-
-export PRIVATE_NETWORK=172.150.1
-export NODE_NAME=olivier
-export NODE_IP=172.2.1.7
-
-generate_dockerfile
 
 if [ -z "$LOCAL" ]; then
     export VOLUMES=docker-compose.test.volumes.yml
@@ -59,50 +18,60 @@ else
     export FORCE_RECREATE_ARGUMENT="--force-recreate"
 fi
 
+function start_node() {
+    PUBLIC_API_HOST_PORT=$1 PRIVATE_NETWORK=$5 NODE_NAME=$2 NODE_IP=$3 PUBLIC_API_ORBS_NETWORK_IP=$4 docker-compose -p orbs-$2 -f $VOLUMES -f docker-compose.test.networks.yml -f docker-compose.test.services.yml up -d $FORCE_RECREATE_ARGUMENT
+}
+
+function stop_node() {
+    PUBLIC_API_HOST_PORT=$1 PRIVATE_NETWORK=$5 NODE_NAME=$2 NODE_IP=$3 PUBLIC_API_ORBS_NETWORK_IP=$4 docker-compose -p orbs-$2 -f $VOLUMES -f docker-compose.test.networks.yml -f docker-compose.test.services.yml down
+}
+
+function run_e2e_test() {
+    E2E_ORBS_NETWORK_IP=$1 PUBLIC_API_ORBS_NETWORK_IP=$2 docker-compose -p orbs-e2e -f docker-compose.test.networks.yml -f docker-compose.test.e2e.yml run --rm e2e
+}
+
 export UP_D=restart
 
-export DOCKER_COMPOSE=`cat <<EOF
-docker-compose -p orbsnetwork \
-        -f docker-compose.test.network.yml \
-        -f $VOLUMES \
-        -f docker-compose.test.yml.tmp.bliny \
-        -f docker-compose.test.yml.tmp.pelmeni \
-        -f docker-compose.test.yml.tmp.borscht \
-        -f docker-compose.test.yml.tmp.pirogi \
-        -f docker-compose.test.yml.tmp.oladyi \
-        -f docker-compose.test.yml.tmp.olivier
-EOF`
 
-function start() {
-    $DOCKER_COMPOSE up -d $FORCE_RECREATE_ARGUMENT
+# environment setup
+
+function start_test_environment() {
+    stop_test_environment || true
+    docker network create orbs-network --subnet 172.2.1.0/24
+    start_node 12345 node1 172.2.1.2 172.2.1.12 172.100.1 &
+    start_node 12346 node2 172.2.1.3 172.2.1.13 172.100.2 &
+    start_node 12347 node3 172.2.1.4 172.2.1.14 172.100.3 &
+    start_node 12348 node4 172.2.1.5 172.2.1.15 172.100.4 &
+    start_node 12349 node5 172.2.1.6 172.2.1.16 172.100.5 &
+    start_node 12350 node6 172.2.1.7 172.2.1.17 172.100.6 &
+    wait
 }
 
-function restart() {
-    $DOCKER_COMPOSE restart
-}
-
-function stop() {
-    $DOCKER_COMPOSE stop
+function stop_test_environment() {
+    stop_node 12345 node1 172.2.1.2 172.2.1.12 172.100.1 &
+    stop_node 12346 node2 172.2.1.3 172.2.1.13 172.100.2 &
+    stop_node 12347 node3 172.2.1.4 172.2.1.14 172.100.3 &
+    stop_node 12348 node4 172.2.1.5 172.2.1.15 172.100.4 &
+    stop_node 12349 node5 172.2.1.6 172.2.1.16 172.100.5 &
+    stop_node 12350 node6 172.2.1.7 172.2.1.17 172.100.6 &
+    wait
+    docker network rm orbs-network    
 }
 
 if [ -z "$STAY_UP" ]; then
-    start
+    start_test_environment
 else
     if ! restart ; then
-        start
+        start_stop_environment
     fi
 fi
 
-
 sleep ${STARTUP_WAITING_TIME-30}
-
-docker exec -ti orbsnetwork_public-api-pelmeni_1 bash -c "cd /opt/orbs/e2e/ && npm test"
+run_e2e_test 172.2.1.19 172.2.1.14
 export EXIT_CODE=$?
-
 docker ps -a --no-trunc > logs/docker-ps
 
 if [ -z "$STAY_UP" ] ; then
-    stop
+    stop_test_environment
 fi
-
 exit $EXIT_CODE

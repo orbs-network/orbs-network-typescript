@@ -1,14 +1,15 @@
 import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
-import { logger, types, topology, topologyPeers, CryptoUtils } from "orbs-common-library";
-
-const crypto = CryptoUtils.loadFromConfiguration();
+import { logger, types, topology, topologyPeers, config } from "orbs-common-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
+const NODE_NAME = config.get("NODE_NAME");
+
 class RPCConnector extends EventEmitter {
   private gossip = topologyPeers(topology.peers).gossip;
+  private id: string;
 
   public connect(): void {
   }
@@ -18,7 +19,7 @@ class RPCConnector extends EventEmitter {
 
   public received(originNodeId: string, message: any): void {
     // Propagate broadcast messages or unicast messages from other nodes.
-    if (message.to === undefined || message.to === crypto.whoAmI()) {
+    if (message.to === undefined || message.to === this.id) {
       this.emit("received", originNodeId, message);
     }
   }
@@ -40,6 +41,11 @@ class RPCConnector extends EventEmitter {
       Buffer: new Buffer(JSON.stringify(data)),
       Immediate: true
     });
+  }
+
+  constructor(id: string) {
+    super();
+    this.id = id;
   }
 }
 
@@ -64,10 +70,10 @@ export default class RaftConsensus {
 
   public constructor(options: RaftConsensusOptions) {
     this.lastBlockId = -1;
-    this.connector = new RPCConnector();
+    this.connector = new RPCConnector(topology.name);
 
     this.node = gaggle({
-      id: crypto.whoAmI(),
+      id: NODE_NAME,
       clusterSize: options.clusterSize,
       channel: {
         name: "custom",
@@ -92,14 +98,6 @@ export default class RaftConsensus {
       const msgData = data.data;
 
       const txData = msgData.msg;
-
-      // Verify the sending node's signature, in order to avoid internal spam or miscommunication.
-      if (crypto.verifySignature(msgData.signer, JSON.stringify(txData), msgData.signature)) {
-        logger.debug(`Verified message from ${msgData.signer}, with signature ${msgData.signature}`);
-      } else {
-        logger.error(`Failed to verify message from ${msgData.signer}, with signature ${msgData.signature}! Aborting!`);
-        return;
-      }
 
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
@@ -146,9 +144,7 @@ export default class RaftConsensus {
       };
 
       this.node.append({
-        msg: msg,
-        signer: this.node.id,
-        signature: crypto.sign(JSON.stringify(msg))
+        msg: msg
       });
     }
   }
