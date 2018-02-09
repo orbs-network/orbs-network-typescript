@@ -1,6 +1,6 @@
-import { logger, types } from "orbs-common-library";
-
 import * as path from "path";
+
+import { logger, types } from "orbs-common-library";
 
 import LevelDBDriver from "./leveldb-driver";
 
