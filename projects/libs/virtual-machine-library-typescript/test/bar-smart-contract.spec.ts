@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import StateCache from "../src/state-cache";
+import { StateCache } from "../src/state-cache";
 import { BaseContractStateAccessor } from "../src/contract-state-accessor";
 import BarSmartContract from "../src/hard-coded-contracts/registry/foobar-smart-contract";
 import BaseSmartContract from "../src/hard-coded-contracts/base-smart-contact";

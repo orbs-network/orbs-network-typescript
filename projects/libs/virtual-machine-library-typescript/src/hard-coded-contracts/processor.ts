@@ -1,5 +1,5 @@
 import { types } from "orbs-common-library";
-import StateCache from "../state-cache";
+import { StateCache, StateCacheKey } from "../state-cache";
 import {
     BaseContractStateAccessor,
     ContractStateReadOnlyAccessor,
@@ -8,19 +8,18 @@ import {
 
 import BaseSmartContract from "./base-smart-contact";
 
-interface CallRequest {
+export interface CallRequest {
     sender: string;
     payload: string;
     contractAddress: string;
-    lastBlockId?: number;
 }
 
 export default class HardCodedSmartContractProcessor {
     contractAddresses = new Map<string, any>();
-    stateStorageClient: types.StateStorageClient;
+    storageClient: types.StorageClient;
 
-    constructor(stateStorageClient: types.StateStorageClient) {
-        this.stateStorageClient = stateStorageClient;
+    constructor(stateStorageClient: types.StorageClient) {
+        this.storageClient = stateStorageClient;
 
         // TODO: register it only in a testing environment via configuration
         this.registerContract("foobar-smart-contract", "foobar");
@@ -37,8 +36,7 @@ export default class HardCodedSmartContractProcessor {
         const writeAdapter = new ContractStateReadWriteAccessor(
             request.contractAddress,
             transactionScopeStateCache,
-            this.stateStorageClient,
-            request.lastBlockId
+            this.storageClient
         );
 
         await this.processMethod(request, writeAdapter);
@@ -52,7 +50,7 @@ export default class HardCodedSmartContractProcessor {
         const readonlyAdapter = new ContractStateReadOnlyAccessor(
             request.contractAddress,
             transactionScopeStateCache,
-            this.stateStorageClient
+            this.storageClient
         );
         return this.processMethod(request, readonlyAdapter);
     }
@@ -64,7 +62,7 @@ export default class HardCodedSmartContractProcessor {
         }
         const contract = new Contract.default(request.sender, stateAdapter);
 
-        const {method, args} = JSON.parse(request.payload);
+        const { method, args } = JSON.parse(request.payload);
 
         return contract[method](...args);
     }

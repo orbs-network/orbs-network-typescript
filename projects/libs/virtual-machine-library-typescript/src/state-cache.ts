@@ -3,11 +3,9 @@ export interface StateCacheKey {
     key: string;
 }
 
-export default class StateCache {
-
+export class StateCache {
     private cache = new Map<string, string>();
     private modifiedKeys = new Set<string>();
-
 
     public get(key: StateCacheKey) {
         return this.cache.get(this.encodeMapKey(key));
@@ -33,7 +31,7 @@ export default class StateCache {
     }
 
     private encodeMapKey(key: StateCacheKey) {
-        // TODO: not sure this approach gurarantees uniqueness of the key. insecure!
+        // TODO: not sure this approach guarantees uniqueness of the key. insecure!
         return [key.contractAddress, key.key].join("|");
     }
 

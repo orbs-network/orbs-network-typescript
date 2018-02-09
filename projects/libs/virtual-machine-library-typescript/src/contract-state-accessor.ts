@@ -1,5 +1,5 @@
 import { types } from "orbs-common-library";
-import StateCache from "./state-cache";
+import { StateCache } from "./state-cache";
 
 export abstract class BaseContractStateAccessor {
     protected contractAddress: string;
@@ -19,15 +19,13 @@ export abstract class BaseContractStateAccessor {
 
 export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
     storageClient: types.StorageClient;
-    lastBlockId: number;
     stateCache: StateCache;
 
-    constructor(contractAddress: string, stateCache: StateCache, stateStorageClient: types.StorageClient, lastBlockId?: number) {
+    constructor(contractAddress: string, stateCache: StateCache, stateStorageClient: types.StorageClient) {
         super(contractAddress);
         this.stateCache = stateCache;
         this.storageClient = stateStorageClient;
         this.contractAddress = contractAddress;
-        this.lastBlockId = lastBlockId;
     }
 
     async load(key: string) {
@@ -37,8 +35,7 @@ export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
 
         const { values } = await this.storageClient.readKeys({
             address: this.contractAddress,
-            keys: [key],
-            lastBlockId: this.lastBlockId == undefined ? undefined : { value: this.lastBlockId }
+            keys: [key]
         });
         return values[key];
     }
