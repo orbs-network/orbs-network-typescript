@@ -1,12 +1,12 @@
 import { types, logger } from "orbs-common-library";
 import { BigNumber } from "bignumber.js";
 
-interface Subscription {
+export interface Subscription {
     id: number;
     tokens: BigNumber;
 }
 
-export default class ERCBillingContractProxy {
+export class ERCBillingContractProxy {
     sidechainConnectorClient: types.SidechainConnectorClient;
     contractAddress: string;
 
@@ -37,6 +37,6 @@ export default class ERCBillingContractProxy {
             parameters: [subscriptionId],
         });
         const { id, tokens } = JSON.parse(res.resultJson);
-        return {id, tokens: new BigNumber(tokens) };
+        return { id, tokens: new BigNumber(tokens) };
     }
 }
