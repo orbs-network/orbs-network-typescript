@@ -1,8 +1,8 @@
 import { logger } from "orbs-common-library";
+
 import BaseKVStore from "./base-kvstore";
 
 export default class MemoryKVStore extends BaseKVStore  {
-
     private storeMap = new Map<string, string>();
 
     public async get(contractAddress: string, key: string) {
@@ -44,7 +44,7 @@ export default class MemoryKVStore extends BaseKVStore  {
     }
 
     generateMapKeyString(contractAddress: string, key: string) {
-        // TODO: not sure this approach gurarantees uniqueness of the key. insecure!
+        // TODO: not sure this approach guarantees uniqueness of the key. insecure!
         return [contractAddress, key].join("|");
     }
 }
