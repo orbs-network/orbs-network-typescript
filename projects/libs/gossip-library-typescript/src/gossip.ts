@@ -19,7 +19,7 @@ function handleWSError(address: string, url: string) {
   };
 }
 
-export default class Gossip {
+export class Gossip {
   localAddress: string;
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
