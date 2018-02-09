@@ -12,19 +12,19 @@ export class VirtualMachine {
     this.processor = new HardCodedSmartContractProcessor(topologyPeers(topology.peers).storage);
   }
 
-  public async executeTransaction(sender: string, contractAddress: string, payload: string) {
+  public async executeTransaction(input: types.ExecuteTransactionInput) {
     return await this.processor.processTransaction({
-      sender: sender,
-      contractAddress: contractAddress,
-      payload: payload
+      sender: input.transaction.sender,
+      contractAddress: input.transaction.contractAddress,
+      payload: input.transaction.payload
     });
   }
 
-  public async callContract(sender: string, contractAddress: string, payload: string) {
+  public async callContract(input: types.CallContractInput) {
     return await this.processor.call({
-      sender: sender,
-      contractAddress: contractAddress,
-      payload: payload
+      sender: input.sender,
+      contractAddress: input.contractAddress,
+      payload: input.payload
     });
   }
 }

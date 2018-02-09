@@ -21,8 +21,7 @@ export default class VirtualMachineService {
 
     // Currently only a "simple" contract type is supported
     try {
-      const modifiedKeys = await this.virtualMachine.executeTransaction(rpc.req.transaction.sender,
-        rpc.req.transaction.contractAddress, rpc.req.transaction.payload);
+      const modifiedKeys = await this.virtualMachine.executeTransaction(rpc.req);
 
       rpc.res = {
         success: true,
@@ -41,7 +40,7 @@ export default class VirtualMachineService {
   public async callContract(rpc: types.CallContractContext) {
     logger.debug(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
 
-    const result = await this.virtualMachine.callContract(rpc.req.sender, rpc.req.contractAddress, rpc.req.payload);
+    const result = await this.virtualMachine.callContract(rpc.req);
 
     rpc.res = {
       resultJson: JSON.stringify(result)
