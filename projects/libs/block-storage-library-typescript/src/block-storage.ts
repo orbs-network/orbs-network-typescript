@@ -2,9 +2,9 @@ import * as path from "path";
 
 import { logger, types } from "orbs-common-library";
 
-import LevelDBDriver from "./leveldb-driver";
+import { LevelDBDriver } from "./leveldb-driver";
 
-export default class BlockStorage {
+export class BlockStorage {
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
   public static readonly LEVELDB_PATH: string = path.resolve("../../db/blocks.db");
   public static readonly GENESIS_BLOCK: types.Block = {

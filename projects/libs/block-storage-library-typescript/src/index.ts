@@ -1,1 +1,1 @@
-export * from "./block-storage";
+export { BlockStorage } from "./block-storage";

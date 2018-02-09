@@ -3,7 +3,7 @@ import * as mkdirp from "mkdirp";
 import * as levelup from "levelup";
 import leveldown from "leveldown";
 
-export default class LevelDBDriver {
+export class LevelDBDriver {
 
   private db: levelup.LevelUp;
 
