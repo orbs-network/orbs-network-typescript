@@ -5,10 +5,6 @@
   "project": "public-api-service-typescript",
   "peers": [
     {
-      "service": "gossip",
-      "endpoint": "0.0.0.0:51153"
-    },
-    {
       "service": "consensus",
       "endpoint": "0.0.0.0:51154"
     },

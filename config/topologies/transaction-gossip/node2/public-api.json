@@ -1,13 +1,9 @@
 {
-  "name": "node2-public-api",
+  "name": "node1-public-api",
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51251",
   "project": "public-api-service-typescript",
   "peers": [
-    {
-      "service": "gossip",
-      "endpoint": "0.0.0.0:51253"
-    },
     {
       "service": "consensus",
       "endpoint": "0.0.0.0:51254"
@@ -15,10 +11,6 @@
     {
       "service": "virtual-machine",
       "endpoint": "0.0.0.0:51255"
-    },
-    {
-      "service": "subscription-manager",
-      "endpoint": "0.0.0.0:51258"
     }
   ]
 }

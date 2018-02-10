@@ -1,7 +1,7 @@
 module.exports = {
-  name: 'sidechain-connector',
+  name: 'storage',
   version: '1.0.0',
   endpoint: '0.0.0.0:51151',
-  project: 'sidechain-connector-service-typescript',
+  project: 'storage-service-typescript',
   peers: [],
 };
