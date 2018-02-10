@@ -23,8 +23,6 @@ export class PublicApi {
       contractAddress: input.contractAddress
     });
 
-    logger.debug(`${topology.name}: called contract with ${JSON.stringify(input)}. result is: ${resultJson}`);
-
     return resultJson;
   }
 }
