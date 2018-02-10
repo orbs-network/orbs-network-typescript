@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
-
 message GetSubscriptionStatusInput {
   string subscriptionKey = 1;
 }

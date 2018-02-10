@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "primitives/heartbeat.proto";
+
 import "./block-storage.proto";
 import "./state-storage.proto";
 

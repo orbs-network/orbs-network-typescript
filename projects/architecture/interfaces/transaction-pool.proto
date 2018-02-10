@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
 
 message AddNewPendingTransactionInput {

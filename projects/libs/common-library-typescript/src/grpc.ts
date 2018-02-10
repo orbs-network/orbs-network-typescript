@@ -27,7 +27,7 @@ export namespace grpc {
   }
 
   export function storageClient({ endpoint }: { endpoint: string }): types.StorageClient {
-    return client("state-storage.proto", "StateStorage", endpoint);
+    return client("storage.proto", "Storage", endpoint);
   }
 
   export function consensusServer({ endpoint, service }: { endpoint: string, service: types.ConsensusServer }) {

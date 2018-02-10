@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "primitives/heartbeat.proto";
 import "primitives/gossip-listener.proto";
 
 import "./gossip.proto";
