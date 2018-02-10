@@ -7,7 +7,7 @@ export class Config {
   private static readonly DEV_ENV: string = "development";
   private static readonly PROD_ENV: string = "production";
   private static readonly STAGING_ENV: string = "staging";
-  private static readonly RELATIVE_PATH: string = "../../../config/";
+  private static readonly RELATIVE_PATH: string = "../../../../config/";
   private static readonly EXT: string = ".json";
 
   constructor() {
