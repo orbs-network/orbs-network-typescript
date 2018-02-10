@@ -28,10 +28,20 @@ export default class SidechainConnectorService {
     };
   }
 
+  async askForHeartbeat(peer: types.HeardbeatClient) {
+    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+  }
+
+  askForHeartbeats() {
+  }
+
   async main(options: SidechainConnectorOptions) {
     logger.info(`${topology.name}: service started`);
 
     this.sidechainConnector = new SidechainConnector(options);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
   }
 
   constructor(options: SidechainConnectorOptions) {

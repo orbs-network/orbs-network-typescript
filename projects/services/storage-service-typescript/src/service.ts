@@ -54,6 +54,14 @@ export default class StorageService {
     this.stateStorage.poll();
   }
 
+  async askForHeartbeat(peer: types.HeardbeatClient) {
+    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+  }
+
+  askForHeartbeats() {
+  }
+
   async main() {
     logger.info(`${topology.name}: service started`);
 
@@ -61,6 +69,8 @@ export default class StorageService {
       this.initBlockStorage(),
       this.initStateStorage()
     ]);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
   }
 
   constructor() {

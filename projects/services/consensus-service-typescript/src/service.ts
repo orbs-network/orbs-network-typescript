@@ -85,6 +85,18 @@ export default class ConsensusService {
     rpc.res = { active: tokens.isGreaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000};
   }
 
+  async askForHeartbeat(peer: types.HeardbeatClient) {
+    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+  }
+
+  askForHeartbeats() {
+    const peers = topologyPeers(topology.peers);
+
+    this.askForHeartbeat(peers.virtualMachine);
+    this.askForHeartbeat(peers.storage);
+  }
+
   async initGossip(): Promise<void> {
     this.gossip = new Gossip(topology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
 
@@ -137,6 +149,8 @@ export default class ConsensusService {
       this.initTransactionPool(),
       this.initSubscriptionManager()
     ]);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
   }
 
   constructor() {

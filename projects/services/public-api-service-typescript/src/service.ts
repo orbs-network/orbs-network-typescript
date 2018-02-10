@@ -37,10 +37,24 @@ export default class PublicApiService {
     };
   }
 
+  async askForHeartbeat(peer: types.HeardbeatClient) {
+    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+  }
+
+  askForHeartbeats() {
+    const peers = topologyPeers(topology.peers);
+
+    this.askForHeartbeat(peers.consensus);
+    this.askForHeartbeat(peers.virtualMachine);
+  }
+
   async main() {
     logger.info(`${topology.name}: service started`);
 
     this.publicApi = new PublicApi(this.consensus, this.virtualMachine);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
   }
 
   constructor() {

@@ -49,10 +49,23 @@ export default class VirtualMachineService {
     };
   }
 
+  async askForHeartbeat(peer: types.HeardbeatClient) {
+    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
+    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+  }
+
+  askForHeartbeats() {
+    const peers = topologyPeers(topology.peers);
+
+    this.askForHeartbeat(peers.storage);
+  }
+
   async main() {
     logger.info(`${topology.name}: service started`);
 
     this.virtualMachine = new VirtualMachine(this.storage);
+
+    setInterval(() => this.askForHeartbeats(), 5000);
   }
 
   constructor() {
