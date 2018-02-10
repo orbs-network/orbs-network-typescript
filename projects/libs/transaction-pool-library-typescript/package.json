@@ -22,7 +22,7 @@
     "orbs-common-library": "file:../common-library-typescript"
   },
   "devDependencies": {
-    "@types/node": "^9.4.0",
+    "@types/node": "^9.4.4",
     "@types/supertest": "^2.0.4",
     "concurrently": "^3.5.1",
     "supertest": "^3.0.0",
