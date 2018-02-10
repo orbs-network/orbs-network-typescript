@@ -72,6 +72,7 @@
     "public-api-library-typescript",
     "state-storage-library-typescript",
     "virtual-machine-library-typescript",
+    "transaction-pool-library-typescript",
     "sidechain-connector-library-typescript",
     "subscription-manager-library-typescript",
     "consensus-service-typescript",
