@@ -1,7 +1,10 @@
 #!/bin/bash -e
 
-npm link ../../architecture
+yarn link orbs-interfaces
 
-npm install --unsafe-perm grpc@1.9.0 # Needs unsafe permissions to install node grpc extensions
-npm install
-npm run build
+yarn install --unsafe-perm grpc@1.9.0 # Needs unsafe permissions to install node grpc extensions
+yarn install
+
+yarn run build
+
+yarn link

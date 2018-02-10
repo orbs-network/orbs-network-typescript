@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-npm link ../common-library-typescript
+yatn link ../common-library-typescript
 
-npm install
-npm run build
+yatn install
+yatn run build
 
-npm test
+yatn test

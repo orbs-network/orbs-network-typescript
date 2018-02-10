@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-npm run rebuild
+yarn run rebuild

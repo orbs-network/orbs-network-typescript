@@ -1,10 +1,11 @@
 #!/bin/bash -e
 
-npm link ../../libs/common-library-typescript
-npm link ../../libs/consensus-library-typescript
-npm link ../../libs/gossip-library-typescript
-npm link ../../libs/transaction-pool-library-typescript
-npm link ../../libs/subscription-manager-library-typescript
+yarn link orbs-common-library
+yarn link orbs-consensus-library
+yarn link orbs-gossip-library
+yarn link orbs-transaction-pool-library
+yarn link orbs-subscription-manager-library
 
-npm install
-npm run build
+yarn install
+
+yarn run build

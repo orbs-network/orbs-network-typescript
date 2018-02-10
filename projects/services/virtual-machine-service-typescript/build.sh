@@ -1,7 +1,10 @@
 #!/bin/bash -e
 
-npm link ../../libs/common-library-typescript
-npm link ../../libs/virtual-machine-library-typescript
+yarn link orbs-common-library
+yarn link orbs-virtual-machine-library
 
-npm install
-npm run build
+yarn install
+
+yarn run build
+
+yarn link

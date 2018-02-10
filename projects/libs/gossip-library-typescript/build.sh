@@ -1,6 +1,9 @@
 #!/bin/bash -e
 
-npm link ../common-library-typescript
+yarn link "orbs-common-library"
 
-npm install
-npm run build
+yarn install
+
+yarn run build
+
+yarn link

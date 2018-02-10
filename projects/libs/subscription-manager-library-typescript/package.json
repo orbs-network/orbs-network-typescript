@@ -11,8 +11,8 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "build": "npm run build-ts && npm run tslint",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve\"",
+    "build": "yarn run build-ts && yarn run tslint",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "test": "NODE_ENV=test ts-mocha test/*.spec.ts",

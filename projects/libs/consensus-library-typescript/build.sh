@@ -1,8 +1,10 @@
 #!/bin/bash -e
 
-npm link ../common-library-typescript
-npm link ../gossip-library-typescript
+yarn link orbs-common-library
+yarn link orbs-gossip-library
 
-npm install
+yarn install
 
-npm run build
+yarn run build
+
+yarn link

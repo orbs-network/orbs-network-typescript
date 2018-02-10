@@ -1,8 +1,9 @@
 #!/bin/bash -e
 
-npm link ../../libs/common-library-typescript
-npm link ../../libs/block-storage-library-typescript
-npm link ../../libs/state-storage-library-typescript
+yarn link orbs-common-library
+yarn link orbs-block-storage-library
+yarn link orbs-state-storage-library
 
-npm install
-npm run build
+yarn install
+
+yarn run build
