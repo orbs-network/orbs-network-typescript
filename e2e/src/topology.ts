@@ -14,9 +14,9 @@ export class OrbsNode {
 
   static loadFromPath(topologyPath: string, nodeName: string) {
     const nodePath = path.resolve(topologyPath, nodeName);
-
     const serviceDirs = shell.ls(nodePath).filter((fileName: string) => fileName !== "config");
     const services = serviceDirs.map((serviceDir: string) => new OrbsService(path.resolve(nodePath, serviceDir)));
+
     return new this(services);
   }
 
@@ -31,10 +31,12 @@ export class OrbsNode {
   }
 
   getPublicApiClient() {
-    const publicApiService = _.find(
-      this.services, (service: OrbsService) => service.topology.project === "public-api-service-typescript");
-    if (!publicApiService)
-      throw "failed to find a public api service in the node";
+    const publicApiService = _.find(this.services, (service: OrbsService) =>
+      service.topology.project === "public-api-service-typescript");
+
+    if (!publicApiService) {
+      throw new Error("Failed to find a public api service in the node");
+    }
 
     return grpc.publicApiClient({ endpoint: publicApiService.topology.endpoint });
   }
@@ -56,8 +58,9 @@ export class OrbsService {
 
   public async start(opts = {}) {
     if (this.process) {
-      throw "already running";
+      throw new Error("Already running!");
     }
+
     this.process = this.run(opts);
     // TODO: wait by polling service state (not implemented yet in the server-side)
     await delay(30000);
@@ -80,14 +83,18 @@ export class OrbsService {
         cwd: projectPath,
         env: { ...process.env, ...opts, ...{ NODE_ENV: "test" } }  // TODO: passing args in env var due a bug in nconf.argv used by the services
       });
+
     if (!childProcess) {
       throw new Error("Failed to run process");
     }
+
     if (streamStdout) {
       childProcess.stdout.on("data", console.log);
-      childProcess.stderr.on("data", console.log);
+      childProcess.stderr.on("data", console.error);
     }
+
     this.process = childProcess;
+
     return childProcess;
   }
 }
@@ -111,6 +118,7 @@ export class OrbsTopology {
     const topologyAbsolutePath = path.resolve(__dirname, topologyPath);
     const nodeDirs = shell.ls(topologyAbsolutePath);
     const nodes = nodeDirs.map((nodeName: string) => OrbsNode.loadFromPath(topologyAbsolutePath, nodeName));
+
     return new this(nodes);
   }
 }
