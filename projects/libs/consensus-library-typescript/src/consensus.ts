@@ -13,4 +13,8 @@ export class Consensus {
   public async sendTransaction(transactionContext: types.SendTransactionInput) {
     await this.consensus.onAppend(transactionContext.transaction, transactionContext.transactionAppendix);
   }
+
+  async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
+    await this.consensus.gossipMessageReceived(fromAddress, messageType, message);
+  }
 }

@@ -8,9 +8,6 @@ import { Gossip } from "orbs-gossip-library";
 import { TransactionPool } from "orbs-transaction-pool-library";
 import { SubscriptionManager } from "orbs-subscription-manager-library";
 
-// // Subscription Manager:
-// rpc GetSubscriptionStatus(GetSubscriptionStatusInput) returns(GetSubscriptionStatusOutput);
-
 export default class ConsensusService {
   private gossip: Gossip;
   private consensus: Consensus;
@@ -23,7 +20,7 @@ export default class ConsensusService {
   public async sendTransaction(rpc: types.SendTransactionContext) {
     logger.debug(`${topology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
 
-    await this.consensus.sendTransaction(rpc.req.transaction, rpc.req.transactionAppendix);
+    await this.consensus.sendTransaction(rpc.req);
 
     rpc.res = {};
   }
@@ -81,7 +78,7 @@ export default class ConsensusService {
 
   @bind
   async getSubscriptionStatus(rpc: types.GetSubscriptionStatusContext) {
-    const { id, tokens } = await this.subscriptionManager.getSubscription(rpc.req.subscriptionKey);
+    const { id, tokens } = await this.subscriptionManager.getSubscriptionStatus(rpc.req.subscriptionKey);
     rpc.res = { active: tokens.isGreaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000};
   }
 
