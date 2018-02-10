@@ -2,14 +2,22 @@ import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
 import { logger, types, topology, topologyPeers, config } from "orbs-common-library";
+import { Gossip } from "orbs-gossip-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
 const NODE_NAME = config.get("NODE_NAME");
 
 class RPCConnector extends EventEmitter {
-  private gossip = topologyPeers(topology.peers).gossip;
   private id: string;
+  private gossip: Gossip;
+
+  public constructor(id: string, gossip: Gossip) {
+    super();
+
+    this.id = id;
+    this.gossip = gossip;
+  }
 
   public connect(): void {
   }
@@ -25,27 +33,11 @@ class RPCConnector extends EventEmitter {
   }
 
   public broadcast(data: any): void {
-    this.gossip.broadcastMessage({
-      BroadcastGroup: "consensus",
-      MessageType: "RaftMessage",
-      Buffer: new Buffer(JSON.stringify(data)),
-      Immediate: true
-    });
+    this.gossip.broadcastMessage("consensus", "RaftMessage", new Buffer(JSON.stringify(data)), true);
   }
 
   public send(nodeId: string, data: any): void {
-    this.gossip.unicastMessage({
-      Recipient: nodeId,
-      BroadcastGroup: "consensus",
-      MessageType: "RaftMessage",
-      Buffer: new Buffer(JSON.stringify(data)),
-      Immediate: true
-    });
-  }
-
-  constructor(id: string) {
-    super();
-    this.id = id;
+    this.gossip.unicastMessage(nodeId, "consensus", "RaftMessage", new Buffer(JSON.stringify(data)), true);
   }
 }
 
@@ -68,9 +60,9 @@ export class RaftConsensus {
   private node: any;
   private lastBlockId: number;
 
-  public constructor(options: RaftConsensusConfig) {
+  public constructor(options: RaftConsensusConfig, gossip: Gossip) {
     this.lastBlockId = -1;
-    this.connector = new RPCConnector(topology.name);
+    this.connector = new RPCConnector(NODE_NAME, gossip);
 
     this.node = gaggle({
       id: NODE_NAME,
@@ -133,8 +125,7 @@ export class RaftConsensus {
   async onAppend(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
     const vmResult = await this.virtualMachine.executeTransaction({
       transaction: tx,
-      transactionAppendix: txAppendix,
-      lastBlockId: this.lastBlockId
+      transactionAppendix: txAppendix
     });
 
     if (vmResult.success) {

@@ -3,12 +3,6 @@ syntax = "proto3";
 import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
 
-service TransactionPool {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
-  rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
-  rpc AddExistingPendingTransaction (AddExistingPendingTransactionInput) returns (AddExistingPendingTransactionOutput);
-}
-
 message AddNewPendingTransactionInput {
   Transaction transaction = 1;
 }

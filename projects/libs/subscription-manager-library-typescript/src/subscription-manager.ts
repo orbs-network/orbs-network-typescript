@@ -1,6 +1,6 @@
 import { logger, types } from "orbs-common-library";
 
-import { ERCBillingContractProxy } from "./erc-billing-contract-proxy";
+import { ERCBillingContractProxy, Subscription } from "./erc-billing-contract-proxy";
 
 export class SubscriptionManagerConfiguration {
   ethereumContractAddress: string;
@@ -15,8 +15,6 @@ export class SubscriptionManager {
   }
 
   async getSubscriptionStatus(subscriptionKey: string) {
-    const { id, tokens } = await this.contractProxy.getSubscription(subscriptionKey);
-
-    return { active: tokens.isGreaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000 };
+    return await this.contractProxy.getSubscription(subscriptionKey);
   }
 }

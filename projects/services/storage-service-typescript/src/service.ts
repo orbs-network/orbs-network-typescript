@@ -44,14 +44,23 @@ export default class StorageService {
     rpc.res = { values: _.fromPairs([...keys]) };
   }
 
+  async initBlockStorage(): Promise<void> {
+    this.blockStorage = new BlockStorage();
+    this.blockStorage.load();
+  }
+
+  async initStateStorage(): Promise<void> {
+    this.stateStorage = new StateStorage(this.blockStorage);
+    this.stateStorage.poll();
+  }
+
   async main() {
     logger.info(`${topology.name}: service started`);
 
-    this.blockStorage = new BlockStorage();
-    this.blockStorage.load();
-
-    this.stateStorage = new StateStorage(this.blockStorage);
-    this.stateStorage.poll();
+    await Promise.all([
+      this.initBlockStorage(),
+      this.initStateStorage()
+    ]);
   }
 
   constructor() {

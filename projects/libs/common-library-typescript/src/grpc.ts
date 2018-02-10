@@ -34,16 +34,12 @@ export namespace grpc {
     server("consensus.proto", "Consensus", endpoint, service);
   }
 
+  export function consensusClient({ endpoint }: { endpoint: string }): types.ConsensusClient {
+    return client("consensus.proto", "Consensus", endpoint);
+  }
+
   export function publicApiServer({ endpoint, service }: { endpoint: string, service: types.PublicApiServer }) {
     server("public-api.proto", "PublicApi", endpoint, service);
-  }
-
-  export function transactionPoolServer({ endpoint, service }: { endpoint: string, service: types.TransactionPoolServer }) {
-    server("transaction-pool.proto", "TransactionPool", endpoint, service);
-  }
-
-  export function gossipServer({ endpoint, service }: { endpoint: string, service: types.GossipServer }) {
-    server("gossip.proto", "Gossip", endpoint, service);
   }
 
   export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
@@ -54,24 +50,8 @@ export namespace grpc {
       server("sidechain-connector.proto", "SidechainConnector", endpoint, service);
   }
 
-  export function subscriptionManagerServer({ endpoint, service }: { endpoint: string, service: types.SubscriptionManagerServer }) {
-    server("subscription-manager.proto", "SubscriptionManager", endpoint, service);
-  }
-
-  export function consensusClient({ endpoint }: { endpoint: string }): types.ConsensusClient {
-    return client("consensus.proto", "Consensus", endpoint);
-  }
-
   export function publicApiClient({ endpoint }: { endpoint: string }): types.PublicApiClient {
     return client("public-api.proto", "PublicApi", endpoint);
-  }
-
-  export function transactionPoolClient({ endpoint }: { endpoint: string }): types.TransactionPoolClient {
-    return client("transaction-pool.proto", "TransactionPool", endpoint);
-  }
-
-  export function gossipClient({ endpoint }: { endpoint: string }): types.GossipClient {
-    return client("gossip.proto", "Gossip", endpoint);
   }
 
   export function virtualMachineClient({ endpoint }: { endpoint: string }): types.VirtualMachineClient {
@@ -80,9 +60,5 @@ export namespace grpc {
 
   export function sidechainConnectorClient({ endpoint }: { endpoint: string }): types.SidechainConnectorClient {
       return client("sidechain-connector.proto", "SidechainConnector", endpoint);
-  }
-
-  export function subscriptionManagerClient({ endpoint }: { endpoint: string }): types.SubscriptionManagerClient {
-    return client("subscription-manager.proto", "SubscriptionManager", endpoint);
   }
 }

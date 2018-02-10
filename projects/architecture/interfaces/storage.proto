@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-import "primitives/block-storage.proto";
+import "./block-storage.proto";
+import "./state-storage.proto";
 
 service Storage {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);

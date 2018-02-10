@@ -9,14 +9,6 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         res.publicApi = grpc.publicApiClient({ endpoint: peer.endpoint });
         break;
       }
-      case "transaction-pool": {
-        res.transactionPool = grpc.transactionPoolClient({ endpoint: peer.endpoint });
-        break;
-      }
-      case "gossip": {
-        res.gossip = grpc.gossipClient({ endpoint: peer.endpoint });
-        break;
-      }
       case "consensus": {
         res.consensus = grpc.consensusClient({ endpoint: peer.endpoint });
         break;
@@ -31,10 +23,6 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
       }
       case "sidechain-connector": {
         res.sidechainConnector = grpc.sidechainConnectorClient({ endpoint: peer.endpoint });
-        break;
-      }
-      case "subscription-manager": {
-        res.subscriptionManager = grpc.subscriptionManagerClient({ endpoint: peer.endpoint });
         break;
       }
       default: {

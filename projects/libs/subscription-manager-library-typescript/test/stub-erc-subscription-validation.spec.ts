@@ -57,9 +57,9 @@ class OrbsService {
     }
 }
 
-class OrbsSubscriptionManager extends OrbsService {
+class OrbsConsensusManager extends OrbsService {
     public getClient() {
-        return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
+        return grpc.consensusClient({ endpoint: this.context.topology.endpoint });
     }
 
     public async start(opts: { ethereumContractAddress: string }) {
@@ -69,7 +69,7 @@ class OrbsSubscriptionManager extends OrbsService {
 
 class OrbsSidechainConnector extends OrbsService {
     public getClient() {
-        return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
+        return grpc.sidechainConnectorClient({ endpoint: this.context.topology.endpoint });
     }
 
     public async start(opts: { ethereumNodeAddress: string }) {
@@ -78,13 +78,13 @@ class OrbsSidechainConnector extends OrbsService {
 }
 
 class TestEnvironment {
-    public readonly subscriptionManager: OrbsSubscriptionManager;
+    public readonly consensusManager: OrbsConsensusManager;
     public readonly sidechainConnector: OrbsSidechainConnector;
     public readonly ethereumNode: EthereumSimulationNode;
 
 
     constructor() {
-        this.subscriptionManager = new OrbsSubscriptionManager("./topology/subscription-manager.json");
+        this.consensusManager = new OrbsConsensusManager("./topology/subscription-manager.json");
         this.sidechainConnector = new OrbsSidechainConnector("./topology/sidechain-connector.json");
         this.ethereumNode = new EthereumSimulationNode();
     }
@@ -94,12 +94,12 @@ class TestEnvironment {
         const ethereumContractAddress = await this.ethereumNode.deployOrbsStubContract(100, ACTIVE_SUBSCRIPTION_ID);
         await Promise.all([
             this.sidechainConnector.start({ ethereumNodeAddress: `http://localhost:${this.ethereumNode.port}` }),
-            this.subscriptionManager.start({ ethereumContractAddress })
+            this.consensusManager.start({ ethereumContractAddress })
         ]);
     }
 
     stop() {
-        this.subscriptionManager.stop();
+        this.consensusManager.stop();
         this.sidechainConnector.stop();
         this.ethereumNode.stop();
     }
@@ -108,16 +108,19 @@ class TestEnvironment {
 describe("subscription manager.getSubscriptionStatus() on a stub Orbs Ethereum contract", () => {
     const testEnvironment = new TestEnvironment();
     let res;
-    let client: types.SubscriptionManagerClient;
+    let client: types.ConsensusClient;
+
     before(async function() {
         this.timeout(15000);
         await testEnvironment.start();
-        client = testEnvironment.subscriptionManager.getClient();
+        client = testEnvironment.consensusManager.getClient();
     });
+
     xit("should return that subscription is active if enough tokens", async () => {
         res = await client.getSubscriptionStatus({ subscriptionKey: ACTIVE_SUBSCRIPTION_ID });
         res.should.have.property("active", true);
     });
+
     xit("should return that subscription is inactive if not enough tokens", async () => {
         res = await client.getSubscriptionStatus({ subscriptionKey: INACTIVE_SUBSCRIPTION_ID });
         res.should.have.property("active", false);
