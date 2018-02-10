@@ -4,7 +4,7 @@ import * as ganache from "ganache-core";
 import * as path from "path";
 import * as solc from "solc";
 
-import EthereumConnector from "../src/ethereum-connector";
+import { EthereumConnector } from "../src/ethereum-connector";
 
 const SIMPLE_STORAGE_SOLIDITY_CONTRACT = `
 pragma solidity 0.4.18;

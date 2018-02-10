@@ -4,7 +4,7 @@ import { types } from "orbs-common-library";
 
 const Web3 = require("web3");
 
-export default class EthereumConnector {
+export class EthereumConnector {
     private web3: any;
 
     public async call(contractAddress: string, functionInterface: types.EthereumFunctionInterface, parameters: Object[],

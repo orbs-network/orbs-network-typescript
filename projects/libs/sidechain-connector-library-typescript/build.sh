@@ -1,8 +1,11 @@
 #!/bin/bash -e
 
-yatn link ../common-library-typescript
+yarn link orbs-common-library
 
-yatn install
-yatn run build
+yarn install
 
-yatn test
+yarn run build
+
+yarn test
+
+yarn link

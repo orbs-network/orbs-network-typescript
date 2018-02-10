@@ -3,16 +3,18 @@
     "module": "commonjs",
     "target": "es6",
     "types": [
-      "node",
-      "mocha"
+      "mocha",
+      "node"
     ],
     "noImplicitAny": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
     "sourceMap": true,
+    "declaration": true,
     "inlineSources": true,
     "experimentalDecorators": true,
     "outDir": "dist",
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "*": [
