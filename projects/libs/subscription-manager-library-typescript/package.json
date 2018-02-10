@@ -1,7 +1,7 @@
 {
-  "name": "subscription-manager-library",
+  "name": "orbs-subscription-manager-library",
   "version": "0.1.0",
-  "description": "subscription-manager-library",
+  "description": "orbs-subscription-manager-library",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
