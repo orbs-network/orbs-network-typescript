@@ -19,7 +19,7 @@
     "bluebird": "^3.5.1",
     "ganache-core": "^2.0.2",
     "nconf": "^0.10.0",
-    "orbs-common-library": "file:../projects/common-library-typescript",
+    "orbs-common-library": "file:../projects/libs/common-library-typescript",
     "solc": "0.4.18",
     "underscore": "^1.8.3",
     "web3": "^1.0.0-beta.29"
