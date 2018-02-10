@@ -4,10 +4,10 @@ import { EventEmitter } from "events";
 import { logger, types, config } from "orbs-common-library";
 import { Gossip } from "orbs-gossip-library";
 
-// An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
-// for using Gaggle's "custom" channel (which we've extended ourselves).
 const NODE_NAME = config.get("NODE_NAME");
 
+// An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
+// for using Gaggle's "custom" channel (which we've extended ourselves).
 class RPCConnector extends EventEmitter {
   private id: string;
   private gossip: Gossip;
