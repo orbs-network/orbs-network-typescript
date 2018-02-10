@@ -6,8 +6,9 @@ import { RaftConsensusConfig, RaftConsensus } from "./raft-consensus";
 export class Consensus {
   private consensus: RaftConsensus;
 
-  constructor(config: RaftConsensusConfig, gossip: Gossip) {
-    this.consensus = new RaftConsensus(config, gossip);
+  constructor(options: RaftConsensusConfig, virtualMachine: types.VirtualMachineClient,
+    storage: types.StorageClient, gossip: Gossip) {
+    this.consensus = new RaftConsensus(options, virtualMachine, storage, gossip);
   }
 
   public async sendTransaction(transactionContext: types.SendTransactionInput) {

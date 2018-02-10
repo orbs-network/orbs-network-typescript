@@ -1,7 +1,7 @@
 import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
-import { logger, types, topology, topologyPeers, config } from "orbs-common-library";
+import { logger, types, config } from "orbs-common-library";
 import { Gossip } from "orbs-gossip-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
@@ -53,14 +53,17 @@ export interface RaftConsensusConfig {
 }
 
 export class RaftConsensus {
-  private virtualMachine = topologyPeers(topology.peers).virtualMachine;
-  private storage = topologyPeers(topology.peers).storage;
+  private virtualMachine: types.VirtualMachineClient;
+  private storage: types.StorageClient;
 
   private connector: RPCConnector;
   private node: any;
   private lastBlockId: number;
 
-  public constructor(options: RaftConsensusConfig, gossip: Gossip) {
+  public constructor(options: RaftConsensusConfig, virtualMachine: types.VirtualMachineClient,
+    storage: types.StorageClient, gossip: Gossip) {
+    this.virtualMachine = virtualMachine;
+    this.storage = storage;
     this.lastBlockId = -1;
     this.connector = new RPCConnector(NODE_NAME, gossip);
 

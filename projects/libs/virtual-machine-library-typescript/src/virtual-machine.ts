@@ -1,15 +1,17 @@
 import * as _ from "lodash";
 
-import { logger, topology, topologyPeers, types } from "orbs-common-library";
+import { logger, types } from "orbs-common-library";
 
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
 
 export class VirtualMachine {
+  private storage: types.StorageClient;
   private processor: HardCodedSmartContractProcessor;
 
-  public constructor() {
-    this.processor = new HardCodedSmartContractProcessor(topologyPeers(topology.peers).storage);
+  public constructor(storage: types.StorageClient) {
+    this.storage = storage;
+    this.processor = new HardCodedSmartContractProcessor(this.storage);
   }
 
   public async executeTransaction(input: types.ExecuteTransactionInput) {

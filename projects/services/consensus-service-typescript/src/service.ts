@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topology, grpc, types } from "orbs-common-library";
+import { logger, config, topology, topologyPeers, grpc, types } from "orbs-common-library";
 
 import { Consensus, RaftConsensusConfig } from "orbs-consensus-library";
 import { Gossip } from "orbs-gossip-library";
@@ -13,6 +13,9 @@ export default class ConsensusService {
   private consensus: Consensus;
   private transactionPool: TransactionPool;
   private subscriptionManager: SubscriptionManager;
+
+  private virtualMachine = topologyPeers(topology.peers).virtualMachine;
+  private storage = topologyPeers(topology.peers).storage;
 
   // Consensus RPC:
 
@@ -113,7 +116,7 @@ export default class ConsensusService {
 
     await this.initGossip();
 
-    this.consensus = new Consensus(consensusConfig, this.gossip);
+    this.consensus = new Consensus(consensusConfig, this.virtualMachine, this.storage, this.gossip);
   }
 
   async initTransactionPool(): Promise<void> {

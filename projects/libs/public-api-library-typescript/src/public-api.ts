@@ -1,8 +1,13 @@
-import { logger, topology, topologyPeers, types } from "orbs-common-library";
+import { logger, types } from "orbs-common-library";
 
 export class PublicApi {
-  private consensus = topologyPeers(topology.peers).consensus;
-  private virtualMachine = topologyPeers(topology.peers).virtualMachine;
+  private consensus: types.ConsensusClient;
+  private virtualMachine: types.VirtualMachineClient;
+
+  public constructor(consensus: types.ConsensusClient, virtualMachine: types.VirtualMachineClient) {
+    this.consensus = consensus;
+    this.virtualMachine = virtualMachine;
+  }
 
   public async sendTransaction(transactionContext: types.SendTransactionInput) {
     const subscriptionKey = transactionContext.transactionAppendix.subscriptionKey;

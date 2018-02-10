@@ -1,12 +1,15 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topology, grpc, types } from "orbs-common-library";
+import { logger, config, topology, topologyPeers, grpc, types } from "orbs-common-library";
 
 import { PublicApi } from "orbs-public-api-library";
 
 export default class PublicApiService {
   private publicApi: PublicApi;
+
+  private virtualMachine = topologyPeers(topology.peers).virtualMachine;
+  private consensus = topologyPeers(topology.peers).consensus;
 
   // Public API RPC:
 
@@ -37,7 +40,7 @@ export default class PublicApiService {
   async main() {
     logger.info(`${topology.name}: service started`);
 
-    this.publicApi = new PublicApi();
+    this.publicApi = new PublicApi(this.consensus, this.virtualMachine);
   }
 
   constructor() {

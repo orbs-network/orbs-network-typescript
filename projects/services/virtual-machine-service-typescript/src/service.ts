@@ -9,6 +9,8 @@ import { VirtualMachine } from "orbs-virtual-machine-library";
 export default class VirtualMachineService {
   private virtualMachine: VirtualMachine;
 
+  private storage: types.StorageClient = topologyPeers(topology.peers).storage;
+
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
@@ -50,7 +52,7 @@ export default class VirtualMachineService {
   async main() {
     logger.info(`${topology.name}: service started`);
 
-    this.virtualMachine = new VirtualMachine();
+    this.virtualMachine = new VirtualMachine(this.storage);
   }
 
   constructor() {

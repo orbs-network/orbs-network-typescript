@@ -1,4 +1,4 @@
-import { types, logger, topology, topologyPeers } from "orbs-common-library";
+import { types, logger } from "orbs-common-library";
 import { Block } from "web3/types";
 
 import { EthereumConnector } from "./ethereum-connector";
