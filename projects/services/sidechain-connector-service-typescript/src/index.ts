@@ -1,10 +1,12 @@
-import { ErrorHandler, topology, grpc } from "orbs-common-library";
+import { config, ErrorHandler, topology, grpc } from "orbs-common-library";
 
-import ConsensusService from "./service";
+import SidehainConnectorService from "./service";
 
 ErrorHandler.setup();
 
-const server = grpc.consensusServer({
+const server = grpc.sidechainConnectorServer({
   endpoint: topology.endpoint,
-  service: new ConsensusService()
+  service: new SidehainConnectorService({
+    ethereumNodeHttpAddress: config.get("ethereumNodeAddress")
+  })
 });

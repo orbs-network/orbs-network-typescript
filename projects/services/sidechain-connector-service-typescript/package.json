@@ -1,7 +1,7 @@
 {
-  "name": "orbs-consensus-service",
+  "name": "orbs-sidechain-connector-service",
   "version": "0.1.0",
-  "description": "orbs-consensus-service",
+  "description": "orbs-sidechain-connector-service",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
@@ -21,10 +21,7 @@
     "bind-decorator": "^1.0.11",
     "lodash": "^4.17.5",
     "orbs-common-library": "file:../../libs/common-library-typescript",
-    "orbs-consensus-library": "file:../../libs/consensus-library-typescript",
-    "orbs-gossip-library": "file:../../libs/gossip-library-typescript",
-    "orbs-transaction-pool-library": "file:../../libs/transaction-pool-library-typescript",
-    "orbs-subscription-manager-library": "file:../../libs/subscription-manager-library-typescript"
+    "orbs-sidechain-connector-library": "file:../../libs/sidechain-connector-library-typescript"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.102",
