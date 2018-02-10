@@ -9,7 +9,7 @@ ADD . /opt/orbs
 
 WORKDIR /opt/orbs
 
-RUN yarn global install typescript@2.7.1
+RUN yarn global add typescript@2.7.1
 
 RUN ./install.sh
 
