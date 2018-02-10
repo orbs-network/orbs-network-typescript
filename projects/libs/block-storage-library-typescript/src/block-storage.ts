@@ -6,7 +6,7 @@ import { LevelDBDriver } from "./leveldb-driver";
 
 export class BlockStorage {
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
-  public static readonly LEVELDB_PATH: string = path.resolve("../../db/blocks.db");
+  public static readonly LEVELDB_PATH: string = path.resolve("../../../db/blocks.db");
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,
