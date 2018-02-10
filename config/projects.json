@@ -3,64 +3,81 @@
     "runtime": "protobuf",
     "type": "static"
   },
-  "block-storage-service-typescript": {
+  "block-storage-library-typescript": {
     "runtime": "typescript",
-    "service": "block-storage",
-    "type": "service"
+    "type": "library"
   },
   "common-library-typescript": {
     "runtime": "typescript",
     "type": "library"
   },
-  "consensus-service-typescript": {
+  "consensus-library-typescript": {
     "runtime": "typescript",
     "type": "library"
   },
-  "gossip-service-typescript": {
+  "gossip-library-typescript": {
     "runtime": "typescript",
-    "service": "gossip",
+    "type": "library"
+  },
+  "public-api-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "sidechain-connector-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "state-storage-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "subscription-manager-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "transaction-pool-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "virtual-machine-library-typescript": {
+    "runtime": "typescript",
+    "type": "library"
+  },
+  "consensus-service-typescript": {
+    "runtime": "typescript",
     "type": "service"
   },
   "public-api-service-typescript": {
     "runtime": "typescript",
-    "service": "public-api",
-    "type": "service"
-  },
-  "state-storage-service-typescript": {
-    "runtime": "typescript",
-    "service": "state-storage",
-    "type": "service"
-  },
-  "transaction-pool-service-typescript": {
-    "runtime": "typescript",
-    "service": "transaction-pool",
-    "type": "service"
-  },
-  "virtual-machine-service-typescript": {
-    "runtime": "typescript",
-    "service": "virtual-machine",
     "type": "service"
   },
   "sidechain-connector-service-typescript": {
     "runtime": "typescript",
-    "service": "sidechain-connector"
+    "type": "service"
   },
-  "subscription-manager-service-typescript": {
+  "storage-service-typescript": {
     "runtime": "typescript",
-    "service": "subscription-manager",
+    "type": "service"
+  },
+  "virtual-machine-service-typescript": {
+    "runtime": "typescript",
     "type": "service"
   },
   "order": [
     "architecture",
     "common-library-typescript",
-    "block-storage-service-typescript",
+    "block-storage-library-typescript",
+    "gossip-library-typescript",
+    "consensus-library-typescript",
+    "public-api-library-typescript",
+    "state-storage-library-typescript",
+    "virtual-machine-library-typescript",
+    "sidechain-connector-library-typescript",
+    "subscription-manager-library-typescript",
     "consensus-service-typescript",
-    "gossip-service-typescript",
     "public-api-service-typescript",
-    "state-storage-service-typescript",
-    "transaction-pool-service-typescript",
-    "virtual-machine-service-typescript",
     "sidechain-connector-service-typescript",
-    "subscription-manager-service-typescript"
+    "storage-service-typescript",
+    "virtual-machine-service-typescript"
   ]
 }
