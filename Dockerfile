@@ -13,7 +13,7 @@ RUN npm install -g typescript@2.7.1
 
 RUN ./install.sh
 
-RUN find . -name package-lock.json -delete
+RUN find . -name yarn.lock -delete
 
 RUN ./build.sh
 
