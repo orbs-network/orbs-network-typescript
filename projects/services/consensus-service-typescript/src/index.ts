@@ -1,10 +1,10 @@
 import { ErrorHandler, topology, grpc } from "orbs-common-library";
 
-import StorageService from "./service";
+import ConsensusService from "./service";
 
 ErrorHandler.setup();
 
-const server = grpc.storageServer({
+const server = grpc.consensusServer({
   endpoint: topology.endpoint,
-  service: new StorageService()
+  service: new ConsensusService()
 });
