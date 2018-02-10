@@ -2,7 +2,7 @@ import * as path from "path";
 import * as shell from "shelljs";
 import * as child_process from "child_process";
 import { delay } from "bluebird";
-import * as _  from "lodash";
+import * as _ from "lodash";
 import { grpc } from "orbs-common-library/src/grpc";
 
 export class OrbsNode {
@@ -20,7 +20,7 @@ export class OrbsNode {
     return new this(services);
   }
 
-  async startAll(optsPerService: { [key: string]: {}} = {}) {
+  async startAll(optsPerService: { [key: string]: {} } = {}) {
     return Promise.all(this.services.map(service => service.start(optsPerService[service.getProjectName()])));
   }
 
@@ -46,8 +46,8 @@ export class OrbsService {
   process: any;
 
   constructor(topologyPath: string) {
-      this.topologyPath = topologyPath;
-      this.topology = require(this.topologyPath);
+    this.topologyPath = topologyPath;
+    this.topology = require(this.topologyPath);
   }
 
   getProjectName(): string {
@@ -55,12 +55,12 @@ export class OrbsService {
   }
 
   public async start(opts = {}) {
-      if (this.process) {
-          throw "already running";
-      }
-      this.process = this.run(opts);
-      // TODO: wait by polling service state (not implemented yet in the server-side)
-      await delay(30000);
+    if (this.process) {
+      throw "already running";
+    }
+    this.process = this.run(opts);
+    // TODO: wait by polling service state (not implemented yet in the server-side)
+    await delay(30000);
   }
 
   public async stop() {
@@ -72,23 +72,23 @@ export class OrbsService {
   }
 
   private run(opts = {}, streamStdout = true) {
-      const projectPath = path.resolve(__dirname, "../../projects", this.topology.project);
-      const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
-      const childProcess = child_process.exec(
-          `node dist/index.js ${absoluteTopologyPath}`, {
-              async: true,
-              cwd: projectPath,
-              env: {...process.env, ...opts, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
-          });
-      if (!childProcess) {
-        throw "failed to run process";
-      }
-      if (streamStdout) {
-          childProcess.stdout.on("data", console.log);
-          childProcess.stderr.on("data", console.log);
-      }
-      this.process = childProcess;
-      return childProcess;
+    const projectPath = path.resolve(__dirname, "../../projects/services", this.topology.project);
+    const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
+    const childProcess = child_process.exec(
+      `node dist/index.js ${absoluteTopologyPath}`, {
+        async: true,
+        cwd: projectPath,
+        env: { ...process.env, ...opts, ...{ NODE_ENV: "test" } }  // TODO: passing args in env var due a bug in nconf.argv used by the services
+      });
+    if (!childProcess) {
+      throw new Error("Failed to run process");
+    }
+    if (streamStdout) {
+      childProcess.stdout.on("data", console.log);
+      childProcess.stderr.on("data", console.log);
+    }
+    this.process = childProcess;
+    return childProcess;
   }
 }
 
@@ -99,7 +99,7 @@ export class OrbsTopology {
     this.nodes = nodes;
   }
 
-  async startAll(optsPerService: { [key: string]: {}} = {}) {
+  async startAll(optsPerService: { [key: string]: {} } = {}) {
     return Promise.all(this.nodes.map(node => node.startAll(optsPerService)));
   }
 
