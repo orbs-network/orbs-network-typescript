@@ -121,7 +121,7 @@ export class Logger {
   }
 
   private static resolvePath(pathname: string): string {
-    return path.resolve(path.join("../../", pathname));
+    return path.resolve(path.join("../../../", pathname));
   }
 
   private enableConsole(): void {
