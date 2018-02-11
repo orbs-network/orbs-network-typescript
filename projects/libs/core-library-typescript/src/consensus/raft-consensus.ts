@@ -1,7 +1,10 @@
 import * as gaggle from "gaggle";
 import { EventEmitter } from "events";
 
-import { logger, types, config } from "../common-library";
+import { logger } from "../common-library/logger";
+import { types } from "../common-library/types";
+import { config } from "../common-library/config";
+
 import { Gossip } from "../gossip";
 
 const NODE_NAME = config.get("NODE_NAME");

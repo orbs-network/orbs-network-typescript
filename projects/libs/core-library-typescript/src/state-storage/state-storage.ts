@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 
-import { logger, types } from "../common-library";
+import { logger } from "../common-library/logger";
+import { types } from "../common-library/types";
 import { BlockStorage } from "../block-storage";
 
 import MemoryKVStore from "./kvstore/memory-kvstore";

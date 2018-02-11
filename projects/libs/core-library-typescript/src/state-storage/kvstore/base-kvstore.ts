@@ -1,5 +1,4 @@
 export default abstract class BaseKVStore {
-
   public async get(contractAddress: string, key: string): Promise<string> {
     throw "Not yet implemented";
   }

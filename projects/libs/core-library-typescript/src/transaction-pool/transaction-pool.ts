@@ -1,4 +1,5 @@
-import { logger, types } from "../common-library";
+import { logger } from "../common-library/logger";
+import { types } from "../common-library/types";
 
 export class TransactionPool {
   private pendingTransactions = new Map<string, types.Transaction>();

@@ -2,7 +2,8 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, topology, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
+import { logger, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
+import { topology } from "orbs-core-library/dist/common-library/topology";
 
 import { VirtualMachine } from "orbs-core-library/dist/virtual-machine";
 

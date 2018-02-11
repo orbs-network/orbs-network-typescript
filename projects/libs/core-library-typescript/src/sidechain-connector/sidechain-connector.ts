@@ -1,5 +1,7 @@
-import { types, logger } from "../common-library";
 import { Block } from "web3/types";
+
+import { logger } from "../common-library/logger";
+import { types } from "../common-library/types";
 
 import { EthereumConnector } from "./ethereum-connector";
 import { SidechainConnectorClient } from "../../../../architecture/dist/index";

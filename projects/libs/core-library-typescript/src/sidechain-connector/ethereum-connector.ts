@@ -1,6 +1,6 @@
 import { Block, Provider } from "web3/types";
 
-import { types } from "../common-library";
+import { types } from "../common-library/types";
 
 const Web3 = require("web3");
 

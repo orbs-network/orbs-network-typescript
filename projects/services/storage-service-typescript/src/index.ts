@@ -1,4 +1,5 @@
-import { ErrorHandler, topology, grpc } from "orbs-core-library/dist/common-library";
+import { ErrorHandler, grpc } from "orbs-core-library/dist/common-library";
+import { topology } from "orbs-core-library/dist/common-library/topology";
 
 import StorageService from "./service";
 

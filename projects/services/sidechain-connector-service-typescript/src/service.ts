@@ -1,7 +1,8 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topology, grpc, types } from "orbs-core-library/dist/common-library";
+import { logger, config, grpc, types } from "orbs-core-library/dist/common-library";
+import { topology } from "orbs-core-library/dist/common-library/topology";
 
 import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library/dist/sidechain-connector";
 

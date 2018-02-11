@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 
-import { logger, types } from "../common-library";
+import { logger } from "../common-library/logger";
+import { types } from "../common-library/types";
 
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";

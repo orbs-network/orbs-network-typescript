@@ -7,22 +7,22 @@ import BarSmartContract from "../../src/virtual-machine/hard-coded-contracts/reg
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {
-    lastBlockId: number;
-    stateCache: StateCache;
+  lastBlockId: number;
+  stateCache: StateCache;
 
-    constructor(contractAddress: string, stateCache: StateCache) {
-        super(contractAddress);
+  constructor(contractAddress: string, stateCache: StateCache) {
+    super(contractAddress);
 
-        this.stateCache = stateCache;
-    }
+    this.stateCache = stateCache;
+  }
 
-    async load(key: string) {
-        return this.stateCache.get({ contractAddress: this.contractAddress, key });
-    }
+  async load(key: string) {
+    return this.stateCache.get({ contractAddress: this.contractAddress, key });
+  }
 
-    async store(key: string, value: string) {
-        this.stateCache.set({ contractAddress: this.contractAddress, key }, value);
-    }
+  async store(key: string, value: string) {
+    this.stateCache.set({ contractAddress: this.contractAddress, key }, value);
+  }
 }
 
 const CONTRACT_ADDRESS = "barbar";
@@ -34,19 +34,19 @@ const recipientContract = new BarSmartContract(SENDER_ADDRESS, adapter);
 const superuserContract = new BarSmartContract(BarSmartContract.SUPERUSER, adapter);
 
 describe("bar contract - transfer tests", () => {
-    it("init token balances", async () => {
-        await superuserContract.initBalance(SENDER_ADDRESS, 1);
-        await superuserContract.initBalance(RECIPIENT_ADDRESS, 1);
-        expect(await senderContract.getMyBalance()).to.equal(1);
-        expect(await recipientContract.getMyBalance()).to.equal(1);
-    });
-    it("transfers 1 token from one account to another", async () => {
-        await superuserContract.initBalance(SENDER_ADDRESS, 2);
-        await superuserContract.initBalance(RECIPIENT_ADDRESS, 0);
+  it("init token balances", async () => {
+    await superuserContract.initBalance(SENDER_ADDRESS, 1);
+    await superuserContract.initBalance(RECIPIENT_ADDRESS, 1);
+    expect(await senderContract.getMyBalance()).to.equal(1);
+    expect(await recipientContract.getMyBalance()).to.equal(1);
+  });
+  it("transfers 1 token from one account to another", async () => {
+    await superuserContract.initBalance(SENDER_ADDRESS, 2);
+    await superuserContract.initBalance(RECIPIENT_ADDRESS, 0);
 
-        await senderContract.transfer(RECIPIENT_ADDRESS, 1);
+    await senderContract.transfer(RECIPIENT_ADDRESS, 1);
 
-        expect(await senderContract.getMyBalance()).to.equal(1);
-        expect(await recipientContract.getMyBalance()).to.equal(1);
-    });
+    expect(await senderContract.getMyBalance()).to.equal(1);
+    expect(await recipientContract.getMyBalance()).to.equal(1);
+  });
 });

@@ -1,6 +1,7 @@
 import { BigNumber } from "bignumber.js";
 
-import { types, logger } from "../common-library";
+import { logger } from "../common-library/logger";
+import { types } from "../common-library/types";
 
 export interface Subscription {
     id: number;

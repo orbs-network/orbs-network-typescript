@@ -9,6 +9,10 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         res.publicApi = grpc.publicApiClient({ endpoint: peer.endpoint });
         break;
       }
+      case "gossip": {
+        res.gossip = grpc.gossipClient({ endpoint: peer.endpoint });
+        break;
+      }
       case "consensus": {
         res.consensus = grpc.consensusClient({ endpoint: peer.endpoint });
         break;

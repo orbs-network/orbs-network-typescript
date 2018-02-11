@@ -1,5 +1,9 @@
 import * as WebSocket from "ws";
-import { logger, topology, topologyPeers } from "../common-library";
+
+import { logger } from "../common-library/logger";
+import { topology } from "../common-library/topology";
+import { topologyPeers } from "../common-library/topologyPeers";
+
 import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 

@@ -1,4 +1,4 @@
-import { logger } from "../../common-library";
+import { logger } from "../../common-library/logger";
 
 import BaseKVStore from "./base-kvstore";
 
