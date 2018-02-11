@@ -1,8 +1,8 @@
 import { Assertion, expect } from "chai";
 import * as nconf from "nconf";
 
-import { grpc } from "orbs-common-library/src/grpc";
-import { types } from "orbs-common-library/src/types";
+import { grpc } from "orbs-core-library/src/grpc";
+import { types } from "orbs-core-library/src/types";
 
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "../src/orbs-client";
 import { FooBarAccount } from "../src/foobar-contract";
