@@ -11,7 +11,7 @@ Parameters:
 
 # TODO: limit associate address to a certain namespace
 Resources:
-  AssociateAddressPolicy:
+  ORBSNetworkAssociateAddressPolicy:
     Type: "AWS::IAM::Policy"
     Properties: 
       PolicyDocument: 
@@ -27,6 +27,47 @@ Resources:
           ]
         }
       PolicyName: !Join ["-", ["AssociateAddressPolicy", !Ref "AWS::Region"]]
+      Roles:
+        - !Ref ORBSNetworkRole
+
+  # TODO: only give access to region bucket
+  ORBSNetworkAccessS3Policy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyDocument:
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "VisualEditor0",
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:AbortMultipartUpload",
+                "s3:ListBucket",
+                "s3:DeleteObject",
+                "s3:GetBucketLocation",
+                "s3:GetObjectVersion"
+              ],
+              "Resource": [
+                "arn:aws:s3:::orbs-network-config-staging",
+                "arn:aws:s3:::orbs-network-config-staging/*"
+              ]
+            },
+            {
+              "Sid": "VisualEditor1",
+              "Effect": "Allow",
+              "Action": [
+                "s3:ListAllMyBuckets",
+                "s3:HeadBucket",
+                "s3:ListObjects"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      PolicyName: !Join ["-", ["AccessS3Policy", !Ref "AWS::Region"]]
       Roles:
         - !Ref ORBSNetworkRole
 
@@ -93,7 +134,7 @@ Outputs:
       Name: !Join ["-", ["orbs-repository", !Ref "AWS::Region"]]
 
   ORBSNodeElasticIP:
-    Value: !Ref ORBSNodeElasticIP
+    Value: !GetAtt ORBSNodeElasticIP.AllocationId
     Export:
       Name: !Join ["-", ["orbs-node-elastic-ip", !Ref "AWS::Region"]]
 

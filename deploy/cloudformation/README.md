@@ -54,7 +54,9 @@ aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --region $RE
 ```
 
 ```bash
-aws s3 sync bootstrap s3://orbs-network-config-staging-$REGION/v1/
+# This is a stub
+# TODO: create bucket per region
+# aws s3 sync bootstrap s3://orbs-network-config-staging-$REGION/v1/
 ```
 
 ```bash

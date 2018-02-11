@@ -143,17 +143,13 @@ Parameters:
     Default: 'master'
   NodeName:
     Type: String
-    Default: 'node1'
+    Default: ''
   NodeEnv:
     Type: String
     Default: 'staging'
   ORBSBootstrap:
     Type: String
     Default: |
-      # create dummy keys infrastructure
-      aws s3 sync s3://orbs-network-config-staging/dummy-keys/public/ /opt/keys/network/
-      aws s3 cp s3://orbs-network-config-staging/dummy-keys/private/$NODE_NAME /opt/keys/test-private-key
-
       # copy bootstrap script, env variables and secrets
       aws s3 sync s3://orbs-network-config-staging/v1/ /opt/orbs/
       bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
@@ -192,6 +188,7 @@ Conditions:
   UseCustomAMI: !Not [!Equals [!Ref ORBSAmiId, '']]
   ImportORBSRole: !Equals [!Ref IamRoleInstanceProfile, '']
   ImportElasticIP: !Equals [!Ref ElasticIP, '']
+  ImportNodeName: !Equals [!Ref NodeName, '']
 Resources:
   Vpc:
     Condition: CreateSubnet1
@@ -306,7 +303,7 @@ Resources:
         Fn::Base64: !Sub 
           - |
            #!/bin/bash -xe
-           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV}
+           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION}
            hostname $NODE_NAME
 
            ${BOOTSTRAP}
@@ -314,9 +311,13 @@ Resources:
               - ImportElasticIP
               - Fn::ImportValue: !Join ["-", ["orbs-node-elastic-ip", !Ref "AWS::Region"]]
               - !Ref ElasticIP
+            NODE_NAME: !If
+              - ImportNodeName
+              - !Join ["-", ["global", !Ref "AWS::Region"]]
+              - !Ref NodeName
             DOCKER_TAG: !Ref DockerTag
-            NODE_NAME: !Ref NodeName
             NODE_ENV: !Ref NodeEnv
+            REGION: !Ref "AWS::Region"
             BOOTSTRAP: !If [DefaultBootstrap, !Ref ORBSBootstrap, !Ref EthereumBootstrap]
   ORBSInstanceAsg:
     Type: AWS::AutoScaling::AutoScalingGroup

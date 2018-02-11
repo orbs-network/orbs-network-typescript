@@ -36,10 +36,6 @@
         "ParameterValue": "master"
     },
     {
-        "ParameterKey": "NodeName",
-        "ParameterValue": "global-eu-central-1"
-    },
-    {
         "ParameterKey": "NodeEnv",
         "ParameterValue": "staging"
     }
