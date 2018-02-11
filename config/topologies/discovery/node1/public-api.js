@@ -5,6 +5,10 @@ module.exports = {
   project: 'public-api-service-typescript',
   peers: [
     {
+      service: 'gossip',
+      endpoint: 'gossip:51151',
+    },
+    {
       service: 'consensus',
       endpoint: 'consensus:51151',
     },
