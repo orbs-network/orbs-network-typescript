@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Creates ECR, roles, reserves Elastic IPs
+Parameters:
+  KeyName:
+    Type: String
+    Description: >
+      Optional - Specifies the name of an existing Amazon EC2 key pair
+      to enable SSH access to the EC2 instances in your cluster.
+    Default: ''
+
+# TODO: limit associate address to a certain namespace
+Resources:
+  AssociateAddressPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties: 
+      PolicyDocument: 
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "VisualEditor0",
+              "Effect": "Allow",
+              "Action": "ec2:AssociateAddress",
+              "Resource": "*"
+            }
+          ]
+        }
+      PolicyName: !Join ["-", ["AssociateAddressPolicy", !Ref "AWS::Region"]]
+      Roles:
+        - !Ref ORBSNetworkRole
+
+  ORBSNetworkRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument:
+        {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [ "ec2.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+          } ]
+        }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy 
+      RoleName: !Join ["-", ["orbs-network-role", !Ref "AWS::Region"]]
+
+  ORBSRepository:
+    Type: "AWS::ECR::Repository"
+    Properties: 
+      RepositoryName: !Join ["-", ["orbs-network", !Ref "AWS::Region"]]
+
+Outputs:
+  ORBSNetworkRole:
+    Value: !Ref ORBSNetworkRole
+    Export:
+      Name: !Join ["-", ["orbs-network-role", !Ref "AWS::Region"]]
+
+  ORBSRepository:
+    Value: !Ref ORBSRepository
+    Export:
+      Name: !Join ["-", ["orbs-repository", !Ref "AWS::Region"]]
+
+  TemplateVersion:
+    Description: The version of the template used by Create Cluster Wizard
+    Value: '1.0.0'
