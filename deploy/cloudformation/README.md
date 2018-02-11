@@ -37,3 +37,11 @@ TODO: extract to a different repo.
 ```bash
 ./test.parity.sh
 ```
+
+## Deploying a node from scratch
+
+Please fisrt make sure you have admin credentials on AWS.
+
+```bash
+aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --region eu-central-1 --template-body file://`pwd`/basic-infrastructure.yaml --stack-name basic-infrastructure
+```

@@ -53,6 +53,11 @@ Resources:
     Properties: 
       RepositoryName: !Join ["-", ["orbs-network", !Ref "AWS::Region"]]
 
+  ORBSNodeElasticIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+
 Outputs:
   ORBSNetworkRole:
     Value: !Ref ORBSNetworkRole
@@ -63,6 +68,11 @@ Outputs:
     Value: !Ref ORBSRepository
     Export:
       Name: !Join ["-", ["orbs-repository", !Ref "AWS::Region"]]
+
+  ORBSNodeElasticIP:
+    Value: !Ref ORBSNodeElasticIP
+    Export:
+      Name: !Join ["-", ["orbs-node-elastic-ip", !Ref "AWS::Region"]]
 
   TemplateVersion:
     Description: The version of the template used by Create Cluster Wizard
