@@ -55,7 +55,7 @@ export namespace grpc {
   }
 
   export function sidechainConnectorServer({ endpoint, service }: { endpoint: string, service: types.SidechainConnectorServer }) {
-      server("sidechain-connector.proto", "SidechainConnector", endpoint, service);
+    server("sidechain-connector.proto", "SidechainConnector", endpoint, service);
   }
 
   export function publicApiClient({ endpoint }: { endpoint: string }): types.PublicApiClient {
@@ -67,6 +67,6 @@ export namespace grpc {
   }
 
   export function sidechainConnectorClient({ endpoint }: { endpoint: string }): types.SidechainConnectorClient {
-      return client("sidechain-connector.proto", "SidechainConnector", endpoint);
+    return client("sidechain-connector.proto", "SidechainConnector", endpoint);
   }
 }
