@@ -2,8 +2,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   AWS CloudFormation template to create a new VPC
   or use an existing VPC for ORBS deployment
-  in Create Cluster Wizard. Requires exactly 1
-  Instance Types for a Spot Request.
+
+Mappings:
+  RegionMap:
+    us-west-2:
+      "64": "ami-f2d3638a"
+    eu-central-1:
+      "64": "ami-5652ce39"
+
 Parameters:
   KeyName:
     Type: String
@@ -33,6 +39,7 @@ Parameters:
   ORBSAmiId:
     Type: String
     Description: Specifies the AMI ID for your container instances.
+    Default: ''
   AsgMaxSize:
     Type: Number
     Description: >
@@ -84,6 +91,7 @@ Parameters:
     Description: >
       Specifies the Name or the Amazon Resource Name (ARN) of the instance
       profile associated with the IAM role for the instance
+    Default: ''
   SecurityIngressFromPort:
     Type: Number
     Description: >
@@ -102,12 +110,6 @@ Parameters:
       Optional - Specifies the CIDR/IP range for Security Ports - defaults
       to 0.0.0.0/0
     Default: 0.0.0.0/0
-  VpcAvailabilityZones:
-    Type: CommaDelimitedList
-    Description: >
-      Specifies a comma-separated list of 3 VPC Availability Zones for
-      the creation of new subnets. These zones must have the available status.
-    Default: ''
   EbsVolumeSize:
     Type: Number
     Description: >
@@ -187,6 +189,9 @@ Conditions:
     - !Not [!Equals [!Ref DeviceName, '']]
   CreateWithASG: !Equals [!Ref CreateWithASG, 'true']
   DefaultBootstrap: !Equals [!Ref Bootstrap, 'ORBSBootstrap']
+  UseCustomAMI: !Not [!Equals [!Ref ORBSAmiId, '']]
+  ImportORBSRole: !Equals [!Ref IamRoleInstanceProfile, '']
+  ImportElasticIP: !Equals [!Ref ElasticIP, '']
 Resources:
   Vpc:
     Condition: CreateSubnet1
@@ -201,7 +206,9 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref SubnetCidr1
-      AvailabilityZone: !Select [ 0, !Ref VpcAvailabilityZones ]
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: ""
       MapPublicIpOnLaunch: true
   PubSubnetAz2:
     Condition: CreateSubnet2
@@ -209,7 +216,9 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref SubnetCidr2
-      AvailabilityZone: !Select [ 1, !Ref VpcAvailabilityZones ]
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: ""
       MapPublicIpOnLaunch: true
   PubSubnetAz3:
     Condition: CreateSubnet3
@@ -217,7 +226,9 @@ Resources:
     Properties:
       VpcId: !Ref Vpc
       CidrBlock: !Ref SubnetCidr3
-      AvailabilityZone: !Select [ 2, !Ref VpcAvailabilityZones ]
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: ""
       MapPublicIpOnLaunch: true
   InternetGateway:
     Condition: CreateSubnet1
@@ -274,10 +285,13 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
     Condition: CreateWithASG
     Properties:
-      ImageId: !Ref ORBSAmiId
+      ImageId: !If [ UseCustomAMI, !Ref ORBSAmiId, !FindInMap [ RegionMap, !Ref "AWS::Region", 64 ] ]
       InstanceType: !Select [ 0, !Ref ORBSInstanceType ]
       AssociatePublicIpAddress: true
-      IamInstanceProfile: !Ref IamRoleInstanceProfile
+      IamInstanceProfile: !If
+        - ImportORBSRole
+        - Fn::ImportValue: !Join ["-", ["orbs-network-instance-profile", !Ref "AWS::Region"]]
+        - !Ref IamRoleInstanceProfile
       KeyName: !If [ CreateEC2LCWithKeyPair, !Ref KeyName, !Ref "AWS::NoValue" ]
       SecurityGroups: [ !If [ CreateNewSecurityGroup, !Ref ORBSSecurityGroup, !Ref SecurityGroupId ] ]
       BlockDeviceMappings: !If
@@ -296,7 +310,10 @@ Resources:
            hostname $NODE_NAME
 
            ${BOOTSTRAP}
-          - EIP: !Ref ElasticIP
+          - EIP: !If
+              - ImportElasticIP
+              - Fn::ImportValue: !Join ["-", ["orbs-node-elastic-ip", !Ref "AWS::Region"]]
+              - !Ref ElasticIP
             DOCKER_TAG: !Ref DockerTag
             NODE_NAME: !Ref NodeName
             NODE_ENV: !Ref NodeEnv
@@ -337,5 +354,5 @@ Outputs:
     Description: Auto Scaling Group Name for ORBS Instances
     Value: !Ref ORBSInstanceAsg
   TemplateVersion:
-    Description: The version of the template used by Create Cluster Wizard
+    Description: The version of the template used by ORBS
     Value: '1.0.0'

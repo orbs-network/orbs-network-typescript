@@ -1,0 +1,46 @@
+[
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "orbs-network-staging-key"
+    },
+    {
+        "ParameterKey": "CreateWithASG",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "ORBSInstanceType",
+        "ParameterValue": "t2.small"
+    },    
+    {
+        "ParameterKey": "SecurityIngressFromPort",
+        "ParameterValue": "22"
+    },
+    {
+        "ParameterKey": "SecurityIngressToPort",
+        "ParameterValue": "64000"
+    },
+    {
+        "ParameterKey": "VpcCidr",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "SubnetCidr1",
+        "ParameterValue": "10.0.0.0/24"
+    },
+    {
+        "ParameterKey": "SubnetCidr2",
+        "ParameterValue": "10.0.1.0/24"
+    },
+    {
+        "ParameterKey": "DockerTag",
+        "ParameterValue": "master"
+    },
+    {
+        "ParameterKey": "NodeName",
+        "ParameterValue": "global-eu-central-1"
+    },
+    {
+        "ParameterKey": "NodeEnv",
+        "ParameterValue": "staging"
+    }
+]

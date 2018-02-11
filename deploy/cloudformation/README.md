@@ -40,8 +40,23 @@ TODO: extract to a different repo.
 
 ## Deploying a node from scratch
 
+Create new EC2 pair of keys named `orbs-network-staging-key`.
+
 Please fisrt make sure you have admin credentials on AWS.
 
+
 ```bash
-aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --region eu-central-1 --template-body file://`pwd`/basic-infrastructure.yaml --stack-name basic-infrastructure
+export REGION=eu-central-1
+```
+
+```bash
+aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --region $REGION --template-body file://`pwd`/basic-infrastructure.yaml --stack-name basic-infrastructure
+```
+
+```bash
+aws s3 sync bootstrap s3://orbs-network-config-staging-$REGION/v1/
+```
+
+```bash
+aws cloudformation create-stack --region $REGION --template-body file://`pwd`/cloudformation.yaml --parameters "$(cat parameters.standalone.json)" --stack-name orbs-network-node
 ```

@@ -48,6 +48,13 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy 
       RoleName: !Join ["-", ["orbs-network-role", !Ref "AWS::Region"]]
 
+  ORBSNetworkInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - !Ref ORBSNetworkRole
+      InstanceProfileName: !Join ["-", ["orbs-network-instance-profile", !Ref "AWS::Region"]]
+
   ORBSRepository:
     Type: "AWS::ECR::Repository"
     Properties: 
@@ -58,11 +65,27 @@ Resources:
     Properties:
       Domain: vpc
 
+  # TODO: add condition, customize zone
+  ORBSNodeDomainName:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: orbs-test.com.
+      Name: !Join [".", [!Ref "AWS::Region", "global.nodes.orbs-test.com."]]
+      Type: A
+      TTL: 900
+      ResourceRecords:
+        - !Ref ORBSNodeElasticIP
+
 Outputs:
   ORBSNetworkRole:
     Value: !Ref ORBSNetworkRole
     Export:
       Name: !Join ["-", ["orbs-network-role", !Ref "AWS::Region"]]
+
+  ORBSNetworkInstanceProfile:
+    Value: !Ref ORBSNetworkInstanceProfile
+    Export:
+      Name: !Join ["-", ["orbs-network-instance-profile", !Ref "AWS::Region"]]
 
   ORBSRepository:
     Value: !Ref ORBSRepository
@@ -74,6 +97,11 @@ Outputs:
     Export:
       Name: !Join ["-", ["orbs-node-elastic-ip", !Ref "AWS::Region"]]
 
+  ORBSNodeDomainName:
+    Value: !Ref ORBSNodeDomainName
+    Export:
+      Name: !Join ["-", ["orbs-node-domain-name", !Ref "AWS::Region"]]
+
   TemplateVersion:
-    Description: The version of the template used by Create Cluster Wizard
+    Description: The version of the template used by ORBS
     Value: '1.0.0'
