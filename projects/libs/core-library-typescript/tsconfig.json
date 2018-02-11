@@ -2,7 +2,13 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es6",
+    "types": [
+      "node",
+      "mocha",
+      "chai"
+    ],
     "noImplicitAny": true,
+    "skipLibCheck": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "declaration": true,
