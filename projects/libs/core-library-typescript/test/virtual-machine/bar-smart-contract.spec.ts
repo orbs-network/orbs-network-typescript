@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import "mocha";
 
 import { StateCache } from "../../src/virtual-machine/state-cache";
 import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-state-accessor";

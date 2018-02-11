@@ -1,5 +1,6 @@
 
 import * as chai from "chai";
+import "mocha";
 import * as path from "path";
 import * as child_process from "child_process";
 import { delay } from "bluebird";
