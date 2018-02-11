@@ -14,8 +14,6 @@ service Consensus {
   // Gossip:
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
-  rpc BroadcastMessage (BroadcastMessageInput) returns (BroadcastMessageOutput);
-  rpc UnicastMessage (UnicastMessageInput) returns (UnicastMessageOutput);
 
   // Transaction Pool:
   rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);

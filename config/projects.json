@@ -7,6 +7,10 @@
     "runtime": "typescript",
     "type": "library"
   },
+  "gossip-service-typescript": {
+    "runtime": "typescript",
+    "type": "service"
+  },
   "consensus-service-typescript": {
     "runtime": "typescript",
     "type": "service"
@@ -30,6 +34,7 @@
   "order": [
     "architecture",
     "core-library-typescript",
+    "gossip-service-typescript",
     "consensus-service-typescript",
     "public-api-service-typescript",
     "sidechain-connector-service-typescript",

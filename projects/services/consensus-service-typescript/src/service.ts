@@ -9,15 +9,22 @@ import { TransactionPool } from "orbs-core-library/dist/transaction-pool";
 import { SubscriptionManager } from "orbs-core-library/dist/subscription-manager";
 
 export default class ConsensusService {
-  private gossip: Gossip;
   private consensus: Consensus;
   private transactionPool: TransactionPool;
   private subscriptionManager: SubscriptionManager;
 
+  private gossip = topologyPeers(topology.peers).gossip;
   private virtualMachine = topologyPeers(topology.peers).virtualMachine;
   private storage = topologyPeers(topology.peers).storage;
 
   // Consensus RPC:
+
+  @bind
+  public async getHeartbeat(rpc: types.GetHeartbeatContext) {
+    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+
+    rpc.res = { responderName: topology.name, responderVersion: topology.version };
+  }
 
   @bind
   public async sendTransaction(rpc: types.SendTransactionContext) {
@@ -28,33 +35,10 @@ export default class ConsensusService {
     rpc.res = {};
   }
 
-  // Gossip RPC:
-
-  @bind
-  public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
-
-    rpc.res = { responderName: topology.name, responderVersion: topology.version };
-  }
-
   @bind
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
-  }
-
-  @bind
-  public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
-
-    rpc.res = {};
-  }
-
-  @bind
-  public async unicastMessage(rpc: types.UnicastMessageContext) {
-    this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
-
-    rpc.res = {};
   }
 
   // Transaction Pool RPC:
@@ -97,28 +81,6 @@ export default class ConsensusService {
     this.askForHeartbeat(peers.storage);
   }
 
-  async initGossip(): Promise<void> {
-    this.gossip = new Gossip(topology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
-
-    setInterval(() => {
-      const activePeers = Array.from(this.gossip.activePeers()).sort();
-
-      if (activePeers.length == 0) {
-        logger.warn(`${this.gossip.localAddress} has no active peers`);
-      } else {
-        logger.info(`${this.gossip.localAddress} has active peers`, {activePeers});
-      }
-    }, 5000);
-
-    setTimeout(() => {
-      this.gossip.discoverPeers().then((gossipPeers: string[]) => {
-        logger.info(`Found gossip peers`, { peers: gossipPeers });
-
-        this.gossip.connect(gossipPeers);
-      }).catch(logger.error);
-    }, Math.ceil(Math.random() * 3000));
-  }
-
   async initConsensus(): Promise<void> {
     // Get the protocol configuration from the environment settings.
     const consensusConfig = config.get("consensus");
@@ -126,9 +88,7 @@ export default class ConsensusService {
       throw new Error("Couldn't find consensus configuration!");
     }
 
-    await this.initGossip();
-
-    this.consensus = new Consensus(consensusConfig, this.virtualMachine, this.storage, this.gossip);
+    this.consensus = new Consensus(consensusConfig, this.gossip, this.virtualMachine, this.storage);
   }
 
   async initTransactionPool(): Promise<void> {

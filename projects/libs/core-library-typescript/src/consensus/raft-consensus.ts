@@ -10,9 +10,9 @@ const NODE_NAME = config.get("NODE_NAME");
 // for using Gaggle's "custom" channel (which we've extended ourselves).
 class RPCConnector extends EventEmitter {
   private id: string;
-  private gossip: Gossip;
+  private gossip: types.GossipClient;
 
-  public constructor(id: string, gossip: Gossip) {
+  public constructor(id: string, gossip: types.GossipClient) {
     super();
 
     this.id = id;
@@ -33,11 +33,22 @@ class RPCConnector extends EventEmitter {
   }
 
   public broadcast(data: any): void {
-    this.gossip.broadcastMessage("consensus", "RaftMessage", new Buffer(JSON.stringify(data)), true);
+    this.gossip.broadcastMessage({
+      BroadcastGroup: "consensus",
+      MessageType: "RaftMessage",
+      Buffer: new Buffer(JSON.stringify(data)),
+      Immediate: true
+    });
   }
 
   public send(nodeId: string, data: any): void {
-    this.gossip.unicastMessage(nodeId, "consensus", "RaftMessage", new Buffer(JSON.stringify(data)), true);
+    this.gossip.unicastMessage({
+      Recipient: nodeId,
+      BroadcastGroup: "consensus",
+      MessageType: "RaftMessage",
+      Buffer: new Buffer(JSON.stringify(data)),
+      Immediate: true
+    });
   }
 }
 
@@ -60,8 +71,8 @@ export class RaftConsensus {
   private node: any;
   private lastBlockId: number;
 
-  public constructor(options: RaftConsensusConfig, virtualMachine: types.VirtualMachineClient,
-    storage: types.StorageClient, gossip: Gossip) {
+  public constructor(options: RaftConsensusConfig, gossip: types.GossipClient,
+    virtualMachine: types.VirtualMachineClient, storage: types.StorageClient) {
     this.virtualMachine = virtualMachine;
     this.storage = storage;
     this.lastBlockId = -1;

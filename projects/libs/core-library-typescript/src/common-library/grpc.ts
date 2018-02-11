@@ -22,6 +22,14 @@ function server(proto: string, name: string, endpoint: string, service: any) {
 }
 
 export namespace grpc {
+  export function gossipServer({ endpoint, service }: { endpoint: string, service: types.GossipServer }) {
+    server("gossip.proto", "Gossip", endpoint, service);
+  }
+
+  export function gossipClient({ endpoint }: { endpoint: string }): types.GossipClient {
+    return client("gossip.proto", "Gossip", endpoint);
+  }
+
   export function storageServer({ endpoint, service }: { endpoint: string, service: types.StorageServer }) {
     return server("storage.proto", "Storage", endpoint, service);
   }
