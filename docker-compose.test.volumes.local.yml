@@ -9,5 +9,6 @@ services:
       - ./projects/services/public-api-service-typescript/dist:/opt/orbs/projects/services/public-api-service-typescript/dist
       - ./projects/services/sidechain-connector-service-typescript/dist:/opt/orbs/projects/services/sidechain-connector-service-typescript/dist
       - ./projects/services/storage-service-typescript/dist:/opt/orbs/projects/services/storage-service-typescript/dist
+      - ./projects/services/gossip-service-typescript/dist:/opt/orbs/projects/services/gossip-service-typescript/dist
       - ./projects/services/consensus-service-typescript/dist:/opt/orbs/projects/services/consensus-service-typescript/dist
       - ./projects/services/virtual-machine-service-typescript/dist:/opt/orbs/projects/services/virtual-machine-service-typescript/dist
