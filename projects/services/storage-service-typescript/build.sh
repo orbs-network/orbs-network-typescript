@@ -1,9 +1,7 @@
 #!/bin/bash -e
 
 yarn link orbs-interfaces
-yarn link orbs-common-library
-yarn link orbs-block-storage-library
-yarn link orbs-state-storage-library
+yarn link orbs-core-library
 
 yarn install
 

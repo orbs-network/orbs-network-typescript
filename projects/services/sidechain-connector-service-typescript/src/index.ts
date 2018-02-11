@@ -1,4 +1,4 @@
-import { config, ErrorHandler, topology, grpc } from "orbs-common-library";
+import { config, ErrorHandler, topology, grpc } from "orbs-core-library/dist/common-library";
 
 import SidehainConnectorService from "./service";
 

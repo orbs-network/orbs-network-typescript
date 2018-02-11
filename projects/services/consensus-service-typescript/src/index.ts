@@ -1,4 +1,4 @@
-import { ErrorHandler, topology, grpc } from "orbs-common-library";
+import { ErrorHandler, topology, grpc } from "orbs-core-library/dist/common-library";
 
 import ConsensusService from "./service";
 

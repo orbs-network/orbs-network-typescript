@@ -1,10 +1,10 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, topology, grpc, types } from "orbs-common-library";
+import { logger, topology, grpc, types } from "orbs-core-library/dist/common-library";
 
-import { BlockStorage } from "orbs-block-storage-library";
-import { StateStorage } from "orbs-state-storage-library";
+import { BlockStorage } from "orbs-core-library/dist/block-storage";
+import { StateStorage } from "orbs-core-library/dist/state-storage";
 
 export default class StorageService {
   private blockStorage: BlockStorage;

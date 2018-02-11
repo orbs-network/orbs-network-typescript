@@ -20,11 +20,7 @@
   "dependencies": {
     "bind-decorator": "^1.0.11",
     "lodash": "^4.17.5",
-    "orbs-common-library": "file:../../libs/common-library-typescript",
-    "orbs-consensus-library": "file:../../libs/consensus-library-typescript",
-    "orbs-gossip-library": "file:../../libs/gossip-library-typescript",
-    "orbs-transaction-pool-library": "file:../../libs/transaction-pool-library-typescript",
-    "orbs-subscription-manager-library": "file:../../libs/subscription-manager-library-typescript"
+    "orbs-core-library": "file:../../libs/core-library-typescript"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.102",

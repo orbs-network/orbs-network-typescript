@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topology, grpc, types } from "orbs-common-library";
+import { logger, config, topology, grpc, types } from "orbs-core-library/dist/common-library";
 
-import { SidechainConnector, SidechainConnectorOptions } from "orbs-sidechain-connector-library";
+import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library/dist/sidechain-connector";
 
 export default class SidechainConnectorService {
   private sidechainConnector: SidechainConnector;

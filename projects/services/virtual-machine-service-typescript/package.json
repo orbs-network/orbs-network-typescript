@@ -20,8 +20,7 @@
   "dependencies": {
     "bind-decorator": "^1.0.11",
     "lodash": "^4.17.4",
-    "orbs-common-library": "file:../../libs/common-library-typescript",
-    "orbs-virtual-machine-library": "file:../../libs/virtual-machine-library-typescript"
+    "orbs-core-library": "file:../../libs/core-library-typescript"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.99",

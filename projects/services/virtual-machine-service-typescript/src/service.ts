@@ -2,9 +2,9 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, topology, topologyPeers, grpc, types } from "orbs-common-library";
+import { logger, topology, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
 
-import { VirtualMachine } from "orbs-virtual-machine-library";
+import { VirtualMachine } from "orbs-core-library/dist/virtual-machine";
 
 export default class VirtualMachineService {
   private virtualMachine: VirtualMachine;

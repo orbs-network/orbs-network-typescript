@@ -1,12 +1,12 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topology, topologyPeers, grpc, types } from "orbs-common-library";
+import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
 
-import { Consensus, RaftConsensusConfig } from "orbs-consensus-library";
-import { Gossip } from "orbs-gossip-library";
-import { TransactionPool } from "orbs-transaction-pool-library";
-import { SubscriptionManager } from "orbs-subscription-manager-library";
+import { Consensus, RaftConsensusConfig } from "orbs-core-library/dist/consensus";
+import { Gossip } from "orbs-core-library/dist/gossip";
+import { TransactionPool } from "orbs-core-library/dist/transaction-pool";
+import { SubscriptionManager } from "orbs-core-library/dist/subscription-manager";
 
 export default class ConsensusService {
   private gossip: Gossip;

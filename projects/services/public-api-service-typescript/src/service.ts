@@ -1,9 +1,9 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topology, topologyPeers, grpc, types } from "orbs-common-library";
+import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
 
-import { PublicApi } from "orbs-public-api-library";
+import { PublicApi } from "orbs-core-library/dist/public-api";
 
 export default class PublicApiService {
   private publicApi: PublicApi;
