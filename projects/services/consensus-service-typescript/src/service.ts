@@ -103,8 +103,8 @@ export default class ConsensusService {
     setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
 
-      if (activePeers.length === 0) {
-        logger.info(`${this.gossip.localAddress} has no active peers`);
+      if (activePeers.length == 0) {
+        logger.warn(`${this.gossip.localAddress} has no active peers`);
       } else {
         logger.info(`${this.gossip.localAddress} has active peers`, {activePeers});
       }
