@@ -14,7 +14,7 @@ const config = stubInterface<TransactionHandlerConfig>();
 const handler = new TransactionHandler(consensus, config);
 config.validateSubscription.returns(true);
 
-function aTransactionWith(builder: {subscriptionKey: string}) {
+function aTransactionWith(builder: { subscriptionKey: string }) {
 
     const transactionAppendix: types.TransactionAppendix = {
         prefetchAddresses: [],
@@ -28,7 +28,7 @@ function aTransactionWith(builder: {subscriptionKey: string}) {
         payload: ""
     };
 
-    return {transactionAppendix, transaction};
+    return { transactionAppendix, transaction };
 }
 
 describe("a transaction", () => {
@@ -38,7 +38,7 @@ describe("a transaction", () => {
 
         consensus.getSubscriptionStatus.withArgs({subscriptionKey}).returns({active: true, expiryTimestamp: -1});
 
-        await handler.handle(aTransactionWith({subscriptionKey}));
+        await handler.handle(aTransactionWith({ subscriptionKey }));
 
         consensus.sendTransaction.should.have.been.called;
     });
@@ -46,6 +46,6 @@ describe("a transaction", () => {
     it("is rejected when it includes an invalid subscription key", async () => {
         consensus.getSubscriptionStatus.returns({active: false, expiryTimestamp: -1});
 
-        await handler.handle(aTransactionWith({subscriptionKey: "some other key"})).should.be.rejected;
+        await handler.handle(aTransactionWith({ subscriptionKey: "some other key" })).should.be.rejected;
     });
 });
