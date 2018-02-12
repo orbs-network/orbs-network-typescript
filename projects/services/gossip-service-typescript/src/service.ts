@@ -41,7 +41,8 @@ export default class GossipService {
   askForHeartbeats() {
     const peers = topologyPeers(topology.peers);
 
-    this.askForHeartbeat(peers.gossip);
+    this.askForHeartbeat(peers.publicApi);
+    this.askForHeartbeat(peers.consensus);
   }
 
   async initGossip(): Promise<void> {
