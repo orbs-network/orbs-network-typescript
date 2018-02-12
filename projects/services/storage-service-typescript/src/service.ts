@@ -47,7 +47,7 @@ export default class StorageService {
 
   async initBlockStorage(): Promise<void> {
     this.blockStorage = new BlockStorage();
-    this.blockStorage.load();
+    await this.blockStorage.load();
   }
 
   async initStateStorage(): Promise<void> {
@@ -66,10 +66,8 @@ export default class StorageService {
   async main() {
     logger.info(`${topology.name}: service started`);
 
-    await Promise.all([
-      this.initBlockStorage(),
-      this.initStateStorage()
-    ]);
+    await this.initBlockStorage();
+    await this.initStateStorage();
 
     setInterval(() => this.askForHeartbeats(), 5000);
   }
