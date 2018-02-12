@@ -10,9 +10,10 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 const consensus = stubInterface<types.ConsensusClient>();
+const subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
 const config = stubInterface<TransactionHandlerConfig>();
-const handler = new TransactionHandler(consensus, config);
 config.validateSubscription.returns(true);
+const handler = new TransactionHandler(consensus, subscriptionManager, config);
 
 function aTransactionWith(builder: { subscriptionKey: string }) {
 
@@ -36,7 +37,7 @@ describe("a transaction", () => {
     it("is processed when it includes a valid subscription key", async () => {
         const subscriptionKey = "a valid key";
 
-        consensus.getSubscriptionStatus.withArgs({subscriptionKey}).returns({active: true, expiryTimestamp: -1});
+        subscriptionManager.getSubscriptionStatus.withArgs({ subscriptionKey }).returns({ active: true, expiryTimestamp: -1 });
 
         await handler.handle(aTransactionWith({ subscriptionKey }));
 
@@ -44,7 +45,7 @@ describe("a transaction", () => {
     });
 
     it("is rejected when it includes an invalid subscription key", async () => {
-        consensus.getSubscriptionStatus.returns({active: false, expiryTimestamp: -1});
+        subscriptionManager.getSubscriptionStatus.returns({ active: false, expiryTimestamp: -1 });
 
         await handler.handle(aTransactionWith({ subscriptionKey: "some other key" })).should.be.rejected;
     });
