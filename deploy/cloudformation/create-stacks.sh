@@ -3,4 +3,6 @@
 rm -rf tmp
 mkdir -p tmp
 
-node create-stacks.js $@
+# Set this variable to temporarily disable deployment on circle ci
+[ -z "$DISABLE_DEPLOYMENT" ] && node create-stacks.js $@
+exit $?

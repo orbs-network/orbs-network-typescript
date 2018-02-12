@@ -42,16 +42,14 @@ const deploy = stack =>
     });
   });
 
-const remove = stack =>
-  new Promise((resolve, reject) => {
+const remove = stack => {
+  return new Promise((resolve, reject) => {
     console.log(`Removing ${stack.StackName}`);
-
-    return new Promise((resolve, reject) => {
-      return cloudFormation.deleteStack({StackName: stack.StackName}, (err, data) => {
-        err ? reject(err) : resolve(data);
-      });
-    })
+    return cloudFormation.deleteStack({StackName: stack.StackName}, (err, data) => {
+      err ? reject(err) : resolve(data);
+    });
   });
+};
 
 const CF_STACK_STATUS = [
   "CREATE_IN_PROGRESS",
@@ -72,26 +70,38 @@ const CF_STACK_STATUS = [
   "CREATE_COMPLETE"
 ];
 
-const cfStacks = new Promise((resolve, reject) => {
+const getStacks = () => new Promise((resolve, reject) => {
   cloudFormation.listStacks({StackStatusFilter: CF_STACK_STATUS}, (err, data) => {
       if (err) return reject(err);
 
-      const results = stacksConfig.map(stack => {
+      const stacks = _.filter(stacksConfig.map(stack => {
         return _.find(data.StackSummaries, summary => _.endsWith(summary.StackName, stack.name))
-      });
+      }), _.isObject);
 
-      resolve(_.filter(results, _.isObject));
+      console.log(`Found ${stacks.length} stacks: ${_.map(stacks, 'StackName').join(', ')}`);
+      resolve(stacks);
   });
 });
 
-cfStacks.then(stacks => console.log(`Found ${stacks.length} stacks: ${_.map(stacks, 'StackName').join(', ')}`));
+const cfStacks = getStacks();
 
-const removeAll = () => {
-  return cfStacks.then(stacks => {
-    console.log(stacks);
-    return Promise.all(_.map(stacks, remove));
-  });
-};
+const removeAll = () => cfStacks.then(stacks => {
+  console.log('Removing stacks...');
+  return Promise.all(_.map(stacks, remove));
+});
+
+const waitForCleanup = () => new Promise((resolve, reject) => {
+  const interval = setInterval(() => {
+    console.log('Waiting for CloudFormation to be empty...');
+
+    getStacks().then(stacks => {
+      if (stacks.length === 0) {
+        clearInterval(interval);
+        resolve();
+      }
+    }).catch(reject);
+  }, 5000);
+});
 
 const deployAll = () => {
   return Promise.all(_.map(stacksConfig, deploy));
@@ -100,5 +110,8 @@ const deployAll = () => {
 if (process.argv[2] === '--remove-all') {
   removeAll().then(console.log, console.error);
 } else {
-  removeAll().then(deployAll).then(console.log, console.error);
+  removeAll().then(waitForCleanup).then(deployAll).then(console.log, (err) => {
+    console.error(console.error);
+    process.exit(1);
+  });
 }
