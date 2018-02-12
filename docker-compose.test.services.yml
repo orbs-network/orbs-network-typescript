@@ -93,7 +93,7 @@ services:
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
       - gossip:${PRIVATE_NETWORK}.19
 
