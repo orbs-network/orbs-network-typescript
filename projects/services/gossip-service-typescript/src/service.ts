@@ -46,8 +46,7 @@ export default class GossipService {
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(topology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"),
-      topologyPeers(topology.peers), topology.gossipPeers);
+    this.gossip = new Gossip(topology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
 
     setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();

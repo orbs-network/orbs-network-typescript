@@ -1,7 +1,8 @@
 import * as WebSocket from "ws";
 
-import { types } from "../common-library/types";
 import { logger } from "../common-library/logger";
+import { topology } from "../common-library/topology";
+import { topologyPeers } from "../common-library/topologyPeers";
 
 import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
@@ -27,19 +28,16 @@ export class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  peers: any;
-  gossipPeers: string[];
+  peers: any = topologyPeers(topology.peers);
   nodeIp: string;
 
-  constructor(port: number, localAddress: string, nodeIp: string, peers: any, gossipPeers: string[]) {
+  constructor(port: number, localAddress: string, nodeIp: string) {
     this.server = new WebSocket.Server({ port });
     this.nodeIp = nodeIp;
     this.localAddress = localAddress;
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
     });
-    this.gossipPeers = gossipPeers;
-    this.peers = peers;
   }
 
   helloMessage(): Buffer {
@@ -74,21 +72,19 @@ export class Gossip {
         logger.info("Registering connection", this.localAddress, "->", sender);
         return;
       }
-      const [recipient, broadcastGroup, objectType, objectRaw] = [readString(message), readString(message),
-        readString(message), message.slice(offset)];
+      const [recipient, broadcastGroup, objectType, objectRaw] = [readString(message), readString(message), readString(message), message.slice(offset)];
       if (recipient !== "" && recipient !== this.localAddress) {
         return;
       }
-      if (!this.listeners.has(broadcastGroup)) {
+      if (! this.listeners.has(broadcastGroup)) {
         const peer = this.peers[broadcastGroup];
-        if (!peer) {
+        if (! peer) {
           throw new Error(`Invalid broadcast group: [${broadcastGroup}]`);
         }
         this.listeners.set(broadcastGroup, peer);
       }
 
-      this.listeners.get(broadcastGroup).gossipMessageReceived({FromAddress: sender.toString(),
-        BroadcastGroup: broadcastGroup, MessageType: objectType, Buffer: objectRaw});
+      this.listeners.get(broadcastGroup).gossipMessageReceived({FromAddress: sender.toString(), BroadcastGroup: broadcastGroup, MessageType: objectType, Buffer: objectRaw});
     });
 
     ws.send(this.helloMessage());
@@ -132,11 +128,11 @@ export class Gossip {
   }
 
   public possiblePeers(): string[] {
-    const ip = this.ip();
-    const me = this.localAddress;
+    const ip = this.ip(),
+      me = this.localAddress;
 
     // TODO: better self-exclusion policy
-    return this.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
+    return topology.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
   }
 
   public activePeers() {

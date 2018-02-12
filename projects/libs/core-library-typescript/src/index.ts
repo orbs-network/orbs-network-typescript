@@ -1,5 +1,5 @@
 export { BlockStorage } from "./block-storage";
-export { config, logger, ErrorHandler, grpc, topologyPeers, types } from "./common-library";
+export * from "./common-library";
 export { Consensus, RaftConsensusConfig } from "./consensus";
 export { Gossip } from "./gossip";
 export { PublicApi } from "./public-api";
