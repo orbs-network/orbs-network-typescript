@@ -19,15 +19,15 @@ else
 fi
 
 function start_node() {
-    PUBLIC_API_HOST_PORT=$1 PRIVATE_NETWORK=$5 NODE_NAME=$2 NODE_IP=$3 PUBLIC_API_ORBS_NETWORK_IP=$4 docker-compose -p orbs-$2 -f $VOLUMES -f docker-compose.test.networks.yml -f docker-compose.test.services.yml up -d $FORCE_RECREATE_ARGUMENT
+    PUBLIC_API_HOST_PORT=$1 PRIVATE_NETWORK=$5 NODE_NAME=$2 NODE_IP=$3 PUBLIC_API_IP=$4 docker-compose -p orbs-$2 -f $VOLUMES -f docker-compose.test.networks.yml -f docker-compose.test.services.yml up -d $FORCE_RECREATE_ARGUMENT
 }
 
 function stop_node() {
-    PUBLIC_API_HOST_PORT=$1 PRIVATE_NETWORK=$5 NODE_NAME=$2 NODE_IP=$3 PUBLIC_API_ORBS_NETWORK_IP=$4 docker-compose -p orbs-$2 -f $VOLUMES -f docker-compose.test.networks.yml -f docker-compose.test.services.yml down
+    PUBLIC_API_HOST_PORT=$1 PRIVATE_NETWORK=$5 NODE_NAME=$2 NODE_IP=$3 PUBLIC_API_IP=$4 docker-compose -p orbs-$2 -f $VOLUMES -f docker-compose.test.networks.yml -f docker-compose.test.services.yml down
 }
 
 function run_e2e_test() {
-    E2E_ORBS_NETWORK_IP=$1 PUBLIC_API_ORBS_NETWORK_IP=$2 docker-compose -p orbs-e2e -f docker-compose.test.networks.yml -f docker-compose.test.e2e.yml run --rm e2e
+    E2E_CLIENT_IP=$1 PUBLIC_API_IP=$2 docker-compose -p orbs-e2e -f docker-compose.test.networks.yml -f docker-compose.test.e2e.yml run --rm e2e
 }
 
 export UP_D=restart
@@ -38,23 +38,25 @@ export UP_D=restart
 function start_test_environment() {
     stop_test_environment || true
     docker network create orbs-network --subnet 172.2.1.0/24
-    start_node 12345 node1 172.2.1.2 172.2.1.12 172.100.1 &
-    start_node 12346 node2 172.2.1.3 172.2.1.13 172.100.2 &
-    start_node 12347 node3 172.2.1.4 172.2.1.14 172.100.3 &
-    start_node 12348 node4 172.2.1.5 172.2.1.15 172.100.4 &
-    start_node 12349 node5 172.2.1.6 172.2.1.16 172.100.5 &
-    start_node 12350 node6 172.2.1.7 172.2.1.17 172.100.6 &
+    docker network create public-api-external-network --subnet 172.2.2.0/24
+    start_node 12345 node1 172.2.1.2 172.2.2.2 172.100.1 &
+    start_node 12346 node2 172.2.1.3 172.2.2.3 172.100.2 &
+    start_node 12347 node3 172.2.1.4 172.2.2.4 172.100.3 &
+    start_node 12348 node4 172.2.1.5 172.2.2.5 172.100.4 &
+    start_node 12349 node5 172.2.1.6 172.2.2.6 172.100.5 &
+    start_node 12350 node6 172.2.1.7 172.2.2.7 172.100.6 &
     wait
 }
 
 function stop_test_environment() {
-    stop_node 12345 node1 172.2.1.2 172.2.1.12 172.100.1 &
-    stop_node 12346 node2 172.2.1.3 172.2.1.13 172.100.2 &
-    stop_node 12347 node3 172.2.1.4 172.2.1.14 172.100.3 &
-    stop_node 12348 node4 172.2.1.5 172.2.1.15 172.100.4 &
-    stop_node 12349 node5 172.2.1.6 172.2.1.16 172.100.5 &
-    stop_node 12350 node6 172.2.1.7 172.2.1.17 172.100.6 &
+    stop_node 12345 node1 172.2.1.2 172.2.2.2 172.100.1 &
+    stop_node 12346 node2 172.2.1.3 172.2.2.3 172.100.2 &
+    stop_node 12347 node3 172.2.1.4 172.2.2.4 172.100.3 &
+    stop_node 12348 node4 172.2.1.5 172.2.2.5 172.100.4 &
+    stop_node 12349 node5 172.2.1.6 172.2.2.6 172.100.5 &
+    stop_node 12350 node6 172.2.1.7 172.2.2.7 172.100.6 &
     wait
+    docker network rm public-api-external-network  
     docker network rm orbs-network    
 }
 
@@ -67,7 +69,7 @@ else
 fi
 
 sleep ${STARTUP_WAITING_TIME-30}
-run_e2e_test 172.2.1.19 172.2.1.14
+run_e2e_test 172.2.2.9 172.2.2.4
 export EXIT_CODE=$?
 docker ps -a --no-trunc > logs/docker-ps
 
