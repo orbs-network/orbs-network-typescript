@@ -21,7 +21,6 @@ export class FooBarContractClient {
 }
 
 export class FooBarAccount {
-  // crypto: CryptoUtils;
   foobarContractClient: FooBarContractClient;
   readonly address: string;
 

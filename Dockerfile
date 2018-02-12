@@ -1,7 +1,6 @@
 FROM node:9-alpine
 
-RUN apk --no-cache add bash git yarn python build-base
-# last two enable gyp-rebuild for secp256k1
+RUN apk --no-cache add bash git yarn
 
 VOLUME [ "/opt/orbs/logs" ]
 

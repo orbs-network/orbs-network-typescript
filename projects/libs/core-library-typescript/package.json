@@ -19,11 +19,8 @@
     "test": "NODE_ENV=test ts-mocha test/**/*.spec.ts"
   },
   "dependencies": {
-    "@types/bluebird": "^3.5.20",
-    "@types/mocha": "^2.2.48",
     "bignumber.js": "^6.0.0",
     "bluebird": "^3.5.1",
-    "bs58": "^4.0.1",
     "gaggle": "git+https://github.com/lbeder/gaggle.git",
     "grpc": "^1.9.0",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",
@@ -35,7 +32,6 @@
     "nconf": "^0.10.0",
     "orbs-interfaces": "file:../../architecture",
     "protobufjs": "^6.8.4",
-    "secp256k1": "^3.5.0",
     "solc": "0.4.18",
     "source-map-support": "^0.5.3",
     "uncaught-exception": "^6.0.2",
@@ -46,10 +42,10 @@
     "ws": "^4.0.0"
   },
   "devDependencies": {
-    "@types/bs58": "^3.0.30",
+    "@types/bluebird": "^3.5.20",
     "@types/chai": "^4.1.2",
-    "@types/crypto-js": "^3.1.38",
     "@types/lodash": "^4.14.99",
+    "@types/mocha": "^2.2.48",
     "@types/mkdirp": "^0.5.2",
     "@types/nconf": "0.0.37",
     "@types/node": "^9.4.4",
