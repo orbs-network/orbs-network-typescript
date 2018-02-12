@@ -11,8 +11,9 @@ export class SubscriptionManager {
   private contractProxy: ERCBillingContractProxy;
   private config: SubscriptionManagerConfiguration;
 
-  constructor(config: SubscriptionManagerConfiguration) {
+  constructor(config: SubscriptionManagerConfiguration, sidechainConnector: types.SidechainConnectorClient) {
     this.config = config;
+    this.contractProxy = new ERCBillingContractProxy(sidechainConnector, this.config.ethereumContractAddress);
   }
 
   async getSubscriptionStatus(subscriptionKey: string) {

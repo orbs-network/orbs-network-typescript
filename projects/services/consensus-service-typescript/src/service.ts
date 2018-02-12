@@ -17,6 +17,7 @@ export default class ConsensusService {
   private gossip = topologyPeers(topology.peers).gossip;
   private virtualMachine = topologyPeers(topology.peers).virtualMachine;
   private storage = topologyPeers(topology.peers).storage;
+  private sidechainConnector = topologyPeers(topology.peers).sidechainConnector;
 
   // Consensus RPC:
 
@@ -97,9 +98,8 @@ export default class ConsensusService {
   }
 
   async initSubscriptionManager(): Promise<void> {
-    this.subscriptionManager = new SubscriptionManager({
-      ethereumContractAddress: config.get("ethereumContractAddress")
-    });
+    const SubscriptionManagerConfiguration = { ethereumContractAddress: config.get("ethereumContractAddress") };
+    this.subscriptionManager = new SubscriptionManager(SubscriptionManagerConfiguration, this.sidechainConnector);
   }
 
   async main() {
