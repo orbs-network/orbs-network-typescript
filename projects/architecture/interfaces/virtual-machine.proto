@@ -12,7 +12,6 @@ service VirtualMachine {
 message ExecuteTransactionInput {
   Transaction transaction = 1;
   TransactionAppendix transactionAppendix = 2;
-  uint32 lastBlockId = 5;
 }
 
 message ExecuteTransactionOutput {

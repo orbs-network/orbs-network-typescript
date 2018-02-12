@@ -1,4 +1,7 @@
 #!/bin/bash -e
 
-npm install
+yarn install
+
 ./build/typescript.sh
+
+yarn link

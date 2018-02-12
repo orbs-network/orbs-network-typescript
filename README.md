@@ -8,7 +8,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 `./install.sh`
 
-* Make sure you have node 8+ and npm 5+ installed before building.
+* Make sure you have node 8+ and yarn installed before building.
 * This command will delete `./projects` so make sure all changes are committed.
 
 ## Configuration
@@ -59,17 +59,8 @@ You can pass values through environment, but you have to replace colon (`:`) wit
 
 `./build.sh`
 
-* This will `npm install` all the sub projects which is a little slow but safer.
+* This will `yarn install` all the sub projects which is a little slow but safer.
 * This will also lint your code which is a little slow but safer.
-
-## Rebuild (faster)
-
-> Run when you made a small code change in one of the sub projects and you want to rebuild quickly:
-
-`./rebuild.sh`
-
-* This will not `npm install` and will not lint your code.
-* If you suspect your change did not go in, run `./build.sh` instead, it's more thorough.
 
 ## Develop Effectively
 
