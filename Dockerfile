@@ -1,6 +1,6 @@
 FROM node:9-alpine
 
-RUN apk --no-cache add bash git yarn
+RUN apk --no-cache add bash git yarn python
 
 VOLUME [ "/opt/orbs/logs" ]
 
