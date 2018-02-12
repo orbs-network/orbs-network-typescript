@@ -2,12 +2,15 @@ import * as path from "path";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
+import { config } from "../common-library/config";
 
 import { LevelDBDriver } from "./leveldb-driver";
 
+const NODE_NAME = config.get("NODE_NAME");
+
 export class BlockStorage {
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
-  public static readonly LEVELDB_PATH: string = path.resolve("../../../db/blocks.db");
+  public static readonly LEVELDB_PATH: string = path.resolve(`../../../db/blocks_${NODE_NAME}.db`);
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,
