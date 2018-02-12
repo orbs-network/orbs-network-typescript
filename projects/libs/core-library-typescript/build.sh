@@ -7,7 +7,6 @@ yarn install
 
 yarn run build
 
-# Please restore after removing the circular dependency between the libraries and the services.
-# yarn test
+yarn test
 
 yarn link
