@@ -98,8 +98,15 @@ export default class ConsensusService {
   }
 
   async initSubscriptionManager(): Promise<void> {
-    const SubscriptionManagerConfiguration = { ethereumContractAddress: config.get("ethereumContractAddress") };
-    this.subscriptionManager = new SubscriptionManager(this.sidechainConnector, SubscriptionManagerConfiguration);
+    const subscriptionManagerConfiguration = { ethereumContractAddress: config.get("ethereumContractAddress") };
+
+    if (!subscriptionManagerConfiguration.ethereumContractAddress) {
+      logger.error("ethereumContractAddress wasn't provided! Subscription manager is disabled!");
+
+      return;
+    }
+
+    this.subscriptionManager = new SubscriptionManager(this.sidechainConnector, subscriptionManagerConfiguration);
   }
 
   async main() {
