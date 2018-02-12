@@ -2,6 +2,7 @@ import * as _ from "lodash";
 import bind from "bind-decorator";
 
 import { logger, config, topology, grpc, types } from "orbs-core-library";
+
 import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library";
 
 const nodeTopology = topology();

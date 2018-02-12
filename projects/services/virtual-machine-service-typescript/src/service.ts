@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import bind from "bind-decorator";
 
 import { logger, topologyPeers, grpc, types, topology } from "orbs-core-library";
+
 import { VirtualMachine } from "orbs-core-library";
 
 const nodeTopology = topology();
