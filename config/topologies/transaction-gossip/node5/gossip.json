@@ -1,16 +1,16 @@
 {
     "name": "node1-gossip",
     "version": "1.0.0",
-    "endpoint": "0.0.0.0:51353",
+    "endpoint": "0.0.0.0:51553",
     "project": "gossip-service-typescript",
     "peers": [
         {
             "service": "public-api",
-            "endpoint": "0.0.0.0:51351"
+            "endpoint": "0.0.0.0:51551"
         },
         {
             "service": "consensus",
-            "endpoint": "0.0.0.0:51354"
+            "endpoint": "0.0.0.0:51554"
         }
     ],
     "gossipPort": "60005",
