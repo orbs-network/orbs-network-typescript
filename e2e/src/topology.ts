@@ -15,7 +15,7 @@ export class OrbsNode {
   static loadFromPath(topologyPath: string, nodeName: string) {
     const nodePath = path.resolve(topologyPath, nodeName);
     const serviceDirs = shell.ls(nodePath).filter((fileName: string) => fileName !== "config");
-    const services = serviceDirs.map((serviceDir: string) => new OrbsService(path.resolve(nodePath, serviceDir)));
+    const services = serviceDirs.map((serviceDir: string) => new OrbsService(nodeName, path.resolve(nodePath, serviceDir)));
 
     return new this(services);
   }
@@ -43,11 +43,13 @@ export class OrbsNode {
 }
 
 export class OrbsService {
+  nodeName: string;
   topologyPath: string;
   topology: any;
   process: any;
 
-  constructor(topologyPath: string) {
+  constructor(nodeName: string, topologyPath: string) {
+    this.nodeName = nodeName;
     this.topologyPath = topologyPath;
     this.topology = require(this.topologyPath);
   }
@@ -80,7 +82,14 @@ export class OrbsService {
     const childProcess = child_process.exec(
       `node dist/index.js ${absoluteTopologyPath}`, {
         cwd: projectPath,
-        env: { ...process.env, ...opts, ...{ NODE_ENV: "test" } }  // TODO: passing args in env var due a bug in nconf.argv used by the services
+        env: {
+          ...process.env,
+          ...opts,
+          ...{
+            NODE_ENV: "test",  // TODO: passing args in env var due a bug in nconf.argv used by the services
+            NODE_NAME: this.nodeName
+          }
+        }
       });
 
     if (!childProcess) {
