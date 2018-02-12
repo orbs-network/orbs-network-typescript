@@ -12,8 +12,6 @@ export default class SubscriptionManagerService {
 
   private sidechainConnector = topologyPeers(nodeTopology.peers).sidechainConnector;
 
-  // Subscription Manager RPC:
-
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
@@ -33,9 +31,6 @@ export default class SubscriptionManagerService {
   }
 
   askForHeartbeats() {
-    const peers = topologyPeers(nodeTopology.peers);
-
-    // this.askForHeartbeat(peers.sidechainConnector);
   }
 
   async initSubscriptionManager(): Promise<void> {

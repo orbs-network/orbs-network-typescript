@@ -41,26 +41,6 @@ export default class ConsensusService {
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
 
-  // Transaction Pool RPC:
-
-  @bind
-  public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
-    logger.info(`${nodeTopology.name}: addNewPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
-
-    this.transactionPool.addNewPendingTransaction(rpc.req.transaction);
-
-    rpc.res = {};
-  }
-
-  @bind
-  public async addExistingPendingTransaction(rpc: types.AddExistingPendingTransactionContext) {
-    logger.info(`${nodeTopology.name}: addExistingPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
-
-    this.transactionPool.addExistingPendingTransaction(rpc.req.transaction);
-
-    rpc.res = {};
-  }
-
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
     logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);

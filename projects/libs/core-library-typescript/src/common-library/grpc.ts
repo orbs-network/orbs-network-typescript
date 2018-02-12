@@ -87,7 +87,7 @@ export namespace grpc {
   }
 
   export function consensusServiceServer({ endpoint, services }: {
-    endpoint: string, services: [types.ConsensusServer, types.SubscriptionManagerServer]
+    endpoint: string, services: [types.ConsensusServer, types.SubscriptionManagerServer, types.TransactionPoolServer]
   }) {
     servers({
       multiProto: "consensus-service.proto",

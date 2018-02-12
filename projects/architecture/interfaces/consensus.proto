@@ -4,17 +4,11 @@ import "primitives/heartbeat.proto";
 import "primitives/gossip-listener.proto";
 
 import "./gossip.proto";
-import "./transaction-pool.proto";
 
 service Consensus {
-  // Consensus:
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
-
-  // Transaction Pool:
-  rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
-  rpc AddExistingPendingTransaction (AddExistingPendingTransactionInput) returns (AddExistingPendingTransactionOutput);
 }
 
 message SendTransactionInput {
