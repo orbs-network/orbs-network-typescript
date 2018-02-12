@@ -15,8 +15,7 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "NODE_ENV=test ts-mocha test/**/*.spec.ts"
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
     "bind-decorator": "^1.0.11",
