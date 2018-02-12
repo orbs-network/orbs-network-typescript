@@ -5,7 +5,7 @@
   "project": "virtual-machine-service-typescript",
   "peers": [
     {
-      "service": "state-storage",
+      "service": "storage",
       "endpoint": "0.0.0.0:51156"
     }
   ]

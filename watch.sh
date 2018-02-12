@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-npm run watch
+yarn run watch

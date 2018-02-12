@@ -1,5 +1,5 @@
 {
-  "name": "node5-public-api",
+  "name": "node1-public-api",
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51551",
   "project": "public-api-service-typescript",
@@ -15,6 +15,6 @@
     {
       "service": "virtual-machine",
       "endpoint": "0.0.0.0:51555"
-    }    
+    }
   ]
 }

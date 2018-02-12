@@ -1,8 +1,0 @@
-{
-  "name": "node5-block-storage",
-  "version": "1.0.0",
-  "endpoint": "0.0.0.0:51557",
-  "project": "block-storage-service-typescript",
-  "peers": [
-  ]
-}

@@ -3,64 +3,42 @@
     "runtime": "protobuf",
     "type": "static"
   },
-  "block-storage-service-typescript": {
-    "runtime": "typescript",
-    "service": "block-storage",
-    "type": "service"
-  },
-  "common-library-typescript": {
-    "runtime": "typescript",
-    "type": "library"
-  },
-  "consensus-service-typescript": {
+  "core-library-typescript": {
     "runtime": "typescript",
     "type": "library"
   },
   "gossip-service-typescript": {
     "runtime": "typescript",
-    "service": "gossip",
+    "type": "service"
+  },
+  "consensus-service-typescript": {
+    "runtime": "typescript",
     "type": "service"
   },
   "public-api-service-typescript": {
     "runtime": "typescript",
-    "service": "public-api",
-    "type": "service"
-  },
-  "state-storage-service-typescript": {
-    "runtime": "typescript",
-    "service": "state-storage",
-    "type": "service"
-  },
-  "transaction-pool-service-typescript": {
-    "runtime": "typescript",
-    "service": "transaction-pool",
-    "type": "service"
-  },
-  "virtual-machine-service-typescript": {
-    "runtime": "typescript",
-    "service": "virtual-machine",
     "type": "service"
   },
   "sidechain-connector-service-typescript": {
     "runtime": "typescript",
-    "service": "sidechain-connector"
+    "type": "service"
   },
-  "subscription-manager-service-typescript": {
+  "storage-service-typescript": {
     "runtime": "typescript",
-    "service": "subscription-manager",
+    "type": "service"
+  },
+  "virtual-machine-service-typescript": {
+    "runtime": "typescript",
     "type": "service"
   },
   "order": [
     "architecture",
-    "common-library-typescript",
-    "block-storage-service-typescript",
-    "consensus-service-typescript",
+    "core-library-typescript",
     "gossip-service-typescript",
+    "consensus-service-typescript",
     "public-api-service-typescript",
-    "state-storage-service-typescript",
-    "transaction-pool-service-typescript",
-    "virtual-machine-service-typescript",
     "sidechain-connector-service-typescript",
-    "subscription-manager-service-typescript"
+    "storage-service-typescript",
+    "virtual-machine-service-typescript"
   ]
 }

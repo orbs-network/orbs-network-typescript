@@ -1,0 +1,33 @@
+{
+  "name": "orbs-storage-service",
+  "version": "0.1.0",
+  "description": "orbs-storage-service",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orbs-network/orbs-network.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Orbs Team",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn run build-ts && yarn run tslint",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
+  },
+  "dependencies": {
+    "bind-decorator": "^1.0.11",
+    "lodash": "^4.17.4",
+    "orbs-core-library": "file:../../libs/core-library-typescript"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.99",
+    "@types/node": "^9.4.4",
+    "@types/supertest": "^2.0.4",
+    "concurrently": "^3.5.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.1"
+  }
+}

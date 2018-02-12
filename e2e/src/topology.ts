@@ -2,8 +2,8 @@ import * as path from "path";
 import * as shell from "shelljs";
 import * as child_process from "child_process";
 import { delay } from "bluebird";
-import * as _  from "lodash";
-import { grpc } from "orbs-common-library/src/grpc";
+import * as _ from "lodash";
+import { grpc } from "orbs-core-library/dist/common-library";
 
 export class OrbsNode {
   services: OrbsService[];
@@ -14,13 +14,13 @@ export class OrbsNode {
 
   static loadFromPath(topologyPath: string, nodeName: string) {
     const nodePath = path.resolve(topologyPath, nodeName);
-
     const serviceDirs = shell.ls(nodePath).filter((fileName: string) => fileName !== "config");
-    const services = serviceDirs.map((serviceDir: string) => new OrbsService(path.resolve(nodePath, serviceDir)));
+    const services = serviceDirs.map((serviceDir: string) => new OrbsService(nodeName, path.resolve(nodePath, serviceDir)));
+
     return new this(services);
   }
 
-  async startAll(optsPerService: { [key: string]: {}} = {}) {
+  async startAll(optsPerService: { [key: string]: {} } = {}) {
     return Promise.all(this.services.map(service => service.start(optsPerService[service.getProjectName()])));
   }
 
@@ -31,23 +31,27 @@ export class OrbsNode {
   }
 
   getPublicApiClient() {
-    const publicApiService = _.find(
-      this.services, (service: OrbsService) => service.topology.project === "public-api-service-typescript");
-    if (!publicApiService)
-      throw "failed to find a public api service in the node";
+    const publicApiService = _.find(this.services, (service: OrbsService) =>
+      service.topology.project === "public-api-service-typescript");
+
+    if (!publicApiService) {
+      throw new Error("Failed to find a public api service in the node");
+    }
 
     return grpc.publicApiClient({ endpoint: publicApiService.topology.endpoint });
   }
 }
 
 export class OrbsService {
+  nodeName: string;
   topologyPath: string;
   topology: any;
   process: any;
 
-  constructor(topologyPath: string) {
-      this.topologyPath = topologyPath;
-      this.topology = require(this.topologyPath);
+  constructor(nodeName: string, topologyPath: string) {
+    this.nodeName = nodeName;
+    this.topologyPath = topologyPath;
+    this.topology = require(this.topologyPath);
   }
 
   getProjectName(): string {
@@ -55,12 +59,13 @@ export class OrbsService {
   }
 
   public async start(opts = {}) {
-      if (this.process) {
-          throw "already running";
-      }
-      this.process = this.run(opts);
-      // TODO: wait by polling service state (not implemented yet in the server-side)
-      await delay(30000);
+    if (this.process) {
+      throw new Error("Already running!");
+    }
+
+    this.process = this.run(opts);
+    // TODO: wait by polling service state (not implemented yet in the server-side)
+    await delay(30000);
   }
 
   public async stop() {
@@ -72,23 +77,33 @@ export class OrbsService {
   }
 
   private run(opts = {}, streamStdout = true) {
-      const projectPath = path.resolve(__dirname, "../../projects", this.topology.project);
-      const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
-      const childProcess = child_process.exec(
-          `node dist/index.js ${absoluteTopologyPath}`, {
-              async: true,
-              cwd: projectPath,
-              env: {...process.env, ...opts, ...{NODE_ENV: "test"}}  // TODO: passing args in env var due a bug in nconf.argv used by the services
-          });
-      if (!childProcess) {
-        throw "failed to run process";
-      }
-      if (streamStdout) {
-          childProcess.stdout.on("data", console.log);
-          childProcess.stderr.on("data", console.log);
-      }
-      this.process = childProcess;
-      return childProcess;
+    const projectPath = path.resolve(__dirname, "../../projects/services", this.topology.project);
+    const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
+    const childProcess = child_process.exec(
+      `node dist/index.js ${absoluteTopologyPath}`, {
+        cwd: projectPath,
+        env: {
+          ...process.env,
+          ...opts,
+          ...{
+            NODE_ENV: "test",  // TODO: passing args in env var due a bug in nconf.argv used by the services
+            NODE_NAME: this.nodeName
+          }
+        }
+      });
+
+    if (!childProcess) {
+      throw new Error("Failed to run process");
+    }
+
+    if (streamStdout) {
+      childProcess.stdout.on("data", console.log);
+      childProcess.stderr.on("data", console.error);
+    }
+
+    this.process = childProcess;
+
+    return childProcess;
   }
 }
 
@@ -99,7 +114,7 @@ export class OrbsTopology {
     this.nodes = nodes;
   }
 
-  async startAll(optsPerService: { [key: string]: {}} = {}) {
+  async startAll(optsPerService: { [key: string]: {} } = {}) {
     return Promise.all(this.nodes.map(node => node.startAll(optsPerService)));
   }
 
@@ -111,7 +126,7 @@ export class OrbsTopology {
     const topologyAbsolutePath = path.resolve(__dirname, topologyPath);
     const nodeDirs = shell.ls(topologyAbsolutePath);
     const nodes = nodeDirs.map((nodeName: string) => OrbsNode.loadFromPath(topologyAbsolutePath, nodeName));
+
     return new this(nodes);
   }
 }
-
