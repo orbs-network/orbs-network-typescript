@@ -1,7 +1,6 @@
 import * as WebSocket from "ws";
 
 import { logger } from "../common-library/logger";
-import { topology } from "../common-library/topology";
 import { topologyPeers } from "../common-library/topologyPeers";
 
 import { includes } from "lodash";
@@ -28,7 +27,8 @@ export class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  peers: any = topologyPeers(topology.peers);
+  peers: any;
+  gossipPeers: string[];
   nodeIp: string;
 
   constructor(port: number, localAddress: string, nodeIp: string) {
@@ -37,6 +37,12 @@ export class Gossip {
     this.localAddress = localAddress;
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
+    });
+
+    // TODO: instead of avoiding dynamic import of topology - refactor it away.
+    import("../common-library/topology").then((topology: any) => {
+      this.peers = topologyPeers(topology.topology.peers);
+      this.gossipPeers = topology.topology.gossipPeers;
     });
   }
 
@@ -132,7 +138,7 @@ export class Gossip {
       me = this.localAddress;
 
     // TODO: better self-exclusion policy
-    return topology.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
+    return this.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
   }
 
   public activePeers() {
