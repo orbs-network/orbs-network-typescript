@@ -35,7 +35,7 @@ export default class SubscriptionManagerService {
   askForHeartbeats() {
     const peers = topologyPeers(nodeTopology.peers);
 
-    this.askForHeartbeat(peers.sidechainConnector);
+    // this.askForHeartbeat(peers.sidechainConnector);
   }
 
   async initSubscriptionManager(): Promise<void> {
