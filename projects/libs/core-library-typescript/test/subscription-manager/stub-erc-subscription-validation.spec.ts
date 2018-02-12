@@ -62,9 +62,9 @@ class OrbsService {
   }
 }
 
-class OrbsConsensus extends OrbsService {
+class OrbsSubscriptionManager extends OrbsService {
   public getClient() {
-    return grpc.consensusClient({ endpoint: this.context.topology.endpoint });
+    return grpc.subscriptionManagerClient({ endpoint: this.context.topology.endpoint });
   }
 
   public async start(opts: { ethereumContractAddress: string }) {
@@ -83,12 +83,12 @@ class OrbsSidechainConnector extends OrbsService {
 }
 
 class TestEnvironment {
-  public readonly consensus: OrbsConsensus;
+  public readonly subscriptionManager: OrbsSubscriptionManager;
   public readonly sidechainConnector: OrbsSidechainConnector;
   public readonly ethereumNode: EthereumSimulationNode;
 
   constructor() {
-    this.consensus = new OrbsConsensus("./topology/consensus.json");
+    this.subscriptionManager = new OrbsSubscriptionManager("./topology/consensus.json");
     this.sidechainConnector = new OrbsSidechainConnector("./topology/sidechain-connector.json");
     this.ethereumNode = new EthereumSimulationNode();
   }
@@ -98,12 +98,12 @@ class TestEnvironment {
     const ethereumContractAddress = await this.ethereumNode.deployOrbsStubContract(100, ACTIVE_SUBSCRIPTION_ID);
     await Promise.all([
       this.sidechainConnector.start({ ethereumNodeAddress: `http://localhost:${this.ethereumNode.port}` }),
-      this.consensus.start({ ethereumContractAddress })
+      this.subscriptionManager.start({ ethereumContractAddress })
     ]);
   }
 
   stop() {
-    this.consensus.stop();
+    this.subscriptionManager.stop();
     this.sidechainConnector.stop();
     this.ethereumNode.stop();
   }
@@ -117,7 +117,7 @@ describe("subscription manager.getSubscriptionStatus() on a stub Orbs Ethereum c
   before(async function () {
     this.timeout(15000);
     await testEnvironment.start();
-    client = testEnvironment.consensus.getClient();
+    client = testEnvironment.subscriptionManager.getClient();
   });
 
   it("should return that subscription is active if enough tokens", async () => {

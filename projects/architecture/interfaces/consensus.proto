@@ -5,22 +5,16 @@ import "primitives/gossip-listener.proto";
 
 import "./gossip.proto";
 import "./transaction-pool.proto";
-import "./subscription-manager.proto";
 
 service Consensus {
   // Consensus:
-  rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
-
-  // Gossip:
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+  rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 
   // Transaction Pool:
   rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
   rpc AddExistingPendingTransaction (AddExistingPendingTransactionInput) returns (AddExistingPendingTransactionOutput);
-
-  // Subscription Manager:
-  rpc GetSubscriptionStatus (GetSubscriptionStatusInput) returns (GetSubscriptionStatusOutput);
 }
 
 message SendTransactionInput {
