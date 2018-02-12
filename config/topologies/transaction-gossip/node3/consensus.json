@@ -1,5 +1,5 @@
 {
-  "name": "node3-consensus",
+  "name": "node1-consensus",
   "version": "1.0.0",
   "endpoint": "0.0.0.0:51354",
   "project": "consensus-service-typescript",
@@ -13,9 +13,8 @@
       "endpoint": "0.0.0.0:51355"
     },
     {
-      "service": "block-storage",
-      "endpoint": "0.0.0.0:51357"
+      "service": "storage",
+      "endpoint": "0.0.0.0:51356"
     }
-
   ]
 }

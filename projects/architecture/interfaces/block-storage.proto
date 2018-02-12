@@ -1,14 +1,6 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
-
-service BlockStorage {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
-  rpc AddBlock (AddBlockInput) returns (AddBlockOutput);
-  rpc GetBlocks (GetBlocksInput) returns (GetBlocksOutput);
-  rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
-}
 
 message BlockHeader {
   uint32 version = 1;
@@ -27,14 +19,6 @@ message AddBlockInput {
 }
 
 message AddBlockOutput {
-}
-
-message GetBlocksInput {
-  uint32 lastBlockId = 1;
-}
-
-message GetBlocksOutput {
-  repeated Block blocks = 1;
 }
 
 message GetLastBlockIdInput {
