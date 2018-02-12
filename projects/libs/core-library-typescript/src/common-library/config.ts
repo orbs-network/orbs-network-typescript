@@ -7,7 +7,7 @@ export class Config {
   private static readonly DEV_ENV: string = "development";
   private static readonly PROD_ENV: string = "production";
   private static readonly STAGING_ENV: string = "staging";
-  private static readonly RELATIVE_PATH: string = "../../../../config/";
+  private static readonly RELATIVE_PATH: string = "../../../../../config/";
   private static readonly EXT: string = ".json";
 
   constructor() {
@@ -15,7 +15,8 @@ export class Config {
     //   1. Command-line arguments.
     //   2. Environment variables.
     //   3. A file located at 'config/[ENVIRONMENT].json'
-    nconf.argv().env({ separator: "__" }).file(path.resolve(__dirname, Config.RELATIVE_PATH, Config.getEnvironment()) + Config.EXT);
+    nconf.argv().env({ separator: "__" }).file(path.resolve(__dirname, Config.RELATIVE_PATH, Config.getEnvironment()) +
+      Config.EXT);
   }
 
   public get(key: string) {
