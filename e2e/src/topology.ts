@@ -79,7 +79,6 @@ export class OrbsService {
     const absoluteTopologyPath = path.resolve(__dirname, this.topologyPath);
     const childProcess = child_process.exec(
       `node dist/index.js ${absoluteTopologyPath}`, {
-        async: true,
         cwd: projectPath,
         env: { ...process.env, ...opts, ...{ NODE_ENV: "test" } }  // TODO: passing args in env var due a bug in nconf.argv used by the services
       });
