@@ -1,11 +1,11 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { logger, config, topologyPeers, grpc, types } from "orbs-core-library";
+import { topology } from "orbs-core-library/src/common-library/topology";
 
-import { Consensus, RaftConsensusConfig } from "orbs-core-library/dist/consensus";
-import { Gossip } from "orbs-core-library/dist/gossip";
+import { Consensus, RaftConsensusConfig } from "orbs-core-library";
+import { Gossip } from "orbs-core-library";
 
 export default class GossipService {
   private gossip: Gossip;

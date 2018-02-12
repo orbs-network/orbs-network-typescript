@@ -3,7 +3,7 @@ import * as shell from "shelljs";
 import * as child_process from "child_process";
 import { delay } from "bluebird";
 import * as _ from "lodash";
-import { grpc } from "orbs-core-library/dist/common-library";
+import { grpc } from "orbs-core-library";
 
 export class OrbsNode {
   services: OrbsService[];

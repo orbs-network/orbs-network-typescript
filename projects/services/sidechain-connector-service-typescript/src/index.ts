@@ -1,5 +1,5 @@
-import { config, ErrorHandler, grpc } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { config, ErrorHandler, grpc } from "orbs-core-library";
+import { topology } from "orbs-core-library/src/common-library/topology";
 
 import SidehainConnectorService from "./service";
 

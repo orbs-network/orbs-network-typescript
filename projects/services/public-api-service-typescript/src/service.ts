@@ -1,10 +1,10 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { logger, config, topologyPeers, grpc, types } from "orbs-core-library";
+import { topology } from "orbs-core-library/src/common-library/topology";
 
-import { PublicApi } from "orbs-core-library/dist/public-api";
+import { PublicApi } from "orbs-core-library";
 
 export default class PublicApiService {
   private publicApi: PublicApi;
