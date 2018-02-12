@@ -1,11 +1,12 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, grpc, types } from "orbs-core-library";
-import { topology } from "orbs-core-library/src/common-library/topology";
+import { logger, grpc, types, topology } from "orbs-core-library";
 
 import { BlockStorage } from "orbs-core-library";
 import { StateStorage } from "orbs-core-library";
+
+const nodeTopology = topology();
 
 export default class StorageService {
   private blockStorage: BlockStorage;
@@ -15,13 +16,13 @@ export default class StorageService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
-    rpc.res = { responderName: topology.name, responderVersion: topology.version };
+    logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
   @bind
   public async addBlock(rpc: types.AddBlockContext) {
-    logger.debug(`${topology.name}: addBlock ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${nodeTopology.name}: addBlock ${JSON.stringify(rpc.req)}`);
 
     await this.blockStorage.addBlock(rpc.req.block);
 
@@ -30,7 +31,7 @@ export default class StorageService {
 
   @bind
   public async getLastBlockId(rpc: types.GetLastBlockIdContext) {
-    logger.debug(`${topology.name}: getLastBlockId ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${nodeTopology.name}: getLastBlockId ${JSON.stringify(rpc.req)}`);
 
     rpc.res = { blockId: await this.blockStorage.getLastBlockId() };
   }
@@ -39,7 +40,7 @@ export default class StorageService {
 
   @bind
   public async readKeys(rpc: types.ReadKeysContext) {
-    logger.debug(`${topology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
+    logger.debug(`${nodeTopology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
     const keys = await this.stateStorage.readKeys(rpc.req.address, rpc.req.keys);
     rpc.res = { values: _.fromPairs([...keys]) };
@@ -56,15 +57,15 @@ export default class StorageService {
   }
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
+    logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
   }
 
   async main() {
-    logger.info(`${topology.name}: service started`);
+    logger.info(`${nodeTopology.name}: service started`);
 
     await this.initBlockStorage();
     await this.initStateStorage();
