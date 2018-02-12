@@ -45,60 +45,60 @@ contract SimpleStorage {
 `;
 
 async function deployContract(web3: any, intValue: number, stringValue: string) {
-    // compile contract
-    const output = solc.compile(SIMPLE_STORAGE_SOLIDITY_CONTRACT, 1);
-    if (output.errors)
-        throw output.errors;
-    const bytecode = output.contracts[":SimpleStorage"].bytecode;
-    const abi = JSON.parse(output.contracts[":SimpleStorage"].interface);
-    // deploy contract
-    const contract = new web3.eth.Contract(abi, {data: "0x" + bytecode});
-    const tx = contract.deploy({arguments: [intValue, stringValue]});
-    const account = (await web3.eth.getAccounts())[0];
-    return tx.send({
-        from: account,
-        gas: await tx.estimateGas()
-    }).then((newContractInstance: Contract) => {
-        return newContractInstance.options.address;
-    });
+  // compile contract
+  const output = solc.compile(SIMPLE_STORAGE_SOLIDITY_CONTRACT, 1);
+  if (output.errors)
+    throw output.errors;
+  const bytecode = output.contracts[":SimpleStorage"].bytecode;
+  const abi = JSON.parse(output.contracts[":SimpleStorage"].interface);
+  // deploy contract
+  const contract = new web3.eth.Contract(abi, { data: "0x" + bytecode });
+  const tx = contract.deploy({ arguments: [intValue, stringValue] });
+  const account = (await web3.eth.getAccounts())[0];
+  return tx.send({
+    from: account,
+    gas: await tx.estimateGas()
+  }).then((newContractInstance: Contract) => {
+    return newContractInstance.options.address;
+  });
 }
 
 describe("Ethereum connector", () => {
-    describe("testing connection to an Ethereum node simulator (aka Ganache)", () => {
-    const ganacheProvider = ganache.provider({accounts: [{balance: "300000000000000000000"}], total_accounts: 1});
+  describe("testing connection to an Ethereum node simulator (aka Ganache)", () => {
+    const ganacheProvider = ganache.provider({ accounts: [{ balance: "300000000000000000000" }], total_accounts: 1 });
     const web3 = new Web3(ganacheProvider);
     const ganacheConnector = new EthereumConnector(web3);
 
-        describe("call to a deployed SimpleStorage contract's get() method", () => {
-            const intValue = Math.floor(Math.random() * 10000000);
-            const stringValue = "foobar";
-            let contractAddress;
-            let res: any;
-            before(async function() {
-                this.timeout(30000);
-                contractAddress = await deployContract(web3, intValue, stringValue);
-                res = await ganacheConnector.call(
-                    contractAddress, {
-                        name: "getValues",
-                        inputs: [],
-                        outputs: [
-                            {name: "intValue", type: "uint256"},
-                            {name: "stringValue", type: "string"}
-                        ]
-                    }, []);
-            });
-            it("should return the values passed to the contract constructor", () => {
-                expect(res).to.ownProperty("result");
-                expect(res.result).to.ownProperty("intValue", intValue.toString());
-                expect(res.result).to.ownProperty("stringValue", stringValue);
-            });
-            it("should return a valid block with a recent timestamp", () => {
-                expect(res).to.ownProperty("block");
-                expect(res.block).to.ownProperty("timestamp");
-                const now = Date.now() / 1000;
-                expect(res.block.timestamp).to.be.gt(now - 600);
-                expect(res.block.timestamp).to.be.lt(now + 10);
-            });
-        });
+    describe("call to a deployed SimpleStorage contract's get() method", () => {
+      const intValue = Math.floor(Math.random() * 10000000);
+      const stringValue = "foobar";
+      let contractAddress;
+      let res: any;
+      before(async function () {
+        this.timeout(30000);
+        contractAddress = await deployContract(web3, intValue, stringValue);
+        res = await ganacheConnector.call(
+          contractAddress, {
+            name: "getValues",
+            inputs: [],
+            outputs: [
+              { name: "intValue", type: "uint256" },
+              { name: "stringValue", type: "string" }
+            ]
+          }, []);
+      });
+      it("should return the values passed to the contract constructor", () => {
+        expect(res).to.own.property("result");
+        expect(res.result).to.own.property("intValue", intValue.toString());
+        expect(res.result).to.own.property("stringValue", stringValue);
+      });
+      it("should return a valid block with a recent timestamp", () => {
+        expect(res).to.own.property("block");
+        expect(res.block).to.own.property("timestamp");
+        const now = Date.now() / 1000;
+        expect(res.block.timestamp).to.be.gt(now - 600);
+        expect(res.block.timestamp).to.be.lt(now + 10);
+      });
     });
+  });
 });
