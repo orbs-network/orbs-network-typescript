@@ -1,13 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Creates ECR, roles, reserves Elastic IPs
-Parameters:
-  KeyName:
-    Type: String
-    Description: >
-      Optional - Specifies the name of an existing Amazon EC2 key pair
-      to enable SSH access to the EC2 instances in your cluster.
-    Default: ''
+#Parameters:
+# TODO: customize names with NODE_ENV
 
 # TODO: limit associate address to a certain namespace
 Resources:
@@ -30,6 +25,11 @@ Resources:
       Roles:
         - !Ref ORBSNetworkRole
 
+  ORBSNetworkS3Bucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Join ["-", ["orbs-network-config-staging", !Ref "AWS::Region"]]
+
   # TODO: only give access to region bucket
   ORBSNetworkAccessS3Policy:
     Type: "AWS::IAM::Policy"
@@ -51,8 +51,8 @@ Resources:
                 "s3:GetObjectVersion"
               ],
               "Resource": [
-                "arn:aws:s3:::orbs-network-config-staging",
-                "arn:aws:s3:::orbs-network-config-staging/*"
+                "arn:aws:s3:::orbs-network-config-staging*",
+                "arn:aws:s3:::orbs-network-config-staging*/*"
               ]
             },
             {
@@ -129,7 +129,7 @@ Outputs:
       Name: !Join ["-", ["orbs-network-instance-profile", !Ref "AWS::Region"]]
 
   ORBSRepository:
-    Value: !Ref ORBSRepository
+    Value: !Join [ ".", [ !Ref "AWS::AccountId", "dkr.ecr", !Ref "AWS::Region", !Join [ "/", [ "amazonaws.com", !Ref ORBSRepository ] ] ] ]
     Export:
       Name: !Join ["-", ["orbs-repository", !Ref "AWS::Region"]]
 
@@ -142,6 +142,11 @@ Outputs:
     Value: !Ref ORBSNodeDomainName
     Export:
       Name: !Join ["-", ["orbs-node-domain-name", !Ref "AWS::Region"]]
+
+  ORBSNetworkS3Bucket:
+    Value: !Ref ORBSNetworkS3Bucket
+    Export:
+      Name: !Join ["-", ["orbs-network-s3-bucket", !Ref "AWS::Region"]]
 
   TemplateVersion:
     Description: The version of the template used by ORBS
