@@ -15,6 +15,8 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
       }
       case "consensus": {
         res.consensus = grpc.consensusClient({ endpoint: peer.endpoint });
+        res.subscriptionManager = grpc.subscriptionManagerClient({ endpoint: peer.endpoint });
+        res.transactionPool = grpc.transactionPoolClient({ endpoint: peer.endpoint });
         break;
       }
       case "virtual-machine": {

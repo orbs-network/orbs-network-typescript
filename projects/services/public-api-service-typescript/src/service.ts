@@ -3,15 +3,25 @@ import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
+import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
 import { PublicApi } from "orbs-core-library";
 
 const nodeTopology = topology();
+
+class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
+  validateSubscription(): boolean {
+    return false;
+  }
+}
 
 export default class PublicApiService {
   private publicApi: PublicApi;
 
   private virtualMachine = topologyPeers(nodeTopology.peers).virtualMachine;
   private consensus = topologyPeers(nodeTopology.peers).consensus;
+  private subscriptionManager = topologyPeers(nodeTopology.peers).subscriptionManager;
+  private transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager,
+    new ConstantTransactionHandlerConfig());
 
   // Public API RPC:
 
@@ -54,7 +64,7 @@ export default class PublicApiService {
   async main() {
     logger.info(`${nodeTopology.name}: service started`);
 
-    this.publicApi = new PublicApi(this.consensus, this.virtualMachine);
+    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
 
     setInterval(() => this.askForHeartbeats(), 5000);
   }

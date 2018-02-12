@@ -118,6 +118,14 @@ export namespace grpc {
     return client({ proto: "subscription-manager.proto", name: "SubscriptionManager", endpoint });
   }
 
+  export function transactionPoolServer({ endpoint, service }: { endpoint: string, service: types.TransactionPoolServer }) {
+    server({ proto: "transaction-pool.proto", name: "TransactionPool", endpoint, service });
+  }
+
+  export function transactionPoolClient({ endpoint }: { endpoint: string }): types.TransactionPoolClient {
+    return client({ proto: "transaction-pool.proto", name: "TransactionPool", endpoint });
+  }
+
   export function publicApiServer({ endpoint, service }: { endpoint: string, service: types.PublicApiServer }) {
     server({ proto: "public-api.proto", name: "PublicApi", endpoint, service });
   }
