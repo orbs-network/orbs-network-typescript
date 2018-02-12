@@ -6,14 +6,9 @@ services:
     volumes:
       - ./config/test.json:/opt/orbs/config/test.json
       - ./e2e:/opt/orbs/e2e
-      - ./projects/transaction-pool-service-typescript/dist:/opt/orbs/projects/transaction-pool-service-typescript/dist
-      - ./projects/public-api-service-typescript/dist:/opt/orbs/projects/public-api-service-typescript/dist
-      - ./projects/sidechain-connector-service-typescript/dist:/opt/orbs/projects/sidechain-connector-service-typescript/dist
-      - ./projects/subscription-manager-service-typescript/dist:/opt/orbs/projects/subscription-manager-service-typescript/dist
-      - ./projects/architecture/dist:/opt/orbs/projects/architecture/dist
-      - ./projects/state-storage-service-typescript/dist:/opt/orbs/projects/state-storage-service-typescript/dist
-      - ./projects/common-library-typescript/dist:/opt/orbs/projects/common-library-typescript/dist
-      - ./projects/consensus-service-typescript/dist:/opt/orbs/projects/consensus-service-typescript/dist
-      - ./projects/virtual-machine-service-typescript/dist:/opt/orbs/projects/virtual-machine-service-typescript/dist
-      - ./projects/block-storage-service-typescript/dist:/opt/orbs/projects/block-storage-service-typescript/dist
-      - ./projects/gossip-service-typescript/dist:/opt/orbs/projects/gossip-service-typescript/dist
+      - ./projects/services/public-api-service-typescript/dist:/opt/orbs/projects/services/public-api-service-typescript/dist
+      - ./projects/services/sidechain-connector-service-typescript/dist:/opt/orbs/projects/services/sidechain-connector-service-typescript/dist
+      - ./projects/services/storage-service-typescript/dist:/opt/orbs/projects/services/storage-service-typescript/dist
+      - ./projects/services/gossip-service-typescript/dist:/opt/orbs/projects/services/gossip-service-typescript/dist
+      - ./projects/services/consensus-service-typescript/dist:/opt/orbs/projects/services/consensus-service-typescript/dist
+      - ./projects/services/virtual-machine-service-typescript/dist:/opt/orbs/projects/services/virtual-machine-service-typescript/dist

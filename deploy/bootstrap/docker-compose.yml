@@ -1,9 +1,25 @@
 version: '2'
 
 services:
+  gossip:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    working_dir: /opt/orbs/projects/services/gossip-service-typescript/
+    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/gossip.js
+    volumes:
+      - /opt/keys/:/opt/orbs/config/topologies/discovery/node1/config/
+    ports:
+      - 60001:60001
+    env_file:
+      - .env
+      - .env-secrets
+    environment:
+      SERVICE: gossip
+    networks:
+      default:
+
   consensus:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/consensus-service-typescript/
+    working_dir: /opt/orbs/projects/services/consensus-service-typescript/
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/consensus.js
     restart: always
     volumes:
@@ -18,7 +34,7 @@ services:
 
   public-api:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/public-api-service-typescript/
+    working_dir: /opt/orbs/projects/services/public-api-service-typescript/
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/public-api.js
     ports:
       - 51151:51151
@@ -30,10 +46,10 @@ services:
     networks:
       default:
 
-  state-storage:
+  storage:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/state-storage-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/state-storage.js
+    working_dir: /opt/orbs/projects/services/storage-service-typescript/
+    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/storage.js
     env_file:
       - .env
       - .env-secrets
@@ -44,7 +60,7 @@ services:
 
   virtual-machine:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/virtual-machine-service-typescript/
+    working_dir: /opt/orbs/projects/services/virtual-machine-service-typescript/
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/virtual-machine.js
     env_file:
       - .env
@@ -53,35 +69,6 @@ services:
       SERVICE: virtual-machine
     networks:
       default:
-
-  block-storage:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/block-storage-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/block-storage.js
-    env_file:
-      - .env
-      - .env-secrets
-    environment:
-      SERVICE: block-storage
-    networks:
-      default:
-
-  gossip:
-    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/gossip-service-typescript/
-    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/gossip.js
-    volumes:
-      - /opt/keys/:/opt/orbs/config/topologies/discovery/node1/config/
-    ports:
-      - 60001:60001
-    env_file:
-      - .env
-      - .env-secrets
-    environment:
-      SERVICE: gossip
-    networks:
-      default:
-
 
 networks:
   default:

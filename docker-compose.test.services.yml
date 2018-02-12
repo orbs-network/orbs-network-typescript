@@ -5,7 +5,7 @@ services:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
-    working_dir: /opt/orbs/projects/consensus-service-typescript/
+    working_dir: /opt/orbs/projects/services/consensus-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/consensus.js
     networks:
       node-network:
@@ -15,16 +15,15 @@ services:
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
+      - gossip:${PRIVATE_NETWORK}.19
 
   public-api:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
-    working_dir: /opt/orbs/projects/public-api-service-typescript/
+    working_dir: /opt/orbs/projects/services/public-api-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/public-api.js
     ports:
       - ${PUBLIC_API_HOST_PORT}:51151
@@ -38,18 +37,16 @@ services:
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
-      - subscription-manager:${PRIVATE_NETWORK}.22
+      - gossip:${PRIVATE_NETWORK}.19
 
-  state-storage:
+  storage:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
-    working_dir: /opt/orbs/projects/state-storage-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/state-storage.js
+    working_dir: /opt/orbs/projects/services/storage-service-typescript/
+    command: node dist/index.js ${NODE_CONFIG_PATH}/storage.js
     volumes_from:
       - shared_volumes
     networks:
@@ -58,16 +55,15 @@ services:
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
-    
+      - gossip:${PRIVATE_NETWORK}.19
+
   virtual-machine:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
-    working_dir: /opt/orbs/projects/virtual-machine-service-typescript/
+    working_dir: /opt/orbs/projects/services/virtual-machine-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/virtual-machine.js
     volumes_from:
       - shared_volumes
@@ -77,35 +73,15 @@ services:
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
-  
-  block-storage:
-    extends:
-      file: docker-compose.test.base.yml
-      service: base-service
-    working_dir: /opt/orbs/projects/block-storage-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/block-storage.js
-    volumes_from:
-      - shared_volumes
-    networks:
-      node-network:
-        ipv4_address: ${PRIVATE_NETWORK}.19
-    extra_hosts:
-      - consensus:${PRIVATE_NETWORK}.15
-      - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
-      - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
+      - gossip:${PRIVATE_NETWORK}.19
 
   gossip:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
-    working_dir: /opt/orbs/projects/gossip-service-typescript/
+    working_dir: /opt/orbs/projects/services/gossip-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/gossip.js
     volumes_from:
       - shared_volumes
@@ -113,55 +89,29 @@ services:
       orbs-network:
         ipv4_address: ${NODE_IP}
       node-network:
-        ipv4_address: ${PRIVATE_NETWORK}.20
+        ipv4_address: ${PRIVATE_NETWORK}.19
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
+      - gossip:${PRIVATE_NETWORK}.19
 
   sidechain-connector:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
-    working_dir: /opt/orbs/projects/sidechain-connector-service-typescript/
+    working_dir: /opt/orbs/projects/services/sidechain-connector-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/sidechain-connector.js --ethereumNodeHttpAddress=${ETHEREUM_NODE_HTTP_ADDRESS}
     volumes_from:
       - shared_volumes
     networks:
       node-network:
-        ipv4_address: ${PRIVATE_NETWORK}.21
+        ipv4_address: ${PRIVATE_NETWORK}.20
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
+      - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
-      - sidechain-connector:${PRIVATE_NETWORK}.21
-      - subscription-manager:${PRIVATE_NETWORK}.22
-
-  subscription-manager:
-    extends:
-      file: docker-compose.test.base.yml
-      service: base-service
-    working_dir: /opt/orbs/projects/subscription-manager-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/subscription-manager.js
-    volumes_from:
-      - shared_volumes
-    environment:
-      ethereumContractAddress: ${ETHEREUM_CONTRACT_ADDRESS}
-    networks:
-      node-network:
-        ipv4_address: ${PRIVATE_NETWORK}.22
-    extra_hosts:
-      - consensus:${PRIVATE_NETWORK}.15
-      - public-api:${PRIVATE_NETWORK}.16
-      - state-storage:${PRIVATE_NETWORK}.17
-      - virtual-machine:${PRIVATE_NETWORK}.18
-      - block-storage:${PRIVATE_NETWORK}.19
-      - gossip:${PRIVATE_NETWORK}.20
-      - sidechain-connector:${PRIVATE_NETWORK}.21
-      - subscription-manager:${PRIVATE_NETWORK}.22
+      - gossip:${PRIVATE_NETWORK}.19
+      - sidechain-connector:${PRIVATE_NETWORK}.20

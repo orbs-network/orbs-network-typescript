@@ -1,2 +1,5 @@
 #!/bin/bash -e
-npm install
+
+yarn link orbs-core-library
+
+yarn install
