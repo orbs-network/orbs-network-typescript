@@ -99,7 +99,7 @@ export default class ConsensusService {
 
   async initSubscriptionManager(): Promise<void> {
     const SubscriptionManagerConfiguration = { ethereumContractAddress: config.get("ethereumContractAddress") };
-    this.subscriptionManager = new SubscriptionManager(SubscriptionManagerConfiguration, this.sidechainConnector);
+    this.subscriptionManager = new SubscriptionManager(this.sidechainConnector, SubscriptionManagerConfiguration);
   }
 
   async main() {

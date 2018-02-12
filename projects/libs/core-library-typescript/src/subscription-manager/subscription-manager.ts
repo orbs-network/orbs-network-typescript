@@ -11,7 +11,7 @@ export class SubscriptionManager {
   private contractProxy: ERCBillingContractProxy;
   private config: SubscriptionManagerConfiguration;
 
-  constructor(config: SubscriptionManagerConfiguration, sidechainConnector: types.SidechainConnectorClient) {
+  constructor(sidechainConnector: types.SidechainConnectorClient, config: SubscriptionManagerConfiguration) {
     this.config = config;
     this.contractProxy = new ERCBillingContractProxy(sidechainConnector, this.config.ethereumContractAddress);
   }
