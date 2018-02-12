@@ -13,12 +13,12 @@
             "endpoint": "0.0.0.0:51354"
         }
     ],
-    "gossipPort": "60001",
+    "gossipPort": "60005",
     "gossipPeers": [
+        "ws://localhost:60001",
         "ws://localhost:60002",
         "ws://localhost:60003",
         "ws://localhost:60004",
-        "ws://localhost:60005",
         "ws://localhost:60006"
     ]
 }
