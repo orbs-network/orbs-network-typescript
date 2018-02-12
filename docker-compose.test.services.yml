@@ -25,13 +25,13 @@ services:
       service: base-service
     working_dir: /opt/orbs/projects/services/public-api-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/public-api.js
-    ports:
-      - ${PUBLIC_API_HOST_PORT}:51151
+    # ports:
+    #   - ${PUBLIC_API_HOST_PORT}:51151
     volumes_from:
       - shared_volumes
     networks:
-      orbs-network:
-        ipv4_address: ${PUBLIC_API_ORBS_NETWORK_IP}
+      public-api-external-network:
+        ipv4_address: ${PUBLIC_API_IP}
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.16
     extra_hosts:
