@@ -9,6 +9,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.192.0",
+    "lodash": "^4.17.5",
     "shelljs": "^0.8.1",
     "web3": "^1.0.0-beta.29"
   }
