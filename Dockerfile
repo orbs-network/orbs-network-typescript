@@ -7,18 +7,14 @@ VOLUME [ "/opt/orbs/logs" ]
 
 # TODO: move to later stage, use cache for ts compiler & top level software
 
-ADD . /opt/orbs
+ADD package.json yarn.lock /opt/orbs/
 
 WORKDIR /opt/orbs
 
-RUN yarn global add typescript@2.7.1
+RUN yarn global add typescript@2.7.1 && yarn install && yarn cache clean
 
-RUN ./install.sh && yarn cache clean
+ADD . /opt/orbs
 
-RUN find . -name yarn.lock -delete
-
-RUN ./build.sh && yarn cache clean
-
-RUN cd e2e && ./build.sh
+RUN yarn run build && cd e2e && ./build.sh && yarn cache clean
 
 CMD echo
