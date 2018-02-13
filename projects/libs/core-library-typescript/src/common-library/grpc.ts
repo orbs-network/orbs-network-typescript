@@ -45,14 +45,14 @@ function server(grpc: GRPServer) {
 function servers(grpcs: GRPServers) {
   const protoPath = path.resolve(PROTO_PATH, grpcs.multiProto);
   const app = new Mali(protoPath, grpcs.names);
-
-  const serviceFuncs: { [key: string]: Function } = {};
+  const serviceFuncs: { [key: string]: { [key: string]: Function } } = {};
 
   for (let i = 0; i < grpcs.names.length; ++i) {
     const name = grpcs.names[i];
     const service = grpcs.services[i];
+    serviceFuncs[name] = {};
     for (const funcName of (<any>types)[name]) {
-      serviceFuncs[funcName] = (service)[funcName];
+      serviceFuncs[name][funcName] = (service)[funcName];
     }
   }
 
