@@ -3,5 +3,10 @@ module.exports = {
   version: '1.0.0',
   endpoint: '0.0.0.0:51151',
   project: 'storage-service-typescript',
-  peers: [],
+  peers: [
+    {
+      service: 'storage',
+      endpoint: 'storage:51151',
+    },
+  ],
 };

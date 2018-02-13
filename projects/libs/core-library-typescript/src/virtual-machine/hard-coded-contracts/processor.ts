@@ -16,10 +16,10 @@ export interface CallRequest {
 
 export default class HardCodedSmartContractProcessor {
   contractAddresses = new Map<string, any>();
-  storageClient: types.StorageClient;
+  stateStorageClient: types.StateStorageClient;
 
-  constructor(stateStorageClient: types.StorageClient) {
-    this.storageClient = stateStorageClient;
+  constructor(stateStorageClient: types.StateStorageClient) {
+    this.stateStorageClient = stateStorageClient;
 
     // TODO: register it only in a testing environment via configuration
     this.registerContract("foobar-smart-contract", "foobar");
@@ -36,7 +36,7 @@ export default class HardCodedSmartContractProcessor {
     const writeAdapter = new ContractStateReadWriteAccessor(
       request.contractAddress,
       transactionScopeStateCache,
-      this.storageClient
+      this.stateStorageClient
     );
 
     await this.processMethod(request, writeAdapter);
@@ -50,7 +50,7 @@ export default class HardCodedSmartContractProcessor {
     const readonlyAdapter = new ContractStateReadOnlyAccessor(
       request.contractAddress,
       transactionScopeStateCache,
-      this.storageClient
+      this.stateStorageClient
     );
     return this.processMethod(request, readonlyAdapter);
   }

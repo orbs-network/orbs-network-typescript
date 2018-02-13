@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+import "./consensus.proto";
+import "./subscription-manager.proto";
+import "./transaction-pool.proto";

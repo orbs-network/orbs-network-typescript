@@ -4,7 +4,7 @@ import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 
 import { EthereumConnector } from "./ethereum-connector";
-import { SidechainConnectorClient } from "../../../../architecture/dist/index";
+import { SidechainConnectorClient } from "orbs-interfaces";
 
 export interface SidechainConnectorOptions {
   ethereumNodeHttpAddress?: string;

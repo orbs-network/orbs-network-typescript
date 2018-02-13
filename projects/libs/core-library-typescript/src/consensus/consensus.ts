@@ -10,8 +10,8 @@ export class Consensus {
   private consensus: RaftConsensus;
 
   constructor(options: RaftConsensusConfig, gossip: types.GossipClient, virtualMachine: types.VirtualMachineClient,
-    storage: types.StorageClient) {
-    this.consensus = new RaftConsensus(options, gossip, virtualMachine, storage);
+    blockStorage: types.BlockStorageClient) {
+    this.consensus = new RaftConsensus(options, gossip, virtualMachine, blockStorage);
   }
 
   public async sendTransaction(transactionContext: types.SendTransactionInput) {

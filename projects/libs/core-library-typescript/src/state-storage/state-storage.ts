@@ -2,17 +2,16 @@ import * as _ from "lodash";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
-import { BlockStorage } from "../block-storage";
 
 import MemoryKVStore from "./kvstore/memory-kvstore";
 
 export class StateStorage {
-  private blockStorage: BlockStorage;
+  private blockStorage: types.BlockStorageClient;
 
   private kvstore = new MemoryKVStore();
   private lastBlockId: number = 0;
 
-  public constructor(blockStorage: BlockStorage) {
+  public constructor(blockStorage: types.BlockStorageClient) {
     this.blockStorage = blockStorage;
   }
 
@@ -28,7 +27,7 @@ export class StateStorage {
   }
 
   private async waitForBlockState(timeout = 5000) {
-    const blockId = await this.blockStorage.getLastBlockId();
+    const { blockId } = await this.blockStorage.getLastBlockId({});
 
     return new Promise((resolve, reject) => {
       if (blockId > this.lastBlockId) {
@@ -44,7 +43,7 @@ export class StateStorage {
   }
 
   private async pollBlockStorage() {
-    const blocks = await this.blockStorage.getBlocks(this.lastBlockId);
+    const { blocks } = await this.blockStorage.getBlocks({ lastBlockId: this.lastBlockId });
 
     // Assuming an ordered list of blocks.
     for (const block of blocks) {

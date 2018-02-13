@@ -1,11 +1,14 @@
-import { ErrorHandler, grpc } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { ErrorHandler, grpc, topology } from "orbs-core-library";
 
-import ConsensusService from "./service";
+import ConsensusService from "./consensus-service";
+import SubscriptionManagerService from "./subscription-manager-service";
+import TransactionPoolService from "./transaction-pool-service";
 
 ErrorHandler.setup();
 
-const server = grpc.consensusServer({
-  endpoint: topology.endpoint,
-  service: new ConsensusService()
+const nodeTopology = topology();
+
+grpc.consensusServiceServer({
+  endpoint: nodeTopology.endpoint,
+  services: [new ConsensusService(), new SubscriptionManagerService(), new TransactionPoolService()]
 });
