@@ -54,7 +54,7 @@ export default class BlockStorageService {
   askForHeartbeats() {
   }
 
-  async main() {
+  async start() {
     logger.info(`${nodeTopology.name}: service started`);
 
     await this.initBlockStorage();
@@ -63,6 +63,5 @@ export default class BlockStorageService {
   }
 
   constructor() {
-    setTimeout(() => this.main(), 0);
   }
 }

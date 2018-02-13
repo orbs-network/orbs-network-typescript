@@ -7,7 +7,16 @@ ErrorHandler.setup();
 
 const nodeTopology = topology();
 
-grpc.storageServiceServer({
-  endpoint: nodeTopology.endpoint,
-  services: [new BlockStorageService(), new StateStorageService()]
-});
+const main = async () => {
+  const blockStorageService = new BlockStorageService();
+  await blockStorageService.start();
+
+  const stateStorageService = new StateStorageService();
+
+  grpc.storageServiceServer({
+    endpoint: nodeTopology.endpoint,
+    services: [blockStorageService, stateStorageService]
+  });
+};
+
+main();
