@@ -10,3 +10,21 @@ jobs:
      - run: docker push ${DOCKER_IMAGE}:$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g')
      - store_artifacts:
           path: logs
+
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run: cd deploy/cloudformation && npm install && ./create-stacks.sh
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
