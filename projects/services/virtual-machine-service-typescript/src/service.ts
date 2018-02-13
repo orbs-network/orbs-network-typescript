@@ -59,7 +59,8 @@ export default class VirtualMachineService {
   askForHeartbeats() {
     const peers = topologyPeers(nodeTopology.peers);
 
-    this.askForHeartbeat(peers.stateStorage);
+    // TODO: restore with support for multiple heartbeats from a multi server.
+    // this.askForHeartbeat(peers.stateStorage);
   }
 
   async main() {
