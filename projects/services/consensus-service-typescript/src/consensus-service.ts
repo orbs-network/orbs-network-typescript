@@ -15,7 +15,7 @@ export default class ConsensusService {
 
   private gossip = topologyPeers(nodeTopology.peers).gossip;
   private virtualMachine = topologyPeers(nodeTopology.peers).virtualMachine;
-  private storage = topologyPeers(nodeTopology.peers).storage;
+  private blockStorage = topologyPeers(nodeTopology.peers).blockStorage;
 
   // Consensus RPC:
 
@@ -50,7 +50,7 @@ export default class ConsensusService {
     const peers = topologyPeers(nodeTopology.peers);
 
     this.askForHeartbeat(peers.virtualMachine);
-    this.askForHeartbeat(peers.storage);
+    this.askForHeartbeat(peers.blockStorage);
   }
 
   async initConsensus(): Promise<void> {
@@ -60,7 +60,7 @@ export default class ConsensusService {
       throw new Error("Couldn't find consensus configuration!");
     }
 
-    this.consensus = new Consensus(consensusConfig, this.gossip, this.virtualMachine, this.storage);
+    this.consensus = new Consensus(consensusConfig, this.gossip, this.virtualMachine, this.blockStorage);
   }
 
   async initTransactionPool(): Promise<void> {

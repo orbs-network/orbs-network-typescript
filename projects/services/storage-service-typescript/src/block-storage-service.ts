@@ -4,13 +4,11 @@ import bind from "bind-decorator";
 import { logger, grpc, types, topology } from "orbs-core-library";
 
 import { BlockStorage } from "orbs-core-library";
-import { StateStorage } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class StorageService {
+export default class BlockStorageService {
   private blockStorage: BlockStorage;
-  private stateStorage: StateStorage;
 
   // Block Storage RPC:
 
@@ -36,24 +34,10 @@ export default class StorageService {
     rpc.res = { blockId: await this.blockStorage.getLastBlockId() };
   }
 
-  // State Storage RPC:
-
-  @bind
-  public async readKeys(rpc: types.ReadKeysContext) {
-    logger.debug(`${nodeTopology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
-
-    const keys = await this.stateStorage.readKeys(rpc.req.address, rpc.req.keys);
-    rpc.res = { values: _.fromPairs([...keys]) };
-  }
 
   async initBlockStorage(): Promise<void> {
     this.blockStorage = new BlockStorage();
     await this.blockStorage.load();
-  }
-
-  async initStateStorage(): Promise<void> {
-    this.stateStorage = new StateStorage(this.blockStorage);
-    this.stateStorage.poll();
   }
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
@@ -68,7 +52,6 @@ export default class StorageService {
     logger.info(`${nodeTopology.name}: service started`);
 
     await this.initBlockStorage();
-    await this.initStateStorage();
 
     setInterval(() => this.askForHeartbeats(), 5000);
   }

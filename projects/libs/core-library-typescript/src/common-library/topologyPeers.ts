@@ -24,7 +24,8 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         break;
       }
       case "storage": {
-        res.storage = grpc.storageClient({ endpoint: peer.endpoint });
+        res.blockStorage = grpc.blockStorageClient({ endpoint: peer.endpoint });
+        res.stateStorage = grpc.stateStorageClient({ endpoint: peer.endpoint });
         break;
       }
       case "sidechain-connector": {

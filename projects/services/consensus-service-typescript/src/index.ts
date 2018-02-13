@@ -1,5 +1,4 @@
 import { ErrorHandler, grpc, topology } from "orbs-core-library";
-import {  } from "orbs-core-library";
 
 import ConsensusService from "./consensus-service";
 import SubscriptionManagerService from "./subscription-manager-service";

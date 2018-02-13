@@ -62,48 +62,43 @@ function servers(grpcs: GRPServers) {
 
 export namespace grpc {
   export function gossipServer({ endpoint, service }: { endpoint: string, service: types.GossipServer }) {
-    server({
-      proto: "gossip.proto",
-      name: "Gossip",
-      endpoint,
-      service
-    });
+    server({ proto: "gossip.proto", name: "Gossip", endpoint, service });
   }
 
   export function gossipClient({ endpoint }: { endpoint: string }): types.GossipClient {
-    return client({
-      proto: "gossip.proto",
-      name: "Gossip",
-      endpoint
-    });
+    return client({ proto: "gossip.proto", name: "Gossip", endpoint });
   }
 
-  export function storageServer({ endpoint, service }: { endpoint: string, service: types.StorageServer }) {
-    return server({ proto: "storage.proto", name: "Storage", endpoint, service });
+  export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
+    return server({ proto: "block-storage.proto", name: "BlockStorage", endpoint, service });
   }
 
-  export function storageClient({ endpoint }: { endpoint: string }): types.StorageClient {
-    return client({ proto: "storage.proto", name: "Storage", endpoint });
+  export function blockStorageClient({ endpoint }: { endpoint: string }): types.BlockStorageClient {
+    return client({ proto: "block-storage.proto", name: "BlockStorage", endpoint });
+  }
+
+  export function stateStorageServer({ endpoint, service }: { endpoint: string, service: types.StateStorageServer }) {
+    return server({ proto: "state-storage.proto", name: "StateStorage", endpoint, service });
+  }
+
+  export function stateStorageClient({ endpoint }: { endpoint: string }): types.StateStorageClient {
+    return client({ proto: "state-storage.proto", name: "StateStorage", endpoint });
+  }
+
+  export function storageServiceServer({ endpoint, services }: {
+    endpoint: string, services: [types.BlockStorageServer, types.StateStorageServer]
+  }) {
+    servers({ multiProto: "storage-service.proto", names: ["BlockStorage", "StateStorage"], endpoint, services });
   }
 
   export function consensusServiceServer({ endpoint, services }: {
     endpoint: string, services: [types.ConsensusServer, types.SubscriptionManagerServer, types.TransactionPoolServer]
   }) {
-    servers({
-      multiProto: "consensus-service.proto",
-      names: ["Consensus", "SubscriptionManager"],
-      endpoint,
-      services
-    });
+    servers({ multiProto: "consensus-service.proto", names: ["Consensus", "SubscriptionManager"], endpoint, services });
   }
 
   export function consensusServer({ endpoint, service }: { endpoint: string, service: types.ConsensusServer }) {
-    server({
-      proto: "consensus.proto",
-      name: "Consensus",
-      endpoint,
-      service
-    });
+    server({ proto: "consensus.proto", name: "Consensus", endpoint, service });
   }
 
   export function consensusClient({ endpoint }: { endpoint: string }): types.ConsensusClient {
