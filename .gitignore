@@ -25,7 +25,9 @@ yarn.lock
 # Editors
 .idea
 .history
-.vscode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
 *.iml
 
 # OS metadata
