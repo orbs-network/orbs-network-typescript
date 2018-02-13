@@ -34,6 +34,12 @@ export default class BlockStorageService {
     rpc.res = { blockId: await this.blockStorage.getLastBlockId() };
   }
 
+  @bind
+  public async getBlocks(rpc: types.GetBlocksContext) {
+    logger.debug(`${nodeTopology.name}: getBlocks ${JSON.stringify(rpc.req)}`);
+
+    rpc.res = { blocks: await this.blockStorage.getBlocks(rpc.req.lastBlockId) };
+  }
 
   async initBlockStorage(): Promise<void> {
     this.blockStorage = new BlockStorage();
