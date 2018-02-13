@@ -69,6 +69,12 @@ export namespace grpc {
     return client({ proto: "gossip.proto", name: "Gossip", endpoint });
   }
 
+  export function storageServiceServer({ endpoint, services }: {
+    endpoint: string, services: [types.BlockStorageServer, types.StateStorageServer]
+  }) {
+    servers({ multiProto: "storage-service.proto", names: ["BlockStorage", "StateStorage"], endpoint, services });
+  }
+
   export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
     return server({ proto: "block-storage.proto", name: "BlockStorage", endpoint, service });
   }
@@ -83,12 +89,6 @@ export namespace grpc {
 
   export function stateStorageClient({ endpoint }: { endpoint: string }): types.StateStorageClient {
     return client({ proto: "state-storage.proto", name: "StateStorage", endpoint });
-  }
-
-  export function storageServiceServer({ endpoint, services }: {
-    endpoint: string, services: [types.BlockStorageServer, types.StateStorageServer]
-  }) {
-    servers({ multiProto: "storage-service.proto", names: ["BlockStorage", "StateStorage"], endpoint, services });
   }
 
   export function consensusServiceServer({ endpoint, services }: {
