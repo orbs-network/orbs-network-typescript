@@ -25,8 +25,8 @@ services:
       service: base-service
     working_dir: /opt/orbs/projects/services/public-api-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/public-api.js
-    # ports:
-    #   - ${PUBLIC_API_HOST_PORT}:51151
+    ports:
+      - ${PUBLIC_API_HOST_PORT}:51151
     volumes_from:
       - shared_volumes
     networks:
@@ -102,7 +102,7 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/sidechain-connector-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/sidechain-connector.js --ethereumNodeHttpAddress=${ETHEREUM_NODE_HTTP_ADDRESS}
+    command: node dist/index.js ${NODE_CONFIG_PATH}/sidechain-connector.js --ethereumNodeHttpAddress=${SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS}
     volumes_from:
       - shared_volumes
     networks:
@@ -115,3 +115,4 @@ services:
       - virtual-machine:${PRIVATE_NETWORK}.18
       - gossip:${PRIVATE_NETWORK}.19
       - sidechain-connector:${PRIVATE_NETWORK}.20
+

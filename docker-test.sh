@@ -27,7 +27,7 @@ function stop_node() {
 }
 
 function run_e2e_test() {
-    E2E_CLIENT_IP=$1 PUBLIC_API_IP=$2 docker-compose -p orbs-e2e -f docker-compose.test.networks.yml -f docker-compose.test.e2e.yml run --rm e2e
+    E2E_CLIENT_IP=$1 E2E_NO_DEPLOY=true PUBLIC_API_IP=$2 docker-compose -p orbs-e2e -f docker-compose.test.volumes.local.yml -f docker-compose.test.networks.yml -f docker-compose.test.e2e.yml run --rm e2e
 }
 
 export UP_D=restart

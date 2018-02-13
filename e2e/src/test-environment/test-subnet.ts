@@ -1,7 +1,7 @@
 import * as shell from "shelljs";
 import TestComponent from "./test-component";
 
-export default class TestNetwork implements TestComponent {
+export default class TestSubnet implements TestComponent {
     name: string;
     subnet: string;
     lastAddressIndex: number = 1;
@@ -15,7 +15,7 @@ export default class TestNetwork implements TestComponent {
         await this.stop();
         const res = shell.exec(`docker network create ${this.name} --subnet ${this.subnet}.0/24`);
         if (res.code != 0 ) {
-            throw `${this.name}: ${res.stderr}`;
+            // throw `${this.name}: ${res.stderr}`;
         }
     }
 
