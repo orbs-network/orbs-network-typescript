@@ -1,23 +1,18 @@
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
+import { TransactionHandler } from "../public-api/transaction-handler";
 
 export class PublicApi {
-  private consensus: types.ConsensusClient;
+  private transactionHandler: TransactionHandler;
   private virtualMachine: types.VirtualMachineClient;
 
-  public constructor(consensus: types.ConsensusClient, virtualMachine: types.VirtualMachineClient) {
-    this.consensus = consensus;
+  public constructor(transactionHandler: TransactionHandler, virtualMachine: types.VirtualMachineClient) {
+    this.transactionHandler = transactionHandler;
     this.virtualMachine = virtualMachine;
   }
 
   public async sendTransaction(transactionContext: types.SendTransactionInput) {
-    const subscriptionKey = transactionContext.transactionAppendix.subscriptionKey;
-    // console.log("sendTransaction", this.peers.subscriptionManager);
-    // const { active } = await this.peers.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
-    // if (!active) {
-    //   throw new Error(`subscription with key [${subscriptionKey}] inactive`);
-    // }
-    await this.consensus.sendTransaction(transactionContext);
+    await this.transactionHandler.handle(transactionContext);
   }
 
   public async callContract(input: types.CallContractInput) {
