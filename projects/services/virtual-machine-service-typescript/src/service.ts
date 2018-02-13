@@ -11,7 +11,7 @@ const nodeTopology = topology();
 export default class VirtualMachineService {
   private virtualMachine: VirtualMachine;
 
-  private storage: types.StorageClient = topologyPeers(nodeTopology.peers).storage;
+  private stateStorage: types.StateStorageClient = topologyPeers(nodeTopology.peers).stateStorage;
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
@@ -59,13 +59,13 @@ export default class VirtualMachineService {
   askForHeartbeats() {
     const peers = topologyPeers(nodeTopology.peers);
 
-    this.askForHeartbeat(peers.storage);
+    this.askForHeartbeat(peers.stateStorage);
   }
 
   async main() {
     logger.info(`${nodeTopology.name}: service started`);
 
-    this.virtualMachine = new VirtualMachine(this.storage);
+    this.virtualMachine = new VirtualMachine(this.stateStorage);
 
     setInterval(() => this.askForHeartbeats(), 5000);
   }
