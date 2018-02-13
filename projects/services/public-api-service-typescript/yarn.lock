@@ -57,10 +57,6 @@
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
-"@types/mocha@^2.2.48":
-  version "2.2.48"
-  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.48.tgz#3523b126a0b049482e1c3c11877460f76622ffab"
-
 "@types/node@*", "@types/node@^9.4.4":
   version "9.4.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.5.tgz#d2a90c634208173d1b1a0a6ba9f1df3de62edcf5"
@@ -2100,7 +2096,6 @@ optjs@~3.2.2:
   version "0.1.0"
   dependencies:
     "@types/bluebird" "^3.5.20"
-    "@types/mocha" "^2.2.48"
     bignumber.js "^6.0.0"
     bluebird "^3.5.1"
     bs58 "^4.0.1"
@@ -2113,7 +2108,7 @@ optjs@~3.2.2:
     mali "^0.7.1"
     mkdirp "^0.5.1"
     nconf "^0.10.0"
-    orbs-interfaces "file:../../../../../usr/local/share/.cache/yarn/architecture"
+    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.4"
     secp256k1 "^3.5.0"
     solc "0.4.18"
