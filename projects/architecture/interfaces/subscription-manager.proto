@@ -1,5 +1,12 @@
 syntax = "proto3";
 
+import "primitives/heartbeat.proto";
+
+service SubscriptionManager {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+  rpc GetSubscriptionStatus (GetSubscriptionStatusInput) returns (GetSubscriptionStatusOutput);
+}
+
 message GetSubscriptionStatusInput {
   string subscriptionKey = 1;
 }

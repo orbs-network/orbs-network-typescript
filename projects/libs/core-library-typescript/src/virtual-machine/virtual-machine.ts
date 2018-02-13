@@ -7,12 +7,12 @@ import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
 
 export class VirtualMachine {
-  private storage: types.StorageClient;
+  private stateStorage: types.StateStorageClient;
   private processor: HardCodedSmartContractProcessor;
 
-  public constructor(storage: types.StorageClient) {
-    this.storage = storage;
-    this.processor = new HardCodedSmartContractProcessor(this.storage);
+  public constructor(stateStorage: types.StateStorageClient) {
+    this.stateStorage = stateStorage;
+    this.processor = new HardCodedSmartContractProcessor(this.stateStorage);
   }
 
   public async executeTransaction(input: types.ExecuteTransactionInput) {

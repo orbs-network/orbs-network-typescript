@@ -68,16 +68,16 @@ export interface RaftConsensusConfig {
 
 export class RaftConsensus {
   private virtualMachine: types.VirtualMachineClient;
-  private storage: types.StorageClient;
+  private blockStorage: types.BlockStorageClient;
 
   private connector: RPCConnector;
   private node: any;
   private lastBlockId: number;
 
   public constructor(options: RaftConsensusConfig, gossip: types.GossipClient,
-    virtualMachine: types.VirtualMachineClient, storage: types.StorageClient) {
+    virtualMachine: types.VirtualMachineClient, storage: types.BlockStorageClient) {
     this.virtualMachine = virtualMachine;
-    this.storage = storage;
+    this.blockStorage = storage;
     this.lastBlockId = -1;
     this.connector = new RPCConnector(NODE_NAME, gossip);
 
@@ -111,13 +111,13 @@ export class RaftConsensus {
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
       if (this.lastBlockId == -1) {
-        const { blockId } = await this.storage.getLastBlockId({});
+        const { blockId } = await this.blockStorage.getLastBlockId({});
         this.lastBlockId = blockId;
       }
 
       this.lastBlockId++;
 
-      await this.storage.addBlock({
+      await this.blockStorage.addBlock({
         block: {
           header: {
             version: 0,

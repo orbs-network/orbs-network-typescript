@@ -2,25 +2,26 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { logger, topologyPeers, grpc, types, topology } from "orbs-core-library";
 
-import { VirtualMachine } from "orbs-core-library/dist/virtual-machine";
+import { VirtualMachine } from "orbs-core-library";
+
+const nodeTopology = topology();
 
 export default class VirtualMachineService {
   private virtualMachine: VirtualMachine;
 
-  private storage: types.StorageClient = topologyPeers(topology.peers).storage;
+  private stateStorage: types.StateStorageClient = topologyPeers(nodeTopology.peers).stateStorage;
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
-    rpc.res = { responderName: topology.name, responderVersion: topology.version };
+    logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
   @bind
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
-    logger.debug(`${topology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${nodeTopology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
 
     // Currently only a "simple" contract type is supported
     try {
@@ -41,7 +42,7 @@ export default class VirtualMachineService {
 
   @bind
   public async callContract(rpc: types.CallContractContext) {
-    logger.debug(`${topology.name}: call contract ${JSON.stringify(rpc.req)}`);
+    logger.debug(`${nodeTopology.name}: call contract ${JSON.stringify(rpc.req)}`);
 
     const result = await this.virtualMachine.callContract(rpc.req);
 
@@ -51,20 +52,21 @@ export default class VirtualMachineService {
   }
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
+    logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
-    const peers = topologyPeers(topology.peers);
+    const peers = topologyPeers(nodeTopology.peers);
 
-    this.askForHeartbeat(peers.storage);
+    // TODO: restore with support for multiple heartbeats from a multi server.
+    // this.askForHeartbeat(peers.stateStorage);
   }
 
   async main() {
-    logger.info(`${topology.name}: service started`);
+    logger.info(`${nodeTopology.name}: service started`);
 
-    this.virtualMachine = new VirtualMachine(this.storage);
+    this.virtualMachine = new VirtualMachine(this.stateStorage);
 
     setInterval(() => this.askForHeartbeats(), 5000);
   }

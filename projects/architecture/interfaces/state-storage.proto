@@ -1,6 +1,11 @@
 syntax = "proto3";
 
-import "primitives/wrappers.proto";
+import "primitives/heartbeat.proto";
+
+service StateStorage {
+  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
+  rpc ReadKeys (ReadKeysInput) returns (ReadKeysOutput);
+}
 
 message ReadKeysInput {
   string address = 1;
