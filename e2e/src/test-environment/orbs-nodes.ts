@@ -1,10 +1,14 @@
 import { exec } from "shelljs";
 import * as path from "path";
 import TestComponent from "./test-component";
-import TestNetwork from "./test-network";
+import TestSubnet from "./test-subnet";
+import { grpc, types } from "orbs-core-library";
+import { delay } from "bluebird";
 
-const COMPOSE_CONFIG_PATH = path.join(__dirname, "../../..");
-const NODE_CONFIG_PATH = path.resolve(path.join(__dirname, "../../../config/topologies/discovery/node1"));
+
+const PROJECT_ROOT_FOLDER = path.join(__dirname, "../../../");
+const COMPOSE_CONFIG_PATH = PROJECT_ROOT_FOLDER;
+const NODE_CONFIG_PATH = "/opt/orbs/config/topology";
 
 export interface OrbsNodeDeployParams {
     nodeName: string;
@@ -12,7 +16,10 @@ export interface OrbsNodeDeployParams {
     nodePublicApiIp: string;
     privateSubnet: string;
     forceRecreate?: boolean;
+    PublicApiHostPort: number;
     gossipPeers: string[];
+    ethereumNodeHttpAddress?: string;
+    ethereumOrbsSubscriptionContractAddress?: string;
 }
 
 export class OrbsNode implements TestComponent {
@@ -29,10 +36,16 @@ export class OrbsNode implements TestComponent {
             command += " --forceRecreate";
         }
         await this.runDockerCompose(command);
+        await delay(60000);
     }
 
     public async stop(): Promise<void> {
         await this.runDockerCompose("down");
+    }
+
+    public getPublicApiClient(accessFromHost = true) {
+        const endpoint = accessFromHost ? `0.0.0.0:${this.deployParams.PublicApiHostPort}` : `${this.deployParams.nodePublicApiIp}:51151`;
+        return grpc.publicApiClient({ endpoint });
     }
 
     private runDockerCompose(dockerComposeCommand: string) {
@@ -41,12 +54,15 @@ export class OrbsNode implements TestComponent {
             async: true,
             cwd: COMPOSE_CONFIG_PATH,
             env: {...process.env, ...{
-                NODE_CONFIG_PATH : NODE_CONFIG_PATH,
+                NODE_CONFIG_PATH : "/opt/orbs/config/topology",
                 PRIVATE_NETWORK: this.deployParams.privateSubnet,
                 NODE_NAME: this.deployParams.nodeName,
                 NODE_IP: this.deployParams.nodeOrbsNetworkIp,
                 PUBLIC_API_IP: this.deployParams.nodePublicApiIp,
-                GOSSIP_PEERS: this.deployParams.gossipPeers
+                GOSSIP_PEERS: this.deployParams.gossipPeers,
+                PUBLIC_API_HOST_PORT: this.deployParams.PublicApiHostPort,
+                SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS: this.deployParams.ethereumNodeHttpAddress,
+                SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS : this.deployParams.ethereumOrbsSubscriptionContractAddress
             }}}, (code: any, stdout: any, stderr: any) => {
                 if (code == 0) {
                     resolve(stdout);
@@ -58,21 +74,24 @@ export class OrbsNode implements TestComponent {
     }
 }
 
-export class OrbsNodeCluster implements TestComponent {
-    orbsNetwork: TestNetwork;
-    publicApiNetwork: TestNetwork;
-    nodes: OrbsNode[];
+interface OrbsNodeClusterOptions {
+    numOfNodes: number;
+    orbsNetwork: TestSubnet;
+    publicApiNetwork: TestSubnet;
+    ethereumNodeHttpAddress?: string;
+    ethereumOrbsSubscriptionContractAddress?: string;
+}
 
-    constructor(numOfNodes: number, orbsNetwork: TestNetwork, publicApiNetwork: TestNetwork) {
-        this.orbsNetwork = orbsNetwork;
-        this.publicApiNetwork = publicApiNetwork;
-        this.nodes = this.generateNodeInstances(numOfNodes);
-    }
+export class OrbsNodeCluster implements TestComponent {
+    readonly nodes: OrbsNode[];
+    readonly options: OrbsNodeClusterOptions;
+
+
 
     private generateNodeInstances(numOfNodes: number) {
         const gossipPeerIps = [];
         for (let i = 0; i < numOfNodes; i++) {
-            gossipPeerIps.push(this.orbsNetwork.allocateAddress());
+            gossipPeerIps.push(this.options.orbsNetwork.allocateAddress());
         }
         const gossipPeers = gossipPeerIps.map(ip => `ws://${ip}:60001`);
         const nodes: OrbsNode[] = [];
@@ -80,12 +99,19 @@ export class OrbsNodeCluster implements TestComponent {
             nodes.push(new OrbsNode({
                 nodeName: `node${i + 1}`,
                 nodeOrbsNetworkIp: gossipPeerIps[i],
-                nodePublicApiIp: this.publicApiNetwork.allocateAddress(),
+                nodePublicApiIp: this.options.publicApiNetwork.allocateAddress(),
                 gossipPeers,
-                privateSubnet: `162.100.${i + 1}`
+                privateSubnet: `162.100.${i + 1}`,
+                ethereumNodeHttpAddress: this.options.ethereumNodeHttpAddress,
+                ethereumOrbsSubscriptionContractAddress: this.options.ethereumOrbsSubscriptionContractAddress,
+                PublicApiHostPort: 20000 + i
             }));
         }
         return nodes;
+   }
+
+   public getAvailableClients() {
+       return this.nodes.map(node => node.getPublicApiClient());
    }
 
    public async start() {
@@ -94,5 +120,14 @@ export class OrbsNodeCluster implements TestComponent {
 
     public async stop() {
         await Promise.all(this.nodes.map(node => node.stop()));
+    }
+
+    public setOrbsSubscriptionContractAddress(contractAddress: string) {
+        this.options.ethereumOrbsSubscriptionContractAddress = contractAddress;
+    }
+
+    constructor(opts: OrbsNodeClusterOptions) {
+        this.options = opts;
+        this.nodes = this.generateNodeInstances(opts.numOfNodes);
     }
 }
