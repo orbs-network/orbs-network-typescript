@@ -20,7 +20,7 @@ tmp
 node_modules
 bower_components
 package-lock.json
-yarn.lock
+# yarn.lock
 
 # Editors
 .idea

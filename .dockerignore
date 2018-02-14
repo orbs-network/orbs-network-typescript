@@ -1,5 +1,5 @@
 node_modules
-projects/*/node_modules
+projects/node_modules
 
 lib-cov
 *.seed
