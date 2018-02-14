@@ -10,7 +10,11 @@
   "license": "MIT",
   "scripts": {
     "clean": "rm -rf ../db/",
-    "test": "yarn run clean && NODE_ENV=test ts-mocha test/**/*.spec.ts --exit",
+    "test": "yarn run clean && NODE_ENV=test mocha dist/**/*.spec.js --exit",
+    "build": "yarn run build-ts && yarn run tslint",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
