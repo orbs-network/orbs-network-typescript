@@ -5,6 +5,16 @@ export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//
 export NODE_CONFIG_PATH=/opt/orbs/config/topology
 export GOSSIP_PEERS=ws://172.2.1.2:60001,ws://172.2.1.3:60001,ws://172.2.1.4:60001,ws://172.2.1.5:60001,ws://172.2.1.6:60001,ws://172.2.1.7:60001
 
+echo "RUNNING UNIT TESTS"
+docker run --rm -ti \
+    -w /opt/orbs/projects/libs/core-library-typescript \
+    $DOCKER_IMAGE:$DOCKER_TAG yarn test
+echo EXIT_CODE=$?
+
+if [[ $EXIT_CODE != 0 ]] ; then
+    echo "FAILED UNIT TESTS"
+    exit $EXIT_CODE
+fi
 
 if [ -z "$LOCAL" ]; then
     export VOLUMES=docker-compose.test.volumes.yml
