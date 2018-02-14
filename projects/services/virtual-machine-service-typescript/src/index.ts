@@ -1,11 +1,10 @@
-import { ErrorHandler, grpc } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { ErrorHandler, grpc, topology } from "orbs-core-library";
 
 import VirtualMachineService from "./service";
 
 ErrorHandler.setup();
 
 const server = grpc.virtualMachineServer({
-  endpoint: topology.endpoint,
+  endpoint: topology().endpoint,
   service: new VirtualMachineService()
 });

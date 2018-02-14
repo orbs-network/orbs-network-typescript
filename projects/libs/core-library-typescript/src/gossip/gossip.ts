@@ -28,7 +28,7 @@ export class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  peers: any = topologyPeers(topology.peers);
+  peers: any = topologyPeers(topology().peers);
   nodeIp: string;
 
   constructor(port: number, localAddress: string, nodeIp: string) {
@@ -132,7 +132,7 @@ export class Gossip {
       me = this.localAddress;
 
     // TODO: better self-exclusion policy
-    return topology.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
+    return topology().gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
   }
 
   public activePeers() {

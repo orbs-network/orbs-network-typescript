@@ -12,10 +12,6 @@
         "ParameterValue": "c5.xlarge"
     },
     {
-        "ParameterKey": "VpcAvailabilityZones",
-        "ParameterValue": "us-west-2a, us-west-2b, us-west2-c"
-    },
-    {
         "ParameterKey": "IamRoleInstanceProfile",
         "ParameterValue": "orbs-network"
     },

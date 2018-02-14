@@ -1,11 +1,22 @@
-import { ErrorHandler, grpc } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { ErrorHandler, grpc, topology } from "orbs-core-library";
 
-import StorageService from "./service";
+import BlockStorageService from "./block-storage-service";
+import StateStorageService from "./state-storage-service";
 
 ErrorHandler.setup();
 
-const server = grpc.storageServer({
-  endpoint: topology.endpoint,
-  service: new StorageService()
-});
+const nodeTopology = topology();
+
+const main = async () => {
+  const blockStorageService = new BlockStorageService();
+  await blockStorageService.start();
+
+  const stateStorageService = new StateStorageService();
+
+  grpc.storageServiceServer({
+    endpoint: nodeTopology.endpoint,
+    services: [blockStorageService, stateStorageService]
+  });
+};
+
+main();

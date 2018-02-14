@@ -1,7 +1,7 @@
 {
-  "name": "orbs-consensus-service",
+  "name": "orbs-gossip-service",
   "version": "0.1.0",
-  "description": "orbs-consensus-service",
+  "description": "orbs-gossip-service",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"

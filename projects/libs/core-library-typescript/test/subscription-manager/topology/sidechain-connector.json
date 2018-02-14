@@ -1,7 +1,0 @@
-{
-  "name": "node1-sidechain-connector",
-  "version": "1.0.0",
-  "endpoint": "0.0.0.0:58158",
-  "project": "sidechain-connector-service-typescript",
-  "peers": []
-}

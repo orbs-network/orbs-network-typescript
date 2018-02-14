@@ -19,13 +19,13 @@ export abstract class BaseContractStateAccessor {
 }
 
 export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
-  storageClient: types.StorageClient;
+  stateStorageClient: types.StateStorageClient;
   stateCache: StateCache;
 
-  constructor(contractAddress: string, stateCache: StateCache, stateStorageClient: types.StorageClient) {
+  constructor(contractAddress: string, stateCache: StateCache, stateStorageClient: types.StateStorageClient) {
     super(contractAddress);
     this.stateCache = stateCache;
-    this.storageClient = stateStorageClient;
+    this.stateStorageClient = stateStorageClient;
     this.contractAddress = contractAddress;
   }
 
@@ -34,7 +34,7 @@ export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
     if (value != undefined)
       return value;
 
-    const { values } = await this.storageClient.readKeys({
+    const { values } = await this.stateStorageClient.readKeys({
       address: this.contractAddress,
       keys: [key]
     });

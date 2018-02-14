@@ -15,6 +15,8 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
       }
       case "consensus": {
         res.consensus = grpc.consensusClient({ endpoint: peer.endpoint });
+        res.subscriptionManager = grpc.subscriptionManagerClient({ endpoint: peer.endpoint });
+        res.transactionPool = grpc.transactionPoolClient({ endpoint: peer.endpoint });
         break;
       }
       case "virtual-machine": {
@@ -22,7 +24,8 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         break;
       }
       case "storage": {
-        res.storage = grpc.storageClient({ endpoint: peer.endpoint });
+        res.blockStorage = grpc.blockStorageClient({ endpoint: peer.endpoint });
+        res.stateStorage = grpc.stateStorageClient({ endpoint: peer.endpoint });
         break;
       }
       case "sidechain-connector": {

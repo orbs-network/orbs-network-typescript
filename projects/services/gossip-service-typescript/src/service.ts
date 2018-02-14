@@ -1,11 +1,12 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, topologyPeers, grpc, types } from "orbs-core-library/dist/common-library";
-import { topology } from "orbs-core-library/dist/common-library/topology";
+import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
-import { Consensus, RaftConsensusConfig } from "orbs-core-library/dist/consensus";
-import { Gossip } from "orbs-core-library/dist/gossip";
+import { Consensus, RaftConsensusConfig } from "orbs-core-library";
+import { Gossip } from "orbs-core-library";
+
+const nodeTopology = topology();
 
 export default class GossipService {
   private gossip: Gossip;
@@ -14,9 +15,9 @@ export default class GossipService {
 
   @bind
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${topology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
 
-    rpc.res = { responderName: topology.name, responderVersion: topology.version };
+    rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
   @bind
@@ -34,19 +35,19 @@ export default class GossipService {
   }
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: topology.name, requesterVersion: topology.version });
-    logger.debug(`${topology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
+    logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   askForHeartbeats() {
-    const peers = topologyPeers(topology.peers);
+    const peers = topologyPeers(nodeTopology.peers);
 
     this.askForHeartbeat(peers.publicApi);
     this.askForHeartbeat(peers.consensus);
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(topology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
+    this.gossip = new Gossip(nodeTopology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
 
     setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
@@ -68,7 +69,7 @@ export default class GossipService {
   }
 
   async main() {
-    logger.info(`${topology.name}: service started`);
+    logger.info(`${nodeTopology.name}: service started`);
 
     await this.initGossip();
 

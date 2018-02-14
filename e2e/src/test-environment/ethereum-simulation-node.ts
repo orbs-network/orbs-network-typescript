@@ -1,26 +1,29 @@
 import * as ganache from "ganache-core";
 import * as solc from "solc";
-
+import TestComponent from "./test-component";
 const Web3 = require("web3");
 
-export class EthereumSimulationNode {
-    server: any;
-    port: number;
+export class EthereumSimulationNode implements TestComponent {
+    readonly server: any;
+    readonly port: number;
+    private running: boolean = false;
 
-    constructor() {
+    constructor(port: number = 1545) {
+        this.port = port;
         this.server = ganache.server({ accounts: [{ balance: "300000000000000000000" }], total_accounts: 1 });
     }
 
-    start(port: number = 8545) {
-        if (this.port != undefined) {
+    public async start() {
+        if (this.running) {
             throw "already running";
         }
-        this.server.listen(port);
-        this.port = port;
+        this.server.listen(this.port);
+        this.running = true;
     }
 
-    stop() {
+    public async stop() {
         this.server.close();
+        this.running = false;
     }
 
     async deployOrbsStubContract(minTokensForSubscription: number, activeSubscriptionId: string) {

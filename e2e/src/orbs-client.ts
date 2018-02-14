@@ -1,4 +1,4 @@
-import { types, grpc } from "orbs-core-library/dist/common-library";
+import { types, grpc } from "orbs-core-library";
 import { delay } from "bluebird";
 
 type OrbsHardCodedContractMethodArgs = [string | number] | any[];

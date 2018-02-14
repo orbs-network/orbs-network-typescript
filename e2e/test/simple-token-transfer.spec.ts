@@ -1,34 +1,15 @@
 import { Assertion, expect } from "chai";
 import * as nconf from "nconf";
 
-import { grpc, types } from "orbs-core-library/dist/common-library";
+import { grpc, types } from "orbs-core-library";
 
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "../src/orbs-client";
 import { FooBarAccount } from "../src/foobar-contract";
-import { OrbsTopology } from "../src/topology";
+import { TestEnvironment } from "../src/test-environment";
 
-class TestEnvironment {
-  topology: OrbsTopology;
 
-  constructor() {
-    this.topology = OrbsTopology.loadFromPath("../../config/topologies/transaction-gossip");
-  }
-
-  async start() {
-    await this.topology.startAll();
-  }
-
-  async stop() {
-    await this.topology.stopAll();
-  }
-
-  getPublicApiClient() {
-    return this.topology.nodes[1].getPublicApiClient();
-  }
-}
-
-let publicApiClient: types.PublicApiClient;
 let testEnvironment: TestEnvironment;
+let publicApiClient: types.PublicApiClient;
 
 nconf.env({ parseValues: true });
 
