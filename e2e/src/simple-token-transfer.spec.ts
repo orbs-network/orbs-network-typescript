@@ -1,15 +1,15 @@
 const { Assertion, expect } = require("chai");
 import * as nconf from "nconf";
 
-import { grpc, types } from "orbs-core-library";
 
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
 import { FooBarAccount } from "./foobar-contract";
 import { TestEnvironment } from "./test-environment";
+import { PublicApiClient, initPublicApiClient } from "./public-api-client";
 
 
 let testEnvironment: TestEnvironment;
-let publicApiClient: types.PublicApiClient;
+let publicApiClient: PublicApiClient;
 
 nconf.env({ parseValues: true });
 
@@ -19,7 +19,7 @@ if (nconf.get("E2E_NO_DEPLOY")) {
     throw new Error("E2E_PUBLIC_API_ENDPOINT must be defined in a no-deploy configuration");
   }
 
-  publicApiClient = grpc.publicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
+  publicApiClient = initPublicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
 } else {
   testEnvironment = new TestEnvironment();
   publicApiClient = testEnvironment.getPublicApiClient();

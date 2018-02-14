@@ -2,8 +2,8 @@ import { exec } from "shelljs";
 import * as path from "path";
 import TestComponent from "./test-component";
 import TestSubnet from "./test-subnet";
-import { grpc, types } from "orbs-core-library";
 import { delay } from "bluebird";
+import { initPublicApiClient } from "../public-api-client";
 
 
 const PROJECT_ROOT_FOLDER = path.join(__dirname, "../../../");
@@ -45,7 +45,7 @@ export class OrbsNode implements TestComponent {
 
     public getPublicApiClient(accessFromHost = true) {
         const endpoint = accessFromHost ? `0.0.0.0:${this.deployParams.PublicApiHostPort}` : `${this.deployParams.nodePublicApiIp}:51151`;
-        return grpc.publicApiClient({ endpoint });
+        return initPublicApiClient({ endpoint });
     }
 
     private runDockerCompose(dockerComposeCommand: string) {
