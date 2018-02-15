@@ -55,7 +55,7 @@ describe("Block storage", () => {
     });    
 
     describe("#addBlock", () => {
-       it("adds a new block", async () => {
+        it("adds a new block", async () => {
             const exampleBlock = {
                 header: {
                     version: 0,
@@ -69,9 +69,9 @@ describe("Block storage", () => {
             await blockStorage.addBlock(exampleBlock);
             const lastBlockId = await blockStorage.getLastBlockId();
             lastBlockId.should.be.eql(1);
-       });
+        });
 
-       it("checks previous block id", async () => {
+        it("checks previous block id", async () => {
             const exampleBlock = {
                 header: {
                     version: 0,
@@ -84,9 +84,63 @@ describe("Block storage", () => {
 
             const result = blockStorage.addBlock(exampleBlock);
             // do not remove return
-            return result.should.eventually.be.rejectedWith(Error, `Invalid prev block ID of block: {"header":{"version":0,"id":1,"prevBlockId":1},"tx":{"contractAddress":"0","sender":"","signature":"","payload":"{}"},"modifiedAddressesJson":"{}"}! Should have been 0`);
-       });
+            await result.should.eventually.be.rejectedWith(Error, `Invalid prev block ID of block: {"header":{"version":0,"id":1,"prevBlockId":1},"tx":{"contractAddress":"0","sender":"","signature":"","payload":"{}"},"modifiedAddressesJson":"{}"}! Should have been 0`);
+        });
 
-       xit("checks block id");
+        it("checks block id", async () => {
+            const exampleBlock = {
+                header: {
+                    version: 0,
+                    id: 2,
+                    prevBlockId: 0
+                },
+                tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+                modifiedAddressesJson: "{}"
+            };
+
+            const result = blockStorage.addBlock(exampleBlock);
+            await result.should.eventually.be.rejectedWith(Error, `Invalid block ID of block: {"header":{"version":0,"id":2,"prevBlockId":0},"tx":{"contractAddress":"0","sender":"","signature":"","payload":"{}"},"modifiedAddressesJson":"{}"}!`);
+        });
+    });
+
+    describe("#hasNewBlocks", () => {
+        it("returns appropriate values", async () => {
+            await blockStorage.hasNewBlocks(0).should.eventually.be.false;
+
+            const exampleBlock = {
+                header: {
+                    version: 0,
+                    id: 1,
+                    prevBlockId: 0
+                },
+                tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+                modifiedAddressesJson: "{}"
+            };
+
+            await blockStorage.addBlock(exampleBlock);
+
+            await blockStorage.hasNewBlocks(0).should.eventually.be.true;
+            await blockStorage.hasNewBlocks(1000).should.eventually.be.false;
+        });
+    });
+
+    describe("#getBlocks", () => {
+        it("returns array of blocks starting from blockNumber", async () => {
+            await blockStorage.getBlocks(0).should.eventually.be.eql([]);
+
+            const exampleBlock = {
+                header: {
+                    version: 0,
+                    id: 1,
+                    prevBlockId: 0
+                },
+                tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+                modifiedAddressesJson: "{}"
+            };
+
+            await blockStorage.addBlock(exampleBlock);
+
+            await blockStorage.getBlocks(0).should.eventually.be.eql([exampleBlock]);
+        });
     });
 });

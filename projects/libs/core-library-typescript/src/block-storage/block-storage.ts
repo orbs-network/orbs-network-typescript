@@ -90,7 +90,7 @@ export class BlockStorage {
     return this.lastBlock.header.id;
   }
 
-  public async hasNewerBlocks(fromLastBlockId: number): Promise<boolean> {
+  public async hasNewBlocks(fromLastBlockId: number): Promise<boolean> {
     return await this.getLastBlockId() > fromLastBlockId;
   }
 
