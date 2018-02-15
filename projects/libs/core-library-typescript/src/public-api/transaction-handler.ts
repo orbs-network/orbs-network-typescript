@@ -26,7 +26,7 @@ export class TransactionHandler {
   constructor(consensus: types.ConsensusClient, subscriptionManager: types.SubscriptionManagerClient,
     config: TransactionHandlerConfig) {
     this.consensus = consensus;
-    this.subscriptionManager = this.subscriptionManager;
+    this.subscriptionManager = subscriptionManager;
     this.config = config;
   }
 }
