@@ -43,4 +43,8 @@ export class LevelDBDriver {
       });
     });
   }
+
+  public async close(): Promise<void> {
+    return this.db.close();
+  }
 }
