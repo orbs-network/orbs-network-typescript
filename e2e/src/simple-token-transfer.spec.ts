@@ -21,7 +21,10 @@ if (nconf.get("E2E_NO_DEPLOY")) {
 
   publicApiClient = initPublicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
 } else {
-  testEnvironment = new TestEnvironment();
+  testEnvironment = new TestEnvironment({
+    connectFromHost: nconf.get("CONNECT_FROM_HOST"),
+    preExistingPublicApiSubnet: nconf.get("PREEXISTING_PUBLIC_API_SUBNET")
+  });
   publicApiClient = testEnvironment.getPublicApiClient();
 }
 
@@ -56,7 +59,7 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 }
 
 describe("simple token transfer", async function () {
-  this.timeout(100000);
+  this.timeout(800000);
   before(async function () {
     if (testEnvironment) {
       console.log("starting the test environment");
