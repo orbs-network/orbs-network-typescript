@@ -5,7 +5,7 @@ services:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
     command: node dist/index.js ${NODE_CONFIG_PATH}
     volumes:
-      - ./logs:/opt/orbs/logs
+      - ../../../logs:/opt/orbs/logs
     environment:
       NODE_NAME: ${NODE_NAME}
       NODE_ENV: test

@@ -6,8 +6,7 @@ import { delay } from "bluebird";
 import { initPublicApiClient } from "../public-api-client";
 
 
-const PROJECT_ROOT_FOLDER = path.join(__dirname, "../../../");
-const COMPOSE_CONFIG_PATH = PROJECT_ROOT_FOLDER;
+const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
 const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 
 export interface OrbsNodeDeployParams {
@@ -52,7 +51,7 @@ export class OrbsNode implements TestComponent {
        return new Promise((resolve, reject) => {
            exec(`docker-compose -p orbs-${this.deployParams.nodeName} -f docker-compose.test.volumes.yml -f docker-compose.test.networks.yml -f docker-compose.test.services.yml ${dockerComposeCommand}`, {
             async: true,
-            cwd: COMPOSE_CONFIG_PATH,
+            cwd: DOCKER_CONFIG_PATH,
             env: {...process.env, ...{
                 NODE_CONFIG_PATH : NODE_CONFIG_PATH,
                 PRIVATE_NETWORK: this.deployParams.privateSubnet,
