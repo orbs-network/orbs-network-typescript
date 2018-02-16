@@ -10,7 +10,7 @@ const nodeTopology = topology();
 
 class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
   validateSubscription(): boolean {
-    return false;
+    return true;
   }
 }
 

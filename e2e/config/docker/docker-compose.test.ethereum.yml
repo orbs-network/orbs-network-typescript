@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  ganache-server:
+    image: ganache-cli
+    build: https://github.com/trufflesuite/ganache-cli.git
+    ports:
+      - 8545:8545
+    networks:
+      public-network:
+        ipv4_address: ${PUBLIC_IP}
+    command: ["--debug","-h", "0.0.0.0","--account","0xd39e45111943503f91ad22650915bda5cbba5538a689bdfa7228516a5441a8c1,300000000000000000000","-g","1"]

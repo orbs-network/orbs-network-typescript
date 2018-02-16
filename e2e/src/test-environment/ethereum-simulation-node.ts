@@ -3,30 +3,57 @@ import * as solc from "solc";
 import TestComponent from "./test-component";
 const Web3 = require("web3");
 
-export class EthereumSimulationNode implements TestComponent {
-    readonly server: any;
-    readonly port: number;
-    private running: boolean = false;
+import { delay } from "bluebird";
+import { exec } from "shelljs";
+import * as path from "path";
 
-    constructor(port: number = 1545) {
-        this.port = port;
-        this.server = ganache.server({ accounts: [{ balance: "300000000000000000000" }], total_accounts: 1 });
+const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
+
+
+interface EthereumSimulationNodeConfig {
+    publicIp: string;
+}
+
+export default class EthereumSimulationNode implements TestComponent {
+    config: EthereumSimulationNodeConfig;
+
+    constructor(config: EthereumSimulationNodeConfig) {
+        this.config = config;
     }
 
-    public async start() {
-        if (this.running) {
-            throw "already running";
-        }
-        this.server.listen(this.port);
-        this.running = true;
+    public async start(): Promise<void> {
+        await this.runDockerCompose("up -d");
+        await delay(1000);
     }
 
-    public async stop() {
-        this.server.close();
-        this.running = false;
+    public async stop(): Promise<void> {
+        await this.runDockerCompose("down");
     }
 
-    async deployOrbsStubContract(minTokensForSubscription: number, activeSubscriptionId: string) {
+    private runDockerCompose(dockerComposeCommand: string) {
+        return new Promise((resolve, reject) => {
+            exec(`docker-compose -p orbs-test-ethereum -f docker-compose.test.networks.yml -f docker-compose.test.ethereum.yml ${dockerComposeCommand}`, {
+             async: true,
+             cwd: DOCKER_CONFIG_PATH,
+             env: {...process.env, ...{
+                 PUBLIC_IP: this.config.publicIp,
+             }}}, (code: any, stdout: any, stderr: any) => {
+                 if (code == 0) {
+                     resolve(stdout);
+                 } else {
+                     reject(stderr);
+                 }
+             });
+         });
+     }
+
+     public getPublicAddress(connectFromHost = false) {
+         const address = connectFromHost ? "localhost" : this.config.publicIp;
+         return `http://${address}:8545`;
+     }
+
+
+    async deployOrbsStubContract(minTokensForSubscription: number, activeSubscriptionId: string, connectFromHost: boolean) {
         const STUD_ORBS_TOKEN_SOLIDITY_CONTRACT = `
         pragma solidity 0.4.18;
 
@@ -55,7 +82,7 @@ export class EthereumSimulationNode implements TestComponent {
         }
         `;
 
-        const web3 = new Web3(new Web3.providers.HttpProvider(`http://localhost:${this.port}`));
+        const web3 = new Web3(new Web3.providers.HttpProvider(this.getPublicAddress(connectFromHost)));
         // compile contract
         const output = solc.compile(STUD_ORBS_TOKEN_SOLIDITY_CONTRACT, 1);
         if (output.errors)
