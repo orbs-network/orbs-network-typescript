@@ -15,16 +15,16 @@ export abstract class Service {
 
   abstract async initialize(): Promise<void>;
 
-  protected static RPCMethod(target: Service, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>): any {
+  protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>): any {
     if (!descriptor || (typeof descriptor.value !== "function")) {
       throw new TypeError(`Only methods can be decorated with @RPCMethod. <${propertyKey}> is not a method!`);
     }
 
     const originalMethod = descriptor.value;
-    descriptor.value = (rpc: any) => {
-      logger.debug(`${target.nodeTopology.name}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
+    descriptor.value = function(rpc: any) {
+      logger.debug(`${this.nodeTopology.name}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
 
-      return originalMethod.apply(this, rpc);
+      return originalMethod.apply(this, [rpc]);
     };
 
     return bind(target, propertyKey, descriptor);
