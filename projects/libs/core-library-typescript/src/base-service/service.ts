@@ -48,8 +48,7 @@ export abstract class Service {
   public askForHeartbeats(peers: types.HeardbeatClient[], interval: number = 5000) {
     setInterval(() => {
       peers.forEach((peer) => {
-        this.askForHeartbeat(this.peers.virtualMachine);
-        this.askForHeartbeat(this.peers.blockStorage);
+        this.askForHeartbeat(peer);
       });
     }, interval);
   }
