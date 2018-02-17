@@ -2,6 +2,10 @@ import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "../common-library";
 
+export interface RPCMethodOptions {
+  log: boolean;
+}
+
 export abstract class Service {
   public nodeTopology: any;
   public peers: types.ClientMap;
@@ -15,19 +19,29 @@ export abstract class Service {
 
   abstract async initialize(): Promise<void>;
 
-  protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>): any {
+  protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>,
+    silent: boolean = false): any {
     if (!descriptor || (typeof descriptor.value !== "function")) {
       throw new TypeError(`Only methods can be decorated with @RPCMethod. <${propertyKey}> is not a method!`);
     }
 
-    const originalMethod = descriptor.value;
-    descriptor.value = function(rpc: any) {
-      logger.debug(`${this.nodeTopology.name}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
+    if (!silent) {
+      const originalMethod = descriptor.value;
+      descriptor.value = function(rpc: any) {
+        logger.debug(`${this.nodeTopology.name}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
 
-      return originalMethod.apply(this, [rpc]);
-    };
+        return originalMethod.apply(this, [rpc]);
+      };
+    }
 
     return bind(target, propertyKey, descriptor);
+  }
+
+  protected static SilentRPCMethod(target: Object, propertyKey: string,
+    descriptor: TypedPropertyDescriptor<Function>): any {
+    return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>) => {
+      return Service.RPCMethod(target, propertyKey, descriptor, true);
+    };
   }
 
   public async start() {

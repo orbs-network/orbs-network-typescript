@@ -37,14 +37,14 @@ export default class GossipService extends Service {
     }, Math.ceil(Math.random() * 3000));
   }
 
-  @Service.RPCMethod
+  @Service.SilentRPCMethod
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
     this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
 
     rpc.res = {};
   }
 
-  @Service.RPCMethod
+  @Service.SilentRPCMethod
   public async unicastMessage(rpc: types.UnicastMessageContext) {
     this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
 
