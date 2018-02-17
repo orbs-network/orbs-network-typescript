@@ -1,56 +1,31 @@
 import * as _ from "lodash";
 
-import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
+import { logger, config, types } from "orbs-core-library";
 
 import { Service } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
 
-const nodeTopology = topology();
-
 export default class ConsensusService extends Service {
   private consensus: Consensus;
   private transactionPool: TransactionPool;
 
-  private gossip = topologyPeers(nodeTopology.peers).gossip;
-  private virtualMachine = topologyPeers(nodeTopology.peers).virtualMachine;
-  private blockStorage = topologyPeers(nodeTopology.peers).blockStorage;
+  private gossip: types.GossipClient;
+  private virtualMachine: types.VirtualMachineClient;
+  private blockStorage: types.BlockStorageClient;
 
-  // Consensus RPC:
+  async initialize() {
+    this.gossip = this.peers.gossip;
+    this.virtualMachine = this.peers.virtualMachine;
+    this.blockStorage = this.peers.blockStorage;
 
-  @Service.RPCMethod
-  public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    await Promise.all([
+      this.initConsensus(),
+      this.initTransactionPool()
+    ]);
 
-    rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
-  }
-
-  @Service.RPCMethod
-  public async sendTransaction(rpc: types.SendTransactionContext) {
-    logger.debug(`${nodeTopology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
-
-    await this.consensus.sendTransaction(rpc.req);
-
-    rpc.res = {};
-  }
-
-  @Service.RPCMethod
-  public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
-    this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
-  }
-
-  async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
-    logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
-  }
-
-  askForHeartbeats() {
-    const peers = topologyPeers(nodeTopology.peers);
-
-    this.askForHeartbeat(peers.virtualMachine);
-    this.askForHeartbeat(peers.blockStorage);
+    this.askForHeartbeats([this.virtualMachine, this.blockStorage]);
   }
 
   async initConsensus(): Promise<void> {
@@ -67,20 +42,16 @@ export default class ConsensusService extends Service {
     this.transactionPool = new TransactionPool();
   }
 
-  async main() {
-    logger.info(`${nodeTopology.name}: service started`);
+  @Service.RPCMethod
+  public async sendTransaction(rpc: types.SendTransactionContext) {
+    await this.consensus.sendTransaction(rpc.req);
 
-    await Promise.all([
-      this.initConsensus(),
-      this.initTransactionPool()
-    ]);
-
-    setInterval(() => this.askForHeartbeats(), 5000);
+    rpc.res = {};
   }
 
-  constructor() {
-    super();
-
-    setTimeout(() => this.main(), 0);
+  @Service.RPCMethod
+  public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
+    const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
+    this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
   }
 }

@@ -1,12 +1,10 @@
 import * as _ from "lodash";
 
-import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
+import { logger, config, types } from "orbs-core-library";
 
 import { Service } from "orbs-core-library";
 import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
 import { PublicApi } from "orbs-core-library";
-
-const nodeTopology = topology();
 
 class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
   validateSubscription(): boolean {
@@ -17,24 +15,25 @@ class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
 export default class PublicApiService extends Service {
   private publicApi: PublicApi;
 
-  private virtualMachine = topologyPeers(nodeTopology.peers).virtualMachine;
-  private consensus = topologyPeers(nodeTopology.peers).consensus;
-  private subscriptionManager = topologyPeers(nodeTopology.peers).subscriptionManager;
-  private transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager,
-    new ConstantTransactionHandlerConfig());
+  private virtualMachine: types.VirtualMachineClient;
+  private consensus: types.ConsensusClient;
+  private subscriptionManager: types.SubscriptionManagerClient;
+  private transactionHandler: TransactionHandler;
 
-  // Public API RPC:
+  async initialize() {
+    this.virtualMachine = this.peers.virtualMachine;
+    this.consensus = this.peers.consensus;
+    this.subscriptionManager = this.peers.subscriptionManager;
 
-  @Service.RPCMethod
-  public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
-    rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
+    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
+    this.transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager,
+      new ConstantTransactionHandlerConfig());
+
+    this.askForHeartbeats([this.consensus, this.virtualMachine]);
   }
 
   @Service.RPCMethod
   async sendTransaction(rpc: types.SendTransactionContext) {
-    logger.debug(`${nodeTopology.name}: send transaction ${JSON.stringify(rpc.req)}`);
-
     await this.publicApi.sendTransaction(rpc.req);
   }
 
@@ -42,36 +41,10 @@ export default class PublicApiService extends Service {
   async call(rpc: types.CallContext) {
     const resultJson = await this.publicApi.callContract(rpc.req);
 
-    logger.debug(`${nodeTopology.name}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
+    logger.debug(`${this.nodeTopology.name}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
 
     rpc.res = {
       resultJson: resultJson
     };
-  }
-
-  async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
-    logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
-  }
-
-  askForHeartbeats() {
-    const peers = topologyPeers(nodeTopology.peers);
-
-    this.askForHeartbeat(peers.consensus);
-    this.askForHeartbeat(peers.virtualMachine);
-  }
-
-  async main() {
-    logger.info(`${nodeTopology.name}: service started`);
-
-    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
-
-    setInterval(() => this.askForHeartbeats(), 5000);
-  }
-
-  constructor() {
-    super();
-
-    setTimeout(() => this.main(), 0);
   }
 }

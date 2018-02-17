@@ -8,4 +8,4 @@ export { StateStorage } from "./state-storage";
 export { SubscriptionManager } from "./subscription-manager";
 export { TransactionPool } from "./transaction-pool";
 export { VirtualMachine } from "./virtual-machine";
-export { Service } from "./base-service";
+export { Service, ServiceRunner } from "./base-service";

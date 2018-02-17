@@ -1,22 +1,22 @@
 import * as _ from "lodash";
 
-import { logger, config, topology, grpc, types } from "orbs-core-library";
+import { logger, config, types } from "orbs-core-library";
 
 import { Service } from "orbs-core-library";
 import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library";
 
-const nodeTopology = topology();
-
 export default class SidechainConnectorService extends Service {
+  private options: SidechainConnectorOptions;
   private sidechainConnector: SidechainConnector;
 
-  // Sidechain Connector RPC:
+  public constructor(options: SidechainConnectorOptions) {
+    super();
 
-  @Service.RPCMethod
-  public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
+    this.options = options;
+  }
 
-    rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
+  async initialize() {
+    this.sidechainConnector = new SidechainConnector(this.options);
   }
 
   @Service.RPCMethod
@@ -28,27 +28,5 @@ export default class SidechainConnectorService extends Service {
       blockNumber: block.number.toString(),
       timestamp: block.timestamp
     };
-  }
-
-  async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: nodeTopology.name, requesterVersion: nodeTopology.version });
-    logger.debug(`${nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
-  }
-
-  askForHeartbeats() {
-  }
-
-  async main(options: SidechainConnectorOptions) {
-    logger.info(`${nodeTopology.name}: service started`);
-
-    this.sidechainConnector = new SidechainConnector(options);
-
-    setInterval(() => this.askForHeartbeats(), 5000);
-  }
-
-  constructor(options: SidechainConnectorOptions) {
-    super();
-
-    setTimeout(() => this.main(options), 0);
   }
 }
