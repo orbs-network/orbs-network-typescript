@@ -25,9 +25,9 @@ export default class PublicApiService extends Service {
     this.consensus = this.peers.consensus;
     this.subscriptionManager = this.peers.subscriptionManager;
 
-    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
     this.transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager,
       new ConstantTransactionHandlerConfig());
+    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
 
     this.askForHeartbeats([this.consensus, this.virtualMachine]);
   }
