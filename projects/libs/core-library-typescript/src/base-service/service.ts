@@ -10,15 +10,6 @@ export abstract class Service {
   public nodeTopology: any;
   public peers: types.ClientMap;
 
-  private server: any;
-
-  public constructor() {
-    this.nodeTopology = topology();
-    this.peers = topologyPeers(this.nodeTopology.peers);
-  }
-
-  abstract async initialize(): Promise<void>;
-
   protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>,
     silent: boolean = false): any {
     if (!descriptor || (typeof descriptor.value !== "function")) {
@@ -44,6 +35,13 @@ export abstract class Service {
     };
   }
 
+  public constructor() {
+    this.nodeTopology = topology();
+    this.peers = topologyPeers(this.nodeTopology.peers);
+  }
+
+  abstract async initialize(): Promise<void>;
+
   public async start() {
     logger.info(`${this.nodeTopology.name}: service started`);
 
@@ -61,8 +59,8 @@ export abstract class Service {
 
   public askForHeartbeats(peers: types.HeardbeatClient[], interval: number = 5000) {
     setInterval(() => {
-      peers.forEach((peer) => {
-        this.askForHeartbeat(peer);
+      peers.forEach(async (peer) => {
+        await this.askForHeartbeat(peer);
       });
     }, interval);
   }
