@@ -1,15 +1,15 @@
 import * as _ from "lodash";
-import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class ConsensusService {
+export default class ConsensusService extends Service {
   private consensus: Consensus;
   private transactionPool: TransactionPool;
 
@@ -19,14 +19,14 @@ export default class ConsensusService {
 
   // Consensus RPC:
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
 
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   public async sendTransaction(rpc: types.SendTransactionContext) {
     logger.debug(`${nodeTopology.name}: sendTransaction ${JSON.stringify(rpc.req)}`);
 
@@ -35,7 +35,7 @@ export default class ConsensusService {
     rpc.res = {};
   }
 
-  @bind
+  @Service.RPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
     this.consensus.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
@@ -79,6 +79,8 @@ export default class ConsensusService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 0);
   }
 }

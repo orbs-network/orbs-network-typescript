@@ -3,23 +3,24 @@ import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { SubscriptionManager } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class SubscriptionManagerService {
+export default class SubscriptionManagerService extends Service {
   private subscriptionManager: SubscriptionManager;
 
   private sidechainConnector = topologyPeers(nodeTopology.peers).sidechainConnector;
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
 
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   async getSubscriptionStatus(rpc: types.GetSubscriptionStatusContext) {
     const { id, tokens } = await this.subscriptionManager.getSubscriptionStatus(rpc.req.subscriptionKey);
     rpc.res = { active: tokens.isGreaterThan(0), expiryTimestamp: Date.now() + 24 * 60 * 1000 };
@@ -54,6 +55,8 @@ export default class SubscriptionManagerService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 0);
   }
 }

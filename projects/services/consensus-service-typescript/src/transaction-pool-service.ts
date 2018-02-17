@@ -3,21 +3,22 @@ import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class TransactionPoolService {
+export default class TransactionPoolService extends Service {
   private transactionPool: TransactionPool;
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
 
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
     logger.info(`${nodeTopology.name}: addNewPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
 
@@ -26,7 +27,7 @@ export default class TransactionPoolService {
     rpc.res = {};
   }
 
-  @bind
+  @Service.RPCMethod
   public async addExistingPendingTransaction(rpc: types.AddExistingPendingTransactionContext) {
     logger.info(`${nodeTopology.name}: addExistingPendingTransaction ${JSON.stringify(rpc.req.transaction)}`);
 
@@ -56,6 +57,8 @@ export default class TransactionPoolService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 0);
   }
 }

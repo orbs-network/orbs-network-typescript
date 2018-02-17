@@ -1,33 +1,33 @@
 import * as _ from "lodash";
-import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class GossipService {
+export default class GossipService extends Service {
   private gossip: Gossip;
 
   // Gossip RPC:
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
 
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
     this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
 
     rpc.res = {};
   }
 
-  @bind
+  @Service.RPCMethod
   public async unicastMessage(rpc: types.UnicastMessageContext) {
     this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
 
@@ -77,6 +77,8 @@ export default class GossipService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 0);
   }
 }

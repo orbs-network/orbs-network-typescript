@@ -1,25 +1,25 @@
 import * as _ from "lodash";
-import bind from "bind-decorator";
 
 import { logger, config, topology, grpc, types } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class SidechainConnectorService {
+export default class SidechainConnectorService extends Service {
   private sidechainConnector: SidechainConnector;
 
   // Sidechain Connector RPC:
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
 
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   public async callEthereumContract(rpc: types.CallEthereumContractContext) {
     const { result, block } = await this.sidechainConnector.callEthereumContract(rpc.req);
 
@@ -47,6 +47,8 @@ export default class SidechainConnectorService {
   }
 
   constructor(options: SidechainConnectorOptions) {
+    super();
+
     setTimeout(() => this.main(options), 0);
   }
 }

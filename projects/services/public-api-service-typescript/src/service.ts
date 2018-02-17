@@ -1,8 +1,8 @@
 import * as _ from "lodash";
-import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
 import { PublicApi } from "orbs-core-library";
 
@@ -14,7 +14,7 @@ class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
   }
 }
 
-export default class PublicApiService {
+export default class PublicApiService extends Service {
   private publicApi: PublicApi;
 
   private virtualMachine = topologyPeers(nodeTopology.peers).virtualMachine;
@@ -25,20 +25,20 @@ export default class PublicApiService {
 
   // Public API RPC:
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-    @bind
-    async sendTransaction(rpc: types.SendTransactionContext) {
-      logger.debug(`${nodeTopology.name}: send transaction ${JSON.stringify(rpc.req)}`);
+  @Service.RPCMethod
+  async sendTransaction(rpc: types.SendTransactionContext) {
+    logger.debug(`${nodeTopology.name}: send transaction ${JSON.stringify(rpc.req)}`);
 
-      await this.publicApi.sendTransaction(rpc.req);
-    }
+    await this.publicApi.sendTransaction(rpc.req);
+  }
 
-  @bind
+  @Service.RPCMethod
   async call(rpc: types.CallContext) {
     const resultJson = await this.publicApi.callContract(rpc.req);
 
@@ -70,6 +70,8 @@ export default class PublicApiService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 0);
   }
 }

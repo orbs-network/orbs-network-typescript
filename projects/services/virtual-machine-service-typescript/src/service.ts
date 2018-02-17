@@ -1,25 +1,25 @@
 
 import * as _ from "lodash";
-import bind from "bind-decorator";
 
 import { logger, topologyPeers, grpc, types, topology } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { VirtualMachine } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class VirtualMachineService {
+export default class VirtualMachineService extends Service {
   private virtualMachine: VirtualMachine;
 
   private stateStorage: types.StateStorageClient = topologyPeers(nodeTopology.peers).stateStorage;
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
     logger.debug(`${nodeTopology.name}: execute transaction ${JSON.stringify(rpc.req)}`);
 
@@ -40,7 +40,7 @@ export default class VirtualMachineService {
     }
   }
 
-  @bind
+  @Service.RPCMethod
   public async callContract(rpc: types.CallContractContext) {
     logger.debug(`${nodeTopology.name}: call contract ${JSON.stringify(rpc.req)}`);
 
@@ -71,6 +71,8 @@ export default class VirtualMachineService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 2000);
   }
 }

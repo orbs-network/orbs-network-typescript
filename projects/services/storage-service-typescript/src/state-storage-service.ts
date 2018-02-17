@@ -1,26 +1,26 @@
 import * as _ from "lodash";
-import bind from "bind-decorator";
 
 import { logger, grpc, types, topology, topologyPeers } from "orbs-core-library";
 
+import { Service } from "orbs-core-library";
 import { StateStorage } from "orbs-core-library";
 
 const nodeTopology = topology();
 
-export default class StateStorageService {
+export default class StateStorageService extends Service {
   private stateStorage: StateStorage;
 
   private blockStorage = topologyPeers(nodeTopology.peers).blockStorage;
 
   // State Storage RPC:
 
-  @bind
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     logger.debug(`${nodeTopology.name}: service '${rpc.req.requesterName}(v${rpc.req.requesterVersion})' asked for heartbeat`);
     rpc.res = { responderName: nodeTopology.name, responderVersion: nodeTopology.version };
   }
 
-  @bind
+  @Service.RPCMethod
   public async readKeys(rpc: types.ReadKeysContext) {
     logger.debug(`${nodeTopology.name}: readKeys ${rpc.req.address}/${rpc.req.keys}`);
 
@@ -50,6 +50,8 @@ export default class StateStorageService {
   }
 
   constructor() {
+    super();
+
     setTimeout(() => this.main(), 0);
   }
 }
