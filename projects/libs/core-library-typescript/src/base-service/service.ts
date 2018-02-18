@@ -7,6 +7,7 @@ export interface RPCMethodOptions {
 }
 
 export abstract class Service {
+  public name: string;
   public nodeTopology: any;
   public peers: types.ClientMap;
 
@@ -34,6 +35,7 @@ export abstract class Service {
   }
 
   public constructor() {
+    this.name = this.constructor.name;
     this.nodeTopology = topology();
     this.peers = topologyPeers(this.nodeTopology.peers);
   }
@@ -41,9 +43,9 @@ export abstract class Service {
   abstract async initialize(): Promise<void>;
 
   public async start() {
-    logger.info(`${this.nodeTopology.name}: service started`);
-
     await this.initialize();
+
+    logger.info(`${this.nodeTopology.name} (${this.name}): service started`);
   }
 
   public async stop() {
@@ -52,7 +54,7 @@ export abstract class Service {
   async askForHeartbeat(peer: types.HeardbeatClient) {
     const res = await peer.getHeartbeat({ requesterName: this.nodeTopology.name, requesterVersion: this.nodeTopology.version });
 
-    logger.debug(`${this.nodeTopology.name}: received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
+    logger.debug(`${this.nodeTopology.name} (${this.name}): received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
   }
 
   public askForHeartbeats(peers: types.HeardbeatClient[], interval: number = 5000) {
