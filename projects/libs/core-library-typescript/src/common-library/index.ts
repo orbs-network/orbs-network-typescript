@@ -5,3 +5,4 @@ export * from "./grpc";
 export * from "./topology";
 export * from "./topologyPeers";
 export * from "./types";
+export * from "./grpc-server";

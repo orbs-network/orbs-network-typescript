@@ -1,15 +1,12 @@
 import * as _ from "lodash";
 
-import { logger, config, types } from "orbs-core-library";
+import { types } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus } from "orbs-core-library";
-import { Gossip } from "orbs-core-library";
-import { TransactionPool } from "orbs-core-library";
 
 export default class ConsensusService extends Service {
   private consensus: Consensus;
-  private transactionPool: TransactionPool;
 
   public constructor(consensus: Consensus,
                     serviceConfig: ServiceConfig) {

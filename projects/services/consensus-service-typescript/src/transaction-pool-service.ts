@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { logger, config, types } from "orbs-core-library";
+import { types } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
@@ -9,16 +9,12 @@ import { TransactionPool } from "orbs-core-library";
 export default class TransactionPoolService extends Service {
   private transactionPool: TransactionPool;
 
-  public constructor(serviceConfig: ServiceConfig) {
+  public constructor(transactionPool: TransactionPool, serviceConfig: ServiceConfig) {
     super(serviceConfig);
+    this.transactionPool = transactionPool;
   }
 
   async initialize() {
-    await this.initTransactionPool();
-  }
-
-  async initTransactionPool(): Promise<void> {
-    this.transactionPool = new TransactionPool();
   }
 
   @Service.RPCMethod

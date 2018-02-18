@@ -30,7 +30,7 @@ function client(grpc: GRPCClient) {
   return caller(grpc.endpoint, protoPath, grpc.name);
 }
 
-function server(grpc: GRPServer) {
+function runServer(grpc: GRPServer) {
   const protoPath = path.resolve(PROTO_PATH, grpc.proto);
   const app = new Mali(protoPath, grpc.name);
   const serviceFuncs: {[key: string]: Function} = {};
@@ -61,8 +61,9 @@ function servers(grpcs: GRPServers) {
 }
 
 export namespace grpc {
+
   export function gossipServer({ endpoint, service }: { endpoint: string, service: types.GossipServer }) {
-    server({ proto: "gossip.proto", name: "Gossip", endpoint, service });
+    runServer({ proto: "gossip.proto", name: "Gossip", endpoint, service });
   }
 
   export function gossipClient({ endpoint }: { endpoint: string }): types.GossipClient {
@@ -76,7 +77,7 @@ export namespace grpc {
   }
 
   export function blockStorageServer({ endpoint, service }: { endpoint: string, service: types.BlockStorageServer }) {
-    return server({ proto: "block-storage.proto", name: "BlockStorage", endpoint, service });
+    return runServer({ proto: "block-storage.proto", name: "BlockStorage", endpoint, service });
   }
 
   export function blockStorageClient({ endpoint }: { endpoint: string }): types.BlockStorageClient {
@@ -84,7 +85,7 @@ export namespace grpc {
   }
 
   export function stateStorageServer({ endpoint, service }: { endpoint: string, service: types.StateStorageServer }) {
-    return server({ proto: "state-storage.proto", name: "StateStorage", endpoint, service });
+    return runServer({ proto: "state-storage.proto", name: "StateStorage", endpoint, service });
   }
 
   export function stateStorageClient({ endpoint }: { endpoint: string }): types.StateStorageClient {
@@ -99,7 +100,7 @@ export namespace grpc {
   }
 
   export function consensusServer({ endpoint, service }: { endpoint: string, service: types.ConsensusServer }) {
-    server({ proto: "consensus.proto", name: "Consensus", endpoint, service });
+    runServer({ proto: "consensus.proto", name: "Consensus", endpoint, service });
   }
 
   export function consensusClient({ endpoint }: { endpoint: string }): types.ConsensusClient {
@@ -107,7 +108,7 @@ export namespace grpc {
   }
 
   export function subscriptionManagerServer({ endpoint, service }: { endpoint: string, service: types.SubscriptionManagerServer }) {
-    server({ proto: "subscription-manager.proto", name: "SubscriptionManager", endpoint, service });
+    runServer({ proto: "subscription-manager.proto", name: "SubscriptionManager", endpoint, service });
   }
 
   export function subscriptionManagerClient({ endpoint }: { endpoint: string }): types.SubscriptionManagerClient {
@@ -115,7 +116,7 @@ export namespace grpc {
   }
 
   export function transactionPoolServer({ endpoint, service }: { endpoint: string, service: types.TransactionPoolServer }) {
-    server({ proto: "transaction-pool.proto", name: "TransactionPool", endpoint, service });
+    runServer({ proto: "transaction-pool.proto", name: "TransactionPool", endpoint, service });
   }
 
   export function transactionPoolClient({ endpoint }: { endpoint: string }): types.TransactionPoolClient {
@@ -123,7 +124,7 @@ export namespace grpc {
   }
 
   export function publicApiServer({ endpoint, service }: { endpoint: string, service: types.PublicApiServer }) {
-    server({ proto: "public-api.proto", name: "PublicApi", endpoint, service });
+    runServer({ proto: "public-api.proto", name: "PublicApi", endpoint, service });
   }
 
   export function publicApiClient({ endpoint }: { endpoint: string }): types.PublicApiClient {
@@ -131,7 +132,7 @@ export namespace grpc {
   }
 
   export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
-    server({ proto: "virtual-machine.proto", name: "VirtualMachine", endpoint, service });
+    runServer({ proto: "virtual-machine.proto", name: "VirtualMachine", endpoint, service });
   }
 
   export function virtualMachineClient({ endpoint }: { endpoint: string }): types.VirtualMachineClient {
@@ -139,7 +140,7 @@ export namespace grpc {
   }
 
   export function sidechainConnectorServer({ endpoint, service }: { endpoint: string, service: types.SidechainConnectorServer }) {
-    server({ proto: "sidechain-connector.proto", name: "SidechainConnector", endpoint, service });
+    runServer({ proto: "sidechain-connector.proto", name: "SidechainConnector", endpoint, service });
   }
 
   export function sidechainConnectorClient({ endpoint }: { endpoint: string }): types.SidechainConnectorClient {
