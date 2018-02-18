@@ -11,6 +11,10 @@ export default class VirtualMachineService extends Service {
 
   private stateStorage: types.StateStorageClient;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     this.stateStorage = this.peers.stateStorage;
     this.virtualMachine = new VirtualMachine(this.stateStorage);

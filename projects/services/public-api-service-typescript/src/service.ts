@@ -20,6 +20,10 @@ export default class PublicApiService extends Service {
   private subscriptionManager: types.SubscriptionManagerClient;
   private transactionHandler: TransactionHandler;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     this.virtualMachine = this.peers.virtualMachine;
     this.consensus = this.peers.consensus;

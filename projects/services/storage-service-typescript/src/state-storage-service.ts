@@ -10,6 +10,10 @@ export default class StateStorageService extends Service {
 
   private blockStorage: types.BlockStorageClient;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     this.blockStorage = this.peers.blockStorage;
 

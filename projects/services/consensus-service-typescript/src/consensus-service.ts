@@ -15,6 +15,10 @@ export default class ConsensusService extends Service {
   private virtualMachine: types.VirtualMachineClient;
   private blockStorage: types.BlockStorageClient;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     this.gossip = this.peers.gossip;
     this.virtualMachine = this.peers.virtualMachine;

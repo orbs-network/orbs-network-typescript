@@ -9,6 +9,10 @@ import { TransactionPool } from "orbs-core-library";
 export default class TransactionPoolService extends Service {
   private transactionPool: TransactionPool;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     await this.initTransactionPool();
   }

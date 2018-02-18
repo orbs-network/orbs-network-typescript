@@ -8,6 +8,10 @@ import { BlockStorage } from "orbs-core-library";
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     await this.initBlockStorage();
   }

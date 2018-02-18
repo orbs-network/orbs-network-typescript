@@ -9,6 +9,10 @@ import { Gossip } from "orbs-core-library";
 export default class GossipService extends Service {
   private gossip: Gossip;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     await this.initGossip();
 

@@ -11,6 +11,10 @@ export default class SubscriptionManagerService extends Service {
 
   private sidechainConnector: types.SidechainConnectorClient;
 
+  public constructor() {
+    super();
+  }
+
   async initialize() {
     this.sidechainConnector = this.peers.sidechainConnector;
 
