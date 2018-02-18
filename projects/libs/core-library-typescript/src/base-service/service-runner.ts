@@ -13,14 +13,14 @@ export class ServiceRunner {
   public static async runMulti(grpcServerFunc: any, services: Service[]): Promise<void> {
     const endpoint = services[0].nodeTopology.endpoint;
 
-    services.forEach(async (service) => {
+    for (const service of services) {
       const serviceEndpoint = service.nodeTopology.endpoint;
       if (endpoint !== serviceEndpoint) {
         throw new Error(`Multi-services should run on the same endpoint! Expected: ${endpoint}, received: ${serviceEndpoint}`);
       }
 
       await service.start();
-    });
+    }
 
     return grpcServerFunc({ endpoint, services });
   }
