@@ -1,15 +1,15 @@
-import { Assertion, expect } from "chai";
+const { Assertion, expect } = require("chai");
 import * as nconf from "nconf";
 
-import { grpc, types } from "orbs-core-library";
 
-import { OrbsClientSession, OrbsHardCodedContractAdapter } from "../src/orbs-client";
-import { FooBarAccount } from "../src/foobar-contract";
-import { TestEnvironment } from "../src/test-environment";
+import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
+import { FooBarAccount } from "./foobar-contract";
+import { TestEnvironment } from "./test-environment";
+import { PublicApiClient, initPublicApiClient } from "./public-api-client";
 
 
 let testEnvironment: TestEnvironment;
-let publicApiClient: types.PublicApiClient;
+let publicApiClient: PublicApiClient;
 
 nconf.env({ parseValues: true });
 
@@ -19,9 +19,12 @@ if (nconf.get("E2E_NO_DEPLOY")) {
     throw new Error("E2E_PUBLIC_API_ENDPOINT must be defined in a no-deploy configuration");
   }
 
-  publicApiClient = grpc.publicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
+  publicApiClient = initPublicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
 } else {
-  testEnvironment = new TestEnvironment();
+  testEnvironment = new TestEnvironment({
+    connectFromHost: nconf.get("CONNECT_FROM_HOST"),
+    preExistingPublicApiSubnet: nconf.get("PREEXISTING_PUBLIC_API_SUBNET")
+  });
   publicApiClient = testEnvironment.getPublicApiClient();
 }
 
@@ -56,7 +59,7 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 }
 
 describe("simple token transfer", async function () {
-  this.timeout(100000);
+  this.timeout(800000);
   before(async function () {
     if (testEnvironment) {
       console.log("starting the test environment");

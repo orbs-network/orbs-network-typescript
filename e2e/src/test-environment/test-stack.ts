@@ -1,11 +1,11 @@
 import TestComponent from "./test-component";
 
-export default class TestStack implements TestComponent {
+export default abstract class TestStack implements TestComponent {
     protected componentStack: TestComponent[] = [];
 
     protected async startComponent(component: TestComponent) {
-        await component.start();
         this.componentStack.push(component);
+        await component.start();
     }
 
     async start() {
