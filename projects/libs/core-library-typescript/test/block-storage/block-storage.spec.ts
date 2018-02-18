@@ -12,12 +12,12 @@ async function initBlockStorage(): Promise<BlockStorage> {
 }
 
 describe("Block storage", () => {
-    let blockStorage;
+    let blockStorage: BlockStorage;
 
     beforeEach(async () => {
         try {
             fsExtra.removeSync(BlockStorage.LEVELDB_PATH);
-        } catch (e) { }        
+        } catch (e) { }
         blockStorage = await initBlockStorage();
     });
 
@@ -30,7 +30,7 @@ describe("Block storage", () => {
         it("on initialization", async () => { 
             const lastBlockId = await blockStorage.getLastBlockId();
             lastBlockId.should.be.eql(0);
-    
+
             const lastBlock = await blockStorage.getBlock(lastBlockId);
             lastBlock.should.be.eql(BlockStorage.GENESIS_BLOCK);
         });
@@ -52,7 +52,7 @@ describe("Block storage", () => {
             const lastBlock = await blockStorage.getBlock(1);
             lastBlock.should.be.eql(exampleBlock);
         });
-    });    
+    });
 
     describe("#addBlock", () => {
         it("adds a new block", async () => {
