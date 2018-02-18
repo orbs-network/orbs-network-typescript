@@ -15,7 +15,7 @@ export default class TestSubnet implements TestComponent {
         await this.stop();
         const res = shell.exec(`docker network create ${this.name} --subnet ${this.subnet}.0/24`);
         if (res.code != 0 ) {
-            // throw `${this.name}: ${res.stderr}`;
+            throw `${this.name}: ${res.stderr}`;
         }
     }
 

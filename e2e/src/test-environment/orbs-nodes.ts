@@ -2,13 +2,12 @@ import { exec } from "shelljs";
 import * as path from "path";
 import TestComponent from "./test-component";
 import TestSubnet from "./test-subnet";
-import { grpc, types } from "orbs-core-library";
 import { delay } from "bluebird";
+import { initPublicApiClient } from "../public-api-client";
 
 
-const PROJECT_ROOT_FOLDER = path.join(__dirname, "../../../");
-const COMPOSE_CONFIG_PATH = PROJECT_ROOT_FOLDER;
-const NODE_CONFIG_PATH = "/opt/orbs/config/topology";
+const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
+const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 
 export interface OrbsNodeDeployParams {
     nodeName: string;
@@ -43,18 +42,18 @@ export class OrbsNode implements TestComponent {
         await this.runDockerCompose("down");
     }
 
-    public getPublicApiClient(accessFromHost = true) {
+    public getPublicApiClient(accessFromHost: boolean) {
         const endpoint = accessFromHost ? `0.0.0.0:${this.deployParams.PublicApiHostPort}` : `${this.deployParams.nodePublicApiIp}:51151`;
-        return grpc.publicApiClient({ endpoint });
+        return initPublicApiClient({ endpoint });
     }
 
     private runDockerCompose(dockerComposeCommand: string) {
        return new Promise((resolve, reject) => {
            exec(`docker-compose -p orbs-${this.deployParams.nodeName} -f docker-compose.test.volumes.yml -f docker-compose.test.networks.yml -f docker-compose.test.services.yml ${dockerComposeCommand}`, {
             async: true,
-            cwd: COMPOSE_CONFIG_PATH,
+            cwd: DOCKER_CONFIG_PATH,
             env: {...process.env, ...{
-                NODE_CONFIG_PATH : "/opt/orbs/config/topology",
+                NODE_CONFIG_PATH : NODE_CONFIG_PATH,
                 PRIVATE_NETWORK: this.deployParams.privateSubnet,
                 NODE_NAME: this.deployParams.nodeName,
                 NODE_IP: this.deployParams.nodeOrbsNetworkIp,
@@ -110,8 +109,8 @@ export class OrbsNodeCluster implements TestComponent {
         return nodes;
    }
 
-   public getAvailableClients() {
-       return this.nodes.map(node => node.getPublicApiClient());
+   public getAvailableClients(accessFromHost: boolean) {
+       return this.nodes.map(node => node.getPublicApiClient(accessFromHost));
    }
 
    public async start() {

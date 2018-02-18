@@ -3,11 +3,9 @@ version: '2'
 services:
   base-service:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    restart: always
     command: node dist/index.js ${NODE_CONFIG_PATH}
     volumes:
-      - ./logs:/opt/orbs/logs
-      - ./config/topologies/discovery/node1:/opt/orbs/config/topology
+      - ../../../logs:/opt/orbs/logs
     environment:
       NODE_NAME: ${NODE_NAME}
       NODE_ENV: test
