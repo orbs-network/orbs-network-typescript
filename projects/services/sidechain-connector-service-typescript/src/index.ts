@@ -1,12 +1,13 @@
-import { config, ErrorHandler, grpc, topology } from "orbs-core-library";
+import { config, ErrorHandler, grpc, ServiceRunner } from "orbs-core-library";
 
 import SidehainConnectorService from "./service";
 
 ErrorHandler.setup();
 
-const server = grpc.sidechainConnectorServer({
-  endpoint: topology().endpoint,
-  service: new SidehainConnectorService({
+const main = async () => {
+  await ServiceRunner.run(grpc.sidechainConnectorServer, new SidehainConnectorService({
     ethereumNodeHttpAddress: config.get("ethereumNodeAddress")
-  })
-});
+  }));
+};
+
+main();

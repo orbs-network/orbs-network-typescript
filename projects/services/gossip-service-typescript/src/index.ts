@@ -1,10 +1,11 @@
-import { ErrorHandler, topology, grpc } from "orbs-core-library";
+import { ErrorHandler, grpc, ServiceRunner } from "orbs-core-library";
 
 import GossipService from "./service";
 
 ErrorHandler.setup();
 
-const server = grpc.gossipServer({
-  endpoint: topology().endpoint,
-  service: new GossipService()
-});
+const main = async () => {
+  await ServiceRunner.run(grpc.gossipServer, new GossipService());
+};
+
+main();
