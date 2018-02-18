@@ -30,9 +30,7 @@ export abstract class Service {
 
   protected static SilentRPCMethod(target: Object, propertyKey: string,
     descriptor: TypedPropertyDescriptor<Function>): any {
-    return (target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>) => {
-      return Service.RPCMethod(target, propertyKey, descriptor, true);
-    };
+    return Service.RPCMethod(target, propertyKey, descriptor, true);
   }
 
   public constructor() {
@@ -65,7 +63,7 @@ export abstract class Service {
     }, interval);
   }
 
-  @this.RPCMethod
+  @Service.RPCMethod
   public async getHeartbeat(rpc: types.GetHeartbeatContext) {
     rpc.res = { responderName: this.nodeTopology.name, responderVersion: this.nodeTopology.version };
   }
