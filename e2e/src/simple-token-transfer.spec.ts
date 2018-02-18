@@ -11,6 +11,8 @@ import { PublicApiClient, initPublicApiClient } from "./public-api-client";
 let testEnvironment: TestEnvironment;
 let publicApiClient: PublicApiClient;
 
+const TEST_SUBSCRIPTION_KEY = "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe";
+
 nconf.env({ parseValues: true });
 
 if (nconf.get("E2E_NO_DEPLOY")) {
@@ -23,7 +25,8 @@ if (nconf.get("E2E_NO_DEPLOY")) {
 } else {
   testEnvironment = new TestEnvironment({
     connectFromHost: nconf.get("CONNECT_FROM_HOST"),
-    preExistingPublicApiSubnet: nconf.get("PREEXISTING_PUBLIC_API_SUBNET")
+    preExistingPublicSubnet: nconf.get("PREEXISTING_PUBLIC_SUBNET"),
+    testSubscriptionKey: TEST_SUBSCRIPTION_KEY
   });
   publicApiClient = testEnvironment.getPublicApiClient();
 }
@@ -49,7 +52,7 @@ Assertion.addMethod("bars", assertFooBarAccountBalance);
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const senderAddress = `addr_${Math.floor(Math.random() * 100000000)}`; // TODO: replace with a proper public key
-  const orbsSession = new OrbsClientSession(senderAddress, "fooFoundation", publicApiClient);
+  const orbsSession = new OrbsClientSession(senderAddress, TEST_SUBSCRIPTION_KEY, publicApiClient);
   const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
   const account = new FooBarAccount(senderAddress, contractAdapter);
 

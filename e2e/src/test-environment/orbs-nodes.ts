@@ -9,29 +9,31 @@ import { initPublicApiClient } from "../public-api-client";
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
 const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 
-export interface OrbsNodeDeployParams {
+export interface OrbsNodeConfig {
     nodeName: string;
     nodeOrbsNetworkIp: string;
     nodePublicApiIp: string;
     privateSubnet: string;
     forceRecreate?: boolean;
-    PublicApiHostPort: number;
+    publicApiHostPort: number;
+    sidechainConnectorPublicIp: string;
     gossipPeers: string[];
-    ethereumNodeHttpAddress?: string;
-    ethereumOrbsSubscriptionContractAddress?: string;
+    ethereumNodeHttpAddress: string;
+    ethereumSubscriptionContractAddress?: string;
+    debugPort: number;
 }
 
 export class OrbsNode implements TestComponent {
-    deployParams: OrbsNodeDeployParams;
+    config: OrbsNodeConfig;
     forceRecreate: boolean;
 
-    constructor(deployParams: OrbsNodeDeployParams) {
-        this.deployParams = deployParams;
+    constructor(config: OrbsNodeConfig) {
+        this.config = config;
     }
 
     public async start(): Promise<void> {
         let command = "up -d";
-        if (this.deployParams.forceRecreate) {
+        if (this.config.forceRecreate) {
             command += " --forceRecreate";
         }
         await this.runDockerCompose(command);
@@ -43,26 +45,36 @@ export class OrbsNode implements TestComponent {
     }
 
     public getPublicApiClient(accessFromHost: boolean) {
-        const endpoint = accessFromHost ? `0.0.0.0:${this.deployParams.PublicApiHostPort}` : `${this.deployParams.nodePublicApiIp}:51151`;
+        const endpoint = accessFromHost ? `0.0.0.0:${this.config.publicApiHostPort}` : `${this.config.nodePublicApiIp}:51151`;
         return initPublicApiClient({ endpoint });
     }
 
+    public setEthereumSubscriptionContractAddress(contractAddress: string) {
+        this.config.ethereumSubscriptionContractAddress = contractAddress;
+    }
+
     private runDockerCompose(dockerComposeCommand: string) {
-       return new Promise((resolve, reject) => {
-           exec(`docker-compose -p orbs-${this.deployParams.nodeName} -f docker-compose.test.volumes.yml -f docker-compose.test.networks.yml -f docker-compose.test.services.yml ${dockerComposeCommand}`, {
-            async: true,
-            cwd: DOCKER_CONFIG_PATH,
-            env: {...process.env, ...{
-                NODE_CONFIG_PATH : NODE_CONFIG_PATH,
-                PRIVATE_NETWORK: this.deployParams.privateSubnet,
-                NODE_NAME: this.deployParams.nodeName,
-                NODE_IP: this.deployParams.nodeOrbsNetworkIp,
-                PUBLIC_API_IP: this.deployParams.nodePublicApiIp,
-                GOSSIP_PEERS: this.deployParams.gossipPeers,
-                PUBLIC_API_HOST_PORT: this.deployParams.PublicApiHostPort,
-                SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS: this.deployParams.ethereumNodeHttpAddress,
-                SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS : this.deployParams.ethereumOrbsSubscriptionContractAddress
-            }}}, (code: any, stdout: any, stderr: any) => {
+        if (this.config.ethereumSubscriptionContractAddress == undefined) {
+            throw "ethereumSubscriptionContractAddress must be defined";
+        }
+        return new Promise((resolve, reject) => {
+            exec(`docker-compose -p orbs-test-${this.config.nodeName} -f docker-compose.test.volumes.yml -f docker-compose.test.networks.yml -f docker-compose.test.services.yml ${dockerComposeCommand}`, {
+                async: true,
+                cwd: DOCKER_CONFIG_PATH,
+                env: {...process.env, ...{
+                    NODE_CONFIG_PATH : NODE_CONFIG_PATH,
+                    PRIVATE_NETWORK: this.config.privateSubnet,
+                    NODE_NAME: this.config.nodeName,
+                    NODE_IP: this.config.nodeOrbsNetworkIp,
+                    PUBLIC_API_IP: this.config.nodePublicApiIp,
+                    GOSSIP_PEERS: this.config.gossipPeers,
+                    PUBLIC_API_HOST_PORT: this.config.publicApiHostPort,
+                    SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
+                    SIDECHAIN_CONNECTOR__PUBLIC_IP: this.config.sidechainConnectorPublicIp,
+                    SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS : this.config.ethereumSubscriptionContractAddress,
+                    DEBUG_PORT: this.config.debugPort }
+                }
+            }, (code: any, stdout: any, stderr: any) => {
                 if (code == 0) {
                     resolve(stdout);
                 } else {
@@ -73,24 +85,23 @@ export class OrbsNode implements TestComponent {
     }
 }
 
-interface OrbsNodeClusterOptions {
+interface OrbsNodeClusterConfig {
     numOfNodes: number;
     orbsNetwork: TestSubnet;
     publicApiNetwork: TestSubnet;
-    ethereumNodeHttpAddress?: string;
-    ethereumOrbsSubscriptionContractAddress?: string;
+    ethereumNodeHttpAddress: string;
 }
 
 export class OrbsNodeCluster implements TestComponent {
     readonly nodes: OrbsNode[];
-    readonly options: OrbsNodeClusterOptions;
+    readonly config: OrbsNodeClusterConfig;
 
 
 
     private generateNodeInstances(numOfNodes: number) {
         const gossipPeerIps = [];
         for (let i = 0; i < numOfNodes; i++) {
-            gossipPeerIps.push(this.options.orbsNetwork.allocateAddress());
+            gossipPeerIps.push(this.config.orbsNetwork.allocateAddress());
         }
         const gossipPeers = gossipPeerIps.map(ip => `ws://${ip}:60001`);
         const nodes: OrbsNode[] = [];
@@ -98,12 +109,13 @@ export class OrbsNodeCluster implements TestComponent {
             nodes.push(new OrbsNode({
                 nodeName: `node${i + 1}`,
                 nodeOrbsNetworkIp: gossipPeerIps[i],
-                nodePublicApiIp: this.options.publicApiNetwork.allocateAddress(),
+                nodePublicApiIp: this.config.publicApiNetwork.allocateAddress(),
                 gossipPeers,
                 privateSubnet: `162.100.${i + 1}`,
-                ethereumNodeHttpAddress: this.options.ethereumNodeHttpAddress,
-                ethereumOrbsSubscriptionContractAddress: this.options.ethereumOrbsSubscriptionContractAddress,
-                PublicApiHostPort: 20000 + i
+                sidechainConnectorPublicIp: this.config.publicApiNetwork.allocateAddress(),
+                ethereumNodeHttpAddress: this.config.ethereumNodeHttpAddress,
+                publicApiHostPort: 20000 + i,
+                debugPort: 9229 + i
             }));
         }
         return nodes;
@@ -121,12 +133,14 @@ export class OrbsNodeCluster implements TestComponent {
         await Promise.all(this.nodes.map(node => node.stop()));
     }
 
-    public setOrbsSubscriptionContractAddress(contractAddress: string) {
-        this.options.ethereumOrbsSubscriptionContractAddress = contractAddress;
+    public setEthereumSubscriptionContractAddress(contractAddress: string) {
+        for (const node of this.nodes) {
+            node.setEthereumSubscriptionContractAddress(contractAddress);
+        }
     }
 
-    constructor(opts: OrbsNodeClusterOptions) {
-        this.options = opts;
-        this.nodes = this.generateNodeInstances(opts.numOfNodes);
+    constructor(config: OrbsNodeClusterConfig) {
+        this.config = config;
+        this.nodes = this.generateNodeInstances(config.numOfNodes);
     }
 }

@@ -7,6 +7,8 @@ services:
       service: base-service
     working_dir: /opt/orbs/projects/services/consensus-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/consensus.js
+    environment:
+      - ethereumContractAddress=${SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS}
     networks:
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.15
@@ -18,19 +20,22 @@ services:
       - storage:${PRIVATE_NETWORK}.17
       - virtual-machine:${PRIVATE_NETWORK}.18
       - gossip:${PRIVATE_NETWORK}.19
+      - sidechain-connector:${PRIVATE_NETWORK}.20
 
   public-api:
     extends:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/public-api-service-typescript/
+    environment:
+      - validateSubscription=true
     command: node dist/index.js ${NODE_CONFIG_PATH}/public-api.js
     ports:
       - ${PUBLIC_API_HOST_PORT}:51151
     volumes_from:
       - shared_volumes
     networks:
-      public-api-external-network:
+      public-network:
         ipv4_address: ${PUBLIC_API_IP}
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.16
@@ -102,10 +107,14 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/sidechain-connector-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/sidechain-connector.js --ethereumNodeHttpAddress=${SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS}
+    environment:
+    - ethereumNodeAddress=${SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS}
+    command: node dist/index.js ${NODE_CONFIG_PATH}/sidechain-connector.js
     volumes_from:
       - shared_volumes
     networks:
+      public-network:
+        ipv4_address: ${SIDECHAIN_CONNECTOR__PUBLIC_IP}
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.20
     extra_hosts:
@@ -115,4 +124,3 @@ services:
       - virtual-machine:${PRIVATE_NETWORK}.18
       - gossip:${PRIVATE_NETWORK}.19
       - sidechain-connector:${PRIVATE_NETWORK}.20
-

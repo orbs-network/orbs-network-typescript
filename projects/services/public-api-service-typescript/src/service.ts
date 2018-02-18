@@ -8,7 +8,7 @@ import { PublicApi } from "orbs-core-library";
 
 class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
   validateSubscription(): boolean {
-    return false;
+    return true;
   }
 }
 

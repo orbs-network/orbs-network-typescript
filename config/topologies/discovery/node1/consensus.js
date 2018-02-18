@@ -13,6 +13,10 @@ module.exports = {
       endpoint: 'storage:51151',
     },
     {
+      service: 'sidechain-connector',
+      endpoint: 'sidechain-connector:51151',
+    },
+    {
       service: 'virtual-machine',
       endpoint: 'virtual-machine:51151',
     },
