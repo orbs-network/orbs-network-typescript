@@ -1,21 +1,22 @@
 import TestComponent from "./test-component";
 import TestSubnet from "./test-subnet";
-import { OrbsNodeCluster, OrbsNodeDeployParams } from "./orbs-nodes";
+import { OrbsNodeCluster, OrbsNodeConfig } from "./orbs-nodes";
 import TestStack from "./test-stack";
-import { EthereumSimulationNode } from "./ethereum-simulation-node";
+import EthereumSimulationNode from "./ethereum-simulation-node";
 
 
-interface TestEnvironmentOptions {
+interface TestEnvironmentConfig {
     connectFromHost: boolean;
-    preExistingPublicApiSubnet: string;
+    preExistingPublicSubnet: string;
+    testSubscriptionKey: string;
 }
 
 export class TestEnvironment extends TestStack {
     readonly orbsNetwork: TestSubnet;
-    readonly publicApiNetwork: TestSubnet;
+    readonly publicNetwork: TestSubnet;
     readonly nodeCluster: OrbsNodeCluster;
     readonly ethereumSimulationNode: EthereumSimulationNode;
-    readonly opts: TestEnvironmentOptions;
+    readonly config: TestEnvironmentConfig;
 
     private started: boolean = false;
 
@@ -24,13 +25,13 @@ export class TestEnvironment extends TestStack {
             return;
         }
         await this.startComponent(this.orbsNetwork);
-        if (!this.opts.preExistingPublicApiSubnet) {
-            await this.startComponent(this.publicApiNetwork);
+        if (!this.config.preExistingPublicSubnet) {
+            await this.startComponent(this.publicNetwork);
         }
         await this.startComponent(this.ethereumSimulationNode);
 
-        const contractAddress = await this.ethereumSimulationNode.deployOrbsStubContract(1000, "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe");
-        this.nodeCluster.setOrbsSubscriptionContractAddress(contractAddress);
+        const contractAddress = await this.ethereumSimulationNode.deployOrbsStubContract(1000, this.config.testSubscriptionKey, this.config.connectFromHost);
+        this.nodeCluster.setEthereumSubscriptionContractAddress(contractAddress);
         await this.startComponent(this.nodeCluster);
         this.started = true;
     }
@@ -42,18 +43,23 @@ export class TestEnvironment extends TestStack {
 
     public getPublicApiClient() {
         // return a client that connects to the first node
-        return this.nodeCluster.getAvailableClients(this.opts.connectFromHost)[0];
+        return this.nodeCluster.getAvailableClients(this.config.connectFromHost)[0];
     }
 
-    constructor(opts: TestEnvironmentOptions) {
+    constructor(config: TestEnvironmentConfig) {
         super();
-        this.opts = opts;
-        if (!opts.connectFromHost && !opts.preExistingPublicApiSubnet) {
-            throw "preexisting public api network must be configured when not connected via host";
+        this.config = config;
+        if (!config.connectFromHost && !config.preExistingPublicSubnet) {
+            throw "A preexisting public api subnet must be configured when not connected via host.";
         }
-        this.ethereumSimulationNode = new EthereumSimulationNode();
         this.orbsNetwork = new TestSubnet("orbs-network", "172.2.1");
-        this.publicApiNetwork = new TestSubnet("public-api-external-network", opts.preExistingPublicApiSubnet || "172.2.2");
-        this.nodeCluster = new OrbsNodeCluster({ numOfNodes: 6 , orbsNetwork: this.orbsNetwork, publicApiNetwork: this.publicApiNetwork});
+        this.publicNetwork = new TestSubnet("public-network", config.preExistingPublicSubnet || "172.2.2");
+        this.ethereumSimulationNode = new EthereumSimulationNode({publicIp: this.publicNetwork.allocateAddress()});
+        this.nodeCluster = new OrbsNodeCluster({
+            numOfNodes: 6,
+            orbsNetwork: this.orbsNetwork,
+            publicApiNetwork: this.publicNetwork,
+            ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false)
+        });
     }
 }
