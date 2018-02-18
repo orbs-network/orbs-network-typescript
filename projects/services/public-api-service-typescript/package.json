@@ -18,7 +18,6 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "bind-decorator": "^1.0.11",
     "lodash": "^4.17.5",
     "orbs-core-library": "file:../../libs/core-library-typescript"
   },

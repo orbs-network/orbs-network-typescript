@@ -1,15 +1,17 @@
-import { Assertion, expect } from "chai";
+const { Assertion, expect } = require("chai");
 import * as nconf from "nconf";
 
-import { grpc, types } from "orbs-core-library";
 
-import { OrbsClientSession, OrbsHardCodedContractAdapter } from "../src/orbs-client";
-import { FooBarAccount } from "../src/foobar-contract";
-import { TestEnvironment } from "../src/test-environment";
+import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
+import { FooBarAccount } from "./foobar-contract";
+import { TestEnvironment } from "./test-environment";
+import { PublicApiClient, initPublicApiClient } from "./public-api-client";
 
 
 let testEnvironment: TestEnvironment;
-let publicApiClient: types.PublicApiClient;
+let publicApiClient: PublicApiClient;
+
+const TEST_SUBSCRIPTION_KEY = "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe";
 
 nconf.env({ parseValues: true });
 
@@ -19,9 +21,13 @@ if (nconf.get("E2E_NO_DEPLOY")) {
     throw new Error("E2E_PUBLIC_API_ENDPOINT must be defined in a no-deploy configuration");
   }
 
-  publicApiClient = grpc.publicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
+  publicApiClient = initPublicApiClient({ endpoint: process.env.E2E_PUBLIC_API_ENDPOINT });
 } else {
-  testEnvironment = new TestEnvironment();
+  testEnvironment = new TestEnvironment({
+    connectFromHost: nconf.get("CONNECT_FROM_HOST"),
+    preExistingPublicSubnet: nconf.get("PREEXISTING_PUBLIC_SUBNET"),
+    testSubscriptionKey: TEST_SUBSCRIPTION_KEY
+  });
   publicApiClient = testEnvironment.getPublicApiClient();
 }
 
@@ -46,7 +52,7 @@ Assertion.addMethod("bars", assertFooBarAccountBalance);
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const senderAddress = `addr_${Math.floor(Math.random() * 100000000)}`; // TODO: replace with a proper public key
-  const orbsSession = new OrbsClientSession(senderAddress, "fooFoundation", publicApiClient);
+  const orbsSession = new OrbsClientSession(senderAddress, TEST_SUBSCRIPTION_KEY, publicApiClient);
   const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
   const account = new FooBarAccount(senderAddress, contractAdapter);
 
@@ -56,7 +62,7 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 }
 
 describe("simple token transfer", async function () {
-  this.timeout(100000);
+  this.timeout(800000);
   before(async function () {
     if (testEnvironment) {
       console.log("starting the test environment");

@@ -1,5 +1,6 @@
-import { types, grpc } from "orbs-core-library";
 import { delay } from "bluebird";
+
+import { Transaction, PublicApiClient } from "./public-api-client";
 
 type OrbsHardCodedContractMethodArgs = [string | number] | any[];
 
@@ -30,11 +31,11 @@ export class OrbsHardCodedContractAdapter {
 }
 
 export class OrbsClientSession {
-  orbsClient: types.PublicApiClient;
+  orbsClient: PublicApiClient;
   subscriptionKey: string;
   senderAddress: string;
 
-  constructor(senderAddress: string, subscriptionKey: string, orbsClient: types.PublicApiClient) {
+  constructor(senderAddress: string, subscriptionKey: string, orbsClient: PublicApiClient) {
     this.senderAddress = senderAddress;
     this.orbsClient = orbsClient;
     this.subscriptionKey = subscriptionKey;
@@ -63,7 +64,7 @@ export class OrbsClientSession {
     return JSON.parse(resultJson);
   }
 
-  public generateTransaction(contractAddress: string, payload: string): types.Transaction {
+  public generateTransaction(contractAddress: string, payload: string): Transaction {
     return {
       sender: this.senderAddress,
       contractAddress: contractAddress,
