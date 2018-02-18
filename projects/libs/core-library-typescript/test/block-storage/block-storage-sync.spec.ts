@@ -25,7 +25,7 @@ function generateBlock(prevBlockId: number): types.Block {
     };
 }
 
-describe.only("Block storage sync", () => {
+describe("Block storage sync", () => {
     let blockStorage: BlockStorage;
     let blockStorageSync: BlockStorageSync;
 
