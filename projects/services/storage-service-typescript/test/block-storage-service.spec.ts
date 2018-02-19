@@ -37,18 +37,21 @@ const gossipNode2 = {
   gossipPeers: [ "ws://127.0.0.1:60001" ]
 };
 
+const LEVELDB_PATH_1 = BlockStorage.LEVELDB_PATH + ".1";
+const LEVELDB_PATH_2 = BlockStorage.LEVELDB_PATH + ".2";
 
 describe("Block storage service", async function () {
   this.timeout(800000);
 
-
-  let blockStorageService: BlockStorageService;
+  let blockStorageService1: BlockStorageService;
+  let blockStorageService2: BlockStorageService;
   let gossipService1: GossipService;
   let gossipService2: GossipService;
 
   beforeEach(async () => {
     try {
-        fsExtra.removeSync(BlockStorage.LEVELDB_PATH);
+        fsExtra.removeSync(LEVELDB_PATH_1);
+        fsExtra.removeSync(LEVELDB_PATH_2);
     } catch (e) { }
 
     // blockStorageService = new BlockStorageService();
@@ -56,19 +59,14 @@ describe("Block storage service", async function () {
     // process.env.NODE_NAME = "node1";
     config.set("NODE_IP", "0.0.0.0");
 
-    config.set("NODE_NAME", "node1");
     gossipService1 = new GossipService(gossipNode1);
+    gossipService2 = new GossipService(gossipNode2);
+
+    config.set("NODE_NAME", "node1");
+    await gossipService1.initGossip();
 
     config.set("NODE_NAME", "node2");
-    gossipService2 = new GossipService(gossipNode2);
-    try {
-      console.log("hey");
-
-      await [gossipService1.initGossip(), gossipService2.initGossip()];
-      console.log("yo");
-    } catch (e) {
-      console.log(e);
-    }
+    await gossipService2.initGossip();
   });
 
   afterEach(async () => {
