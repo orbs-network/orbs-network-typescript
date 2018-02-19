@@ -17,36 +17,36 @@ const handler = new TransactionHandler(consensus, subscriptionManager, config);
 
 function aTransactionWith(builder: { subscriptionKey: string }) {
 
-    const transactionAppendix: types.TransactionAppendix = {
-        prefetchAddresses: [],
-        subscriptionKey: builder.subscriptionKey
-    };
+  const transactionAppendix: types.TransactionAppendix = {
+    prefetchAddresses: [],
+    subscriptionKey: builder.subscriptionKey
+  };
 
-    const transaction: types.Transaction = {
-        sender: "sender",
-        contractAddress: "address",
-        signature: "",
-        payload: ""
-    };
+  const transaction: types.Transaction = {
+    sender: "sender",
+    contractAddress: "address",
+    signature: "",
+    payload: ""
+  };
 
-    return { transactionAppendix, transaction };
+  return { transactionAppendix, transaction };
 }
 
 describe("a transaction", () => {
 
-    it("is processed when it includes a valid subscription key", async () => {
-        const subscriptionKey = "a valid key";
+  it("is processed when it includes a valid subscription key", async () => {
+    const subscriptionKey = "a valid key";
 
-        subscriptionManager.getSubscriptionStatus.withArgs({ subscriptionKey }).returns({ active: true, expiryTimestamp: -1 });
+    subscriptionManager.getSubscriptionStatus.withArgs({ subscriptionKey }).returns({ active: true, expiryTimestamp: -1 });
 
-        await handler.handle(aTransactionWith({ subscriptionKey }));
+    await handler.handle(aTransactionWith({ subscriptionKey }));
 
-        consensus.sendTransaction.should.have.been.called;
-    });
+    consensus.sendTransaction.should.have.been.called;
+  });
 
-    it("is rejected when it includes an invalid subscription key", async () => {
-        subscriptionManager.getSubscriptionStatus.returns({ active: false, expiryTimestamp: -1 });
+  it("is rejected when it includes an invalid subscription key", async () => {
+    subscriptionManager.getSubscriptionStatus.returns({ active: false, expiryTimestamp: -1 });
 
-        await handler.handle(aTransactionWith({ subscriptionKey: "some other key" })).should.be.rejected;
-    });
+    await handler.handle(aTransactionWith({ subscriptionKey: "some other key" })).should.be.rejected;
+  });
 });
