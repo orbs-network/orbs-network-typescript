@@ -18,11 +18,13 @@ const handler = new TransactionHandler(consensus, subscriptionManager, config);
 function aTransactionWith(builder: { subscriptionKey: string }) {
 
   const transactionAppendix: types.TransactionAppendix = {
+    version: 0,
     prefetchAddresses: [],
     subscriptionKey: builder.subscriptionKey
   };
 
   const transaction: types.Transaction = {
+    version: 0,
     sender: "sender",
     contractAddress: "address",
     signature: "",

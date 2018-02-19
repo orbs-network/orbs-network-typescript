@@ -1,13 +1,15 @@
 syntax = "proto3";
 
 message Transaction {
-  string sender = 1;
-  string contractAddress = 2;
-  string payload = 3;
-  string signature = 4;
+  uint32 version = 1;
+  string sender = 2;
+  string contractAddress = 3;
+  string payload = 4;
+  string signature = 5;
 }
 
 message TransactionAppendix {
-  repeated string prefetchAddresses = 1;
-  string subscriptionKey = 2;
+  uint32 version = 1;
+  repeated string prefetchAddresses = 2;
+  string subscriptionKey = 3;
 }

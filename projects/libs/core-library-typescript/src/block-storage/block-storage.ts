@@ -17,7 +17,13 @@ export class BlockStorage {
       id: 0,
       prevBlockId: -1
     },
-    tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+    tx: {
+      version: 0,
+      contractAddress: "0",
+      sender: "",
+      signature: "",
+      payload: "{}"
+    },
     modifiedAddressesJson: "{}"
   };
 
@@ -86,7 +92,11 @@ export class BlockStorage {
   }
 
   private verifyNewBlock(block: types.Block) {
-    if (block.header.id != this.lastBlock.header.id + 1) {
+    if (block.header.version !== 0) {
+      throw new Error(`Invalid block version: ${block.header.version}!`);
+    }
+
+    if (block.header.id !== this.lastBlock.header.id + 1) {
       throw new Error(`Invalid block ID of block: ${block}!`);
     }
 

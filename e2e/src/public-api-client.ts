@@ -10,6 +10,7 @@ export interface GRPCClient {
 }
 
 export interface Transaction {
+  version: number;
   sender: string;
   contractAddress: string;
   payload: string;
@@ -17,6 +18,7 @@ export interface Transaction {
 }
 
 export interface TransactionAppendix {
+  version: number;
   prefetchAddresses: string[];
   subscriptionKey: string;
 }
