@@ -26,7 +26,11 @@ export class BlockStorage {
 
   public constructor() {
     // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(BlockStorage.LEVELDB_PATH);
+    this.db = new LevelDBDriver(this.getDBPath());
+  }
+
+  public getDBPath(): string {
+    return config.get("LEVELDB_PATH") || BlockStorage.LEVELDB_PATH;
   }
 
   public async load(): Promise<void> {

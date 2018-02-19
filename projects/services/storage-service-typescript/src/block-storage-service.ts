@@ -1,20 +1,24 @@
 import * as _ from "lodash";
 
 import { logger, types, config } from "orbs-core-library";
-
 import { Service } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
+import { stringToBuffer } from "orbs-core-library";
 
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
+  private gossip: types.GossipClient;
+  private nodeName: string;
 
   public constructor(topology?: any) {
     super(topology);
+    this.nodeName = config.get("NODE_NAME");
   }
 
   async initialize() {
     await this.initBlockStorage();
+    this.gossip = this.peers.gossip;
 
     this.askForHeartbeats([this.peers.gossip]);
 
@@ -60,10 +64,10 @@ export default class BlockStorageService extends Service {
 
     logger.debug("Polling for new blocks", { lastBlockId: blockId });
 
-    this.peers.gossip.broadcastMessage({
-      BroadcastGroup: "block-storage",
+    this.gossip.broadcastMessage({
+      BroadcastGroup: "blockStorage",
       MessageType: "HasNewBlocksMessage",
-      Buffer: new Buffer(JSON.stringify({ blockId })),
+      Buffer: stringToBuffer(JSON.stringify({ blockId })),
       Immediate: true
     });
   }
@@ -74,13 +78,18 @@ export default class BlockStorageService extends Service {
 
     switch (rpc.req.MessageType) {
       case "HasNewBlocksMessage":
+        if (rpc.req.FromAddress === this.nodeName) {
+          break;
+        }
+
+
         const hasNewBlocks = await this.blockStorage.hasNewBlocks(obj.blockId);
 
-        this.peers.gossip.unicastMessage({
+        this.gossip.unicastMessage({
           Recipient: rpc.req.FromAddress,
-          BroadcastGroup: "block-storage",
+          BroadcastGroup: "blockStorage",
           MessageType: "HasNewBlocksResponse",
-          Buffer: new Buffer(JSON.stringify( { hasNewBlocks })),
+          Buffer: stringToBuffer(JSON.stringify( { hasNewBlocks })),
           Immediate: true,
         });
         break;

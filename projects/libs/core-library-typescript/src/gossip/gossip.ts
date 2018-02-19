@@ -6,7 +6,7 @@ import { topologyPeers } from "../common-library/topologyPeers";
 import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 
-function stringToBuffer(str: string): Buffer {
+export function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
   buf.writeUInt8(Math.min(str.length, 255), 0);
   buf.write(str, 1, 255, "utf8");
@@ -139,6 +139,10 @@ export class Gossip {
 
   public activePeers() {
     return this.clients.keys();
+  }
+
+  public activeBroadcastGroups() {
+    return Object.keys(this.peers);
   }
 
   async discoverPeers(): Promise<string[]> {

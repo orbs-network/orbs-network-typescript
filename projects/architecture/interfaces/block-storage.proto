@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
+import "primitives/gossip-listener.proto";
 
 service BlockStorage {
   rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
@@ -9,6 +10,7 @@ service BlockStorage {
   rpc GetBlocks (GetBlocksInput) returns (GetBlocksOutput);
   rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
   rpc HasNewBlocks (HasNewBlocksInput) returns (HasNewBlocksOutput);
+  rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }
 
 message BlockHeader {

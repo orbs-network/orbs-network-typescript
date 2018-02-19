@@ -62,10 +62,13 @@ export abstract class Service {
   }
 
   public askForHeartbeats(peers: types.HeardbeatClient[], interval: number = 5000) {
-    this.heartbeatInterval = setInterval(() => {
-      peers.forEach(async (peer) => {
+    this.heartbeatInterval = setInterval(async () => {
+      for (const peerName in peers) {
+        const peer = peers[peerName];
+        logger.debug(`Trying to get a heartbeat from ${peerName}: unedefined? ${peer === undefined}`, this.nodeTopology);
         await this.askForHeartbeat(peer);
-      });
+      }
+
     }, interval);
   }
 

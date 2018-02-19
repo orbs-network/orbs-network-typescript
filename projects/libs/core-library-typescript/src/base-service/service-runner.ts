@@ -24,4 +24,10 @@ export class ServiceRunner {
 
     return grpcServerFunc({ endpoint, services });
   }
+
+  public static async shutdown(...services: any[]) {
+    return Promise.all(services.map(service => new Promise((resolve, reject) => {
+      service.close((err: any) => err ? reject(err) : resolve());
+    })));
+  }
 }

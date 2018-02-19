@@ -15,7 +15,7 @@ module.exports = {
       endpoint: 'consensus:51151',
     },
     {
-      service: 'block-storage',
+      service: 'storage',
       endpoint: 'storage:51151',
     },
   ],

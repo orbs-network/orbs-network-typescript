@@ -17,7 +17,7 @@ export default class GossipService extends Service {
   async initialize() {
     await this.initGossip();
 
-    this.askForHeartbeats([this.peers.publicApi, this.peers.consensus, this.peers.blockStorage]);
+    // this.askForHeartbeats([this.peers.publicApi, this.peers.consensus, this.peers.blockStorage]);
   }
 
   async initGossip(): Promise<void> {
@@ -30,6 +30,14 @@ export default class GossipService extends Service {
         logger.warn(`${this.gossip.localAddress} has no active peers`);
       } else {
         logger.info(`${this.gossip.localAddress} has active peers`, { activePeers });
+      }
+
+      const broadcastGroups = Array.from(this.gossip.activeBroadcastGroups()).sort();
+
+      if (broadcastGroups.length == 0) {
+        logger.warn(`${this.gossip.localAddress} has no active broadcast groups`);
+      } else {
+        logger.info(`${this.gossip.localAddress} has active broadcast groups`, { broadcastGroups });
       }
     }, 5000);
 
