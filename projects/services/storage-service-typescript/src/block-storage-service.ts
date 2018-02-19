@@ -9,8 +9,8 @@ export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
 
-  public constructor() {
-    super();
+  public constructor(topology?: any) {
+    super(topology);
   }
 
   async initialize() {

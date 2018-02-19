@@ -1,6 +1,7 @@
 import bind from "bind-decorator";
 
 import { logger, config, topology, topologyPeers, grpc, types } from "../common-library";
+import { isObject } from "lodash";
 
 export interface RPCMethodOptions {
   log: boolean;
@@ -10,6 +11,8 @@ export abstract class Service {
   public name: string;
   public nodeTopology: any;
   public peers: types.ClientMap;
+
+  private heartbeatInterval: any;
 
   protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>,
     silent: boolean = false): any {
@@ -34,9 +37,9 @@ export abstract class Service {
     return Service.RPCMethod(target, propertyKey, descriptor, true);
   }
 
-  public constructor() {
+  public constructor(nodeTopology?: any) {
     this.name = this.constructor.name;
-    this.nodeTopology = topology();
+    this.nodeTopology = isObject(nodeTopology) ? nodeTopology : topology();
     this.peers = topologyPeers(this.nodeTopology.peers);
   }
 
@@ -49,6 +52,7 @@ export abstract class Service {
   }
 
   public async stop() {
+    clearInterval(this.heartbeatInterval);
   }
 
   async askForHeartbeat(peer: types.HeardbeatClient) {
@@ -58,7 +62,7 @@ export abstract class Service {
   }
 
   public askForHeartbeats(peers: types.HeardbeatClient[], interval: number = 5000) {
-    setInterval(() => {
+    this.heartbeatInterval = setInterval(() => {
       peers.forEach(async (peer) => {
         await this.askForHeartbeat(peer);
       });

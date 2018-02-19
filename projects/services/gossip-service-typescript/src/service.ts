@@ -8,9 +8,10 @@ import { Gossip } from "orbs-core-library";
 
 export default class GossipService extends Service {
   private gossip: Gossip;
+  private peerPollInterval: any;
 
-  public constructor() {
-    super();
+  public constructor(nodeTopology?: any) {
+    super(nodeTopology);
   }
 
   async initialize() {
@@ -20,9 +21,9 @@ export default class GossipService extends Service {
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(this.nodeTopology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
+    this.gossip = new Gossip(this.nodeTopology, config.get("NODE_NAME"), config.get("NODE_IP"));
 
-    setInterval(() => {
+    this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
 
       if (activePeers.length == 0) {
@@ -39,6 +40,13 @@ export default class GossipService extends Service {
         this.gossip.connect(gossipPeers);
       }).catch(logger.error);
     }, Math.ceil(Math.random() * 3000));
+  }
+
+  async stop() {
+    await super.stop();
+    clearInterval(this.peerPollInterval);
+    logger.info(`Shutting down ${this.nodeTopology.name}`);
+    return this.gossip.shutdown();
   }
 
   @Service.SilentRPCMethod

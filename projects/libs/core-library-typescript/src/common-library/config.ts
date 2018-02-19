@@ -47,6 +47,16 @@ export class Config {
   public getEnvironment(): string {
     return Config.getEnvironment();
   }
+
+  public set(key: any, value: any) {
+    nconf.set(key, value);
+  }
+
+  public clear(...keys: Array<string>) {
+    keys.forEach(key => {
+      nconf.remove(key);
+    });
+  }
 }
 
 export const config = new Config();
