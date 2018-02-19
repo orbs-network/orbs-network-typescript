@@ -46,7 +46,7 @@
   * `Processor` - The actual runtime environments for a smart contract in various languages (Python / JS / etc).
 * `StateStorage` - Holds all state (mutable and immutable) updated for the latest closed block.
 * `BlockStorage` - Holds incremental long-term storage used to generate the state (all past closed blocks).
-* `SubscriptionManager` - Responsible for validating Orbs subscription and billing them.
+* `SubscriptionManager` - Responsible for validating Orbs subscriptions and billing them.
 * `SidechainConnector` - Syncs data with other blockchains. Currently supports Ethereum contracts.
 
 ## Libraries
