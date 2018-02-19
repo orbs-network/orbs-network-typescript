@@ -46,7 +46,8 @@
   * `Processor` - The actual runtime environments for a smart contract in various languages (Python / JS / etc).
 * `StateStorage` - Holds all state (mutable and immutable) updated for the latest closed block.
 * `BlockStorage` - Holds incremental long-term storage used to generate the state (all past closed blocks).
-* `TimeSync` - Synchronizes clocks, required to run on every machine that runs       *TransactionPool* or *Consensus*.
+* `SubscriptionManager` - Responsible for validating Orbs subscription and billing them.
+* `SidechainConnector` - Syncs data with other blockchains. Currently supports Ethereum contracts.
 
 ## Libraries
 
@@ -70,6 +71,11 @@
         <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black">TransactionPool</td>
       </tr>
       </table>
+      <table class="arch-table">
+      <tr>
+        <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black">SubscriptionManager</td>
+      </tr>
+      </table>
     </td>
     <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black" colspan="3">
       VirtualMachine<br><br>
@@ -83,8 +89,8 @@
   </tr>
   <tr>
     <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black">BlockStorage</td>
-    <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black" colspan="3">StateStorage</td>
     <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black" class="not-implemented">SidechainConnector</td>
+    <td style="width:16%;height:50px;text-align:center;background:lightgrey;color:black" colspan="3">StateStorage</td>
     <th style="width:16%;borders:none;background:green;font-weight:100">Layer II<br>high-level storage</th>
   </tr>
   <tr>
