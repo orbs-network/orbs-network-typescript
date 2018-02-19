@@ -5,6 +5,7 @@ import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import * as fsExtra from "fs-extra";
+import { range } from "lodash";
 
 ErrorHandler.setup();
 
@@ -73,6 +74,29 @@ const blockStorage2 = {
 const LEVELDB_PATH_1 = BlockStorage.LEVELDB_PATH + ".1";
 const LEVELDB_PATH_2 = BlockStorage.LEVELDB_PATH + ".2";
 
+function generateBlock(prevBlockId: number): types.Block {
+    return {
+        header: {
+            version: 0,
+            id: prevBlockId + 1,
+            prevBlockId: prevBlockId
+        },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        modifiedAddressesJson: "{}"
+    };
+}
+
+async function createBlockStorage (numberOfBlocks: number) {
+  const blockStorage = new BlockStorage();
+  await blockStorage.load();
+
+  for (const i of range(0, numberOfBlocks)) {
+    await blockStorage.addBlock(generateBlock(i));
+  }
+
+  return blockStorage.shutdown();
+}
+
 describe("Block storage service", async function () {
   this.timeout(800000);
 
@@ -87,9 +111,15 @@ describe("Block storage service", async function () {
 
   beforeEach(async () => {
     try {
-        fsExtra.removeSync(LEVELDB_PATH_1);
-        fsExtra.removeSync(LEVELDB_PATH_2);
+      fsExtra.removeSync(LEVELDB_PATH_1);
+      fsExtra.removeSync(LEVELDB_PATH_2);
     } catch (e) { }
+
+    config.set("LEVELDB_PATH", LEVELDB_PATH_1);
+    await createBlockStorage(10);
+
+    config.set("LEVELDB_PATH", LEVELDB_PATH_2);
+    await createBlockStorage(20);
 
     config.set("NODE_IP", "0.0.0.0");
 
