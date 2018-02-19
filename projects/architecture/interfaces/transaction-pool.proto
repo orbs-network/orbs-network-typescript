@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "primitives/transactions.proto";
-
 import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
 
