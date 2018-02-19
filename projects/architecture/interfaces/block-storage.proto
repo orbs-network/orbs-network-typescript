@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "primitives/heartbeat.proto";
+import "primitives/blocks.proto";
 import "primitives/transactions.proto";
 
 service BlockStorage {
@@ -8,18 +9,6 @@ service BlockStorage {
   rpc AddBlock (AddBlockInput) returns (AddBlockOutput);
   rpc GetBlocks (GetBlocksInput) returns (GetBlocksOutput);
   rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
-}
-
-message BlockHeader {
-  uint32 version = 1;
-  uint32 id = 2;
-  uint32 prevBlockId = 3;
-}
-
-message Block {
-  BlockHeader header = 1;
-  Transaction tx = 2;
-  string modifiedAddressesJson = 3;
 }
 
 message AddBlockInput {
