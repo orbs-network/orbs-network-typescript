@@ -9,48 +9,46 @@ export interface GRPCClient {
   endpoint: string;
 }
 
-
 export interface Transaction {
-    sender: string;
-    contractAddress: string;
-    payload: string;
-    signature: string;
+  sender: string;
+  contractAddress: string;
+  payload: string;
+  signature: string;
 }
 
 export interface TransactionAppendix {
-    prefetchAddresses: string[];
-    subscriptionKey: string;
+  prefetchAddresses: string[];
+  subscriptionKey: string;
 }
 
 interface PublicApiSendTransactionInput {
-    transaction: Transaction;
-    transactionAppendix: TransactionAppendix;
+  transaction: Transaction;
+  transactionAppendix: TransactionAppendix;
 }
 
 interface PublicApiSendTransactionOutput {
 }
 
 interface PublicApiCallInput {
-    sender: string;
-    contractAddress: string;
-    payload: string;
+  sender: string;
+  contractAddress: string;
+  payload: string;
 }
 
 export interface PublicApiCallOutput {
-    resultJson: string;
+  resultJson: string;
 }
 
 export interface PublicApiClient {
-    sendTransaction(publicApiSendTransactionInput: PublicApiSendTransactionInput): PublicApiSendTransactionOutput;
-    call(publicApiCallInput: PublicApiCallInput): PublicApiCallOutput;
+  sendTransaction(publicApiSendTransactionInput: PublicApiSendTransactionInput): PublicApiSendTransactionOutput;
+  call(publicApiCallInput: PublicApiCallInput): PublicApiCallOutput;
 }
 
 function client(grpc: GRPCClient) {
   const protoPath = path.resolve(PROTO_PATH, grpc.proto);
   return caller(grpc.endpoint, protoPath, grpc.name);
-
 }
 
 export function initPublicApiClient({ endpoint }: { endpoint: string }): PublicApiClient {
-    return client({ proto: "public-api.proto", name: "PublicApi", endpoint });
+  return client({ proto: "public-api.proto", name: "PublicApi", endpoint });
 }
