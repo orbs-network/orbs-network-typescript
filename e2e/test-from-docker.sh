@@ -1,5 +1,8 @@
 #!/bin/bash -xe
 
+export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
+export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
+
 docker network create public-network --subnet 172.2.2.0/24 || true
 docker run -ti --rm --privileged  \
 --network=public-network --ip 172.2.2.15 \
