@@ -1,12 +1,10 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
 import "primitives/gossip-listener.proto";
 
 import "./gossip.proto";
 
 service Consensus {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }

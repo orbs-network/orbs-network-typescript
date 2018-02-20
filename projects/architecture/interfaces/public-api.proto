@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
 
 message PublicApiSendTransactionInput {
@@ -22,7 +21,6 @@ message PublicApiCallOutput {
 }
 
 service PublicApi {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc SendTransaction (PublicApiSendTransactionInput) returns (PublicApiSendTransactionOutput);
   rpc Call (PublicApiCallInput) returns (PublicApiCallOutput);
 }

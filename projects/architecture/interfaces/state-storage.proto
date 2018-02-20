@@ -1,9 +1,6 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
-
 service StateStorage {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc ReadKeys (ReadKeysInput) returns (ReadKeysOutput);
 }
 

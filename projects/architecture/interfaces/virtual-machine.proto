@@ -1,10 +1,8 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
 
 service VirtualMachine {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc ExecuteTransaction (ExecuteTransactionInput) returns (ExecuteTransactionOutput);
   rpc CallContract (CallContractInput) returns (CallContractOutput);
 }
