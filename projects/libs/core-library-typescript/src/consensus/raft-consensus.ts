@@ -65,6 +65,7 @@ export interface RaftConsensusConfig {
   heartbeatInterval: number;
 }
 
+
 export class RaftConsensus {
   private virtualMachine: types.VirtualMachineClient;
   private blockStorage: types.BlockStorageClient;
@@ -77,8 +78,8 @@ export class RaftConsensus {
     virtualMachine: types.VirtualMachineClient, storage: types.BlockStorageClient) {
     this.virtualMachine = virtualMachine;
     this.blockStorage = storage;
-    this.lastBlockId = -1;
     this.connector = new RPCConnector(options.nodeName, gossip);
+    this.lastBlockId;
 
     this.node = gaggle({
       id: options.nodeName,
@@ -103,30 +104,14 @@ export class RaftConsensus {
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
     this.node.on("committed", async (data: any) => {
-      const msgData = data.data;
-
-      const txData = msgData.msg;
+      const msg: types.ConsensusMessage = data.data;
 
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
-      if (this.lastBlockId == -1) {
-        const { blockId } = await this.blockStorage.getLastBlockId({});
-        this.lastBlockId = blockId;
-      }
-
-      this.lastBlockId++;
-
       await this.blockStorage.addBlock({
-        block: {
-          header: {
-            version: 0,
-            id: this.lastBlockId,
-            prevBlockId: this.lastBlockId - 1
-          },
-          tx: txData.tx,
-          modifiedAddressesJson: txData.modifiedAddressesJson,
-        }
+        block: msg.block
       });
+      this.lastBlockId = msg.block.header.id;
     });
 
     this.node.on("leaderElected", () => {
@@ -136,25 +121,47 @@ export class RaftConsensus {
     });
   }
 
+  private appendMessage(msg: types.ConsensusMessage) {
+    this.node.append(msg);
+  }
+
   // Suggests new entry to be appended to the Raft log (e.g., new transaction), by first executing the transaction and
   // then propagating the transaction with its execution outputs.
-  async onAppend(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
+  async sendTransaction(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
     const vmResult = await this.virtualMachine.executeTransaction({
       transaction: tx,
       transactionAppendix: txAppendix
     });
 
     if (vmResult.success) {
-      const msg = {
-        tx: tx,
-        modifiedAddressesJson: vmResult.modifiedAddressesJson
+      const modifiedContractKeys = JSON.parse(vmResult.modifiedAddressesJson);
+      const stateDiff = Object.keys(modifiedContractKeys).map((key): types.modifiedStateKey => (
+        { contractAddress: tx.contractAddress,
+          key,
+          value: modifiedContractKeys[key]
+        }));
+
+        if (this.lastBlockId == undefined) {
+          const { blockId } = await this.blockStorage.getLastBlockId({});
+          this.lastBlockId = blockId;
+        }
+
+        const block: types.Block = {
+        header: {
+          version: 0,
+          id: this.lastBlockId + 1,
+          prevBlockId: this.lastBlockId
+        },
+        transactions: [tx],
+        stateDiff,
       };
 
-      this.node.append({
-        msg: msg
-      });
+      this.appendMessage({ block });
+
+      this.lastBlockId = block.header.id;
     }
   }
+
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
     switch (messageType) {

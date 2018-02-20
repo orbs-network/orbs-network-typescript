@@ -6,18 +6,18 @@ import { Gossip } from "../gossip";
 import { RaftConsensusConfig, RaftConsensus } from "./raft-consensus";
 
 export class Consensus {
-  private consensus: RaftConsensus;
+  private raftConsensus: RaftConsensus;
 
   constructor(options: RaftConsensusConfig, gossip: types.GossipClient, virtualMachine: types.VirtualMachineClient,
     blockStorage: types.BlockStorageClient) {
-    this.consensus = new RaftConsensus(options, gossip, virtualMachine, blockStorage);
+    this.raftConsensus = new RaftConsensus(options, gossip, virtualMachine, blockStorage);
   }
 
   public async sendTransaction(transactionContext: types.SendTransactionInput) {
-    await this.consensus.onAppend(transactionContext.transaction, transactionContext.transactionAppendix);
+    await this.raftConsensus.sendTransaction(transactionContext.transaction, transactionContext.transactionAppendix);
   }
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
-    await this.consensus.gossipMessageReceived(fromAddress, messageType, message);
+    await this.raftConsensus.gossipMessageReceived(fromAddress, messageType, message);
   }
 }
