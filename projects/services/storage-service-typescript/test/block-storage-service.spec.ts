@@ -140,23 +140,28 @@ describe("Block storage service", async function () {
     blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2);
   });
 
-  afterEach(async () => {
-      // await [gossipService1.stop(), gossipService2.stop()];
-      // await [blockStorageService1.stop(), blockStorageService1.stop()];
-      // await ServiceRunner.shutdown(gossipGrpc1, gossipGrpc2, blockGrpc1, blockGrpc2);
-      // await [gossipGrpc1.shutdown(), gossipGrpc2.shutdown(), blockGrpc1.shutdown(), blockGrpc2.shutdown()];
+  afterEach(async function () {
+    process.exit(this.currentTest.state === "passed" ? 0 : 1);
   });
 
   describe("sync process", () => {
     it("#pollForNewBlocks", (done) => {
-      setTimeout(() => {
+      setTimeout(async () => {
+        try {
+        // await ServiceRunner.shutdown(gossipGrpc1, blockGrpc1, gossipGrpc2, blockGrpc2);
+        await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
 
+        } catch (e) {
+          console.log(e);
+        }
+        config.set("LEVELDB_PATH", LEVELDB_PATH_2);
+        const blockStorage = new BlockStorage();
+        await blockStorage.load();
+
+        const lastBlockId = await blockStorage.getLastBlockId();
+        chai.expect(lastBlockId).to.be.eql(20);
         done();
-      }, 15000);
+      }, 5000);
     });
-  });
-
-  after(() => {
-    // process.exit(1);
   });
 });
