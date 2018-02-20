@@ -3,14 +3,14 @@ import bind from "bind-decorator";
 
 import { logger, config, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
 
 export default class TransactionPoolService extends Service {
   private transactionPool: TransactionPool;
 
-  public constructor() {
-    super();
+  public constructor(serviceConfig: ServiceConfig) {
+    super(serviceConfig);
   }
 
   async initialize() {

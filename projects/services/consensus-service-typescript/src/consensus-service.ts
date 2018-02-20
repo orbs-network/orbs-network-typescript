@@ -2,7 +2,7 @@ import * as _ from "lodash";
 
 import { logger, config, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
@@ -15,14 +15,15 @@ export default class ConsensusService extends Service {
   private virtualMachine: types.VirtualMachineClient;
   private blockStorage: types.BlockStorageClient;
 
-  public constructor() {
-    super();
+  public constructor(gossip: types.GossipClient, virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient, serviceConfig: ServiceConfig) {
+    super(serviceConfig);
+    this.gossip = gossip;
+    this.virtualMachine = virtualMachine;
+    this.blockStorage = blockStorage;
+
   }
 
   async initialize() {
-    this.gossip = this.peers.gossip;
-    this.virtualMachine = this.peers.virtualMachine;
-    this.blockStorage = this.peers.blockStorage;
 
     await Promise.all([
       this.initConsensus(),

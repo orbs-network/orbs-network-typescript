@@ -2,14 +2,14 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { BlockStorage } from "orbs-core-library";
 
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
 
-  public constructor() {
-    super();
+  public constructor(serviceConfig: ServiceConfig) {
+    super(serviceConfig);
   }
 
   async initialize() {

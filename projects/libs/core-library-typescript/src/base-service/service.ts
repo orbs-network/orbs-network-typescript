@@ -1,16 +1,20 @@
 import bind from "bind-decorator";
 
-import { logger, config, topology, topologyPeers, grpc, types } from "../common-library";
+import { logger, grpc, types, topology, topologyPeers } from "../common-library";
 
 export interface RPCMethodOptions {
   log: boolean;
 }
 
+export interface ServiceConfig {
+  nodeName: string;
+}
+
 export abstract class Service {
   public name: string;
+  public nodeName: string;
   public nodeTopology: any;
   public peers: types.ClientMap;
-
   protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>,
     silent: boolean = false): any {
     if (!descriptor || (typeof descriptor.value !== "function")) {
@@ -20,7 +24,7 @@ export abstract class Service {
     if (!silent) {
       const originalMethod = descriptor.value;
       descriptor.value = function(rpc: any) {
-        logger.debug(`${this.nodeTopology.name}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
+        logger.debug(`${this.nodeName}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
 
         return originalMethod.apply(this, [rpc]);
       };
@@ -34,10 +38,11 @@ export abstract class Service {
     return Service.RPCMethod(target, propertyKey, descriptor, true);
   }
 
-  public constructor() {
+  public constructor(serviceConfig?: ServiceConfig) {
     this.name = this.constructor.name;
     this.nodeTopology = topology();
     this.peers = topologyPeers(this.nodeTopology.peers);
+    this.nodeName = (serviceConfig && serviceConfig.nodeName) || this.nodeTopology.name;
   }
 
   abstract async initialize(): Promise<void>;
@@ -45,7 +50,7 @@ export abstract class Service {
   public async start() {
     await this.initialize();
 
-    logger.info(`${this.nodeTopology.name} (${this.name}): service started`);
+    logger.info(`${this.nodeName} (${this.name}): service started`);
   }
 
   public async stop() {

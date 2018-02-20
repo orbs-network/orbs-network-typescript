@@ -1,11 +1,11 @@
-import { ErrorHandler, grpc, ServiceRunner } from "orbs-core-library";
+import { ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
 
 import PublicApiService from "./service";
 
 ErrorHandler.setup();
 
-const main = async () => {
-  await ServiceRunner.run(grpc.publicApiServer, new PublicApiService());
-};
+const nodeTopology = topology();
+const peers = topologyPeers(nodeTopology.peers);
+const nodeConfig = { nodeName: nodeTopology.name };
 
-main();
+ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.consensus, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);

@@ -3,7 +3,7 @@ import bind from "bind-decorator";
 
 import { logger, config, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { SubscriptionManager } from "orbs-core-library";
 
 export default class SubscriptionManagerService extends Service {
@@ -11,13 +11,12 @@ export default class SubscriptionManagerService extends Service {
 
   private sidechainConnector: types.SidechainConnectorClient;
 
-  public constructor() {
-    super();
+  public constructor(sidechainConnector: types.SidechainConnectorClient, serviceConfig: ServiceConfig) {
+    super(serviceConfig);
+    this.sidechainConnector = sidechainConnector;
   }
 
   async initialize() {
-    this.sidechainConnector = this.peers.sidechainConnector;
-
     await this.initSubscriptionManager();
 
   }

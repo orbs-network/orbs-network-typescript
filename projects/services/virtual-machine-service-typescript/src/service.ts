@@ -3,21 +3,19 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { VirtualMachine } from "orbs-core-library";
 
 export default class VirtualMachineService extends Service {
   private virtualMachine: VirtualMachine;
 
-  private stateStorage: types.StateStorageClient;
+  public constructor(stateStorage: types.StateStorageClient, serviceConfig: ServiceConfig) {
+    super(serviceConfig);
 
-  public constructor() {
-    super();
+    this.virtualMachine = new VirtualMachine(stateStorage);
   }
 
   async initialize() {
-    this.stateStorage = this.peers.stateStorage;
-    this.virtualMachine = new VirtualMachine(this.stateStorage);
 
   }
 
