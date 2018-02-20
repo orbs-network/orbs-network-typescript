@@ -16,7 +16,6 @@ export default class SubscriptionManagerService extends Service {
   }
 
   async initialize() {
-
   }
 
   @Service.RPCMethod

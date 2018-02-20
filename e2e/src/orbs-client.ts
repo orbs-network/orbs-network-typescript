@@ -47,6 +47,7 @@ export class OrbsClientSession {
     const res = await this.orbsClient.sendTransaction({
       transaction: signedTransaction,
       transactionAppendix: {
+        version: 0,
         prefetchAddresses: [],
         subscriptionKey: this.subscriptionKey
       }
@@ -66,6 +67,7 @@ export class OrbsClientSession {
 
   public generateTransaction(contractAddress: string, payload: string): Transaction {
     return {
+      version: 0,
       sender: this.senderAddress,
       contractAddress: contractAddress,
       payload: payload,
