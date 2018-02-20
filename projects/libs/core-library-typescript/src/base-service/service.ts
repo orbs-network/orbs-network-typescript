@@ -51,22 +51,5 @@ export abstract class Service {
   public async stop() {
   }
 
-  async askForHeartbeat(peer: types.HeardbeatClient) {
-    const res = await peer.getHeartbeat({ requesterName: this.nodeTopology.name, requesterVersion: this.nodeTopology.version });
 
-    logger.debug(`${this.nodeTopology.name} (${this.name}): received heartbeat from '${res.responderName}(v${res.responderVersion})'`);
-  }
-
-  public askForHeartbeats(peers: types.HeardbeatClient[], interval: number = 5000) {
-    setInterval(() => {
-      peers.forEach(async (peer) => {
-        await this.askForHeartbeat(peer);
-      });
-    }, interval);
-  }
-
-  @Service.RPCMethod
-  public async getHeartbeat(rpc: types.GetHeartbeatContext) {
-    rpc.res = { responderName: this.nodeTopology.name, responderVersion: this.nodeTopology.version };
-  }
 }

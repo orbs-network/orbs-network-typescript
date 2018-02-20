@@ -1,10 +1,8 @@
 syntax = "proto3";
 
-import "primitives/heartbeat.proto";
 import "primitives/transactions.proto";
 
 service Gossip {
-  rpc GetHeartbeat (GetHeartbeatInput) returns (GetHeartbeatOutput);
   rpc BroadcastMessage (BroadcastMessageInput) returns (BroadcastMessageOutput);
   rpc UnicastMessage (UnicastMessageInput) returns (UnicastMessageOutput);
 }

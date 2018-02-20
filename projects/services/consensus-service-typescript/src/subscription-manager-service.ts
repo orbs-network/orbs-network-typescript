@@ -20,7 +20,6 @@ export default class SubscriptionManagerService extends Service {
 
     await this.initSubscriptionManager();
 
-    this.askForHeartbeats([this.sidechainConnector]);
   }
 
   async initSubscriptionManager(): Promise<void> {
