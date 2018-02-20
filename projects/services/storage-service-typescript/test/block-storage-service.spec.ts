@@ -9,6 +9,8 @@ import { range } from "lodash";
 
 ErrorHandler.setup();
 
+chai.use(chaiAsPromised);
+
 const GOSSIP_GRPC_PORT_1 = 41151;
 const GOSSIP_GRPC_PORT_2 = 61151;
 const BLOCK_STORAGE_GRPC_PORT_1 = 31151;
@@ -148,20 +150,17 @@ describe("Block storage service", async function () {
     it("#pollForNewBlocks", (done) => {
       setTimeout(async () => {
         try {
-        // await ServiceRunner.shutdown(gossipGrpc1, blockGrpc1, gossipGrpc2, blockGrpc2);
         await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
 
         } catch (e) {
           console.log(e);
         }
-        config.set("LEVELDB_PATH", LEVELDB_PATH_2);
+        config.set("LEVELDB_PATH", LEVELDB_PATH_1);
         const blockStorage = new BlockStorage();
         await blockStorage.load();
 
-        const lastBlockId = await blockStorage.getLastBlockId();
-        chai.expect(lastBlockId).to.be.eql(20);
-        done();
-      }, 5000);
+        chai.expect(blockStorage.getLastBlockId()).to.eventually.be.eql(20).and.notify(done);
+      }, 15000);
     });
   });
 });

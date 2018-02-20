@@ -77,60 +77,55 @@ export default class BlockStorageService extends Service {
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     logger.warn("Block storage received new message", {FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8")});
+
+    const { MessageType, FromAddress } = rpc.req;
     const obj = JSON.parse(rpc.req.Buffer.toString("utf8"));
 
-    switch (rpc.req.MessageType) {
-      case "HasNewBlocksMessage":
-        if (rpc.req.FromAddress === this.nodeName) break;
+    if (MessageType === "HasNewBlocksMessage") {
+      if (FromAddress === this.nodeName) return;
 
-        const hasNewBlocks = await this.blockStorage.hasNewBlocks(obj.blockId);
+      const hasNewBlocks = await this.blockStorage.hasNewBlocks(obj.blockId);
 
-        if (!hasNewBlocks) break;
+      if (!hasNewBlocks) return;
 
+      this.gossip.unicastMessage({
+        Recipient: FromAddress,
+        BroadcastGroup: "blockStorage",
+        MessageType: "HasNewBlocksResponse",
+        Buffer: new Buffer(JSON.stringify({ hasNewBlocks })),
+        Immediate: true,
+      });
+    } else if (MessageType === "HasNewBlocksResponse") {
+      logger.info(`Block storage has a peer with more blocks`, { peer: FromAddress });
+
+      const blockId = await this.blockStorage.getLastBlockId();
+
+      this.gossip.unicastMessage({
+        Recipient: FromAddress,
+        BroadcastGroup: "blockStorage",
+        MessageType: "SendNewBlocks",
+        Buffer: new Buffer(JSON.stringify({ blockId })),
+        Immediate: true,
+      });
+    } else if (MessageType === "SendNewBlocks") {
+      logger.info(`Block storage received request for new blocks from ${FromAddress}`);
+
+      const blocks = await this.blockStorage.getBlocks(obj.blockId);
+
+      blocks.forEach(async (block) => {
         this.gossip.unicastMessage({
-          Recipient: rpc.req.FromAddress,
+          Recipient: FromAddress,
           BroadcastGroup: "blockStorage",
-          MessageType: "HasNewBlocksResponse",
-          Buffer: new Buffer(JSON.stringify({ hasNewBlocks })),
+          MessageType: "SendNewBlocksResponse",
+          Buffer: new Buffer(JSON.stringify({ block })),
           Immediate: true,
         });
-        break;
-      case "HasNewBlocksResponse":
-        logger.info(`Block storage has a peer with more blocks`, { peer: rpc.req.FromAddress });
-
-        const blockId = await this.blockStorage.getLastBlockId();
-
-        this.gossip.unicastMessage({
-          Recipient: rpc.req.FromAddress,
-          BroadcastGroup: "blockStorage",
-          MessageType: "SendNewBlocks",
-          Buffer: new Buffer(JSON.stringify({ blockId })),
-          Immediate: true,
-        });
-        break;
-
-      case "SendNewBlocks":
-        logger.info(`Block storage received request for new blocks from ${rpc.req.FromAddress}`);
-
-        const blocks = await this.blockStorage.getBlocks(obj.blockId);
-
-        blocks.forEach(async (block) => {
-          this.gossip.unicastMessage({
-            Recipient: rpc.req.FromAddress,
-            BroadcastGroup: "blockStorage",
-            MessageType: "SendNewBlocksResponse",
-            Buffer: new Buffer(JSON.stringify({ block })),
-            Immediate: true,
-          });
-        });
-        break;
-
-      case "SendNewBlocksResponse":
-        logger.info(`Block storage received a new block via sync`);
-        this.sync.onReceiveBlock(obj.block);
-      default:
-        logger.debug(`Not implemented`, rpc.req);
-        break;
+      });
+    } else if (MessageType === "SendNewBlocksResponse") {
+          logger.info(`Block storage received a new block via sync`);
+          this.sync.onReceiveBlock(obj.block);
+    } else {
+      logger.debug(`Not implemented`, rpc.req);
     }
   }
 }
