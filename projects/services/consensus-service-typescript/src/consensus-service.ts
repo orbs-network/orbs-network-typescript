@@ -29,7 +29,6 @@ export default class ConsensusService extends Service {
       this.initTransactionPool()
     ]);
 
-    this.askForHeartbeats([this.virtualMachine, this.blockStorage]);
   }
 
   async initConsensus(): Promise<void> {

@@ -33,7 +33,6 @@ export default class PublicApiService extends Service {
       new ConstantTransactionHandlerConfig());
     this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
 
-    this.askForHeartbeats([this.consensus, this.virtualMachine]);
   }
 
   @Service.RPCMethod

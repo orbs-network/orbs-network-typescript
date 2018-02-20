@@ -19,7 +19,6 @@ export default class VirtualMachineService extends Service {
     this.stateStorage = this.peers.stateStorage;
     this.virtualMachine = new VirtualMachine(this.stateStorage);
 
-    this.askForHeartbeats([this.stateStorage]);
   }
 
   @Service.RPCMethod

@@ -16,7 +16,6 @@ export default class GossipService extends Service {
   async initialize() {
     await this.initGossip();
 
-    this.askForHeartbeats([this.peers.publicApi, this.peers.consensus]);
   }
 
   async initGossip(): Promise<void> {
