@@ -13,8 +13,6 @@ export interface ServiceConfig {
 export abstract class Service {
   public name: string;
   public nodeName: string;
-  public nodeTopology: any;
-  public peers: types.ClientMap;
   protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>,
     silent: boolean = false): any {
     if (!descriptor || (typeof descriptor.value !== "function")) {
