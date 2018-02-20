@@ -6,6 +6,7 @@ import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
+  private syncFrom: string;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
   private nodeName: string;
@@ -43,6 +44,12 @@ export default class BlockStorageService extends Service {
 
   @Service.RPCMethod
   public async addBlock(rpc: types.AddBlockContext) {
+    if (this.isSyncing()) {
+      const message = `Block storage can't add new blocks while syncing`;
+      logger.error(message);
+      throw new Error(message);
+    }
+
     await this.blockStorage.addBlock(rpc.req.block);
 
     rpc.res = {};
@@ -81,11 +88,18 @@ export default class BlockStorageService extends Service {
     const obj = JSON.parse(rpc.req.Buffer.toString("utf8"));
 
     if (MessageType === "HasNewBlocksMessage") {
+      // Ignore my own messages
       if (FromAddress === this.nodeName) return;
 
       const hasNewBlocks = await this.blockStorage.hasNewBlocks(obj.blockId);
 
-      if (!hasNewBlocks) return;
+      if (!hasNewBlocks) {
+        if (FromAddress === this.syncFrom) {
+          this.syncFrom = undefined;
+        }
+
+        return;
+      }
 
       this.gossip.unicastMessage({
         Recipient: FromAddress,
@@ -97,10 +111,14 @@ export default class BlockStorageService extends Service {
     } else if (MessageType === "HasNewBlocksResponse") {
       logger.info(`Block storage has a peer with more blocks`, { peer: FromAddress });
 
+      if (!this.isSyncing()) {
+        this.syncFrom = FromAddress;
+      }
+
       const blockId = await this.blockStorage.getLastBlockId();
 
       this.gossip.unicastMessage({
-        Recipient: FromAddress,
+        Recipient: this.syncFrom,
         BroadcastGroup: "blockStorage",
         MessageType: "SendNewBlocks",
         Buffer: new Buffer(JSON.stringify({ blockId })),
@@ -121,10 +139,25 @@ export default class BlockStorageService extends Service {
         });
       });
     } else if (MessageType === "SendNewBlocksResponse") {
-          logger.info(`Block storage received a new block via sync`);
-          this.sync.onReceiveBlock(obj.block);
+      logger.info(`Block storage received a new block via sync`);
+
+      if (!this.isSyncing()) {
+        logger.error(`Block storaged dropped new block received via sync because it is not syncing right now`);
+        return;
+      }
+
+      if (FromAddress !== this.syncFrom) {
+        logger.info(`Block storaged dropped new block received via sync because it came from ${FromAddress} instead of ${this.syncFrom}`);
+        return;
+      }
+
+      this.sync.onReceiveBlock(obj.block);
     } else {
       logger.debug(`Not implemented`, rpc.req);
     }
+  }
+
+  public isSyncing(): boolean {
+    return this.syncFrom !== undefined;
   }
 }
