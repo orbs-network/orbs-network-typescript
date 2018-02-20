@@ -1,15 +1,21 @@
 syntax = "proto3";
 
-import "./transactions.proto";
+import "transactions.proto";
 
 message BlockHeader {
-  uint32 version = 1;
-  uint32 id = 2;
-  uint32 prevBlockId = 3;
+    uint32 version = 1;
+    uint32 id = 2;
+    uint32 prevBlockId = 3;
 }
 
+message modifiedStateKey {
+    string contractAddress = 1;
+    string key = 2;
+    string value = 3;
+}
+  
 message Block {
-  BlockHeader header = 1;
-  Transaction tx = 2;
-  string modifiedAddressesJson = 3;
+    BlockHeader header = 1;
+    repeated Transaction transactions = 2;
+    repeated modifiedStateKey stateDiff = 3;
 }

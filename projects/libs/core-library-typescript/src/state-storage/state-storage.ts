@@ -47,18 +47,19 @@ export class StateStorage {
 
     // Assuming an ordered list of blocks.
     for (const block of blocks) {
-      await this.processNextBlock(block);
+      await this.syncNextBlock(block);
     }
 
     setTimeout(() => this.pollBlockStorage(), 200);
   }
 
-  private async processNextBlock(block: types.Block) {
+  private async syncNextBlock(block: types.Block) {
     if (block.header.prevBlockId == this.lastBlockId) {
       logger.debug("Processing block:", block.header.id);
 
-      const modifiedArgs = new Map<string, string>(_.toPairs(JSON.parse(block.modifiedAddressesJson)));
-      await this.kvstore.setMany(block.tx.contractAddress, modifiedArgs);
+      for (const { contractAddress, key, value} of block.stateDiff) {
+        this.kvstore.set(contractAddress, key, value);
+      }
       this.lastBlockId = block.header.id;
     } else {
       throw new Error(`Unexpected block ID: ${block.header.id}. Out of sync?`);
