@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import { logger, config, types } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";
-import { Consensus, RaftConsensusConfig } from "orbs-core-library";
+import { Consensus } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
 
@@ -11,39 +11,14 @@ export default class ConsensusService extends Service {
   private consensus: Consensus;
   private transactionPool: TransactionPool;
 
-  private gossip: types.GossipClient;
-  private virtualMachine: types.VirtualMachineClient;
-  private blockStorage: types.BlockStorageClient;
-
-  public constructor(gossip: types.GossipClient, virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient, serviceConfig: ServiceConfig) {
+  public constructor(consensus: Consensus,
+                    serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.gossip = gossip;
-    this.virtualMachine = virtualMachine;
-    this.blockStorage = blockStorage;
+    this.consensus = consensus;
 
   }
 
   async initialize() {
-
-    await Promise.all([
-      this.initConsensus(),
-      this.initTransactionPool()
-    ]);
-
-  }
-
-  async initConsensus(): Promise<void> {
-    // Get the protocol configuration from the environment settings.
-    const consensusConfig = config.get("consensus");
-    if (!consensusConfig) {
-      throw new Error("Couldn't find consensus configuration!");
-    }
-
-    this.consensus = new Consensus(consensusConfig, this.gossip, this.virtualMachine, this.blockStorage);
-  }
-
-  async initTransactionPool(): Promise<void> {
-    this.transactionPool = new TransactionPool();
   }
 
   @Service.RPCMethod

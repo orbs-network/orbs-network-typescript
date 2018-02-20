@@ -1,6 +1,6 @@
 import bind from "bind-decorator";
 
-import { logger, grpc, types, topology, topologyPeers } from "../common-library";
+import { logger, grpc, types } from "../common-library";
 
 export interface RPCMethodOptions {
   log: boolean;
@@ -38,11 +38,9 @@ export abstract class Service {
     return Service.RPCMethod(target, propertyKey, descriptor, true);
   }
 
-  public constructor(serviceConfig?: ServiceConfig) {
+  public constructor(serviceConfig: ServiceConfig) {
     this.name = this.constructor.name;
-    this.nodeTopology = topology();
-    this.peers = topologyPeers(this.nodeTopology.peers);
-    this.nodeName = (serviceConfig && serviceConfig.nodeName) || this.nodeTopology.name;
+    this.nodeName = serviceConfig.nodeName;
   }
 
   abstract async initialize(): Promise<void>;
