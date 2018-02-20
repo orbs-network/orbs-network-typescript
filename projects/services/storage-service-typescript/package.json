@@ -23,6 +23,8 @@
     "orbs-core-library": "file:../../libs/core-library-typescript"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.2",
+    "@types/chai-as-promised": "^7.1.0",
     "@types/fs-extra": "^5.0.0",
     "@types/lodash": "^4.14.99",
     "@types/node": "^9.4.4",

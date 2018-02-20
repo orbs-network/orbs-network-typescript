@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import { logger, types, config } from "orbs-core-library";
 import { Service } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
-import { stringToBuffer } from "orbs-core-library";
 
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;

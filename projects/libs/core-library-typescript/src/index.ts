@@ -1,7 +1,7 @@
 export * from "./common-library";
 export { BlockStorage, BlockStorageSync } from "./block-storage";
 export { Consensus, RaftConsensusConfig } from "./consensus";
-export { Gossip, stringToBuffer } from "./gossip";
+export { Gossip } from "./gossip";
 export { PublicApi, TransactionHandler, TransactionHandlerConfig } from "./public-api";
 export { SidechainConnector, SidechainConnectorOptions } from "./sidechain-connector";
 export { StateStorage } from "./state-storage";

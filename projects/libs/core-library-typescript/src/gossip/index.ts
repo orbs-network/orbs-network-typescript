@@ -1,1 +1,1 @@
-export { Gossip, stringToBuffer } from "./gossip";
+export { Gossip } from "./gossip";

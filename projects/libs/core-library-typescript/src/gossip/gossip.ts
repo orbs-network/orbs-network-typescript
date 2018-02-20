@@ -6,7 +6,7 @@ import { topologyPeers } from "../common-library/topologyPeers";
 import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 
-export function stringToBuffer(str: string): Buffer {
+function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
   buf.writeUInt8(Math.min(str.length, 255), 0);
   buf.write(str, 1, 255, "utf8");
