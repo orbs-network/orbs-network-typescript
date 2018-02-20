@@ -2,7 +2,7 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { StateStorage } from "orbs-core-library";
 
 export default class StateStorageService extends Service {
@@ -10,13 +10,12 @@ export default class StateStorageService extends Service {
 
   private blockStorage: types.BlockStorageClient;
 
-  public constructor() {
-    super();
+  public constructor(blockStorage: types.BlockStorageClient, serviceConfig: ServiceConfig) {
+    super(serviceConfig);
+    this.blockStorage = blockStorage;
   }
 
   async initialize() {
-    this.blockStorage = this.peers.blockStorage;
-
     await this.initStateStorage();
   }
 

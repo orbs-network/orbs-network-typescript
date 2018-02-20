@@ -5,8 +5,9 @@ import { types } from "../common-library/types";
 
 import { EthereumConnector } from "./ethereum-connector";
 import { SidechainConnectorClient } from "orbs-interfaces";
+import { ServiceConfig } from "..";
 
-export interface SidechainConnectorOptions {
+export interface SidechainConnectorOptions extends ServiceConfig {
   ethereumNodeHttpAddress?: string;
 }
 
@@ -28,7 +29,7 @@ export class SidechainConnector {
     return EthereumConnector.createHttpConnector(address);
   }
 
-  constructor(options: SidechainConnectorOptions = {}) {
+  constructor(options: SidechainConnectorOptions = { nodeName: "unnamed" }) {
     this.options = options;
     this.ethereumConnector = this.createEthereumConnector();
   }

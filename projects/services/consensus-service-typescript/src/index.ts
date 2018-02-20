@@ -1,17 +1,10 @@
-import { ErrorHandler, grpc, ServiceRunner } from "orbs-core-library";
-
-import ConsensusService from "./consensus-service";
-import SubscriptionManagerService from "./subscription-manager-service";
-import TransactionPoolService from "./transaction-pool-service";
+import { ErrorHandler, config, topology } from "orbs-core-library";
+import consensusServer from "./consensus-server";
 
 ErrorHandler.setup();
 
-const main = async () => {
-  await ServiceRunner.runMulti(grpc.consensusServiceServer, [
-    new ConsensusService(),
-    new SubscriptionManagerService(),
-    new TransactionPoolService()
-  ]);
-};
+const nodeTopology = topology();
 
-main();
+consensusServer(config, nodeTopology)
+  .onEndpoint(nodeTopology.endpoint)
+  .start();

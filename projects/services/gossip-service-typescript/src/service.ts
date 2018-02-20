@@ -2,15 +2,21 @@ import * as _ from "lodash";
 
 import { logger, config, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 
+export interface GossipServiceConfig extends ServiceConfig {
+  gossipPort: number;
+}
+
 export default class GossipService extends Service {
+  private serviceConfig: GossipServiceConfig;
   private gossip: Gossip;
 
-  public constructor() {
-    super();
+  public constructor(serviceConfig: GossipServiceConfig) {
+    super(serviceConfig);
+    this.serviceConfig = serviceConfig;
   }
 
   async initialize() {
@@ -19,7 +25,7 @@ export default class GossipService extends Service {
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(this.nodeTopology.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
+    this.gossip = new Gossip(this.serviceConfig.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
 
     setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();

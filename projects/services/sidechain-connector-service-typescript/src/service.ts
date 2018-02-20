@@ -10,7 +10,7 @@ export default class SidechainConnectorService extends Service {
   private sidechainConnector: SidechainConnector;
 
   public constructor(options: SidechainConnectorOptions) {
-    super();
+    super(options);
 
     this.options = options;
   }
