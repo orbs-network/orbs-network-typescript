@@ -6,7 +6,6 @@ import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
-  private syncFrom: string;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
   private nodeName: string;
@@ -94,8 +93,8 @@ export default class BlockStorageService extends Service {
       const hasNewBlocks = await this.blockStorage.hasNewBlocks(obj.blockId);
 
       if (!hasNewBlocks) {
-        if (FromAddress === this.syncFrom) {
-          this.syncFrom = undefined;
+        if (this.sync.isSyncingWith(FromAddress)) {
+          this.sync.off();
         }
 
         return;
@@ -112,13 +111,13 @@ export default class BlockStorageService extends Service {
       logger.info(`Block storage has a peer with more blocks`, { peer: FromAddress });
 
       if (!this.isSyncing()) {
-        this.syncFrom = FromAddress;
+        this.sync.on(FromAddress);
       }
 
       const blockId = await this.blockStorage.getLastBlockId();
 
       this.gossip.unicastMessage({
-        Recipient: this.syncFrom,
+        Recipient: this.sync.getNode(),
         BroadcastGroup: "blockStorage",
         MessageType: "SendNewBlocks",
         Buffer: new Buffer(JSON.stringify({ blockId })),
@@ -146,8 +145,8 @@ export default class BlockStorageService extends Service {
         return;
       }
 
-      if (FromAddress !== this.syncFrom) {
-        logger.info(`Block storaged dropped new block received via sync because it came from ${FromAddress} instead of ${this.syncFrom}`);
+      if (!this.sync.isSyncingWith(FromAddress)) {
+        logger.info(`Block storaged dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
         return;
       }
 
@@ -158,6 +157,6 @@ export default class BlockStorageService extends Service {
   }
 
   public isSyncing(): boolean {
-    return this.syncFrom !== undefined;
+    return this.sync.isSyncing();
   }
 }

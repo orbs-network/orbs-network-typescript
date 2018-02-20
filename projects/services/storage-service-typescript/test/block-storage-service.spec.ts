@@ -141,10 +141,6 @@ describe("Block storage service", async function () {
     blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2);
   });
 
-  afterEach(async function () {
-    process.exit(this.currentTest.state === "passed" ? 0 : 1);
-  });
-
   describe("sync process", () => {
     it("#pollForNewBlocks", (done) => {
       setTimeout(async () => {

@@ -7,35 +7,56 @@ import { BlockStorage } from "./block-storage";
 import { sortBy } from "lodash";
 
 function copyArray<T>(source: Array<T>, destination: Array<T>) {
-    while (source.length > 0) {
-        destination.push(source.pop());
-    }
+  while (source.length > 0) {
+      destination.push(source.pop());
+  }
 }
 
 export class BlockStorageSync {
-    private blockStorage: BlockStorage;
-    private queue: Array<types.Block> = [];
+  private blockStorage: BlockStorage;
+  private queue: Array<types.Block> = [];
+  private node: string;
 
-    constructor(blockStorage: BlockStorage) {
-        this.blockStorage = blockStorage;
+  constructor(blockStorage: BlockStorage) {
+    this.blockStorage = blockStorage;
+  }
+
+  public onReceiveBlock(block: types.Block) {
+    this.queue.push(block);
+  }
+
+  public async appendBlocks(): Promise<void> {
+    const data: Array<types.Block> = [];
+    copyArray(this.queue, data);
+
+    const sortedBlocks = sortBy(data, (block) => block.header.id);
+
+    for (const block of sortedBlocks) {
+      await this.blockStorage.addBlock(block);
     }
+  }
 
-    public onReceiveBlock(block: types.Block) {
-        this.queue.push(block);
-    }
+  public getQueueSize(): number {
+    return this.queue.length;
+  }
 
-    public async appendBlocks(): Promise<void> {
-        const data: Array<types.Block> = [];
-        copyArray(this.queue, data);
+  public isSyncing(): boolean {
+    return this.node !== undefined;
+  }
 
-        const sortedBlocks = sortBy(data, (block) => block.header.id);
+  public isSyncingWith(node: string): boolean {
+    return this.node === node;
+  }
 
-        for (const block of sortedBlocks) {
-            await this.blockStorage.addBlock(block);
-        }
-    }
+  public on(node: string) {
+    this.node = node;
+  }
 
-    public getQueueSize(): number {
-        return this.queue.length;
-    }
+  public off() {
+    this.node = undefined;
+  }
+
+  public getNode() {
+    return this.node;
+  }
 }
