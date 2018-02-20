@@ -3,7 +3,6 @@ import BlockStorageService from "../src/block-storage-service";
 import GossipService from "../../gossip-service-typescript/src/service";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
-import * as sinonChai from "sinon-chai";
 import * as fsExtra from "fs-extra";
 import { range } from "lodash";
 
@@ -100,7 +99,7 @@ async function createBlockStorage (numberOfBlocks: number) {
 }
 
 describe("Block storage service", async function () {
-  this.timeout(800000);
+  this.timeout(20000);
 
   let blockStorageService1: BlockStorageService;
   let blockStorageService2: BlockStorageService;
