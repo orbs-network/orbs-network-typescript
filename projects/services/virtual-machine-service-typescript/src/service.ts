@@ -31,8 +31,7 @@ export default class VirtualMachineService extends Service {
 
       rpc.res = {
         success: true,
-        modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedKeys].map(
-          ([{ contractAddress, key }, value]) => [key, value])))
+        modifiedAddressesJson: modifiedKeys.map(({key, value}) => [key.key, value])
       };
 
     } catch (err) {
