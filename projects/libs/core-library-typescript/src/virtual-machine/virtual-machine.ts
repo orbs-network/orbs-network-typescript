@@ -1,6 +1,3 @@
-import * as _ from "lodash";
-
-import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
@@ -16,11 +13,23 @@ export class VirtualMachine {
   }
 
   public async executeTransaction(input: types.ExecuteTransactionInput) {
-    return await this.processor.processTransaction({
-      sender: input.transaction.sender,
-      contractAddress: input.transaction.contractAddress,
-      payload: input.transaction.payload
-    });
+    const transactionScopeStateCache = new StateCache();
+
+    return await this.processTransactionSet({orderedTransactions: [input.transaction]});
+  }
+
+  public async processTransactionSet(input: types.ProcessTransactionSetInput) {
+    const stateCache = new StateCache();
+
+    for (const transaction of input.orderedTransactions) {
+      await this.processor.processTransaction({
+        sender: transaction.sender,
+        contractAddress: transaction.contractAddress,
+        payload: transaction.payload
+      }, stateCache);
+    }
+
+    return stateCache.getModifiedKeys();
   }
 
   public async callContract(input: types.CallContractInput) {

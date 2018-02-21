@@ -22,10 +22,10 @@ export class StateCache {
     this.cache.set(encodedKey, value);
   }
 
-  public getModifiedKeys() {
-    const res = new Map<StateCacheKey, string>();
+  public getModifiedKeys(): {key: StateCacheKey, value: string}[] {
+    const res = [];
     for (const key of this.modifiedKeys) {
-      res.set(this.decodeMapKey(key), this.cache.get(key));
+      res.push({key: this.decodeMapKey(key), value: this.cache.get(key)});
     }
     return res;
   }
