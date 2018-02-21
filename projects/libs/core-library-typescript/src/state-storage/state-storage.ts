@@ -3,12 +3,12 @@ import * as _ from "lodash";
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 
-import MemoryKVStore from "./kvstore/memory-kvstore";
+import { InMemoryKVStore } from "./kvstore";
 
 export class StateStorage {
   private blockStorage: types.BlockStorageClient;
 
-  private kvstore = new MemoryKVStore();
+  private kvstore = new InMemoryKVStore();
   private lastBlockId: number = 0;
 
   public constructor(blockStorage: types.BlockStorageClient) {
