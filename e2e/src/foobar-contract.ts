@@ -1,5 +1,4 @@
 import { OrbsHardCodedContractAdapter } from "./orbs-client";
-
 export class FooBarContractClient {
   adapter: OrbsHardCodedContractAdapter;
 
@@ -42,3 +41,25 @@ export class FooBarAccount {
     return await this.foobarContractClient.getMyBalance();
   }
 }
+
+
+const { Assertion } = require("chai");
+
+async function assertFooBarAccountBalance(n: number) {
+  // make sure we are working with am Account model
+  new Assertion(this._obj).to.be.instanceof(FooBarAccount);
+
+  const account = <FooBarAccount>this._obj;
+
+  const actualBars = await account.getBalance();
+
+  this.assert(
+    actualBars === n
+    , "expected #{this} to have balance #{exp} but got #{act}"
+    , "expected #{this} to not have balance #{act}"
+    , n
+    , actualBars
+  );
+}
+
+Assertion.addMethod("bars", assertFooBarAccountBalance);
