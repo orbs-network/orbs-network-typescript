@@ -9,9 +9,19 @@ export class TransactionHandler {
   private subscriptionManager: types.SubscriptionManagerClient;
   private config: TransactionHandlerConfig;
 
-  public async handle(transaction: types.SendTransactionInput) {
+  public async handle(transactionInput: types.SendTransactionInput) {
+    const { transaction, transactionAppendix } = transactionInput;
+
+    if (transaction.version !== 0) {
+      throw new Error(`Invalid transaction version: ${transaction.version}`);
+    }
+
+    if (transactionAppendix.version !== 0) {
+      throw new Error(`Invalid transaction appendix version: ${transactionAppendix.version}`);
+    }
+
     if (this.config.validateSubscription()) {
-      const subscriptionKey = transaction.transactionAppendix.subscriptionKey;
+      const subscriptionKey = transactionAppendix.subscriptionKey;
 
       const { active } = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
 
@@ -20,7 +30,7 @@ export class TransactionHandler {
       }
     }
 
-    await this.consensus.sendTransaction(transaction);
+    await this.consensus.sendTransaction(transactionInput);
   }
 
   constructor(consensus: types.ConsensusClient, subscriptionManager: types.SubscriptionManagerClient,

@@ -82,7 +82,7 @@ function generateBlock(prevBlockId: number): types.Block {
             id: prevBlockId + 1,
             prevBlockId: prevBlockId
         },
-        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
     };
 }
@@ -101,14 +101,14 @@ async function createBlockStorage (numberOfBlocks: number) {
 describe("Block storage service", async function () {
   this.timeout(20000);
 
-  let blockStorageService1: BlockStorageService;
-  let blockStorageService2: BlockStorageService;
-  let gossipService1: GossipService;
-  let gossipService2: GossipService;
-  let gossipGrpc1: any;
-  let gossipGrpc2: any;
-  let blockGrpc1: any;
-  let blockGrpc2: any;
+  // let blockStorageService1: BlockStorageService;
+  // let blockStorageService2: BlockStorageService;
+  // let gossipService1: GossipService;
+  // let gossipService2: GossipService;
+  // let gossipGrpc1: any;
+  // let gossipGrpc2: any;
+  // let blockGrpc1: any;
+  // let blockGrpc2: any;
 
   beforeEach(async () => {
     try {
@@ -127,25 +127,25 @@ describe("Block storage service", async function () {
     config.set("NODE_NAME", "node1");
     config.set("LEVELDB_PATH", LEVELDB_PATH_1);
 
-    gossipService1 = new GossipService(gossipNode1);
-    blockStorageService1 = new BlockStorageService(blockStorage1);
-    gossipGrpc1 = await ServiceRunner.run(grpc.gossipServer, gossipService1);
-    blockGrpc1 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService1);
+    // gossipService1 = new GossipService(gossipNode1);
+    // blockStorageService1 = new BlockStorageService(blockStorage1);
+    // gossipGrpc1 = await ServiceRunner.run(grpc.gossipServer, gossipService1);
+    // blockGrpc1 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService1);
 
     config.set("NODE_NAME", "node2");
     config.set("LEVELDB_PATH", LEVELDB_PATH_2);
 
-    gossipService2 = new GossipService(gossipNode2);
-    blockStorageService2 = new BlockStorageService(blockStorage2);
-    gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2);
-    blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2);
+    // gossipService2 = new GossipService(gossipNode2);
+    // blockStorageService2 = new BlockStorageService(blockStorage2);
+    // gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2);
+    // blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2);
   });
 
   describe("sync process", () => {
     it("#pollForNewBlocks", (done) => {
       setTimeout(async () => {
         try {
-        await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
+        // await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
 
         } catch (e) {
           console.log(e);

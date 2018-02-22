@@ -1,25 +1,21 @@
 import * as _ from "lodash";
 
-import { logger, types, config } from "orbs-core-library";
-import { Service } from "orbs-core-library";
+import { logger, types } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
-  private nodeName: string;
 
-  public constructor(topology?: any) {
-    super(topology);
-    this.nodeName = config.get("NODE_NAME");
+  public constructor(gossip: types.GossipClient, serviceConfig: ServiceConfig) {
+    super(serviceConfig);
+    this.gossip = gossip;
   }
 
   async initialize() {
     await this.initBlockStorage();
-    this.gossip = this.peers.gossip;
-
-    this.askForHeartbeats([this.peers.gossip]);
 
     setInterval(() => {
       this.pollForNewBlocks();

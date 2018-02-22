@@ -2,7 +2,7 @@ import * as _ from "lodash";
 
 import { logger, config, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
 import { PublicApi } from "orbs-core-library";
 
@@ -20,20 +20,19 @@ export default class PublicApiService extends Service {
   private subscriptionManager: types.SubscriptionManagerClient;
   private transactionHandler: TransactionHandler;
 
-  public constructor() {
-    super();
+  public constructor(virtualMachine: types.VirtualMachineClient, consensus: types.ConsensusClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
+    super(serviceConfig);
+    this.virtualMachine = virtualMachine;
+    this.consensus = consensus;
+    this.subscriptionManager = subscriptionManager;
+
+    this.transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager, new ConstantTransactionHandlerConfig());
+
+    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
   }
 
   async initialize() {
-    this.virtualMachine = this.peers.virtualMachine;
-    this.consensus = this.peers.consensus;
-    this.subscriptionManager = this.peers.subscriptionManager;
 
-    this.transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager,
-      new ConstantTransactionHandlerConfig());
-    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
-
-    this.askForHeartbeats([this.consensus, this.virtualMachine]);
   }
 
   @Service.RPCMethod
@@ -45,7 +44,7 @@ export default class PublicApiService extends Service {
   async call(rpc: types.CallContext) {
     const resultJson = await this.publicApi.callContract(rpc.req);
 
-    logger.debug(`${this.nodeTopology.name}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
+    logger.debug(`${this.nodeName}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
 
     rpc.res = {
       resultJson: resultJson

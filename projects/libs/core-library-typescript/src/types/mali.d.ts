@@ -9,7 +9,7 @@ declare class mali {
 
     close(...args: any[]): void;
 
-    init(...args: any[]): void;
+    addService(...args: any[]): void;
 
     inspect(...args: any[]): void;
 
@@ -20,6 +20,7 @@ declare class mali {
     toJSON(...args: any[]): void;
 
     use(...args: any[]): void;
+
 
     static defaultMaxListeners: number;
 

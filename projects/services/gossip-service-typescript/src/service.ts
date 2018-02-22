@@ -2,26 +2,33 @@ import * as _ from "lodash";
 
 import { logger, config, types } from "orbs-core-library";
 
-import { Service } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
 
+export interface GossipServiceConfig extends ServiceConfig {
+  gossipPort: number;
+  peers: any;
+  gossipPeers: any;
+}
+
 export default class GossipService extends Service {
+  private serviceConfig: GossipServiceConfig;
   private gossip: Gossip;
   private peerPollInterval: any;
 
-  public constructor(nodeTopology?: any) {
-    super(nodeTopology);
+  public constructor(serviceConfig: GossipServiceConfig) {
+    super(serviceConfig);
+    this.serviceConfig = serviceConfig;
   }
 
   async initialize() {
     await this.initGossip();
 
-    // this.askForHeartbeats([this.peers.publicApi, this.peers.consensus, this.peers.blockStorage]);
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(this.nodeTopology, config.get("NODE_NAME"), config.get("NODE_IP"));
+    this.gossip = new Gossip(this.serviceConfig.gossipPort, this.serviceConfig.gossipPeers, this.serviceConfig.peers, config.get("NODE_NAME"), config.get("NODE_IP"));
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
@@ -53,7 +60,7 @@ export default class GossipService extends Service {
   async stop() {
     await super.stop();
     clearInterval(this.peerPollInterval);
-    logger.info(`Shutting down ${this.nodeTopology.name}`);
+    logger.info(`Shutting down`);
     return this.gossip.shutdown();
   }
 
