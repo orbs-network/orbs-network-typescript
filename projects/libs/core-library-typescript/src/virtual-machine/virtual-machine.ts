@@ -12,7 +12,7 @@ export class VirtualMachine {
     this.processor = new HardCodedSmartContractProcessor(this.stateStorage);
   }
 
-  public async executeTransaction(input: types.ExecuteTransactionInput) {
+  public async processTransaction(input: types.ProcessTransactionInput) {
     const transactionScopeStateCache = new StateCache();
 
     return await this.processTransactionSet({orderedTransactions: [input.transaction]});

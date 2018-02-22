@@ -128,7 +128,7 @@ export class RaftConsensus {
   // Suggests new entry to be appended to the Raft log (e.g., new transaction), by first executing the transaction and
   // then propagating the transaction with its execution outputs.
   async sendTransaction(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
-    const vmResult = await this.virtualMachine.executeTransaction({
+    const vmResult = await this.virtualMachine.processTransaction({
       transaction: tx,
       transactionAppendix: txAppendix
     });
