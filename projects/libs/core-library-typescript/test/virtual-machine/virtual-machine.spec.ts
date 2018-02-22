@@ -46,9 +46,9 @@ describe("test virtual machine", () => {
         virtualMachine = new VirtualMachine(stateStorageClient);
     });
 
-    it("#executeTransaction - transfer from one account to another", async () => {
+    it("#processTransaction - transfer from one account to another", async () => {
         const transaction = buildBarTransferTransaction("account1", "account2", 4);
-        const res = await virtualMachine.executeTransaction({
+        const res = await virtualMachine.processTransaction({
             transaction,
             transactionAppendix: { prefetchAddresses: [], subscriptionKey: ""}
         });
