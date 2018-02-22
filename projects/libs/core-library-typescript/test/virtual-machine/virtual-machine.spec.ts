@@ -46,11 +46,11 @@ describe("test virtual machine", () => {
         virtualMachine = new VirtualMachine(stateStorageClient);
     });
 
-    it("#executeTransaction", async () => {
+    it("#executeTransaction - transfer from one account to another", async () => {
         const transaction = buildBarTransferTransaction("account1", "account2", 4);
         const res = await virtualMachine.executeTransaction({
             transaction,
-            transactionAppendix: { version: 1, prefetchAddresses: [], subscriptionKey: ""}
+            transactionAppendix: { prefetchAddresses: [], subscriptionKey: ""}
         });
         res.length.should.equal(2);
         for (const item of res) {
@@ -60,7 +60,7 @@ describe("test virtual machine", () => {
         res.find(item => item.key.key === "balances.account2").should.have.property("value", "4");
     });
 
-    it("#processTransactionSet", async () => {
+    it("#processTransactionSet - ordered transfers between 3 accounts", async () => {
         const res = await virtualMachine.processTransactionSet({orderedTransactions: [    // account1=10
             buildBarTransferTransaction("account1", "account2", 9), // account1 = 1, account2 = 9
             buildBarTransferTransaction("account2", "account1", 2), // account1 = 3, account2 = 7
