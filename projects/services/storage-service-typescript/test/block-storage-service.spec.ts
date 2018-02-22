@@ -1,4 +1,4 @@
-import { types, config, BlockStorage, logger, grpc, ServiceRunner, ErrorHandler } from "orbs-core-library";
+import { types, config, BlockStorage, logger, grpc, ServiceRunner, ErrorHandler, topologyPeers } from "orbs-core-library";
 import BlockStorageService from "../src/block-storage-service";
 import GossipService from "../../gossip-service-typescript/src/service";
 import * as chai from "chai";
@@ -20,6 +20,7 @@ const gossipNode1 = {
   version: "1.0.0",
   endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_1}`,
   project: "gossip-service-typescript",
+  nodeName: "node1",
   peers: [
     {
       service: "storage",
@@ -35,6 +36,7 @@ const gossipNode2 = {
   version: "1.0.0",
   endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_2}`,
   project: "gossip-service-typescript",
+  nodeName: "node2",
   peers: [
     {
       service: "storage",
@@ -50,6 +52,7 @@ const blockStorage1 = {
   version: "1.0.0",
   endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_1}`,
   project: "storage-service-typescript",
+  nodeName: "node1",
   peers: [
     {
       service: "gossip",
@@ -63,6 +66,7 @@ const blockStorage2 = {
   version: "1.0.0",
   endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_2}`,
   project: "storage-service-typescript",
+  nodeName: "node2",
   peers: [
     {
       service: "gossip",
@@ -101,14 +105,14 @@ async function createBlockStorage (numberOfBlocks: number) {
 describe("Block storage service", async function () {
   this.timeout(20000);
 
-  // let blockStorageService1: BlockStorageService;
-  // let blockStorageService2: BlockStorageService;
-  // let gossipService1: GossipService;
-  // let gossipService2: GossipService;
-  // let gossipGrpc1: any;
-  // let gossipGrpc2: any;
-  // let blockGrpc1: any;
-  // let blockGrpc2: any;
+  let blockStorageService1: BlockStorageService;
+  let blockStorageService2: BlockStorageService;
+  let gossipService1: GossipService;
+  let gossipService2: GossipService;
+  let gossipGrpc1: any;
+  let gossipGrpc2: any;
+  let blockGrpc1: any;
+  let blockGrpc2: any;
 
   beforeEach(async () => {
     try {
@@ -127,25 +131,27 @@ describe("Block storage service", async function () {
     config.set("NODE_NAME", "node1");
     config.set("LEVELDB_PATH", LEVELDB_PATH_1);
 
-    // gossipService1 = new GossipService(gossipNode1);
-    // blockStorageService1 = new BlockStorageService(blockStorage1);
-    // gossipGrpc1 = await ServiceRunner.run(grpc.gossipServer, gossipService1);
-    // blockGrpc1 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService1);
+    const nodeConfig = {  };
+
+    gossipService1 = new GossipService(gossipNode1);
+    blockStorageService1 = new BlockStorageService(topologyPeers(blockStorage1.peers).gossip, blockStorage1);
+    gossipGrpc1 = await ServiceRunner.run(grpc.gossipServer, gossipService1, gossipNode1.endpoint);
+    blockGrpc1 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService1, blockStorage1.endpoint);
 
     config.set("NODE_NAME", "node2");
     config.set("LEVELDB_PATH", LEVELDB_PATH_2);
 
-    // gossipService2 = new GossipService(gossipNode2);
-    // blockStorageService2 = new BlockStorageService(blockStorage2);
-    // gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2);
-    // blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2);
+    gossipService2 = new GossipService(gossipNode2);
+    blockStorageService2 = new BlockStorageService(topologyPeers(blockStorage2.peers).gossip, blockStorage2);
+    gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2, gossipNode2.endpoint);
+    blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2, blockStorage2.endpoint);
   });
 
   describe("sync process", () => {
     it("#pollForNewBlocks", (done) => {
       setTimeout(async () => {
         try {
-        // await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
+        await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
 
         } catch (e) {
           console.log(e);
