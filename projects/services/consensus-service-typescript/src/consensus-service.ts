@@ -8,11 +8,10 @@ import { Consensus } from "orbs-core-library";
 export default class ConsensusService extends Service {
   private consensus: Consensus;
 
-  public constructor(consensus: Consensus,
-                    serviceConfig: ServiceConfig) {
+  public constructor(consensus: Consensus, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.consensus = consensus;
 
+    this.consensus = consensus;
   }
 
   async initialize() {
