@@ -47,6 +47,10 @@ export class Config {
   public getEnvironment(): string {
     return Config.getEnvironment();
   }
+
+  public getNodeName(): string {
+    return this.get("NODE_NAME");
+  }
 }
 
 export const config = new Config();
