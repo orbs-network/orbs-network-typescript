@@ -9,7 +9,7 @@
   "author": "Orbs Team",
   "license": "MIT",
   "scripts": {
-    "clean": "rm -rf ../db/",
+    "clean": "rm -rf ../db/test",
     "test": "yarn run clean && NODE_ENV=test ./node_modules/.bin/mocha dist/**/*.spec.js --exit",
     "build": "yarn run build-ts && yarn run tslint",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",

@@ -6,11 +6,8 @@ import { config } from "../common-library/config";
 
 import { LevelDBDriver } from "./leveldb-driver";
 
-const NODE_NAME = config.get("NODE_NAME");
-
 export class BlockStorage {
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
-  public static readonly LEVELDB_PATH: string = path.resolve(`../../../db/blocks_${NODE_NAME}.db`);
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,
@@ -30,9 +27,8 @@ export class BlockStorage {
   private lastBlock: types.Block;
   private db: LevelDBDriver;
 
-  public constructor() {
-    // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(BlockStorage.LEVELDB_PATH);
+  public constructor(dbPath: string) {
+    this.db = new LevelDBDriver(dbPath);
   }
 
   public async load(): Promise<void> {
