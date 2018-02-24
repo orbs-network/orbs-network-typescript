@@ -8,15 +8,14 @@ import { Gossip } from "orbs-core-library";
 
 export interface GossipServiceConfig extends ServiceConfig {
   gossipPort: number;
+  nodeIp: string;
 }
 
 export default class GossipService extends Service {
-  private serviceConfig: GossipServiceConfig;
   private gossip: Gossip;
 
   public constructor(serviceConfig: GossipServiceConfig) {
     super(serviceConfig);
-    this.serviceConfig = serviceConfig;
   }
 
   async initialize() {
@@ -25,7 +24,8 @@ export default class GossipService extends Service {
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(this.serviceConfig.gossipPort, config.get("NODE_NAME"), config.get("NODE_IP"));
+    const gossipConfig = <GossipServiceConfig>this.config;
+    this.gossip = new Gossip(gossipConfig.gossipPort, gossipConfig.nodeName, gossipConfig.nodeIp);
 
     setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();

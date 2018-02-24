@@ -44,7 +44,7 @@ export default class PublicApiService extends Service {
   async call(rpc: types.CallContext) {
     const resultJson = await this.publicApi.callContract(rpc.req);
 
-    logger.debug(`${this.nodeName}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
+    logger.debug(`${this.config.nodeName}: called contract with ${JSON.stringify(rpc.req)}. result is: ${resultJson}`);
 
     rpc.res = {
       resultJson: resultJson

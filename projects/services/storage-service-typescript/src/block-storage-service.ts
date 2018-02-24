@@ -5,10 +5,14 @@ import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { BlockStorage } from "orbs-core-library";
 
+export interface BlockStorageServiceConfig extends ServiceConfig {
+  dbPath: string;
+}
+
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
 
-  public constructor(serviceConfig: ServiceConfig) {
+  public constructor(serviceConfig: BlockStorageServiceConfig) {
     super(serviceConfig);
   }
 
@@ -17,7 +21,8 @@ export default class BlockStorageService extends Service {
   }
 
   async initBlockStorage(): Promise<void> {
-    this.blockStorage = new BlockStorage();
+    const blockStorageConfig = <BlockStorageServiceConfig>this.config;
+    this.blockStorage = new BlockStorage(blockStorageConfig.dbPath);
     await this.blockStorage.load();
   }
 
