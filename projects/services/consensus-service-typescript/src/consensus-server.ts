@@ -11,6 +11,8 @@ function makeConsensus(config: Config, peers: types.ClientMap) {
     throw new Error("Couldn't find consensus configuration!");
   }
 
+  consensusConfig.nodeName = config.getNodeName();
+
   return new Consensus(consensusConfig, peers.gossip, peers.virtualMachine, peers.blockStorage);
 }
 
