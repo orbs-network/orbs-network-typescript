@@ -17,6 +17,7 @@ export class Logger {
     maxSize: 10 * 1024 * 1024,
     maxFiles: 20,
     console: false,
+    json: true,
     logzio: {
       enabled: false,
       apiKey: ""
@@ -50,7 +51,7 @@ export class Logger {
           maxFiles: opts.maxFiles,
           prettyPrint: false,
           tailable: true,
-          json: true
+          json: opts.json
         })
       ],
       rewriters: [

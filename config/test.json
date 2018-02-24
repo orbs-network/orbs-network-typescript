@@ -5,6 +5,7 @@
     "maxSize": 1024000,
     "maxFiles": 4,
     "console": true,
+    "json": false,
     "logzio": {
       "enabled": false
     }
