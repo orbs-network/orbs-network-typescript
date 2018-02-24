@@ -15,6 +15,6 @@ const nodeConfig = { nodeName: config.getNodeName() };
 const blockStorageConfig = { nodeName: config.getNodeName(), dbPath: blockStorageDBPath };
 
 ServiceRunner.runMulti(grpc.storageServiceServer, [
-    new BlockStorageService(blockStorageConfig),
-    new StateStorageService(peers.blockStorage, nodeConfig)
-  ], nodeTopology.endpoint);
+  new BlockStorageService(blockStorageConfig),
+  new StateStorageService(peers.blockStorage, nodeConfig)
+], nodeTopology.endpoint);
