@@ -1,6 +1,6 @@
-FROM node:9.6.1-alpine
+FROM node:9-alpine
 
-RUN apk --no-cache add bash git yarn python libc6-compat build-base
+RUN apk --no-cache add bash git yarn python build-base
 
 VOLUME [ "/opt/orbs/logs" ]
 
