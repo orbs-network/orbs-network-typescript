@@ -28,7 +28,7 @@ if (!NUM_OF_NODES) {
 function makeConsensus(peers: types.ClientMap) {
   const consensusConfig = defaults({ nodeName: NODE_NAME, clusterSize: Number(NUM_OF_NODES) }, DEFAULT_CONSENSUS_CONFIG);
 
-  return new Consensus(consensusConfig, peers.gossip, peers.virtualMachine, peers.blockStorage);
+  return new Consensus(consensusConfig, peers.gossip, peers.virtualMachine, peers.blockStorage, peers.transactionPool);
 }
 
 function makeSubscriptionManager(peers: types.ClientMap) {

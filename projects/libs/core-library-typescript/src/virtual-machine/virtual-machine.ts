@@ -1,4 +1,4 @@
-import { types } from "../common-library/types";
+import { types, logger } from "../common-library";
 
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
@@ -12,24 +12,30 @@ export class VirtualMachine {
     this.processor = new HardCodedSmartContractProcessor(this.stateStorage);
   }
 
-  public async processTransaction(input: types.ProcessTransactionInput) {
-    const transactionScopeStateCache = new StateCache();
-
-    return await this.processTransactionSet({orderedTransactions: [input.transaction]});
-  }
-
-  public async processTransactionSet(input: types.ProcessTransactionSetInput) {
+  public async processTransactionSet(input: types.ProcessTransactionSetInput): Promise<types.ProcessTransactionSetOutput> {
     const stateCache = new StateCache();
+    const processedTransactions = [];
 
     for (const transaction of input.orderedTransactions) {
-      await this.processor.processTransaction({
-        sender: transaction.sender,
-        contractAddress: transaction.contractAddress,
-        payload: transaction.payload
-      }, stateCache);
+      try {
+        await this.processor.processTransaction({
+          sender: transaction.sender,
+          contractAddress: transaction.contractAddress,
+          payload: transaction.payload
+        }, stateCache);
+
+        processedTransactions.push(transaction);
+      } catch (err) {
+        logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
+      }
     }
 
-    return stateCache.getModifiedKeys();
+    const stateDiff = stateCache.getModifiedKeys().map(({ key, value}) => ({contractAddress: key.contractAddress, key: key.key, value }));
+
+    return {
+      stateDiff,
+      processedTransactions
+    };
   }
 
   public async callContract(input: types.CallContractInput) {

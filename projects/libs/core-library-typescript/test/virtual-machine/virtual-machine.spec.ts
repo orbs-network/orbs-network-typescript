@@ -4,7 +4,7 @@ import { VirtualMachine } from "../../src/virtual-machine";
 import { types } from "../../src/common-library";
 import * as _ from "lodash";
 
-class DummyStateStorageClient implements types.StateStorageClient {
+class StubStorageClient implements types.StateStorageClient {
     keyMap: {[id: string]: string};
     contractAddress: string;
 
@@ -21,14 +21,14 @@ class DummyStateStorageClient implements types.StateStorageClient {
     }
 }
 
-function buildBarTransferTransaction(from, to, amount): types.Transaction {
+function aTransaction(builder: {from: string, to: string, amount: number}): types.Transaction {
     return {
         version: 1,
-        sender: from,
+        sender: builder.from,
         contractAddress: "foobar",
         payload: JSON.stringify({
             method: "transfer",
-            args: [to, amount]
+            args: [builder.to, builder.amount]
         }),
         signature: ""
     };
@@ -36,42 +36,28 @@ function buildBarTransferTransaction(from, to, amount): types.Transaction {
 
 describe("test virtual machine", () => {
     let virtualMachine: VirtualMachine;
-    let stateStorageClient: DummyStateStorageClient;
+    let stateStorage: StubStorageClient;
 
     beforeEach(() => {
-        stateStorageClient = new DummyStateStorageClient({
+        stateStorage = new StubStorageClient({
             contractAddress: "foobar",
             keyMap: {"balances.account1" : "10", "balances.account2": "0" }
         });
-        virtualMachine = new VirtualMachine(stateStorageClient);
-    });
-
-    it("#processTransaction - transfer from one account to another", async () => {
-        const transaction = buildBarTransferTransaction("account1", "account2", 4);
-        const res = await virtualMachine.processTransaction({
-            transaction,
-            transactionAppendix: { prefetchAddresses: [], subscriptionKey: ""}
-        });
-        res.length.should.equal(2);
-        for (const item of res) {
-            item.should.have.property("key").have.property("contractAddress", "foobar");
-        }
-        res.find(item => item.key.key === "balances.account1").should.have.property("value", "6");
-        res.find(item => item.key.key === "balances.account2").should.have.property("value", "4");
+        virtualMachine = new VirtualMachine(stateStorage);
     });
 
     it("#processTransactionSet - ordered transfers between 3 accounts", async () => {
-        const res = await virtualMachine.processTransactionSet({orderedTransactions: [    // account1=10
-            buildBarTransferTransaction("account1", "account2", 9), // account1 = 1, account2 = 9
-            buildBarTransferTransaction("account2", "account1", 2), // account1 = 3, account2 = 7
-            buildBarTransferTransaction("account1", "account3", 2)  // account1 = 1, account2 = 7, account3 = 2
+        const { processedTransactions, stateDiff } = await virtualMachine.processTransactionSet({orderedTransactions: [    // account1=10
+            aTransaction({from: "account1", to: "account2", amount: 9}), // account1 = 1, account2 = 9
+            aTransaction({from: "account2", to: "account1", amount: 2}), // account1 = 3, account2 = 7
+            aTransaction({from: "account1", to: "account3", amount: 2})  // account1 = 1, account2 = 7, account3 = 2
         ]});
-        res.length.should.equal(3);
-        for (const item of res) {
-            item.should.have.property("key").have.property("contractAddress", "foobar");
+        stateDiff.should.have.lengthOf(3);
+        for (const item of stateDiff) {
+            item.should.have.property("contractAddress", "foobar");
         }
-        res.find(item => item.key.key === "balances.account1").should.have.property("value", "1");
-        res.find(item => item.key.key === "balances.account2").should.have.property("value", "7");
-        res.find(item => item.key.key === "balances.account3").should.have.property("value", "2");
+        stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
+        stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
+        stateDiff.find(item => item.key === "balances.account3").should.have.property("value", "2");
     });
 });

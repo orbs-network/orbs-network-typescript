@@ -9,12 +9,8 @@ export class Consensus {
   private raftConsensus: RaftConsensus;
 
   constructor(options: RaftConsensusConfig, gossip: types.GossipClient, virtualMachine: types.VirtualMachineClient,
-    blockStorage: types.BlockStorageClient) {
-    this.raftConsensus = new RaftConsensus(options, gossip, virtualMachine, blockStorage);
-  }
-
-  public async sendTransaction(transactionContext: types.SendTransactionInput) {
-    await this.raftConsensus.sendTransaction(transactionContext.transaction, transactionContext.transactionAppendix);
+    blockStorage: types.BlockStorageClient, transactionPool: types.TransactionPoolClient) {
+    this.raftConsensus = new RaftConsensus(options, gossip, virtualMachine, blockStorage, transactionPool);
   }
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {

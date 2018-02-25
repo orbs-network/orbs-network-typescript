@@ -25,4 +25,4 @@ const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 const nodeConfig = { nodeName: NODE_NAME };
 
-ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.consensus, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);
+ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);

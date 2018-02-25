@@ -5,7 +5,7 @@ export interface TransactionHandlerConfig {
 }
 
 export class TransactionHandler {
-  private consensus: types.ConsensusClient;
+  private transactionPool: types.TransactionPoolClient;
   private subscriptionManager: types.SubscriptionManagerClient;
   private config: TransactionHandlerConfig;
 
@@ -30,12 +30,12 @@ export class TransactionHandler {
       }
     }
 
-    await this.consensus.sendTransaction(transactionInput);
+    await this.transactionPool.addNewPendingTransaction({ transaction });
   }
 
-  constructor(consensus: types.ConsensusClient, subscriptionManager: types.SubscriptionManagerClient,
+  constructor(transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient,
     config: TransactionHandlerConfig) {
-    this.consensus = consensus;
+    this.transactionPool = transactionPool;
     this.subscriptionManager = subscriptionManager;
     this.config = config;
   }
