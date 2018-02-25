@@ -29,7 +29,7 @@ function makeSubscriptionManager(config: Config, peers: types.ClientMap) {
 }
 
 export default function(config: Config, nodeTopology: any) {
-  const nodeConfig = { nodeName: nodeTopology.name };
+  const nodeConfig = { nodeName: config.getNodeName() };
   const peers = topologyPeers(nodeTopology.peers);
 
   return grpcServer.builder()

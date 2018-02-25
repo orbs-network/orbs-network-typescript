@@ -51,6 +51,10 @@ export class Config {
   public getNodeName(): string {
     return this.get("NODE_NAME");
   }
+
+  public getNodeIP(): string {
+    return this.get("NODE_IP");
+  }
 }
 
 export const config = new Config();
