@@ -5,6 +5,7 @@ import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as fsExtra from "fs-extra";
 import { range } from "lodash";
+import { ClientMap } from "orbs-interfaces";
 
 ErrorHandler.setup();
 
@@ -20,7 +21,6 @@ const gossipNode1 = {
   version: "1.0.0",
   endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_1}`,
   project: "gossip-service-typescript",
-  nodeName: "node1",
   peers: [
     {
       service: "storage",
@@ -133,7 +133,14 @@ describe("Block storage service", async function () {
 
     const nodeConfig = {  };
 
-    gossipService1 = new GossipService(gossipNode1);
+    const peers: ClientMap = topologyPeers(gossipNode1.peers);
+
+    gossipService1 = new GossipService({
+      nodeName: "node1",
+      peers: topologyPeers(gossipNode1.peers),
+      gossipPeers: gossipNode1.gossipPeers,
+      gossipPort: gossipNode1.gossipPort
+    });
     blockStorageService1 = new BlockStorageService(topologyPeers(blockStorage1.peers).gossip, blockStorage1);
     gossipGrpc1 = await ServiceRunner.run(grpc.gossipServer, gossipService1, gossipNode1.endpoint);
     blockGrpc1 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService1, blockStorage1.endpoint);
@@ -141,7 +148,12 @@ describe("Block storage service", async function () {
     config.set("NODE_NAME", "node2");
     config.set("LEVELDB_PATH", LEVELDB_PATH_2);
 
-    gossipService2 = new GossipService(gossipNode2);
+    gossipService2 = new GossipService({
+      nodeName: "node2",
+      peers: topologyPeers(gossipNode2.peers),
+      gossipPeers: gossipNode2.gossipPeers,
+      gossipPort: gossipNode2.gossipPort
+    });
     blockStorageService2 = new BlockStorageService(topologyPeers(blockStorage2.peers).gossip, blockStorage2);
     gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2, gossipNode2.endpoint);
     blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2, blockStorage2.endpoint);
