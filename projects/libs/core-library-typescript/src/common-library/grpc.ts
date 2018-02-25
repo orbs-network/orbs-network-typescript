@@ -2,8 +2,7 @@ import * as path from "path";
 import * as Mali from "mali";
 import * as caller from "grpc-caller";
 import { types } from "./types";
-
-const PROTO_PATH = path.resolve(__dirname, "../../../../architecture/interfaces");
+import * as interfaces from "orbs-interfaces";
 
 export interface GRPCClient {
   proto: string;
@@ -26,12 +25,12 @@ export interface GRPServers {
 }
 
 function client(grpc: GRPCClient) {
-  const protoPath = path.resolve(PROTO_PATH, grpc.proto);
+  const protoPath = interfaces.getPathToProto(grpc.proto);
   return caller(grpc.endpoint, protoPath, grpc.name);
 }
 
 function runServer(grpc: GRPServer) {
-  const protoPath = path.resolve(PROTO_PATH, grpc.proto);
+  const protoPath = interfaces.getPathToProto(grpc.proto);
   const app = new Mali(protoPath, grpc.name);
   const serviceFuncs: {[key: string]: Function} = {};
   for (const funcName of (<any>types)[grpc.name]) {
@@ -43,7 +42,7 @@ function runServer(grpc: GRPServer) {
 }
 
 function servers(grpcs: GRPServers) {
-  const protoPath = path.resolve(PROTO_PATH, grpcs.multiProto);
+  const protoPath = interfaces.getPathToProto(grpcs.multiProto);
   const app = new Mali(protoPath, grpcs.names);
   const serviceFuncs: { [key: string]: { [key: string]: Function } } = {};
 
