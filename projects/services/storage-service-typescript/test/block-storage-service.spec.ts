@@ -131,10 +131,6 @@ describe("Block storage service", async function () {
     config.set("NODE_NAME", "node1");
     config.set("LEVELDB_PATH", LEVELDB_PATH_1);
 
-    const nodeConfig = {  };
-
-    const peers: ClientMap = topologyPeers(gossipNode1.peers);
-
     gossipService1 = new GossipService({
       nodeName: "node1",
       peers: topologyPeers(gossipNode1.peers),

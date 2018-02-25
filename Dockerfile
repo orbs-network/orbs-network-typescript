@@ -1,4 +1,4 @@
-FROM node:9-alpine
+FROM node:9.6.1-alpine
 
 RUN apk --no-cache add bash git yarn python build-base
 
