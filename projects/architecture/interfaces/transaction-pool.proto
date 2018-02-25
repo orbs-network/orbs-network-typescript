@@ -4,7 +4,7 @@ import "primitives/transactions.proto";
 
 service TransactionPool {
   rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
-  rpc AddExistingPendingTransaction (AddExistingPendingTransactionInput) returns (AddExistingPendingTransactionOutput);
+  rpc PullAllPendingTransactions (PullAllPendingTransactionsInput) returns (PullAllPendingTransactionsOutput);
 }
 
 message AddNewPendingTransactionInput {
@@ -15,10 +15,9 @@ message AddNewPendingTransactionOutput {
   // empty
 }
 
-message AddExistingPendingTransactionInput {
-  Transaction transaction = 1;
+message PullAllPendingTransactionsInput {
 }
 
-message AddExistingPendingTransactionOutput {
-  // empty
+message PullAllPendingTransactionsOutput {
+  repeated Transaction transactions = 1;
 }

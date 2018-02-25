@@ -6,7 +6,6 @@ import "primitives/blocks.proto";
 import "./gossip.proto";
 
 service Consensus {
-  rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }
 

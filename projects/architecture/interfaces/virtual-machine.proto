@@ -4,19 +4,8 @@ import "primitives/transactions.proto";
 import "primitives/blocks.proto";
 
 service VirtualMachine {
-  rpc ProcessTransaction (ProcessTransactionInput) returns (ProcessTransactionOutput);
   rpc CallContract (CallContractInput) returns (CallContractOutput);
   rpc ProcessTransactionSet(ProcessTransactionSetInput) returns (ProcessTransactionSetOutput);
-}
-
-message ProcessTransactionInput {
-  Transaction transaction = 1;
-  TransactionAppendix transactionAppendix = 2;
-}
-
-message ProcessTransactionOutput {
-  bool success = 1;
-  string modifiedAddressesJson = 2;
 }
 
 message ProcessTransactionSetInput {
@@ -24,7 +13,7 @@ message ProcessTransactionSetInput {
 }
 
 message ProcessTransactionSetOutput {
-  Transaction processedTransactions = 1;
+  repeated Transaction processedTransactions = 1;
   repeated modifiedStateKey stateDiff = 2;
 }
 

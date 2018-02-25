@@ -3,8 +3,10 @@ import { EventEmitter } from "events";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
+import BlockBuilder from "./block-builder";
 
 import { Gossip } from "../gossip";
+import { Block } from "web3/types";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
@@ -59,7 +61,6 @@ export interface ElectionTimeoutConfig {
 
 export interface RaftConsensusConfig {
   nodeName: string;
-
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
@@ -67,19 +68,23 @@ export interface RaftConsensusConfig {
 
 
 export class RaftConsensus {
-  private virtualMachine: types.VirtualMachineClient;
   private blockStorage: types.BlockStorageClient;
+  private blockBuilder: BlockBuilder;
 
   private connector: RPCConnector;
   private node: any;
   private lastBlockId: number;
 
-  public constructor(options: RaftConsensusConfig, gossip: types.GossipClient,
-    virtualMachine: types.VirtualMachineClient, storage: types.BlockStorageClient) {
-    this.virtualMachine = virtualMachine;
-    this.blockStorage = storage;
+  public constructor(
+    options: RaftConsensusConfig,
+    gossip: types.GossipClient,
+    virtualMachine: types.VirtualMachineClient,
+    blockStorage: types.BlockStorageClient,
+    private transactionPool: types.TransactionPoolClient,
+  ) {
+    this.blockStorage = blockStorage;
     this.connector = new RPCConnector(options.nodeName, gossip);
-    this.lastBlockId;
+    this.blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
 
     this.node = gaggle({
       id: options.nodeName,
@@ -112,56 +117,35 @@ export class RaftConsensus {
         block: msg.block
       });
       this.lastBlockId = msg.block.header.id;
+
+      if (this.node.isLeader()) {
+        await this.appendNextBlock();
+      }
     });
 
     this.node.on("leaderElected", () => {
       if (this.node.isLeader()) {
         logger.info(`Node ${this.node.id} was elected as a new leader!`);
+        this.appendNextBlock();
       }
+    });
+  }
+
+  private async appendNextBlock() {
+    if (this.lastBlockId == -1) {
+      const { blockId } = await this.blockStorage.getLastBlockId({});
+      this.lastBlockId = blockId;
+    }
+    const block = await this.blockBuilder.buildNextBlock(this.lastBlockId);
+
+    this.appendMessage({
+      block
     });
   }
 
   private appendMessage(msg: types.ConsensusMessage) {
     this.node.append(msg);
   }
-
-  // Suggests new entry to be appended to the Raft log (e.g., new transaction), by first executing the transaction and
-  // then propagating the transaction with its execution outputs.
-  async sendTransaction(tx: types.Transaction, txAppendix: types.TransactionAppendix) {
-    const vmResult = await this.virtualMachine.processTransaction({
-      transaction: tx,
-      transactionAppendix: txAppendix
-    });
-
-    if (vmResult.success) {
-      const modifiedContractKeys = JSON.parse(vmResult.modifiedAddressesJson);
-      const stateDiff = Object.keys(modifiedContractKeys).map((key): types.modifiedStateKey => (
-        { contractAddress: tx.contractAddress,
-          key,
-          value: modifiedContractKeys[key]
-        }));
-
-        if (this.lastBlockId == undefined) {
-          const { blockId } = await this.blockStorage.getLastBlockId({});
-          this.lastBlockId = blockId;
-        }
-
-        const block: types.Block = {
-        header: {
-          version: 0,
-          id: this.lastBlockId + 1,
-          prevBlockId: this.lastBlockId
-        },
-        transactions: [tx],
-        stateDiff,
-      };
-
-      this.appendMessage({ block });
-
-      this.lastBlockId = block.header.id;
-    }
-  }
-
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
     switch (messageType) {
