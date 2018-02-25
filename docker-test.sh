@@ -19,9 +19,9 @@ function run_tests() {
 
 run_tests ./projects/libs/core-library-typescript
 
-# for D in `find ./projects/services -type d -maxdepth 1 -mindepth 1 ! -name node_modules`; do
-#     run_tests "$D"
-# done
+for D in `find ./projects/services -type d -maxdepth 1 -mindepth 1 ! -name node_modules`; do
+    run_tests "$D"
+done
 
 ./e2e/test-from-docker.sh
 
