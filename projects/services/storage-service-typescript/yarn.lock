@@ -507,6 +507,10 @@ chai-as-promised@^7.1.1:
   dependencies:
     check-error "^1.0.2"
 
+chai-bytes@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/chai-bytes/-/chai-bytes-0.1.1.tgz#9b16e20462daf5d7eb4fd665553fe39b36bb45a6"
+
 chai@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chai/-/chai-4.1.2.tgz#0f64584ba642f0f2ace2806279f4f06ca23ad73c"
@@ -2172,6 +2176,7 @@ optjs@~3.2.2:
     bignumber.js "^6.0.0"
     bind-decorator "^1.0.11"
     bluebird "^3.5.1"
+    chai-bytes "^0.1.1"
     gaggle "git+https://github.com/lbeder/gaggle.git"
     grpc "^1.9.0"
     grpc-caller "https://github.com/electricmonk/grpc-caller"

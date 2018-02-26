@@ -1,8 +1,6 @@
 import * as WebSocket from "ws";
 
-import { logger } from "../common-library/logger";
-import { includes } from "lodash";
-import { platform, networkInterfaces } from "os";
+import { logger, types } from "../common-library";
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
@@ -25,19 +23,19 @@ export class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  gossipPeers: any;
   peers: any;
-  nodeIp: string;
+  readonly port: number;
+  gossipPeers: string[];
 
-  constructor(gossipPort: any, gossipPeers: any, peers: any, localAddress: string, nodeIp: string) {
-    this.server = new WebSocket.Server({ port: gossipPort });
-    this.nodeIp = nodeIp;
-    this.localAddress = localAddress;
+  constructor(input: {localAddress: string, port: number, peers: types.ClientMap, gossipPeers: string[]}) {
+    this.port = input.port;
+    this.server = new WebSocket.Server({ port: input.port });
+    this.peers = input.peers;
+    this.gossipPeers = input.gossipPeers;
+    this.localAddress = input.localAddress;
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
     });
-    this.peers = peers;
-    this.gossipPeers = gossipPeers;
   }
 
   helloMessage(): Buffer {
@@ -73,9 +71,11 @@ export class Gossip {
         return;
       }
       const [recipient, broadcastGroup, objectType, objectRaw] = [readString(message), readString(message), readString(message), message.slice(offset)];
+
       if (recipient !== "" && recipient !== this.localAddress) {
         return;
       }
+
       if (! this.listeners.has(broadcastGroup)) {
         const peer = this.peers[broadcastGroup];
         if (! peer) {
@@ -118,38 +118,16 @@ export class Gossip {
     }
   }
 
-  networkInterface(): any {
-    const eth = platform() == "darwin" ? "en0" : "eth0";
-    return networkInterfaces()[eth].filter(iface => iface.family === "IPv4")[0];
-  }
-
-  public ip(): string {
-    return this.nodeIp || this.networkInterface().address;
-  }
-
-  public possiblePeers(): string[] {
-    const ip = this.ip(),
-      me = this.localAddress;
-
-    // TODO: better self-exclusion policy
-    return this.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
-  }
-
-  public activePeers() {
-    return this.clients.keys();
-  }
-
   public activeBroadcastGroups() {
     return Object.keys(this.peers);
-  }
-
-  async discoverPeers(): Promise<string[]> {
-    return Promise.resolve(this.possiblePeers());
   }
 
   async shutdown(): Promise<void> {
     return new Promise<void>((resolve, reject) => this.server.close((err) => {
       err ? reject(err) : resolve();
     }));
+  }
+  public activePeers() {
+    return this.clients.keys();
   }
 }
