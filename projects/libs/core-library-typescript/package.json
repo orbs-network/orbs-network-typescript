@@ -16,12 +16,13 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "NODE_ENV=test ts-mocha test/**/*.spec.ts"
+    "test": "NODE_ENV=test ts-mocha test/**/*.spec.ts --exit"
   },
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "bind-decorator": "^1.0.11",
     "bluebird": "^3.5.1",
+    "chai-bytes": "^0.1.1",
     "gaggle": "git+https://github.com/lbeder/gaggle.git",
     "grpc": "^1.9.0",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",

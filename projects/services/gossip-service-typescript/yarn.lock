@@ -469,6 +469,10 @@ caseless@~0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.6.0.tgz#8167c1ab8397fb5bb95f96d28e5a81c50f247ac4"
 
+chai-bytes@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/chai-bytes/-/chai-bytes-0.1.1.tgz#9b16e20462daf5d7eb4fd665553fe39b36bb45a6"
+
 chalk@0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-0.5.1.tgz#663b3a648b68b55d04690d49167aa837858f2174"
@@ -2068,6 +2072,7 @@ optjs@~3.2.2:
     bignumber.js "^6.0.0"
     bind-decorator "^1.0.11"
     bluebird "^3.5.1"
+    chai-bytes "^0.1.1"
     gaggle "git+https://github.com/lbeder/gaggle.git"
     grpc "^1.9.0"
     grpc-caller "https://github.com/electricmonk/grpc-caller"
@@ -2077,7 +2082,7 @@ optjs@~3.2.2:
     mali "^0.7.1"
     mkdirp "^0.5.1"
     nconf "^0.10.0"
-    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
+    orbs-interfaces "file:../../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.4"
     solc "0.4.18"
     source-map-support "^0.5.3"
