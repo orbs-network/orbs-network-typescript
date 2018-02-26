@@ -8,7 +8,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "experimentalDecorators": true,
-    "outDir": "dist",
+    "outDir": "distTest",
     "baseUrl": ".",
     "paths": {
       "*": [
@@ -18,6 +18,6 @@
     }
   },
   "include": [
-    "src/**/*"
+    "test/**/*"
   ]
 }

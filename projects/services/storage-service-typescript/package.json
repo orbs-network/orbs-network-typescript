@@ -16,7 +16,7 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "NODE_ENV=test mocha --exit dist/**/*.spec.js"
+    "test": "tsc -p tsconfig.test.json && NODE_ENV=test mocha --exit distTest/storage-service-typescript/**/*.spec.js"
   },
   "dependencies": {
     "lodash": "^4.17.4",
