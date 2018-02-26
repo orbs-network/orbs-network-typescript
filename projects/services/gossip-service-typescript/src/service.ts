@@ -26,7 +26,7 @@ export default class GossipService extends Service {
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip({port: this.serviceConfig.gossipPort, localAddress: config.get("NODE_NAME"), peers: topologyPeers(topology().peers), gossipPeers: topology().gossipPeers});
+    this.gossip = new Gossip({port: this.serviceConfig.gossipPort, localAddress: config.get("NODE_NAME"), peers: topologyPeers(topology().peers)});
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();

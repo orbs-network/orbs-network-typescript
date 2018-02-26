@@ -13,26 +13,66 @@ chai.use(sinonChai);
 chai.use(chaiBytes);
 
 
-const consensus1 = stubObject<types.ConsensusClient>(<types.ConsensusClient>{}, ["gossipMessageReceived"]);
-const consensus2 = stubObject<types.ConsensusClient>(<types.ConsensusClient>{}, ["gossipMessageReceived"]);
-
-
 describe("Gossip", function() {
     this.timeout(20000);
-    let gossip1, gossip2: Gossip;
+    let consensuses: types.ConsensusClient[];
+    let gossips: Gossip[];
+    const numberOfGossips = 3;
 
-    before(async() => {
-        gossip1 = new Gossip({localAddress: "node1", port: 30028, peers: { consensus: consensus1 }, gossipPeers: [] });
-        gossip2 = new Gossip({localAddress: "node2", port: 30029, peers: { consensus: consensus2 }, gossipPeers: [] });
-        await gossip1.connect([`ws://127.0.0.1:${gossip2.port}`]);
+    beforeEach(async() => {
+        consensuses = [];
+        gossips = [];
+        for (let i = 0; i < numberOfGossips; i++) {
+            const consensus = stubObject<types.ConsensusClient>(<types.ConsensusClient>{}, ["gossipMessageReceived"]);
+            const gossip = new Gossip({localAddress: `node${i}`, port: 30070 + i, peers: { consensus }});
+            consensuses.push(consensus);
+            gossips.push(gossip);
+        }
+        await gossips[0].connect(gossips.map(gossip => `ws://127.0.0.1:${gossip.port}`));
         await delay(1000);
     });
 
-    it("unicast message from one gossip to another", async () => {
+    it("#unicast message triggers the service only at the recipient's node", async () => {
+        const senderId = 0;
+        const recipientId = 1;
         const buffer = new Buffer(JSON.stringify({foo: "bar"}));
-        await gossip1.unicastMessage(gossip2.localAddress, "consensus", "TEST_MESSAGE", buffer, true);
+
+        await gossips[senderId].unicastMessage(gossips[recipientId].localAddress, "consensus", "TEST_MESSAGE", buffer, true);
         await delay(1000);
-        consensus2.gossipMessageReceived.should.have.been.calledOnce;
-        consensus2.gossipMessageReceived.getCall(0).args[0].should.have.property("Buffer").which.equalBytes(buffer);
+
+        for (let i = 0; i < numberOfGossips; i++) {
+            const consensus = consensuses[i];
+            if (i == recipientId) {
+                consensus.gossipMessageReceived.should.have.been.calledOnce;
+                consensus.gossipMessageReceived.getCall(0).args[0].should.have.property("Buffer").which.equalBytes(buffer);
+            } else {
+                consensus.gossipMessageReceived.should.have.not.been.called;
+            }
+        }
     });
+
+    it("#broadcast message triggers the service at all other nodes", async () => {
+        const senderId = 0;
+        const buffer = new Buffer(JSON.stringify({foo: "bar"}));
+
+        await gossips[senderId].broadcastMessage("consensus", "TEST_MESSAGE", buffer, true);
+        await delay(2000);
+
+        for (let i = 0; i < numberOfGossips - 1; i++) {
+            const consensus = consensuses[i];
+            if (i != senderId) {
+                consensus.gossipMessageReceived.should.have.been.calledOnce;
+                consensus.gossipMessageReceived.getCall(0).args[0].should.have.property("Buffer").which.equalBytes(buffer);
+            } else {
+                consensus.gossipMessageReceived.should.have.not.been.called;
+            }
+        }
+    });
+
+    afterEach(() => {
+        for (const gossip of gossips) {
+            gossip.server.close();
+        }
+    });
+
 });
