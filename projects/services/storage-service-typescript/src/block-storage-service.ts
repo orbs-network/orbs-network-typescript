@@ -42,7 +42,7 @@ export default class BlockStorageService extends Service {
   @Service.RPCMethod
   public async addBlock(rpc: types.AddBlockContext) {
     if (this.isSyncing()) {
-      const message = `Block storage can't add new blocks while syncing`;
+      const message = `Block storage ${this.nodeName} can't add new blocks while syncing`;
       logger.error(message);
       throw new Error(message);
     }
@@ -67,7 +67,7 @@ export default class BlockStorageService extends Service {
 
     const blockId = await this.blockStorage.getLastBlockId();
 
-    logger.debug("Polling for new blocks", { lastBlockId: blockId });
+    logger.debug(`Block storage ${this.nodeName} is polling for new blocks`, { lastBlockId: blockId });
 
     this.gossip.broadcastMessage({
       BroadcastGroup: "blockStorage",
@@ -80,7 +80,7 @@ export default class BlockStorageService extends Service {
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     // TODO: remove when @Service.SilentRPCMethod is fixed
-    logger.warn("Block storage received new message", { FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8") });
+    logger.warn(`Block storage ${this.nodeName} received new message`, { FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8") });
 
     const { MessageType, FromAddress } = rpc.req;
     const payload = JSON.parse(rpc.req.Buffer.toString("utf8"));
@@ -107,14 +107,6 @@ export default class BlockStorageService extends Service {
 
     const hasNewBlocks = await this.blockStorage.hasNewBlocks(payload.blockId);
 
-    if (!hasNewBlocks) {
-      if (this.sync.isSyncingWith(FromAddress)) {
-        this.sync.off();
-      }
-
-      return;
-    }
-
     this.gossip.unicastMessage({
       Recipient: FromAddress,
       BroadcastGroup: "blockStorage",
@@ -125,25 +117,34 @@ export default class BlockStorageService extends Service {
   }
 
   async onHasNewBlocksResponse(FromAddress: string, payload: any) {
-    logger.info(`Block storage has a peer with more blocks`, { peer: FromAddress });
-
-    if (!this.isSyncing()) {
-      this.sync.on(FromAddress);
+    if (!payload.hasNewBlocks && this.sync.isSyncingWith(FromAddress)) {
+      this.sync.off();
+      logger.info(`Block storage ${this.nodeName} stopped syncing with node`, { peer: FromAddress });
+      return;
     }
 
-    const blockId = await this.blockStorage.getLastBlockId();
+    if (payload.hasNewBlocks) {
+      logger.info(`Block storage ${this.nodeName} has a peer with more blocks`, { peer: FromAddress });
+    }
 
-    this.gossip.unicastMessage({
-      Recipient: this.sync.getNode(),
-      BroadcastGroup: "blockStorage",
-      MessageType: "SendNewBlocks",
-      Buffer: new Buffer(JSON.stringify({ blockId })),
-      Immediate: true,
-    });
+    if (payload.hasNewBlocks && !this.isSyncing()) {
+      this.sync.on(FromAddress);
+      logger.info(`Block storage ${this.nodeName} starts to sync with node`, { peer: FromAddress });
+
+      const blockId = await this.blockStorage.getLastBlockId();
+
+      this.gossip.unicastMessage({
+        Recipient: this.sync.getNode(),
+        BroadcastGroup: "blockStorage",
+        MessageType: "SendNewBlocks",
+        Buffer: new Buffer(JSON.stringify({ blockId })),
+        Immediate: true,
+      });
+    }
   }
 
   async onSendNewBlocks(FromAddress: string, payload: any) {
-    logger.info(`Block storage received request for new blocks from ${FromAddress}`);
+    logger.info(`Block storage ${this.nodeName} received request for new blocks from ${FromAddress}`);
 
     const blocks = await this.blockStorage.getBlocks(payload.blockId);
 
@@ -159,15 +160,15 @@ export default class BlockStorageService extends Service {
   }
 
   async onSendNewBlocksResponse(FromAddress: string, payload: any) {
-    logger.info(`Block storage received a new block via sync`);
+    logger.info(`Block storage ${this.nodeName} received a new block via sync`);
 
     if (!this.isSyncing()) {
-      logger.error(`Block storaged dropped new block received via sync because it is not syncing right now`);
+      logger.error(`Block storaged ${this.nodeName} dropped new block received via sync because it is not syncing right now`);
       return;
     }
 
     if (!this.sync.isSyncingWith(FromAddress)) {
-      logger.info(`Block storaged dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
+      logger.info(`Block storaged ${this.nodeName} dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
       return;
     }
 

@@ -201,7 +201,7 @@ describe("Block storage service", async function () {
   });
 
   describe("sync process", () => {
-    it("#pollForNewBlocks", (done) => {
+    it("works with two nodes", (done) => {
       setTimeout(async () => {
         try {
           await ServiceRunner.stop(...node1.services, ...node2.services);
@@ -239,7 +239,7 @@ describe("Block storage service", async function () {
           ]);
 
         chai.expect(values).to.eventually.be.eql([30, 30, 30]).and.notify(done);
-      }, 27000);
+      }, 15000);
     });
 
     xit("finishes if we keep adding more and more blocks");
