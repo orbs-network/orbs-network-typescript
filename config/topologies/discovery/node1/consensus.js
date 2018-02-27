@@ -17,6 +17,10 @@ module.exports = {
       endpoint: 'sidechain-connector:51151',
     },
     {
+      service: 'consensus',
+      endpoint: 'consensus:51151',
+    },
+    {
       service: 'virtual-machine',
       endpoint: 'virtual-machine:51151',
     },

@@ -1,9 +1,7 @@
 syntax = "proto3";
 
-import "primitives/gossip-listener.proto";
 import "primitives/blocks.proto";
-
-import "./gossip.proto";
+import "primitives/gossip-listener.proto";
 
 service Consensus {
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
