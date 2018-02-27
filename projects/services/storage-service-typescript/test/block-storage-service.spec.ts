@@ -157,6 +157,9 @@ describe("Block storage service", async function () {
 
   let node1: any;
   let node2: any;
+  let node3: any;
+
+  let blockStorage: BlockStorage;
 
   beforeEach(async () => {
     try {
@@ -180,6 +183,10 @@ describe("Block storage service", async function () {
     node2 = await createNode("node2", LEVELDB_PATH_2, gossipNode2, blockStorage2);
   });
 
+  afterEach(async () => {
+    return blockStorage.shutdown();
+  });
+
   describe("sync process", () => {
     it("#pollForNewBlocks", (done) => {
       setTimeout(async () => {
@@ -189,14 +196,32 @@ describe("Block storage service", async function () {
           console.log(e);
         }
         config.set("LEVELDB_PATH", LEVELDB_PATH_1);
-        const blockStorage = new BlockStorage();
+        blockStorage = new BlockStorage();
         await blockStorage.load();
 
         chai.expect(blockStorage.getLastBlockId()).to.eventually.be.eql(20).and.notify(done);
       }, 15000);
     });
 
-    xit("works with multiple nodes");
+    it("works with multiple nodes", async () => {
+      node3 = await createNode("node3", LEVELDB_PATH_3, gossipNode3, blockStorage3);
+
+      return new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            await ServiceRunner.stop(...node1.services, ...node2.services, ...node3.services);
+          } catch (e) {
+            console.log(e);
+          }
+
+          config.set("LEVELDB_PATH", LEVELDB_PATH_1);
+          blockStorage = new BlockStorage();
+          await blockStorage.load();
+
+          chai.expect(blockStorage.getLastBlockId()).to.eventually.be.eql(30).and.notify(resolve);
+        }, 15000);
+      });
+    });
 
     xit("finishes if we keep adding more and more blocks");
   });
