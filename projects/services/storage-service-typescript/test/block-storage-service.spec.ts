@@ -152,14 +152,27 @@ async function createNode(nodeName: string, levelDBPath: string, gossipConfig: a
   return { services: [gossipGrpc, blockGrpc] };
 }
 
+async function loadAllBlockStorages(): Promise<BlockStorage[]> {
+  const storages = [];
+
+  for (const levelDBPath of [LEVELDB_PATH_1, LEVELDB_PATH_2, LEVELDB_PATH_3]) {
+    config.set("LEVELDB_PATH", levelDBPath);
+    const blockStorage = new BlockStorage();
+    await blockStorage.load();
+    storages.push(blockStorage);
+  }
+
+  return storages;
+}
+
 describe("Block storage service", async function () {
-  this.timeout(20000);
+  this.timeout(30000);
 
   let node1: any;
   let node2: any;
   let node3: any;
 
-  let blockStorage: BlockStorage;
+  let blockStorages: BlockStorage[];
 
   beforeEach(async () => {
     try {
@@ -184,7 +197,7 @@ describe("Block storage service", async function () {
   });
 
   afterEach(async () => {
-    return blockStorage.shutdown();
+    return Promise.all(blockStorages.map(s => s.shutdown()));
   });
 
   describe("sync process", () => {
@@ -195,32 +208,38 @@ describe("Block storage service", async function () {
         } catch (e) {
           console.log(e);
         }
-        config.set("LEVELDB_PATH", LEVELDB_PATH_1);
-        blockStorage = new BlockStorage();
-        await blockStorage.load();
 
-        chai.expect(blockStorage.getLastBlockId()).to.eventually.be.eql(20).and.notify(done);
+        blockStorages = await loadAllBlockStorages();
+        const values = Promise.all([
+            blockStorages[0].getLastBlockId(),
+            blockStorages[1].getLastBlockId()
+          ]);
+
+        chai.expect(values).to.eventually.be.eql([20, 20]).and.notify(done);
       }, 15000);
     });
 
-    it("works with multiple nodes", async () => {
-      node3 = await createNode("node3", LEVELDB_PATH_3, gossipNode3, blockStorage3);
-
-      return new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          try {
-            await ServiceRunner.stop(...node1.services, ...node2.services, ...node3.services);
-          } catch (e) {
-            console.log(e);
-          }
-
-          config.set("LEVELDB_PATH", LEVELDB_PATH_1);
-          blockStorage = new BlockStorage();
-          await blockStorage.load();
-
-          chai.expect(blockStorage.getLastBlockId()).to.eventually.be.eql(30).and.notify(resolve);
-        }, 15000);
+    it("works with multiple nodes", (done) => {
+      createNode("node3", LEVELDB_PATH_3, gossipNode3, blockStorage3).then((node) => {
+        node3 = node;
       });
+
+      setTimeout(async () => {
+        try {
+          await ServiceRunner.stop(...node1.services, ...node2.services, ...node3.services);
+        } catch (e) {
+          console.log(e);
+        }
+
+        blockStorages = await loadAllBlockStorages();
+        const values = Promise.all([
+            blockStorages[0].getLastBlockId(),
+            blockStorages[1].getLastBlockId(),
+            blockStorages[2].getLastBlockId()
+          ]);
+
+        chai.expect(values).to.eventually.be.eql([30, 30, 30]).and.notify(done);
+      }, 27000);
     });
 
     xit("finishes if we keep adding more and more blocks");
