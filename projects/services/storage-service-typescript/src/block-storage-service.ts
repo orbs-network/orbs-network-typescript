@@ -80,79 +80,98 @@ export default class BlockStorageService extends Service {
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     // TODO: remove when @Service.SilentRPCMethod is fixed
-    logger.warn("Block storage received new message", {FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8")});
+    logger.warn("Block storage received new message", { FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8") });
 
     const { MessageType, FromAddress } = rpc.req;
-    const obj = JSON.parse(rpc.req.Buffer.toString("utf8"));
+    const payload = JSON.parse(rpc.req.Buffer.toString("utf8"));
 
-    if (MessageType === "HasNewBlocksMessage") {
-      // Ignore my own messages
-      if (FromAddress === this.nodeName) return;
+    switch (MessageType) {
+      case "HasNewBlocksMessage":
+        this.onHasNewBlocksMessage(FromAddress, payload);
+        break;
+      case "HasNewBlocksResponse":
+        this.onHasNewBlocksResponse(FromAddress, payload);
+        break;
+      case "SendNewBlocks":
+        this.onSendNewBlocks(FromAddress, payload);
+        break;
+      case "SendNewBlocksResponse":
+        this.onSendNewBlocksResponse(FromAddress, payload);
+        break;
+    }
+  }
 
-      const hasNewBlocks = await this.blockStorage.hasNewBlocks(obj.blockId);
+  async onHasNewBlocksMessage(FromAddress: string, payload: any) {
+    // Ignore my own messages
+    if (FromAddress === this.nodeName) return;
 
-      if (!hasNewBlocks) {
-        if (this.sync.isSyncingWith(FromAddress)) {
-          this.sync.off();
-        }
+    const hasNewBlocks = await this.blockStorage.hasNewBlocks(payload.blockId);
 
-        return;
+    if (!hasNewBlocks) {
+      if (this.sync.isSyncingWith(FromAddress)) {
+        this.sync.off();
       }
 
+      return;
+    }
+
+    this.gossip.unicastMessage({
+      Recipient: FromAddress,
+      BroadcastGroup: "blockStorage",
+      MessageType: "HasNewBlocksResponse",
+      Buffer: new Buffer(JSON.stringify({ hasNewBlocks })),
+      Immediate: true,
+    });
+  }
+
+  async onHasNewBlocksResponse(FromAddress: string, payload: any) {
+    logger.info(`Block storage has a peer with more blocks`, { peer: FromAddress });
+
+    if (!this.isSyncing()) {
+      this.sync.on(FromAddress);
+    }
+
+    const blockId = await this.blockStorage.getLastBlockId();
+
+    this.gossip.unicastMessage({
+      Recipient: this.sync.getNode(),
+      BroadcastGroup: "blockStorage",
+      MessageType: "SendNewBlocks",
+      Buffer: new Buffer(JSON.stringify({ blockId })),
+      Immediate: true,
+    });
+  }
+
+  async onSendNewBlocks(FromAddress: string, payload: any) {
+    logger.info(`Block storage received request for new blocks from ${FromAddress}`);
+
+    const blocks = await this.blockStorage.getBlocks(payload.blockId);
+
+    blocks.forEach(async (block) => {
       this.gossip.unicastMessage({
         Recipient: FromAddress,
         BroadcastGroup: "blockStorage",
-        MessageType: "HasNewBlocksResponse",
-        Buffer: new Buffer(JSON.stringify({ hasNewBlocks })),
+        MessageType: "SendNewBlocksResponse",
+        Buffer: new Buffer(JSON.stringify({ block })),
         Immediate: true,
       });
-    } else if (MessageType === "HasNewBlocksResponse") {
-      logger.info(`Block storage has a peer with more blocks`, { peer: FromAddress });
+    });
+  }
 
-      if (!this.isSyncing()) {
-        this.sync.on(FromAddress);
-      }
+  async onSendNewBlocksResponse(FromAddress: string, payload: any) {
+    logger.info(`Block storage received a new block via sync`);
 
-      const blockId = await this.blockStorage.getLastBlockId();
-
-      this.gossip.unicastMessage({
-        Recipient: this.sync.getNode(),
-        BroadcastGroup: "blockStorage",
-        MessageType: "SendNewBlocks",
-        Buffer: new Buffer(JSON.stringify({ blockId })),
-        Immediate: true,
-      });
-    } else if (MessageType === "SendNewBlocks") {
-      logger.info(`Block storage received request for new blocks from ${FromAddress}`);
-
-      const blocks = await this.blockStorage.getBlocks(obj.blockId);
-
-      blocks.forEach(async (block) => {
-        this.gossip.unicastMessage({
-          Recipient: FromAddress,
-          BroadcastGroup: "blockStorage",
-          MessageType: "SendNewBlocksResponse",
-          Buffer: new Buffer(JSON.stringify({ block })),
-          Immediate: true,
-        });
-      });
-    } else if (MessageType === "SendNewBlocksResponse") {
-      logger.info(`Block storage received a new block via sync`);
-
-      if (!this.isSyncing()) {
-        logger.error(`Block storaged dropped new block received via sync because it is not syncing right now`);
-        return;
-      }
-
-      if (!this.sync.isSyncingWith(FromAddress)) {
-        logger.info(`Block storaged dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
-        return;
-      }
-
-      this.sync.onReceiveBlock(obj.block);
-    } else {
-      logger.debug(`Not implemented`, rpc.req);
+    if (!this.isSyncing()) {
+      logger.error(`Block storaged dropped new block received via sync because it is not syncing right now`);
+      return;
     }
+
+    if (!this.sync.isSyncingWith(FromAddress)) {
+      logger.info(`Block storaged dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
+      return;
+    }
+
+    this.sync.onReceiveBlock(payload.block);
   }
 
   public isSyncing(): boolean {
