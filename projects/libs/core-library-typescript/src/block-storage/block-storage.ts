@@ -2,7 +2,6 @@ import * as path from "path";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
-import { config } from "../common-library/config";
 
 import { LevelDBDriver } from "./leveldb-driver";
 
