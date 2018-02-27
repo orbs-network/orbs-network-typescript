@@ -13,8 +13,10 @@ chai.use(chaiAsPromised);
 
 const GOSSIP_GRPC_PORT_1 = 41151;
 const GOSSIP_GRPC_PORT_2 = 61151;
+const GOSSIP_GRPC_PORT_3 = 21151;
 const BLOCK_STORAGE_GRPC_PORT_1 = 31151;
 const BLOCK_STORAGE_GRPC_PORT_2 = 11151;
+const BLOCK_STORAGE_GRPC_PORT_3 = 51151;
 
 const gossipNode1 = {
   name: "gossip",
@@ -44,7 +46,23 @@ const gossipNode2 = {
     },
   ],
   gossipPort: 60002,
-  gossipPeers: [ "ws://0.0.0.0:60001" ]
+  gossipPeers: [ "ws://127.0.0.1:60001" ]
+};
+
+const gossipNode3 = {
+  name: "gossip",
+  version: "1.0.0",
+  endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_3}`,
+  project: "gossip-service-typescript",
+  nodeName: "node3",
+  peers: [
+    {
+      service: "storage",
+      endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_3}`,
+    },
+  ],
+  gossipPort: 60003,
+  gossipPeers: [ "ws://127.0.0.1:60001", "ws://127.0.0.1:60002" ]
 };
 
 const blockStorage1 = {
@@ -75,9 +93,24 @@ const blockStorage2 = {
   ],
 };
 
+const blockStorage3 = {
+  name: "storage",
+  version: "1.0.0",
+  endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_3}`,
+  project: "storage-service-typescript",
+  nodeName: "node3",
+  peers: [
+    {
+      service: "gossip",
+      endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_3}`,
+    },
+  ],
+};
+
 
 const LEVELDB_PATH_1 = BlockStorage.LEVELDB_PATH + ".1";
 const LEVELDB_PATH_2 = BlockStorage.LEVELDB_PATH + ".2";
+const LEVELDB_PATH_3 = BlockStorage.LEVELDB_PATH + ".3";
 
 function generateBlock(prevBlockId: number): types.Block {
     return {
@@ -102,22 +135,34 @@ async function createBlockStorage (numberOfBlocks: number) {
   return blockStorage.shutdown();
 }
 
+async function createNode(nodeName: string, levelDBPath: string, gossipConfig: any, blockStorageConfig: any) {
+  config.set("NODE_NAME", nodeName);
+  config.set("LEVELDB_PATH", levelDBPath);
+
+  const gossipService = new GossipService({
+    nodeName,
+    peers: topologyPeers(gossipConfig.peers),
+    gossipPeers: gossipConfig.gossipPeers,
+    gossipPort: gossipConfig.gossipPort
+  });
+  const blockStorageService = new BlockStorageService(topologyPeers(blockStorageConfig.peers).gossip, blockStorageConfig);
+  const gossipGrpc = await ServiceRunner.run(grpc.gossipServer, gossipService, gossipConfig.endpoint);
+  const blockGrpc = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService, blockStorageConfig.endpoint);
+
+  return { services: [gossipGrpc, blockGrpc] };
+}
+
 describe("Block storage service", async function () {
   this.timeout(20000);
 
-  let blockStorageService1: BlockStorageService;
-  let blockStorageService2: BlockStorageService;
-  let gossipService1: GossipService;
-  let gossipService2: GossipService;
-  let gossipGrpc1: GRPCRuntime;
-  let gossipGrpc2: any;
-  let blockGrpc1: GRPCRuntime;
-  let blockGrpc2: any;
+  let node1: any;
+  let node2: any;
 
   beforeEach(async () => {
     try {
       fsExtra.removeSync(LEVELDB_PATH_1);
       fsExtra.removeSync(LEVELDB_PATH_2);
+      fsExtra.removeSync(LEVELDB_PATH_3);
     } catch (e) { }
 
     config.set("LEVELDB_PATH", LEVELDB_PATH_1);
@@ -126,45 +171,20 @@ describe("Block storage service", async function () {
     config.set("LEVELDB_PATH", LEVELDB_PATH_2);
     await createBlockStorage(20);
 
+    config.set("LEVELDB_PATH", LEVELDB_PATH_3);
+    await createBlockStorage(30);
+
     config.set("NODE_IP", "0.0.0.0");
 
-    config.set("NODE_NAME", "node1");
-    config.set("LEVELDB_PATH", LEVELDB_PATH_1);
-
-    gossipService1 = new GossipService({
-      nodeName: "node1",
-      peers: topologyPeers(gossipNode1.peers),
-      gossipPeers: gossipNode1.gossipPeers,
-      gossipPort: gossipNode1.gossipPort
-    });
-    blockStorageService1 = new BlockStorageService(topologyPeers(blockStorage1.peers).gossip, blockStorage1);
-    gossipGrpc1 = await ServiceRunner.run(grpc.gossipServer, gossipService1, gossipNode1.endpoint);
-    blockGrpc1 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService1, blockStorage1.endpoint);
-
-    config.set("NODE_NAME", "node2");
-    config.set("LEVELDB_PATH", LEVELDB_PATH_2);
-
-    gossipService2 = new GossipService({
-      nodeName: "node2",
-      peers: topologyPeers(gossipNode2.peers),
-      gossipPeers: gossipNode2.gossipPeers,
-      gossipPort: gossipNode2.gossipPort
-    });
-    blockStorageService2 = new BlockStorageService(topologyPeers(blockStorage2.peers).gossip, blockStorage2);
-    gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2, gossipNode2.endpoint);
-    blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2, blockStorage2.endpoint);
-  });
-
-  afterEach(async () => {
-    await ServiceRunner.stop(blockGrpc1, gossipGrpc1, blockGrpc2, gossipGrpc2);
+    node1 = await createNode("node1", LEVELDB_PATH_1, gossipNode1, blockStorage1);
+    node2 = await createNode("node2", LEVELDB_PATH_2, gossipNode2, blockStorage2);
   });
 
   describe("sync process", () => {
     it("#pollForNewBlocks", (done) => {
       setTimeout(async () => {
         try {
-        await [blockStorageService1.stop(), gossipService1.stop(), blockStorageService2.stop(), gossipService2.stop()];
-
+          await ServiceRunner.stop(...node1.services, ...node2.services);
         } catch (e) {
           console.log(e);
         }
@@ -175,5 +195,9 @@ describe("Block storage service", async function () {
         chai.expect(blockStorage.getLastBlockId()).to.eventually.be.eql(20).and.notify(done);
       }, 15000);
     });
+
+    xit("works with multiple nodes");
+
+    xit("finishes if we keep adding more and more blocks");
   });
 });
