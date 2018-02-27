@@ -1,23 +1,38 @@
-import { grpcServer, types, Config, topologyPeers, logger } from "orbs-core-library";
+import { defaults } from "lodash";
+
+import { grpcServer, types, topologyPeers, logger } from "orbs-core-library";
 import { Consensus, SubscriptionManager, TransactionPool } from "orbs-core-library";
 
 import ConsensusService from "./consensus-service";
 import SubscriptionManagerService from "./subscription-manager-service";
 import TransactionPoolService from "./transaction-pool-service";
 
-function makeConsensus(config: Config, peers: types.ClientMap) {
-  const consensusConfig = config.get("consensus");
-  if (!consensusConfig) {
-    throw new Error("Couldn't find consensus configuration!");
-  }
+const DEFAULT_CONSENSUS_CONFIG = {
+  electionTimeout: {
+    min: 2000,
+    max: 4000
+  },
+  heartbeatInterval: 100,
+};
 
-  consensusConfig.nodeName = config.getNodeName();
+const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS } = process.env;
+
+if (!NODE_NAME) {
+  throw new Error("NODE_NAME can't be empty!");
+}
+
+if (!NUM_OF_NODES) {
+  throw new Error("NUM_OF_NODES can't be 0!");
+}
+
+function makeConsensus(peers: types.ClientMap) {
+  const consensusConfig = defaults({ nodeName: NODE_NAME, clusterSize: Number(NUM_OF_NODES) }, DEFAULT_CONSENSUS_CONFIG);
 
   return new Consensus(consensusConfig, peers.gossip, peers.virtualMachine, peers.blockStorage);
 }
 
-function makeSubscriptionManager(config: Config, peers: types.ClientMap) {
-  const subscriptionManagerConfiguration = { ethereumContractAddress: config.get("ethereumContractAddress") };
+function makeSubscriptionManager(peers: types.ClientMap) {
+  const subscriptionManagerConfiguration = { ethereumContractAddress: ETHEREUM_CONTRACT_ADDRESS };
 
   if (!subscriptionManagerConfiguration.ethereumContractAddress) {
     logger.error("ethereumContractAddress wasn't provided! SubscriptionManager is disabled!");
@@ -28,12 +43,12 @@ function makeSubscriptionManager(config: Config, peers: types.ClientMap) {
   return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
 }
 
-export default function(config: Config, nodeTopology: any) {
-  const nodeConfig = { nodeName: config.getNodeName() };
+export default function(nodeTopology: any) {
+  const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);
 
   return grpcServer.builder()
-    .withService("Consensus", new ConsensusService(makeConsensus(config, peers), nodeConfig))
-    .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(config, peers), nodeConfig))
+    .withService("Consensus", new ConsensusService(makeConsensus(peers), nodeConfig))
+    .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers), nodeConfig))
     .withService("TransactionPool", new TransactionPoolService(new TransactionPool(), nodeConfig));
 }
