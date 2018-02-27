@@ -1,4 +1,4 @@
-import { types, config, BlockStorage, logger, grpc, ServiceRunner, ErrorHandler, topologyPeers } from "orbs-core-library";
+import { types, config, BlockStorage, logger, grpc, ServiceRunner, ErrorHandler, topologyPeers, GRPCRuntime } from "orbs-core-library";
 import BlockStorageService from "../src/block-storage-service";
 import GossipService from "../../gossip-service-typescript/src/service";
 import * as chai from "chai";
@@ -109,9 +109,9 @@ describe("Block storage service", async function () {
   let blockStorageService2: BlockStorageService;
   let gossipService1: GossipService;
   let gossipService2: GossipService;
-  let gossipGrpc1: any;
+  let gossipGrpc1: GRPCRuntime;
   let gossipGrpc2: any;
-  let blockGrpc1: any;
+  let blockGrpc1: GRPCRuntime;
   let blockGrpc2: any;
 
   beforeEach(async () => {
@@ -153,6 +153,10 @@ describe("Block storage service", async function () {
     blockStorageService2 = new BlockStorageService(topologyPeers(blockStorage2.peers).gossip, blockStorage2);
     gossipGrpc2 = await ServiceRunner.run(grpc.gossipServer, gossipService2, gossipNode2.endpoint);
     blockGrpc2 = await ServiceRunner.run(grpc.blockStorageServer, blockStorageService2, blockStorage2.endpoint);
+  });
+
+  afterEach(async () => {
+    await ServiceRunner.stop(blockGrpc1, gossipGrpc1, blockGrpc2, gossipGrpc2);
   });
 
   describe("sync process", () => {
