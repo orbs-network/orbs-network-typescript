@@ -69,9 +69,9 @@ export class OrbsNode implements TestComponent {
                     PUBLIC_API_IP: this.config.nodePublicApiIp,
                     GOSSIP_PEERS: this.config.gossipPeers,
                     PUBLIC_API_HOST_PORT: this.config.publicApiHostPort,
-                    SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
-                    SIDECHAIN_CONNECTOR__PUBLIC_IP: this.config.sidechainConnectorPublicIp,
-                    SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS : this.config.ethereumSubscriptionContractAddress,
+                    SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
+                    SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
+                    SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS : this.config.ethereumSubscriptionContractAddress,
                     DEBUG_PORT: this.config.debugPort }
                 }
             }, (code: any, stdout: any, stderr: any) => {
