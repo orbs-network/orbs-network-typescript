@@ -300,10 +300,10 @@ Resources:
              VolumeType: !Ref EbsVolumeType
         - !Ref "AWS::NoValue"
       UserData:
-        Fn::Base64: !Sub 
+        Fn::Base64: !Sub
           - |
            #!/bin/bash -xe
-           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION}
+           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} NUM_OF_NODES=${NUM_OF_NODES} REGION=${REGION}
            hostname $NODE_NAME
 
            ${BOOTSTRAP}
@@ -315,6 +315,8 @@ Resources:
               - ImportNodeName
               - !Join ["-", ["global", !Ref "AWS::Region"]]
               - !Ref NodeName
+            NUM_OF_NODES: 7
+            ETHEREUM_NODE_ADDRESS: "http://ethereum.services.orbs-test.com:8545"
             DOCKER_TAG: !Ref DockerTag
             NODE_ENV: !Ref NodeEnv
             REGION: !Ref "AWS::Region"
