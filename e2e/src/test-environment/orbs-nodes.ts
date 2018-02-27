@@ -96,8 +96,6 @@ export class OrbsNodeCluster implements TestComponent {
     readonly nodes: OrbsNode[];
     readonly config: OrbsNodeClusterConfig;
 
-
-
     private generateNodeInstances(numOfNodes: number) {
         const gossipPeerIps = [];
         for (let i = 0; i < numOfNodes; i++) {
