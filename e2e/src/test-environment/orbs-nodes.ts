@@ -11,6 +11,7 @@ const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 
 export interface OrbsNodeConfig {
     nodeName: string;
+    numOfNodes: number;
     nodeOrbsNetworkIp: string;
     nodePublicApiIp: string;
     privateSubnet: string;
@@ -66,6 +67,7 @@ export class OrbsNode implements TestComponent {
                     PRIVATE_NETWORK: this.config.privateSubnet,
                     NODE_NAME: this.config.nodeName,
                     NODE_IP: this.config.nodeOrbsNetworkIp,
+                    NUM_OF_NODES: this.config.numOfNodes,
                     PUBLIC_API_IP: this.config.nodePublicApiIp,
                     GOSSIP_PEERS: this.config.gossipPeers,
                     PUBLIC_API_HOST_PORT: this.config.publicApiHostPort,
@@ -106,6 +108,7 @@ export class OrbsNodeCluster implements TestComponent {
         for (let i = 0; i < numOfNodes; i++) {
             nodes.push(new OrbsNode({
                 nodeName: `node${i + 1}`,
+                numOfNodes: numOfNodes,
                 nodeOrbsNetworkIp: gossipPeerIps[i],
                 nodePublicApiIp: this.config.publicApiNetwork.allocateAddress(),
                 gossipPeers,
