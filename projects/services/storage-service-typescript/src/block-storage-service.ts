@@ -8,6 +8,7 @@ export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
+  private pollForNewBlocksInterval: any;
 
   public constructor(gossip: types.GossipClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
@@ -17,7 +18,7 @@ export default class BlockStorageService extends Service {
   async initialize() {
     await this.initBlockStorage();
 
-    setInterval(() => {
+    this.pollForNewBlocksInterval = setInterval(() => {
       this.pollForNewBlocks();
     }, 5000);
   }
@@ -28,7 +29,8 @@ export default class BlockStorageService extends Service {
     this.sync = new BlockStorageSync(this.blockStorage);
   }
 
-  async stop(): Promise<void> {
+  async shutdown() {
+    clearInterval(this.pollForNewBlocksInterval);
     return this.blockStorage.shutdown();
   }
 
@@ -77,6 +79,7 @@ export default class BlockStorageService extends Service {
 
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
+    // TODO: remove when @Service.SilentRPCMethod is fixed
     logger.warn("Block storage received new message", {FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8")});
 
     const { MessageType, FromAddress } = rpc.req;

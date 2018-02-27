@@ -19,6 +19,10 @@ export default class VirtualMachineService extends Service {
 
   }
 
+  async shutdown() {
+
+  }
+
   @Service.RPCMethod
   public async executeTransaction(rpc: types.ExecuteTransactionContext) {
     // Currently only a "simple" contract type is supported

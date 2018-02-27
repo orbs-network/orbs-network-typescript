@@ -24,7 +24,6 @@ export default class GossipService extends Service {
 
   async initialize() {
     await this.initGossip();
-
   }
 
   async initGossip(): Promise<void> {
@@ -57,10 +56,8 @@ export default class GossipService extends Service {
     }, Math.ceil(Math.random() * 3000));
   }
 
-  async stop() {
-    await super.stop();
+  async shutdown() {
     clearInterval(this.peerPollInterval);
-    logger.info(`Shutting down`);
     return this.gossip.shutdown();
   }
 
