@@ -34,9 +34,6 @@ package-lock.json
 .DS_Store
 Thumbs.db
 
-# Configuration files
-config/production.json
-
 # Docker-compose tmp files
 docker-compose.test.yml.tmp*
 
