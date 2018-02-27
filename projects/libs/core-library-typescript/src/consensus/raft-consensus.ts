@@ -74,6 +74,7 @@ export class RaftConsensus {
   private connector: RPCConnector;
   private node: any;
   private lastBlockId: number;
+  private readyForBlockAppend = false;
 
   public constructor(
     options: RaftConsensusConfig,
@@ -108,31 +109,52 @@ export class RaftConsensus {
     //
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
+
     this.node.on("committed", async (data: any) => {
       const msg: types.ConsensusMessage = data.data;
 
       // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
       // committed entry.
+      const block: types.Block = msg.block;
+      logger.debug("new block to be committed ${JSON.stringify(block)}");
       await this.blockStorage.addBlock({
-        block: msg.block
+        block: block
       });
-      this.lastBlockId = msg.block.header.id;
+      this.lastBlockId = block.header.id;
 
       if (this.node.isLeader()) {
-        await this.appendNextBlock();
+        this.readyForBlockAppend = true;
       }
     });
 
     this.node.on("leaderElected", () => {
       if (this.node.isLeader()) {
+        this.readyForBlockAppend = true;
         logger.info(`Node ${this.node.id} was elected as a new leader!`);
-        this.appendNextBlock();
+      } else {
+        this.readyForBlockAppend = false;
       }
     });
+
+    this.pollTransactionPool();
+
+  }
+
+  private pollTransactionPool() {
+    setInterval(async () => {
+      try {
+        if (this.readyForBlockAppend) {
+          logger.debug(`attempting append of new block`);
+          await this.appendNextBlock();
+        }
+      } catch (err) {
+        logger.error("newBlockAppendTick error: " + err);
+      }
+    }, 500);
   }
 
   private async appendNextBlock() {
-    if (this.lastBlockId == -1) {
+    if (this.lastBlockId == undefined) {
       const { blockId } = await this.blockStorage.getLastBlockId({});
       this.lastBlockId = blockId;
     }
@@ -141,6 +163,10 @@ export class RaftConsensus {
     this.appendMessage({
       block
     });
+
+    logger.debug(`appended new block ${JSON.stringify(block)}`);
+
+    this.readyForBlockAppend = false;
   }
 
   private appendMessage(msg: types.ConsensusMessage) {

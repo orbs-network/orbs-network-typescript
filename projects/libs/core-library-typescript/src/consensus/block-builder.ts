@@ -10,7 +10,7 @@ export default class BlockBuilder {
     }
 
     public async buildNextBlock(lastBlockId: number) {
-        const transactions = this.transactionPool.pullAllPendingTransactions({}).transactions;
+        const { transactions } = await this.transactionPool.pullAllPendingTransactions({});
 
         if (transactions.length == 0) {
             throw "transaction pool is empty";

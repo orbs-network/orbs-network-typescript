@@ -10,6 +10,9 @@ export class TransactionPool {
     if (this.pendingTransactions.has(txHash)) {
       throw `transaction with hash ${txHash} already exists in the pool`;
     }
+
+    logger.debug(`added a new transaction ${JSON.stringify(transaction)} to the pool`);
+
     this.pendingTransactions.set(txHash, transaction);
   }
 
@@ -25,5 +28,13 @@ export class TransactionPool {
     const transactions = Array.from(this.pendingTransactions.values());
     this.pendingTransactions.clear();
     return { transactions };
+  }
+
+  public async gossipMessageReceived(fromAddress: string, messageType: string, message: types.GossipMessageReceivedData) {
+    if (messageType == "newTransaction") {
+      this.addNewPendingTransaction(message.transaction);
+    } else {
+      throw `Unsupported message type ${messageType}`;
+    }
   }
 }
