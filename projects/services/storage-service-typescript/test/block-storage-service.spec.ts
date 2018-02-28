@@ -1,10 +1,13 @@
-import { types, config, BlockStorage, logger, grpc, ServiceRunner, ErrorHandler, topologyPeers, GRPCRuntime } from "orbs-core-library";
-import BlockStorageService from "../src/block-storage-service";
-import GossipService from "../../gossip-service-typescript/src/service";
+import * as path from "path";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as fsExtra from "fs-extra";
 import { range } from "lodash";
+
+import { types, BlockStorage, logger, grpc, ServiceRunner, ErrorHandler, topologyPeers, GRPCRuntime } from "orbs-core-library";
+import BlockStorageService from "../src/block-storage-service";
+import GossipService from "../../gossip-service-typescript/src/service";
+
 import { ClientMap } from "orbs-interfaces";
 
 ErrorHandler.setup();
@@ -71,6 +74,7 @@ const blockStorage1 = {
   endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_1}`,
   project: "storage-service-typescript",
   nodeName: "node1",
+  dbPath: path.resolve("../../../db/test/blocks.db.1"),
   peers: [
     {
       service: "gossip",
@@ -85,6 +89,7 @@ const blockStorage2 = {
   endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_2}`,
   project: "storage-service-typescript",
   nodeName: "node2",
+  dbPath: path.resolve("../../../db/test/blocks.db.2"),
   peers: [
     {
       service: "gossip",
@@ -99,6 +104,7 @@ const blockStorage3 = {
   endpoint: `0.0.0.0:${BLOCK_STORAGE_GRPC_PORT_3}`,
   project: "storage-service-typescript",
   nodeName: "node3",
+  dbPath: path.resolve("../../../db/test/blocks.db.3"),
   peers: [
     {
       service: "gossip",
@@ -106,11 +112,6 @@ const blockStorage3 = {
     },
   ],
 };
-
-
-const LEVELDB_PATH_1 = BlockStorage.LEVELDB_PATH + ".1";
-const LEVELDB_PATH_2 = BlockStorage.LEVELDB_PATH + ".2";
-const LEVELDB_PATH_3 = BlockStorage.LEVELDB_PATH + ".3";
 
 function generateBlock(prevBlockId: number): types.Block {
     return {
@@ -124,8 +125,8 @@ function generateBlock(prevBlockId: number): types.Block {
     };
 }
 
-async function createBlockStorage (numberOfBlocks: number) {
-  const blockStorage = new BlockStorage();
+async function createBlockStorage(numberOfBlocks: number, levelDBPath: string) {
+  const blockStorage = new BlockStorage(levelDBPath);
   await blockStorage.load();
 
   for (const i of range(0, numberOfBlocks)) {
@@ -135,12 +136,10 @@ async function createBlockStorage (numberOfBlocks: number) {
   return blockStorage.shutdown();
 }
 
-async function createNode(nodeName: string, levelDBPath: string, gossipConfig: any, blockStorageConfig: any) {
-  config.set("NODE_NAME", nodeName);
-  config.set("LEVELDB_PATH", levelDBPath);
-
+async function createNode(nodeName: string, gossipConfig: any, blockStorageConfig: any) {
   const gossipService = new GossipService({
     nodeName,
+    nodeIp: "0.0.0.0",
     peers: topologyPeers(gossipConfig.peers),
     gossipPeers: gossipConfig.gossipPeers,
     gossipPort: gossipConfig.gossipPort
@@ -155,9 +154,8 @@ async function createNode(nodeName: string, levelDBPath: string, gossipConfig: a
 async function loadAllBlockStorages(): Promise<BlockStorage[]> {
   const storages = [];
 
-  for (const levelDBPath of [LEVELDB_PATH_1, LEVELDB_PATH_2, LEVELDB_PATH_3]) {
-    config.set("LEVELDB_PATH", levelDBPath);
-    const blockStorage = new BlockStorage();
+  for (const config of [blockStorage1, blockStorage2, blockStorage3]) {
+    const blockStorage = new BlockStorage(config.dbPath);
     await blockStorage.load();
     storages.push(blockStorage);
   }
@@ -176,24 +174,17 @@ describe("Block storage service", async function () {
 
   beforeEach(async () => {
     try {
-      fsExtra.removeSync(LEVELDB_PATH_1);
-      fsExtra.removeSync(LEVELDB_PATH_2);
-      fsExtra.removeSync(LEVELDB_PATH_3);
+      fsExtra.removeSync(blockStorage1.dbPath);
+      fsExtra.removeSync(blockStorage2.dbPath);
+      fsExtra.removeSync(blockStorage3.dbPath);
     } catch (e) { }
 
-    config.set("LEVELDB_PATH", LEVELDB_PATH_1);
-    await createBlockStorage(10);
+    await createBlockStorage(10, blockStorage1.dbPath);
+    await createBlockStorage(20, blockStorage2.dbPath);
+    await createBlockStorage(30, blockStorage3.dbPath);
 
-    config.set("LEVELDB_PATH", LEVELDB_PATH_2);
-    await createBlockStorage(20);
-
-    config.set("LEVELDB_PATH", LEVELDB_PATH_3);
-    await createBlockStorage(30);
-
-    config.set("NODE_IP", "0.0.0.0");
-
-    node1 = await createNode("node1", LEVELDB_PATH_1, gossipNode1, blockStorage1);
-    node2 = await createNode("node2", LEVELDB_PATH_2, gossipNode2, blockStorage2);
+    node1 = await createNode("node1", gossipNode1, blockStorage1);
+    node2 = await createNode("node2", gossipNode2, blockStorage2);
   });
 
   afterEach(async () => {
@@ -220,7 +211,7 @@ describe("Block storage service", async function () {
     });
 
     it("works with multiple nodes", (done) => {
-      createNode("node3", LEVELDB_PATH_3, gossipNode3, blockStorage3).then((node) => {
+      createNode("node3", gossipNode3, blockStorage3).then((node) => {
         node3 = node;
       });
 
