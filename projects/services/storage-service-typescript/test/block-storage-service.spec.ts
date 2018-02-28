@@ -239,7 +239,7 @@ describe("Block storage service", async function () {
           ]);
 
         chai.expect(values).to.eventually.be.eql([30, 30, 30]).and.notify(done);
-      }, 15000);
+      }, 25000);
     });
 
     xit("finishes if we keep adding more and more blocks");

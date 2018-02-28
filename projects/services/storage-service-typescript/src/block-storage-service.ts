@@ -77,11 +77,8 @@ export default class BlockStorageService extends Service {
     });
   }
 
-  @Service.SilentRPCMethod
+  @Service.RPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    // TODO: remove when @Service.SilentRPCMethod is fixed
-    logger.warn(`Block storage ${this.nodeName} received new message`, { FromAddress: rpc.req.FromAddress, Buffer: rpc.req.Buffer.toString("utf8") });
-
     const { MessageType, FromAddress } = rpc.req;
     const payload = JSON.parse(rpc.req.Buffer.toString("utf8"));
 
