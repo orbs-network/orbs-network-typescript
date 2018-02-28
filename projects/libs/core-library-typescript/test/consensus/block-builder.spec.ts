@@ -47,8 +47,8 @@ function aRandomStateDiff(): types.modifiedStateKey[] {
 
 const dummyTransactionSet = aDummyTransactionSet();
 
-const pullAllPendingTransactionsOutput: types.PullAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
-transactionPool.pullAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
+transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
 
 const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
   processedTransactions: dummyTransactionSet,

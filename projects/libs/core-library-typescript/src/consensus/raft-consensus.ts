@@ -70,6 +70,7 @@ export interface RaftConsensusConfig {
 export class RaftConsensus {
   private blockStorage: types.BlockStorageClient;
   private blockBuilder: BlockBuilder;
+  private transactionPool: types.TransactionPoolClient;
 
   private connector: RPCConnector;
   private node: any;
@@ -81,11 +82,12 @@ export class RaftConsensus {
     gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient,
     blockStorage: types.BlockStorageClient,
-    private transactionPool: types.TransactionPoolClient,
+    transactionPool: types.TransactionPoolClient
   ) {
     this.blockStorage = blockStorage;
     this.connector = new RPCConnector(options.nodeName, gossip);
     this.blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
+    this.transactionPool = transactionPool;
 
     this.node = gaggle({
       id: options.nodeName,
@@ -110,37 +112,42 @@ export class RaftConsensus {
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
 
-    this.node.on("committed", async (data: any) => {
-      const msg: types.ConsensusMessage = data.data;
+    this.node.on("committed", async (data: any) => this.onCommitted(data));
 
-      // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
-      // committed entry.
-      const block: types.Block = msg.block;
-      logger.debug("new block to be committed ${JSON.stringify(block)}");
-      await this.blockStorage.addBlock({
-        block: block
-      });
-      this.lastBlockId = block.header.id;
+    this.node.on("leaderElected", () => this.onLeaderElected());
 
-      if (this.node.isLeader()) {
-        this.readyForBlockAppend = true;
-      }
-    });
-
-    this.node.on("leaderElected", () => {
-      if (this.node.isLeader()) {
-        this.readyForBlockAppend = true;
-        logger.info(`Node ${this.node.id} was elected as a new leader!`);
-      } else {
-        this.readyForBlockAppend = false;
-      }
-    });
-
-    this.pollTransactionPool();
-
+    this.pollForPendingTransactions();
   }
 
-  private pollTransactionPool() {
+  private async onCommitted(data: any) {
+    const msg: types.ConsensusMessage = data.data;
+
+    // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
+    // committed entry.
+    const block: types.Block = msg.block;
+    logger.debug("new block to be committed ${JSON.stringify(block)}");
+    await this.blockStorage.addBlock({
+      block: block
+    });
+    this.lastBlockId = block.header.id;
+
+    await this.transactionPool.clearPendingTransactions({ transactions: block.transactions });
+
+    if (this.node.isLeader()) {
+      this.readyForBlockAppend = true;
+    }
+  }
+
+  private async onLeaderElected() {
+    if (this.node.isLeader()) {
+      this.readyForBlockAppend = true;
+      logger.info(`Node ${this.node.id} was elected as a new leader!`);
+    } else {
+      this.readyForBlockAppend = false;
+    }
+  }
+
+  private pollForPendingTransactions() {
     setInterval(async () => {
       try {
         if (this.readyForBlockAppend) {
@@ -154,26 +161,27 @@ export class RaftConsensus {
   }
 
   private async appendNextBlock() {
-    if (this.lastBlockId == undefined) {
-      const { blockId } = await this.blockStorage.getLastBlockId({});
-      this.lastBlockId = blockId;
-    }
-    const block = await this.blockBuilder.buildNextBlock(this.lastBlockId);
+    const lastBlockId = await this.getLastBlockId();
+    const block = await this.blockBuilder.buildNextBlock(lastBlockId);
 
-    this.appendMessage({
-      block
-    });
+    const appendMessage: types.ConsensusMessage = {block};
+
+    this.node.append(appendMessage);
 
     logger.debug(`appended new block ${JSON.stringify(block)}`);
 
     this.readyForBlockAppend = false;
   }
 
-  private appendMessage(msg: types.ConsensusMessage) {
-    this.node.append(msg);
+  private async getLastBlockId() {
+    if (this.lastBlockId == undefined) {
+      const { blockId } = await this.blockStorage.getLastBlockId({});
+      this.lastBlockId = blockId;
+    }
+    return this.lastBlockId;
   }
 
-  async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
+  async onMessageReceived(fromAddress: string, messageType: string, message: any) {
     switch (messageType) {
       case "RaftMessage": {
         this.connector.received(message.from, message.data);

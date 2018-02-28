@@ -9,7 +9,9 @@ chai.should();
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-const transactionPool = new TransactionPool();
+const gossip = stubInterface<types.GossipClient>();
+
+const transactionPool = new TransactionPool(gossip);
 
 
 function aTransaction() {
@@ -27,8 +29,9 @@ function aTransaction() {
 describe("new broadcast transaction", () => {
   it("is added to the transaction pool", async () => {
       const tx = aTransaction();
-      transactionPool.gossipMessageReceived("", "newTransaction", {transaction: tx});
-      const { transactions } = await transactionPool.pullAllPendingTransactions();
+      transactionPool.addNewPendingTransaction(tx);
+      const { transactions } = await transactionPool.getAllPendingTransactions();
       transactions.should.eql([tx]);
+      gossip.broadcastMessage.should.have.been.called;
   });
 });

@@ -14,10 +14,10 @@ export class Consensus {
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
     this.raftConsensus = new RaftConsensus(
-      options, gossip, blockStorage, new BlockBuilder({ virtualMachine, transactionPool }));
+      options, gossip, blockStorage, transactionPool, new BlockBuilder({ virtualMachine, transactionPool }));
   }
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
-    await this.raftConsensus.gossipMessageReceived(fromAddress, messageType, message);
+    await this.raftConsensus.onMessageReceived(fromAddress, messageType, message);
   }
 }
