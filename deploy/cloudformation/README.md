@@ -10,8 +10,6 @@
 ./create-stacks.sh
 ```
 
-Deployment script creates specific parameters for each stack (common `parameters.json` being updated with values from `stacks.json`) and writes them to `tmp/parameters-${stack.name}.json`.
-
 ## Removing old stacks
 
 ```bash
@@ -77,3 +75,41 @@ docker push $DOCKER_IMAGE
 # Create node stack
 aws cloudformation create-stack --region $REGION --template-body file://`pwd`/cloudformation.yaml --parameters "$(cat parameters.standalone.json)" --stack-name orbs-network-node
 ```
+
+## PROPOSAL: Delivery to the clients
+
+Currently, we have no ability to deliver our code to the clients upon releasing a new version or new configuration.
+
+Requirements:
+
+1. Upon release of a new version it should be installed on clients machines either automatically or manually
+
+2. Upon release of a new configuration it should be installed on clients machines either automatically or manually
+
+3. Since we have no key/transaction signing infrastructure, there are no requirements to distribute keys
+
+4. Since we want to gradually add more nodes to the testnet federation, there should be a way to update old nodes configuration either automatically or manually
+
+5. Possilby we want also recover testnet state, so there should be a mechanism to store transaction database
+
+Current flow of deploying new node:
+
+1. Create `basic-infrastructure` CloudFormation stack, which exports such things as IAM instance profile, ECR repository, S3 bucket, Elastic IP and DNS domain name bound to this Elastic IP.
+
+2. Upload configuration files to S3.
+
+3. Build Docker image and push it to ECR repository.
+
+4. Create `orbs-network-node` CloudFormation stack, which imports all the values from `basic-infrastructure` and creates an EC2 autoscaling group which consists from a single instance running the ORBS.
+
+5. On bootstrap, EC2 instance clones configuration files from S3, assumes Elastic IP and creates a set of containers using `docker-compose`, pulling the image from ECR repository.
+
+6. After that, node tries to connect to other nodes using `GOSSIP_PEERS` env variable. Peers can be passed as a list of domain names bound to Elastic IPs.
+
+How it should work:
+
+TODO: add happy flow for configuratino update.
+
+What's missing:
+
+TODO: add remedies for things missing in happy flow.
