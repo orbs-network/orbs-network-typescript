@@ -80,7 +80,7 @@ aws cloudformation create-stack --region $REGION --template-body file://`pwd`/cl
 
 Currently, we have no ability to deliver our code to the clients upon releasing a new version or new configuration.
 
-Requirements:
+### Requirements
 
 1. Upon release of a new version it should be installed on clients machines either automatically or manually
 
@@ -90,9 +90,11 @@ Requirements:
 
 4. Since we want to gradually add more nodes to the testnet federation, there should be a way to update old nodes configuration either automatically or manually
 
-5. Possilby we want also recover testnet state, so there should be a mechanism to store transaction database
+5. There should be no single point of failure between nodes: no shared infrastructure, no shared buckets, complete independence.
 
-Current flow of deploying new node:
+6. Possilby we also want to recover testnet state, so there should be a mechanism to store transaction database. It does not have to be in the scope of this particular pull request.
+
+### Current flow of deploying new node
 
 1. Create `basic-infrastructure` CloudFormation stack, which exports such things as IAM instance profile, ECR repository, S3 bucket, Elastic IP and DNS domain name bound to this Elastic IP.
 
@@ -106,10 +108,26 @@ Current flow of deploying new node:
 
 6. After that, node tries to connect to other nodes using `GOSSIP_PEERS` env variable. Peers can be passed as a list of domain names bound to Elastic IPs.
 
-How it should work:
+### How it should work
 
-TODO: add happy flow for configuratino update.
+1. In case we release new version, steps 2, 3 and 5 of the current flow should happen.
 
-What's missing:
+2. In case we add new node, steps 2 and 5 of the current flow should happend for old nodes.
 
-TODO: add remedies for things missing in happy flow.
+3. Steps 2 and 3 require access to clients' AWS credentials.
+
+4. Step 5 can be done automatically via combination of `crontab` and `docker-compose`.
+
+### What's missing
+
+1. Currently S3 bucket names are not configurable, there should be a per-client prefix that makes them unique across AWS accounts.
+
+2. DNS zones are not configurable either.
+
+3. There is no script that automates steps 2 and 3 of the current flow (upload configuration to S3, push docker image).
+
+4. Automation of step 5 if we want to turn on auto-update.
+
+### How to proceed
+
+We can start by running 3 nodes of Orbs network that are deployed on our AWS account (possibly in different regions), test them as if they were run completely independenty, polish the process of adding a new region withouth turning off old nodes. That should be enough to be able to deploy new nodes on clients' accounts.
