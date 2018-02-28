@@ -1,5 +1,5 @@
 export * from "./common-library";
-export { BlockStorage } from "./block-storage";
+export { BlockStorage, BlockStorageSync } from "./block-storage";
 export { Consensus, RaftConsensusConfig } from "./consensus";
 export { Gossip } from "./gossip";
 export { PublicApi, TransactionHandler, TransactionHandlerConfig } from "./public-api";

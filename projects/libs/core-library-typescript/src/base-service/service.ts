@@ -50,6 +50,11 @@ export abstract class Service {
     logger.info(`${this.config.nodeName} (${this.name}): service started`);
   }
 
+  abstract async shutdown(): Promise<void>;
+
   public async stop() {
+    await this.shutdown();
+
+    logger.info(`${this.config.nodeName} (${this.name}): service shut down`);
   }
 }

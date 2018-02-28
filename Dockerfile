@@ -1,6 +1,6 @@
-FROM node:9-alpine
+FROM node:9
 
-RUN apk --no-cache add bash git yarn python build-base
+RUN apt-get update && apt-get install -y git build-essential
 
 VOLUME [ "/opt/orbs/logs" ]
 

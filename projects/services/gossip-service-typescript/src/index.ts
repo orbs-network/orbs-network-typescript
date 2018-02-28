@@ -23,5 +23,12 @@ if (!NODE_IP) {
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 
-const gossipConfig = { nodeName: NODE_NAME, nodeIp: NODE_IP, gossipPort: nodeTopology.gossipPort };
+const gossipConfig = {
+  nodeName: NODE_NAME,
+  nodeIp: NODE_IP,
+  gossipPort: nodeTopology.gossipPort,
+  peers,
+  gossipPeers: nodeTopology.gossipPeers
+};
+
 ServiceRunner.run(grpc.gossipServer, new GossipService(gossipConfig), nodeTopology.endpoint);

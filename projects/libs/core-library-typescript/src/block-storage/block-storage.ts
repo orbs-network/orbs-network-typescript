@@ -53,6 +53,11 @@ export class BlockStorage {
     this.lastBlock = await this.getBlock(lastBlockId);
   }
 
+  public async shutdown() {
+    logger.info(`Shutting down block storage`);
+    return this.db.close();
+  }
+
   // Adds new block to the persistent block storage.
   //
   // NOTE: this method should be only called serially.
@@ -86,21 +91,25 @@ export class BlockStorage {
     return this.lastBlock.header.id;
   }
 
+  public async hasNewBlocks(fromLastBlockId: number): Promise<boolean> {
+    return await this.getLastBlockId() > fromLastBlockId;
+  }
+
   private verifyNewBlock(block: types.Block) {
     if (block.header.version !== 0) {
       throw new Error(`Invalid block version: ${block.header.version}!`);
     }
 
     if (block.header.id !== this.lastBlock.header.id + 1) {
-      throw new Error(`Invalid block ID of block: ${block}!`);
+      throw new Error(`Invalid block ID of block: ${JSON.stringify(block)}!`);
     }
 
     if (block.header.prevBlockId !== this.lastBlock.header.id) {
-      throw new Error(`Invalid prev block ID of block: ${block}! Should have been ${this.lastBlock.header.id}`);
+      throw new Error(`Invalid prev block ID of block: ${JSON.stringify(block)}! Should have been ${this.lastBlock.header.id}`);
     }
   }
 
-  private async getBlock(id: number): Promise<types.Block> {
+  public async getBlock(id: number): Promise<types.Block> {
     return JSON.parse(await this.db.get<string>(id.toString()));
   }
 

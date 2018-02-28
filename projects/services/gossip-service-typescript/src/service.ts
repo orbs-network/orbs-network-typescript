@@ -9,10 +9,13 @@ import { Gossip } from "orbs-core-library";
 export interface GossipServiceConfig extends ServiceConfig {
   gossipPort: number;
   nodeIp: string;
+  peers: any;
+  gossipPeers: any;
 }
 
 export default class GossipService extends Service {
   private gossip: Gossip;
+  private peerPollInterval: any;
 
   public constructor(serviceConfig: GossipServiceConfig) {
     super(serviceConfig);
@@ -20,20 +23,28 @@ export default class GossipService extends Service {
 
   async initialize() {
     await this.initGossip();
-
   }
 
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
-    this.gossip = new Gossip(gossipConfig.gossipPort, gossipConfig.nodeName, gossipConfig.nodeIp);
+    this.gossip = new Gossip(gossipConfig.gossipPort, gossipConfig.gossipPeers, gossipConfig.peers,
+      gossipConfig.nodeName, gossipConfig.nodeIp);
 
-    setInterval(() => {
+    this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
 
       if (activePeers.length == 0) {
         logger.warn(`${this.gossip.localAddress} has no active peers`);
       } else {
         logger.info(`${this.gossip.localAddress} has active peers`, { activePeers });
+      }
+
+      const broadcastGroups = Array.from(this.gossip.activeBroadcastGroups()).sort();
+
+      if (broadcastGroups.length == 0) {
+        logger.warn(`${this.gossip.localAddress} has no active broadcast groups`);
+      } else {
+        logger.info(`${this.gossip.localAddress} has active broadcast groups`, { broadcastGroups });
       }
     }, 5000);
 
@@ -44,6 +55,11 @@ export default class GossipService extends Service {
         this.gossip.connect(gossipPeers);
       }).catch(logger.error);
     }, Math.ceil(Math.random() * 3000));
+  }
+
+  async shutdown() {
+    clearInterval(this.peerPollInterval);
+    return this.gossip.shutdown();
   }
 
   @Service.SilentRPCMethod

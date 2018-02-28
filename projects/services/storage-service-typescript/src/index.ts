@@ -25,6 +25,6 @@ const peers = topologyPeers(nodeTopology.peers);
 const blockStorageDBPath = path.resolve(path.join("../../../db", NODE_ENV || "development") + "blocks.db");
 
 ServiceRunner.runMulti(grpc.storageServiceServer, [
-  new BlockStorageService({ nodeName: NODE_NAME, dbPath: blockStorageDBPath }),
+  new BlockStorageService(peers.gossip, { nodeName: NODE_NAME, dbPath: blockStorageDBPath }),
   new StateStorageService(peers.blockStorage, { nodeName: NODE_NAME })
 ], nodeTopology.endpoint);

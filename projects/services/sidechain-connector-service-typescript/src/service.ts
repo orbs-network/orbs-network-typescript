@@ -19,6 +19,10 @@ export default class SidechainConnectorService extends Service {
     this.sidechainConnector = new SidechainConnector(this.options);
   }
 
+  async shutdown() {
+
+  }
+
   @Service.RPCMethod
   public async callEthereumContract(rpc: types.CallEthereumContractContext) {
     const { result, block } = await this.sidechainConnector.callEthereumContract(rpc.req);

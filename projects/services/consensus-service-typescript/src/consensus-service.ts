@@ -17,6 +17,10 @@ export default class ConsensusService extends Service {
   async initialize() {
   }
 
+  async shutdown() {
+
+  }
+
   @Service.RPCMethod
   public async sendTransaction(rpc: types.SendTransactionContext) {
     await this.consensus.sendTransaction(rpc.req);

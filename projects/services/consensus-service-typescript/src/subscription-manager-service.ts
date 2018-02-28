@@ -18,6 +18,10 @@ export default class SubscriptionManagerService extends Service {
   async initialize() {
   }
 
+  async shutdown() {
+
+  }
+
   @Service.RPCMethod
   async getSubscriptionStatus(rpc: types.GetSubscriptionStatusContext) {
     const { id, tokens } = await this.subscriptionManager.getSubscriptionStatus(rpc.req.subscriptionKey);
