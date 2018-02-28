@@ -5,7 +5,7 @@ export interface TransactionHandlerConfig {
 }
 
 export class TransactionHandler {
-  private gossip: types.GossipClient;
+  private transactionPool: types.TransactionPoolClient;
   private subscriptionManager: types.SubscriptionManagerClient;
   private config: TransactionHandlerConfig;
 
@@ -30,21 +30,12 @@ export class TransactionHandler {
       }
     }
 
-    await this.broadcastTransaction(transaction);
+    await this.transactionPool.addNewPendingTransaction({ transaction });
   }
 
-  private async broadcastTransaction(transaction: types.Transaction) {
-    await this.gossip.broadcastMessage({
-      BroadcastGroup: "transactionPool",
-      MessageType: "newTransaction",
-      Buffer: new Buffer(JSON.stringify({transaction})),
-      Immediate: true
-    });
-  }
-
-  constructor(gossip: types.GossipClient, subscriptionManager: types.SubscriptionManagerClient,
+  constructor(transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient,
     config: TransactionHandlerConfig) {
-    this.gossip = gossip;
+    this.transactionPool = transactionPool;
     this.subscriptionManager = subscriptionManager;
     this.config = config;
   }

@@ -9,11 +9,11 @@ chai.should();
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-const gossip = stubInterface<types.GossipClient>();
+const transactionPool = stubInterface<types.TransactionPoolClient>();
 const subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
 const config = stubInterface<TransactionHandlerConfig>();
 config.validateSubscription.returns(true);
-const handler = new TransactionHandler(gossip, subscriptionManager, config);
+const handler = new TransactionHandler(transactionPool, subscriptionManager, config);
 
 function aTransactionWith(builder: { subscriptionKey: string }) {
 
@@ -43,7 +43,7 @@ describe("a transaction", () => {
 
     await handler.handle(aTransactionWith({ subscriptionKey }));
 
-    gossip.broadcastMessage.should.have.been.called;
+    transactionPool.addNewPendingTransaction.should.have.been.called;
   });
 
   it("is rejected when it includes an invalid subscription key", async () => {

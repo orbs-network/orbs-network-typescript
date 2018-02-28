@@ -17,9 +17,9 @@ export default class PublicApiService extends Service {
 
   private transactionHandler: TransactionHandler;
 
-  public constructor(virtualMachine: types.VirtualMachineClient, gossip: types.GossipClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
+  public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.transactionHandler = new TransactionHandler(gossip, subscriptionManager, new ConstantTransactionHandlerConfig());
+    this.transactionHandler = new TransactionHandler(transactionPool, subscriptionManager, new ConstantTransactionHandlerConfig());
 
     this.publicApi = new PublicApi(this.transactionHandler, virtualMachine);
   }

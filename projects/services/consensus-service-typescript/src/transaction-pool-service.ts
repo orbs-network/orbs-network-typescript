@@ -28,8 +28,14 @@ export default class TransactionPoolService extends Service {
   }
 
   @Service.RPCMethod
-  public async pullAllPendingTransactions(rpc: types.PullAllPendingTransactionsContext) {
-    rpc.res = await this.transactionPool.pullAllPendingTransactions();
+  public async getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext) {
+    rpc.res = this.transactionPool.getAllPendingTransactions();
+  }
+
+  @Service.RPCMethod
+  public async clearPendingTransactions(rpc: types.ClearPendingTransactionsContext) {
+    this.transactionPool.clearPendingTransactions(rpc.req.transactions);
+    rpc.res = {};
   }
 
   @Service.SilentRPCMethod
