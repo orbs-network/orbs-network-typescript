@@ -242,6 +242,10 @@ describe("Block storage service", async function () {
       }, 25000);
     });
 
-    xit("finishes if we keep adding more and more blocks");
+    xit("finishes if we keep adding more and more blocks to other nodes");
+
+    xit("finishes even if node we sync from is dead");
+
+    xit("successfully adds new blocks during sync");
   });
 });

@@ -3,6 +3,7 @@ import * as Mali from "mali";
 import * as caller from "grpc-caller";
 import { types } from "./types";
 import * as interfaces from "orbs-interfaces";
+import { Service } from "../base-service/service";
 
 export interface GRPCClient {
   proto: string;
@@ -26,7 +27,7 @@ export interface GRPServers {
 
 export interface GRPCRuntime {
   app: Mali;
-  services: GRPCRuntime[];
+  services: Service[];
 }
 
 function client(grpc: GRPCClient) {
@@ -45,7 +46,7 @@ function runServer(grpc: GRPServer): GRPCRuntime {
   app.use(serviceFuncs);
   app.start(grpc.endpoint);
 
-  return {app, services: [grpc.service] };
+  return { app, services: [grpc.service] };
 }
 
 function servers(grpcs: GRPServers): GRPCRuntime {
@@ -65,7 +66,7 @@ function servers(grpcs: GRPServers): GRPCRuntime {
   app.use(serviceFuncs);
   app.start(grpcs.endpoint);
 
-  return {app, services: grpcs.services };
+  return { app, services: grpcs.services };
 }
 
 export namespace grpc {

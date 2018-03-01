@@ -179,10 +179,6 @@ array-flatten@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/array-flatten/-/array-flatten-1.1.1.tgz#9a5f699051b1e7073328f2a008968b64ea2955d2"
 
-arrify@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/arrify/-/arrify-1.0.1.tgz#898508da2226f380df904728456849c1501a4b0d"
-
 ascallback@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ascallback/-/ascallback-1.1.1.tgz#246086fb5d3ac4e9b78ae79d2d5979efe563da35"
@@ -538,7 +534,7 @@ chalk@^1.1.3:
     strip-ansi "^3.0.0"
     supports-color "^2.0.0"
 
-chalk@^2.0.0, chalk@^2.3.0:
+chalk@^2.3.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.3.1.tgz#523fe2678aec7b04e8041909292fe8b17059b796"
   dependencies:
@@ -906,7 +902,7 @@ diff@3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.3.1.tgz#aa8567a6eed03c531fc89d3f711cd0e5259dec75"
 
-diff@^3.1.0, diff@^3.2.0:
+diff@^3.2.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-3.4.0.tgz#b1d85507daf3964828de54b37d0d73ba67dda56c"
 
@@ -1513,12 +1509,6 @@ hoek@5.x.x:
   version "5.0.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-5.0.3.tgz#b71d40d943d0a95da01956b547f83c4a5b4a34ac"
 
-homedir-polyfill@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/homedir-polyfill/-/homedir-polyfill-1.0.1.tgz#4c2bbc8a758998feebf5ed68580f76d46768b4bc"
-  dependencies:
-    parse-passwd "^1.0.0"
-
 hosted-git-info@^2.1.4:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.5.0.tgz#6d60e34b3abbc8313062c3b798ef8d901a07af3c"
@@ -1878,10 +1868,6 @@ make-dir@^1.0.0:
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-1.1.0.tgz#19b4369fe48c116f53c2af95ad102c0e39e85d51"
   dependencies:
     pify "^3.0.0"
-
-make-error@^1.1.1:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/make-error/-/make-error-1.3.4.tgz#19978ed575f9e9545d2ff8c13e33b5d18a67d535"
 
 mali-call-types@~0.1.0:
   version "0.1.0"
@@ -2266,10 +2252,6 @@ parse-json@^2.2.0:
   resolved "https://registry.yarnpkg.com/parse-json/-/parse-json-2.2.0.tgz#f480f40434ef80741f8469099f8dea18f55a4dc9"
   dependencies:
     error-ex "^1.2.0"
-
-parse-passwd@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/parse-passwd/-/parse-passwd-1.0.0.tgz#6d5b934a456993b23d37f40a382d6f1666a8e5c6"
 
 parseurl@~1.3.2:
   version "1.3.2"
@@ -2835,21 +2817,11 @@ solc@0.4.18:
     semver "^5.3.0"
     yargs "^4.7.1"
 
-source-map-support@^0.4.0:
-  version "0.4.18"
-  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.18.tgz#0286a6de8be42641338594e97ccea75f0a2c585f"
-  dependencies:
-    source-map "^0.5.6"
-
 source-map-support@^0.5.3:
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.3.tgz#2b3d5fff298cfa4d1afd7d4352d569e9a0158e76"
   dependencies:
     source-map "^0.6.0"
-
-source-map@^0.5.6:
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
 
 source-map@^0.6.0:
   version "0.6.1"
@@ -2963,10 +2935,6 @@ strip-bom@^2.0.0:
   dependencies:
     is-utf8 "^0.2.0"
 
-strip-bom@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/strip-bom/-/strip-bom-3.0.0.tgz#2334c18e9c759f7bdd56fdef7e9ae3d588e68ed3"
-
 strip-dirs@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/strip-dirs/-/strip-dirs-2.1.0.tgz#4987736264fc344cf20f6c34aca9d13d1d4ed6c5"
@@ -2979,7 +2947,7 @@ strip-hex-prefix@1.0.0:
   dependencies:
     is-hex-prefixed "1.0.0"
 
-strip-json-comments@^2.0.0, strip-json-comments@~2.0.1:
+strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
@@ -3133,34 +3101,6 @@ trim@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/trim/-/trim-0.0.1.tgz#5858547f6b290757ee95cccc666fb50084c460dd"
 
-ts-mocha@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/ts-mocha/-/ts-mocha-1.1.0.tgz#4018c3c9841695262a9345346bba1e93b6493c60"
-  dependencies:
-    ts-node "^3.3.0"
-
-ts-node@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-3.3.0.tgz#c13c6a3024e30be1180dd53038fc209289d4bf69"
-  dependencies:
-    arrify "^1.0.0"
-    chalk "^2.0.0"
-    diff "^3.1.0"
-    make-error "^1.1.1"
-    minimist "^1.2.0"
-    mkdirp "^0.5.1"
-    source-map-support "^0.4.0"
-    tsconfig "^6.0.0"
-    v8flags "^3.0.0"
-    yn "^2.0.0"
-
-tsconfig@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/tsconfig/-/tsconfig-6.0.0.tgz#6b0e8376003d7af1864f8df8f89dd0059ffcd032"
-  dependencies:
-    strip-bom "^3.0.0"
-    strip-json-comments "^2.0.0"
-
 tslib@^1.8.0, tslib@^1.8.1:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.0.tgz#e37a86fda8cbbaf23a057f473c9f4dc64e5fc2e8"
@@ -3304,12 +3244,6 @@ uuid@2.0.1:
 uuid@^3.0.0, uuid@^3.1.0, uuid@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
-
-v8flags@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/v8flags/-/v8flags-3.0.1.tgz#dce8fc379c17d9f2c9e9ed78d89ce00052b1b76b"
-  dependencies:
-    homedir-polyfill "^1.0.1"
 
 validate-npm-package-license@^3.0.1:
   version "3.0.1"
@@ -3707,7 +3641,3 @@ yauzl@^2.4.2:
   dependencies:
     buffer-crc32 "~0.2.3"
     fd-slicer "~1.0.1"
-
-yn@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
