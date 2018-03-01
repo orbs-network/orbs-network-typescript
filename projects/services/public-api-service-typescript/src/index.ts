@@ -2,19 +2,22 @@ import { ErrorHandler, grpc, ServiceRunner, topology, topologyPeers, logger } fr
 
 import PublicApiService from "./service";
 
-logger.configure({
-  file: {
-    fileName: __dirname + "../../../../logs/public-api.log"
-  },
-});
-
 ErrorHandler.setup();
 
-const { NODE_NAME } = process.env;
+const { NODE_NAME, LOGZIO_API_KEY } = process.env;
 
 if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");
 }
+
+logger.configure({
+  file: {
+    fileName: __dirname + "../../../../logs/public-api.log"
+  },
+  logzio: {
+    apiKey: LOGZIO_API_KEY
+  },
+});
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);

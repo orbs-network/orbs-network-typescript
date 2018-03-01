@@ -9,7 +9,6 @@ import { defaults } from "lodash";
 const { NODE_NAME, NODE_IP, NODE_ENV, SERVICE_NAME } = process.env;
 
 export interface LogzIoOptions {
-  enabled: boolean;
   apiKey: string;
 }
 
@@ -36,8 +35,7 @@ export class Logger {
     level: Logger.DEFAULT_LOG_LEVEL,
     console: Logger.isTest(),
     logzio: {
-      enabled: false,
-      apiKey: ""
+      apiKey: undefined
     }
   };
 
@@ -86,7 +84,7 @@ export class Logger {
     }
 
     // Enable log shipping to Logz.io (according to the configuration).
-    if (loggerOptions.logzio && loggerOptions.logzio.enabled) {
+    if (loggerOptions.logzio && loggerOptions.logzio.apiKey) {
       this.enableLogzio(loggerOptions.level, loggerOptions.logzio.apiKey);
     }
   }

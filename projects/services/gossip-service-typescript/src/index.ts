@@ -2,15 +2,9 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 
 import GossipService from "./service";
 
-logger.configure({
-  file: {
-    fileName: __dirname + "../../../../logs/gossip.log"
-  },
-});
-
 ErrorHandler.setup();
 
-const { NODE_NAME, NODE_IP } = process.env;
+const { NODE_NAME, NODE_IP, LOGZIO_API_KEY } = process.env;
 
 if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");
@@ -19,6 +13,15 @@ if (!NODE_NAME) {
 if (!NODE_IP) {
   throw new Error("NODE_IP can't be empty!");
 }
+
+logger.configure({
+  file: {
+    fileName: __dirname + "../../../../logs/gossip.log"
+  },
+  logzio: {
+    apiKey: LOGZIO_API_KEY
+  },
+});
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);

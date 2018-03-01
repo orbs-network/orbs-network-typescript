@@ -2,19 +2,22 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 
 import VirtualMachineService from "./service";
 
-logger.configure({
-  file: {
-    fileName: __dirname + "../../../../logs/virtual-machine.log"
-  },
-});
-
 ErrorHandler.setup();
 
-const { NODE_NAME, ETHEREUM_NODE_ADDRESS } = process.env;
+const { NODE_NAME, ETHEREUM_NODE_ADDRESS, LOGZIO_API_KEY } = process.env;
 
 if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");
 }
+
+logger.configure({
+  file: {
+    fileName: __dirname + "../../../../logs/virtual-machine.log"
+  },
+  logzio: {
+    apiKey: LOGZIO_API_KEY
+  },
+});
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
