@@ -197,7 +197,7 @@ describe("Block storage service", async function () {
         try {
           await ServiceRunner.stop(...node1.services, ...node2.services);
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
 
         blockStorages = await loadAllBlockStorages();
@@ -219,7 +219,7 @@ describe("Block storage service", async function () {
         try {
           await ServiceRunner.stop(...node1.services, ...node2.services, ...node3.services);
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
 
         blockStorages = await loadAllBlockStorages();
