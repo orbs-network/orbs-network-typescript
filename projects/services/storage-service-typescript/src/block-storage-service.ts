@@ -4,15 +4,21 @@ import { logger, types } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 
+export interface BlockStorageServiceConfig extends ServiceConfig {
+  nodeName: string;
+  pollInterval: number;
+}
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
   private pollForNewBlocksInterval: any;
+  private pollForNewBlocksIntervalMs: number;
 
-  public constructor(gossip: types.GossipClient, serviceConfig: ServiceConfig) {
+  public constructor(gossip: types.GossipClient, serviceConfig: BlockStorageServiceConfig) {
     super(serviceConfig);
     this.gossip = gossip;
+    this.pollForNewBlocksIntervalMs = serviceConfig.pollInterval;
   }
 
   async initialize() {
@@ -20,7 +26,7 @@ export default class BlockStorageService extends Service {
 
     this.pollForNewBlocksInterval = setInterval(() => {
       this.pollForNewBlocks();
-    }, 5000);
+    }, this.pollForNewBlocksIntervalMs);
   }
 
   async initBlockStorage(): Promise<void> {
