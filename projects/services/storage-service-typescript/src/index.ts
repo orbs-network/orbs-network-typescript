@@ -5,22 +5,22 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 import BlockStorageService from "./block-storage-service";
 import StateStorageService from "./state-storage-service";
 
-ErrorHandler.setup();
-
 const { NODE_NAME, NODE_ENV, LOGZIO_API_KEY } = process.env;
 
-if (!NODE_NAME) {
-  throw new Error("NODE_NAME can't be empty!");
-}
+ErrorHandler.setup();
 
 logger.configure({
   file: {
-    fileName: __dirname + "../../../../logs/storage.log"
+    fileName: path.join(__dirname, "../../../../logs/storage.log")
   },
   logzio: {
     apiKey: LOGZIO_API_KEY
   },
 });
+
+if (!NODE_NAME) {
+  throw new Error("NODE_NAME can't be empty!");
+}
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
