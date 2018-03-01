@@ -81,6 +81,7 @@ const blockStorage1 = {
       endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_1}`,
     },
   ],
+  pollInterval: 100
 };
 
 const blockStorage2 = {
@@ -96,6 +97,7 @@ const blockStorage2 = {
       endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_2}`,
     },
   ],
+  pollInterval: 100
 };
 
 const blockStorage3 = {
@@ -111,6 +113,7 @@ const blockStorage3 = {
       endpoint: `0.0.0.0:${GOSSIP_GRPC_PORT_3}`,
     },
   ],
+  pollInterval: 100
 };
 
 function generateBlock(prevBlockId: number): types.Block {
@@ -207,7 +210,7 @@ describe("Block storage service", async function () {
           ]);
 
         chai.expect(values).to.eventually.be.eql([20, 20]).and.notify(done);
-      }, 15000);
+      }, 3000);
     });
 
     it("works with multiple nodes", (done) => {
@@ -230,9 +233,13 @@ describe("Block storage service", async function () {
           ]);
 
         chai.expect(values).to.eventually.be.eql([30, 30, 30]).and.notify(done);
-      }, 25000);
+      }, 5000);
     });
 
-    xit("finishes if we keep adding more and more blocks");
+    xit("finishes if we keep adding more and more blocks to other nodes");
+
+    xit("finishes even if node we sync from is dead");
+
+    xit("successfully adds new blocks during sync");
   });
 });
