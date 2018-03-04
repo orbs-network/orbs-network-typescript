@@ -10,7 +10,7 @@
     {
         "ParameterKey": "ORBSInstanceType",
         "ParameterValue": "t2.small"
-    },    
+    },
     {
         "ParameterKey": "SecurityIngressFromPort",
         "ParameterValue": "22"
@@ -38,5 +38,9 @@
     {
         "ParameterKey": "NodeEnv",
         "ParameterValue": "staging"
+    },
+    {
+        "ParameterKey": "DNSZone",
+        "ParameterValue": "orbs-test.com"
     }
 ]

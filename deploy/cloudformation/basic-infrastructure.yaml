@@ -1,15 +1,27 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Creates ECR, roles, reserves Elastic IPs
-#Parameters:
-# TODO: customize names with NODE_ENV
+Parameters:
+  DNSZone:
+    Type: String
+    Description: >
+      Specifies a name of DNS zone to which Elastic IP is going to be bound
+    Default: orbs-test.com
+  NodeEnv:
+    Type: String
+    Description: >
+      production/staging/whatever
+    Default: staging
+  BucketName:
+    Type: String
+    Default: orbs-network-config
 
 # TODO: limit associate address to a certain namespace
 Resources:
-  ORBSNetworkAssociateAddressPolicy:
+  NetworkAssociateAddressPolicy:
     Type: "AWS::IAM::Policy"
-    Properties: 
-      PolicyDocument: 
+    Properties:
+      PolicyDocument:
         {
           "Version": "2012-10-17",
           "Statement": [
@@ -21,17 +33,17 @@ Resources:
             }
           ]
         }
-      PolicyName: !Join ["-", ["AssociateAddressPolicy", !Ref "AWS::Region"]]
+      PolicyName: !Join ["-", ["AssociateAddressPolicy", !Ref NodeEnv, !Ref "AWS::Region"]]
       Roles:
-        - !Ref ORBSNetworkRole
+        - !Ref NetworkRole
 
-  ORBSNetworkS3Bucket:
+  NetworkS3Bucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Join ["-", ["orbs-network-config-staging", !Ref "AWS::Region"]]
+      BucketName: !Join ["-", [!Ref BucketName, !Ref NodeEnv, !Ref "AWS::Region"]]
 
   # TODO: only give access to region bucket
-  ORBSNetworkAccessS3Policy:
+  NetworkAccessS3Policy:
     Type: "AWS::IAM::Policy"
     Properties:
       PolicyDocument:
@@ -51,8 +63,10 @@ Resources:
                 "s3:GetObjectVersion"
               ],
               "Resource": [
-                "arn:aws:s3:::orbs-network-config-staging*",
-                "arn:aws:s3:::orbs-network-config-staging*/*"
+                !Join ["", ["arn:aws:s3:::", !Ref BucketName, "-", !Ref NodeEnv, "-", !Ref "AWS::Region", ""]],
+                !Join ["", ["arn:aws:s3:::", !Ref BucketName, "-", !Ref NodeEnv, "-", !Ref "AWS::Region", "/*"]],
+                # TODO: remove later
+                "arn:aws:s3:::orbs-network-config-staging*"
               ]
             },
             {
@@ -67,13 +81,13 @@ Resources:
             }
           ]
         }
-      PolicyName: !Join ["-", ["AccessS3Policy", !Ref "AWS::Region"]]
+      PolicyName: !Join ["-", ["AccessS3Policy", !Ref NodeEnv, !Ref "AWS::Region"]]
       Roles:
-        - !Ref ORBSNetworkRole
+        - !Ref NetworkRole
 
-  ORBSNetworkRole:
+  NetworkRole:
     Type: "AWS::IAM::Role"
-    Properties: 
+    Properties:
       AssumeRolePolicyDocument:
         {
           "Version" : "2012-10-17",
@@ -86,68 +100,68 @@ Resources:
           } ]
         }
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy 
-      RoleName: !Join ["-", ["orbs-network-role", !Ref "AWS::Region"]]
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      RoleName: !Join ["-", ["orbs-network-role", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSNetworkInstanceProfile:
+  NetworkInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
       Roles:
-        - !Ref ORBSNetworkRole
+        - !Ref NetworkRole
       InstanceProfileName: !Join ["-", ["orbs-network-instance-profile", !Ref "AWS::Region"]]
 
-  ORBSRepository:
+  Repository:
     Type: "AWS::ECR::Repository"
-    Properties: 
-      RepositoryName: !Join ["-", ["orbs-network", !Ref "AWS::Region"]]
+    Properties:
+      RepositoryName: !Join ["-", ["orbs-network", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSNodeElasticIP:
+  NodeElasticIP:
     Type: "AWS::EC2::EIP"
     Properties:
       Domain: vpc
 
   # TODO: add condition, customize zone
-  ORBSNodeDomainName:
+  NodeDomainName:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneName: orbs-test.com.
-      Name: !Join [".", [!Ref "AWS::Region", "global.nodes.orbs-test.com."]]
+      Name: !Join ["", [!Ref "AWS::Region", ".global.nodes.", !Ref NodeEnv, ".", !Ref DNSZone, "."]]
       Type: A
       TTL: 900
       ResourceRecords:
-        - !Ref ORBSNodeElasticIP
+        - !Ref NodeElasticIP
 
 Outputs:
-  ORBSNetworkRole:
-    Value: !Ref ORBSNetworkRole
+  NetworkRole:
+    Value: !Ref NetworkRole
     Export:
-      Name: !Join ["-", ["orbs-network-role", !Ref "AWS::Region"]]
+      Name: !Join ["-", ["orbs-network-role", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSNetworkInstanceProfile:
-    Value: !Ref ORBSNetworkInstanceProfile
+  NetworkInstanceProfile:
+    Value: !Ref NetworkInstanceProfile
     Export:
-      Name: !Join ["-", ["orbs-network-instance-profile", !Ref "AWS::Region"]]
+      Name: !Join ["-", ["orbs-network-instance-profile", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSRepository:
-    Value: !Join [ ".", [ !Ref "AWS::AccountId", "dkr.ecr", !Ref "AWS::Region", !Join [ "/", [ "amazonaws.com", !Ref ORBSRepository ] ] ] ]
+  Repository:
+    Value: !Join [ ".", [ !Ref "AWS::AccountId", "dkr.ecr", !Ref "AWS::Region", !Join [ "/", [ "amazonaws.com", !Ref Repository ] ] ] ]
     Export:
-      Name: !Join ["-", ["orbs-repository", !Ref "AWS::Region"]]
+      Name: !Join ["-", ["orbs-repository", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSNodeElasticIP:
-    Value: !GetAtt ORBSNodeElasticIP.AllocationId
+  NodeElasticIP:
+    Value: !GetAtt NodeElasticIP.AllocationId
     Export:
-      Name: !Join ["-", ["orbs-node-elastic-ip", !Ref "AWS::Region"]]
+      Name: !Join ["-", ["orbs-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSNodeDomainName:
-    Value: !Ref ORBSNodeDomainName
+  NodeDomainName:
+    Value: !Ref NodeDomainName
     Export:
-      Name: !Join ["-", ["orbs-node-domain-name", !Ref "AWS::Region"]]
+      Name: !Join ["-", ["orbs-node-domain-name", !Ref NodeEnv, !Ref "AWS::Region"]]
 
-  ORBSNetworkS3Bucket:
-    Value: !Ref ORBSNetworkS3Bucket
+  NetworkS3Bucket:
+    Value: !Ref NetworkS3Bucket
     Export:
-      Name: !Join ["-", ["orbs-network-s3-bucket", !Ref "AWS::Region"]]
+      Name: !Join ["-", ["orbs-network-s3-bucket", !Ref NodeEnv, !Ref "AWS::Region"]]
 
   TemplateVersion:
-    Description: The version of the template used by ORBS
+    Description: The version of the template used by
     Value: '1.0.0'
