@@ -1,8 +1,19 @@
-FILE(GLOB CRYPTO_SDK_TEST_SRC
+# Configure google-test as a downloadable library.
+include(gtest.cmake)
+
+file(GLOB CRYPTO_SDK_TEST_SRC
     "*.h"
     "*.cpp"
 )
 
-ADD_EXECUTABLE(crypto-test ${CRYPTO_SDK_TEST_SRC})
+add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
 
-TARGET_LINK_LIBRARIES(crypto-test LINK_PUBLIC crypto)
+target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY}
+)
+
+# Tell ctest about my tests
+include(GoogleTest)
+gtest_discover_tests(crypto-test TEST_LIST crypto-test-targets)
+
+# Set each target to timeout if not finished within 10 sec.
+set_tests_properties(${crypto-test-targets} PROPERTIES TIMEOUT 10)
