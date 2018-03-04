@@ -1,0 +1,8 @@
+FILE(GLOB CRYPTO_SDK_TEST_SRC
+    "*.h"
+    "*.cpp"
+)
+
+ADD_EXECUTABLE(crypto-sdk-test ${CRYPTO_SDK_TEST_SRC})
+
+TARGET_LINK_LIBRARIES(crypto-sdk-test LINK_PUBLIC crypto-sdk)
