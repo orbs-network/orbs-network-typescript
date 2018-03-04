@@ -7,7 +7,8 @@ import { stubObject } from "ts-sinon";
 import * as chaiBytes from "chai-bytes";
 import { delay } from "bluebird";
 
-chai.should();
+const expect = chai.expect;
+
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 chai.use(chaiBytes);
@@ -43,10 +44,10 @@ describe("Gossip", function() {
         for (let i = 0; i < numberOfGossips; i++) {
             const consensus = consensuses[i];
             if (i == recipientId) {
-                consensus.gossipMessageReceived.should.have.been.calledOnce;
-                consensus.gossipMessageReceived.getCall(0).args[0].should.have.property("Buffer").which.equalBytes(buffer);
+                expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
+                expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("Buffer").which.equalBytes(buffer);
             } else {
-                consensus.gossipMessageReceived.should.have.not.been.called;
+                expect(consensus.gossipMessageReceived).to.have.not.been.called;
             }
         }
     });
@@ -61,10 +62,10 @@ describe("Gossip", function() {
         for (let i = 0; i < numberOfGossips - 1; i++) {
             const consensus = consensuses[i];
             if (i != senderId) {
-                consensus.gossipMessageReceived.should.have.been.calledOnce;
-                consensus.gossipMessageReceived.getCall(0).args[0].should.have.property("Buffer").which.equalBytes(buffer);
+                expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
+                expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("Buffer").which.equalBytes(buffer);
             } else {
-                consensus.gossipMessageReceived.should.have.not.been.called;
+                expect(consensus.gossipMessageReceived).to.have.not.been.called;
             }
         }
     });
@@ -74,5 +75,4 @@ describe("Gossip", function() {
             await gossip.shutdown();
         }
     });
-
 });
