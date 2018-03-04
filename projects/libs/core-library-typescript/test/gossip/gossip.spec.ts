@@ -69,9 +69,9 @@ describe("Gossip", function() {
         }
     });
 
-    afterEach(() => {
+    afterEach(async () => {
         for (const gossip of gossips) {
-            gossip.server.close();
+            await gossip.shutdown();
         }
     });
 

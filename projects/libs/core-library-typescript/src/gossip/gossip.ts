@@ -134,6 +134,7 @@ export class Gossip {
       err ? reject(err) : resolve();
     }));
   }
+
   public activePeers() {
     return this.clients.keys();
   }
