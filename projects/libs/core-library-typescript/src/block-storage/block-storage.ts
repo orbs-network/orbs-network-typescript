@@ -2,15 +2,10 @@ import * as path from "path";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
-import { config } from "../common-library/config";
-
 import { LevelDBDriver } from "./leveldb-driver";
-
-const NODE_NAME = config.get("NODE_NAME");
 
 export class BlockStorage {
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
-  public static readonly LEVELDB_PATH: string = path.resolve(`../../../db/blocks_${NODE_NAME}.db`);
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,
@@ -30,13 +25,9 @@ export class BlockStorage {
   private lastBlock: types.Block;
   private db: LevelDBDriver;
 
-  public constructor() {
+  public constructor(config: {dbPath: string}) {
     // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(this.getDBPath());
-  }
-
-  public getDBPath(): string {
-    return config.get("LEVELDB_PATH") || BlockStorage.LEVELDB_PATH;
+    this.db = new LevelDBDriver(config.dbPath);
   }
 
   public async load(): Promise<void> {

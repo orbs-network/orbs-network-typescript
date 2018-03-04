@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import * as path from "path";
 
 import { logger, types } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
@@ -7,6 +8,7 @@ import { Service, ServiceConfig } from "orbs-core-library";
 export interface BlockStorageServiceConfig extends ServiceConfig {
   nodeName: string;
   pollInterval: number;
+  dbPath?: string;
 }
 export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
@@ -14,11 +16,13 @@ export default class BlockStorageService extends Service {
   private gossip: types.GossipClient;
   private pollForNewBlocksInterval: any;
   private pollForNewBlocksIntervalMs: number;
+  private dbPath: string;
 
   public constructor(gossip: types.GossipClient, serviceConfig: BlockStorageServiceConfig) {
     super(serviceConfig);
     this.gossip = gossip;
     this.pollForNewBlocksIntervalMs = serviceConfig.pollInterval;
+    this.dbPath = serviceConfig.dbPath || path.resolve(`../../../db/blocks_${this.nodeName}.db`);
   }
 
   async initialize() {
@@ -30,7 +34,7 @@ export default class BlockStorageService extends Service {
   }
 
   async initBlockStorage(): Promise<void> {
-    this.blockStorage = new BlockStorage();
+    this.blockStorage = new BlockStorage({dbPath: this.dbPath});
     await this.blockStorage.load();
     this.sync = new BlockStorageSync(this.blockStorage);
   }
@@ -83,7 +87,7 @@ export default class BlockStorageService extends Service {
     });
   }
 
-  @Service.RPCMethod
+  @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const { MessageType, FromAddress } = rpc.req;
     const payload = JSON.parse(rpc.req.Buffer.toString("utf8"));
