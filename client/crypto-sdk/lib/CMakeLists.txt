@@ -1,8 +1,8 @@
-FILE(GLOB CRYPTO_SDK_SRC
+file(GLOB CRYPTO_SDK_SRC
     "*.h"
     "*.cpp"
 )
 
-ADD_LIBRARY(crypto STATIC ${CRYPTO_SDK_SRC})
+add_library(crypto STATIC ${CRYPTO_SDK_SRC})
 
-TARGET_INCLUDE_DIRECTORIES(crypto PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(crypto PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

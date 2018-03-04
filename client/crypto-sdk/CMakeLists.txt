@@ -1,10 +1,16 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10)
 
-FIND_PACKAGE(PkgConfig)
+find_package(PkgConfig)
 
-PROJECT(crypto-sdk)
+project(crypto-sdk)
 
-SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-ADD_SUBDIRECTORY(lib)
-ADD_SUBDIRECTORY(test)
+add_subdirectory(lib)
+add_subdirectory(test)
+
+execute_process (
+    COMMAND bash -c "find ./test -type f -print0 | sort -z | xargs -0 shasum -a512 | shasum -a512"
+    OUTPUT_VARIABLE CHECKSUM_VARIABLE
+)
+message("Test hash is: ${CHECKSUM_VARIABLE}")
