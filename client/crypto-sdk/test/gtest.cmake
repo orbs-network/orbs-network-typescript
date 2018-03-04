@@ -1,13 +1,12 @@
 find_package(Threads REQUIRED)
 
-# https://github.com/google/googletest/releases/tag/release-1.8.0
-set(GTEST_SHA1 "ec44c6c1675c25b9827aacd08c02433cccde7780")
+set(GTEST_VERSION release-1.8.0)
 
 include(ExternalProject)
 ExternalProject_Add(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG ${GTEST_SHA1}
+  GIT_TAG ${GTEST_VERSION}
   UPDATE_COMMAND ""
   INSTALL_COMMAND ""
   LOG_DOWNLOAD ON
