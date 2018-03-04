@@ -16,7 +16,7 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "NODE_ENV=test ts-mocha test/**/*.spec.ts --exit"
+    "test": "NODE_ENV=test ts-mocha test/**/*.spec.ts"
   },
   "dependencies": {
     "bignumber.js": "^6.0.0",
