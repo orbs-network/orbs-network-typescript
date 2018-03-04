@@ -1,5 +1,4 @@
-# Configure google-test as a downloadable library.
-include(gtest.cmake)
+include(../gtest.cmake)
 
 file(GLOB CRYPTO_SDK_TEST_SRC
     "*.h"
@@ -8,8 +7,7 @@ file(GLOB CRYPTO_SDK_TEST_SRC
 
 add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
 
-target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY}
-)
+target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY})
 
 # Tell ctest about my tests
 include(GoogleTest)
