@@ -8,7 +8,7 @@
         "ParameterValue": "true"
     },
     {
-        "ParameterKey": "ORBSInstanceType",
+        "ParameterKey": "InstanceType",
         "ParameterValue": "t2.small"
     },
     {
@@ -38,9 +38,5 @@
     {
         "ParameterKey": "NodeEnv",
         "ParameterValue": "staging"
-    },
-    {
-        "ParameterKey": "DNSZone",
-        "ParameterValue": "orbs-test.com"
     }
 ]

@@ -47,7 +47,14 @@ Please fisrt make sure you have admin credentials on AWS.
 export REGION=eu-central-1
 export NODE_ENV=staging
 export AWS_ACCOUNT_ID=
+export DNS_ZONE=
 ```
+
+```bash
+# Create set of SSH keys that you are going to use to access EC2 instances. Then import them.
+aws ec2 import-key-pair --key-name orbs-network-$NODE_ENV-key --public-key-material "$(cat ~/.ssh/orbs-network-$NODE_ENV-key.pub)" --region $REGION
+```
+
 
 ```bash
 # Create basic infrastructure (roles, buckets, elastic ips)
@@ -59,7 +66,7 @@ aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --region $RE
 # This is a stub
 # Copy bootstrap script to a new bucket
 # TODO: update cloudformation.yaml to boot from regional URL
-aws s3 sync bootstrap s3://orbs-network-config-$NODE_ENV-$REGION/v1/
+aws s3 sync ../bootstrap/ s3://orbs-network-config-$NODE_ENV-$REGION/v1/
 ```
 
 ```bash
@@ -75,6 +82,11 @@ docker push $DOCKER_IMAGE
 ```bash
 # Create node stack
 aws cloudformation create-stack --region $REGION --template-body file://`pwd`/cloudformation.yaml --parameters "$(cat parameters.standalone.json)" --stack-name orbs-network-node-$NODE_ENV
+```
+
+```bash
+# SSH into your newly created node
+ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_ZONE
 ```
 
 ## PROPOSAL: Delivery to the clients
