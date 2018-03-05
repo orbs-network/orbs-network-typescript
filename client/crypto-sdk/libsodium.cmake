@@ -10,6 +10,7 @@ ExternalProject_Add(
   BUILD_IN_SOURCE ON
   CONFIGURE_COMMAND <SOURCE_DIR>/autogen.sh
   BUILD_COMMAND <SOURCE_DIR>/configure  --prefix=<INSTALL_DIR>
+  UPDATE_COMMAND ""
   INSTALL_COMMAND make -j4
   TEST_COMMAND make -j4 check
   LOG_DOWNLOAD ON
