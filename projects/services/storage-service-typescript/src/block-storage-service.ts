@@ -170,12 +170,12 @@ export default class BlockStorageService extends Service {
     logger.info(`Block storage ${this.nodeName} received a new block via sync`);
 
     if (!this.isSyncing()) {
-      logger.error(`Block storaged ${this.nodeName} dropped new block received via sync because it is not syncing right now`);
+      logger.error(`Block storage ${this.nodeName} dropped new block received via sync because it is not syncing right now`);
       return;
     }
 
     if (!this.sync.isSyncingWith(FromAddress)) {
-      logger.info(`Block storaged ${this.nodeName} dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
+      logger.info(`Block storage ${this.nodeName} dropped new block received via sync because it came from ${FromAddress} instead of ${this.sync.getNode()}`);
       return;
     }
 
