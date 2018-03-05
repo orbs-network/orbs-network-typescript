@@ -6,6 +6,7 @@ file(GLOB CRYPTO_SDK_TEST_SRC
 )
 
 add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
+add_dependencies(crypto-test googletest)
 
 target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY})
 

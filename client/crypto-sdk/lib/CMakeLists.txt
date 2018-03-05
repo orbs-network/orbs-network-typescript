@@ -6,6 +6,7 @@ file(GLOB CRYPTO_SDK_SRC
 )
 
 add_library(crypto STATIC ${CRYPTO_SDK_SRC})
+add_dependencies(crypto libsodium)
 
 target_include_directories(crypto PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
