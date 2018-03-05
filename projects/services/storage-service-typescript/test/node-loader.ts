@@ -32,7 +32,7 @@ export class NodeLoader {
 
         this.blockStorageService = new BlockStorageService(this.fakeGossipClient, {
             nodeName,
-            pollInterval: 500,
+            pollInterval: 100,
             dbPath: this.levelDbPath
         });
     }
