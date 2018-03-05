@@ -1,6 +1,6 @@
-FROM node:9
+FROM node:9-slim
 
-RUN apt-get update && apt-get install -y git build-essential
+RUN apt-get update && apt-get install -y git python build-essential && apt-get clean
 
 VOLUME [ "/opt/orbs/logs" ]
 

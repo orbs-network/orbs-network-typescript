@@ -10,4 +10,4 @@ docker run -ti --rm --privileged  \
 -e DOCKER_IMAGE -e DOCKER_TAG \
 -v /var/run/docker.sock:/var/run/docker.sock \
 $DOCKER_IMAGE:$DOCKER_TAG  \
-bash -c 'apt-get update && apt-get install -y python-pip python-dev && pip install docker-compose && (curl -fsSL get.docker.com | bash) &&cd e2e && yarn test'
+bash -c 'apt-get update && apt-get install -y python-pip python-dev && pip install docker-compose && (curl -fsSL get.docker.com | bash) && cd e2e && ./build.sh && yarn test'
