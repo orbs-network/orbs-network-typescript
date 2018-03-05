@@ -27,6 +27,7 @@ export class BlockStorage {
   private db: LevelDBDriver;
 
   public constructor(dbPath: string) {
+    // Open/create the blocks LevelDB database.
     this.db = new LevelDBDriver(dbPath);
   }
 

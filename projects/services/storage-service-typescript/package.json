@@ -16,13 +16,15 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/storage-service-typescript/**/*.spec.js"
+    "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js"
   },
   "dependencies": {
     "lodash": "^4.17.4",
     "orbs-core-library": "file:../../libs/core-library-typescript"
   },
   "devDependencies": {
+    "bluebird": "^3.5.1",
+    "@types/bluebird": "^3.5.20",
     "@types/chai": "^4.1.2",
     "@types/chai-as-promised": "^7.1.0",
     "@types/fs-extra": "^5.0.0",

@@ -8,10 +8,10 @@ import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockStorageSync } from "../../src/block-storage/block-storage-sync";
 
-const LEVEL_DB_PATH = path.resolve("../../../../../db/test/blocks.db.ut");
+const LEVELDB_PATH = "/tmp/leveldb-test";
 
 async function init(): Promise<any> {
-  const blockStorage = new BlockStorage(LEVEL_DB_PATH);
+  const blockStorage = new BlockStorage(LEVELDB_PATH);
   await blockStorage.load();
   const blockStorageSync = new BlockStorageSync(blockStorage);
   return { blockStorage, blockStorageSync };
@@ -35,7 +35,7 @@ describe("Block storage sync", () => {
 
   beforeEach(async () => {
     try {
-      fsExtra.removeSync(LEVEL_DB_PATH);
+      fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
 
     const results = await init();

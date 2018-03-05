@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import * as path from "path";
 
 import { logger, types } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
@@ -85,7 +86,7 @@ export default class BlockStorageService extends Service {
     });
   }
 
-  @Service.RPCMethod
+  @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const { messageType, fromAddress } = rpc.req;
     const payload = JSON.parse(rpc.req.buffer.toString("utf8"));
@@ -170,12 +171,12 @@ export default class BlockStorageService extends Service {
     logger.info(`Block storage ${this.config.nodeName} received a new block via sync`);
 
     if (!this.isSyncing()) {
-      logger.error(`Block storaged ${this.config.nodeName} dropped new block received via sync because it is not syncing right now`);
+      logger.error(`Block storage ${this.config.nodeName} dropped new block received via sync because it is not syncing right now`);
       return;
     }
 
     if (!this.sync.isSyncingWith(fromAddress)) {
-      logger.info(`Block storaged ${this.config.nodeName} dropped new block received via sync because it came from ${fromAddress} instead of ${this.sync.getNode()}`);
+      logger.info(`Block storage ${this.config.nodeName} dropped new block received via sync because it came from ${fromAddress} instead of ${this.sync.getNode()}`);
       return;
     }
 

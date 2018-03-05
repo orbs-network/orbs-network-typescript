@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
@@ -7,10 +6,10 @@ import * as fsExtra from "fs-extra";
 import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 
-const LEVEL_DB_PATH = path.resolve("../../../../../db/test/blocks.db.ut");
+const LEVELDB_PATH = "/tmp/leveldb-test";
 
 async function initBlockStorage(): Promise<BlockStorage> {
-  const blockStorage = new BlockStorage(LEVEL_DB_PATH);
+  const blockStorage = new BlockStorage(LEVELDB_PATH);
   await blockStorage.load();
   return blockStorage;
 }
@@ -20,7 +19,7 @@ describe("Block storage", () => {
 
   beforeEach(async () => {
     try {
-      fsExtra.removeSync(LEVEL_DB_PATH);
+      fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
     blockStorage = await initBlockStorage();
   });
@@ -48,7 +47,7 @@ describe("Block storage", () => {
           id: 1,
           prevBlockId: 0
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
       };
 
@@ -66,7 +65,7 @@ describe("Block storage", () => {
           id: 1,
           prevBlockId: 0
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
       };
 
@@ -82,12 +81,13 @@ describe("Block storage", () => {
           id: 1,
           prevBlockId: 1
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
       };
 
       const result = blockStorage.addBlock(exampleBlock);
-      await result.should.eventually.be.rejectedWith(Error, `Invalid prev block ID of block: ${JSON.stringify(exampleBlock)}! Should have been 0`);
+      // do not remove return
+      await result.should.eventually.be.rejectedWith(Error, `Invalid prev block ID of block: {"header":{"version":0,"id":1,"prevBlockId":1},"tx":{"contractAddress":"0","sender":"","signature":"","payload":"{}"},"modifiedAddressesJson":"{}"}! Should have been 0`);
     });
 
     it("checks block id", async () => {
@@ -97,12 +97,12 @@ describe("Block storage", () => {
           id: 2,
           prevBlockId: 0
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
       };
 
       const result = blockStorage.addBlock(exampleBlock);
-      await result.should.eventually.be.rejectedWith(Error, `Invalid block ID of block: ${JSON.stringify(exampleBlock)}!`);
+      await result.should.eventually.be.rejectedWith(Error, `Invalid block ID of block: {"header":{"version":0,"id":2,"prevBlockId":0},"tx":{"contractAddress":"0","sender":"","signature":"","payload":"{}"},"modifiedAddressesJson":"{}"}!`);
     });
   });
 
@@ -116,7 +116,7 @@ describe("Block storage", () => {
           id: 1,
           prevBlockId: 0
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
       };
 
@@ -137,7 +137,7 @@ describe("Block storage", () => {
           id: 1,
           prevBlockId: 0
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
+        tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
         modifiedAddressesJson: "{}"
       };
 
