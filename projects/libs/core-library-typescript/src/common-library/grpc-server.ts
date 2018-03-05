@@ -3,8 +3,8 @@ import * as path from "path";
 
 import { types } from "./types";
 import { Service } from "../base-service/service";
+import { getPathToProto } from "orbs-interfaces";
 
-const PROTO_PATH = path.resolve(__dirname, "../../../../architecture/interfaces");
 const protos: Map<string, string> = new Map<string, string>();
 protos.set("Consensus", "consensus.proto");
 protos.set("SubscriptionManager", "subscription-manager.proto");
@@ -30,7 +30,7 @@ export class GRPCServerBuilder {
 
   withService<T extends Service>(name: string, impl: T): GRPCServerBuilder {
     const proto = protos.get(name);
-    const protoPath = path.resolve(PROTO_PATH, proto);
+    const protoPath = getPathToProto(proto);
 
     if (this.mali) {
       this.mali.addService(protoPath, name);

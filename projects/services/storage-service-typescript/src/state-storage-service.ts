@@ -19,6 +19,10 @@ export default class StateStorageService extends Service {
     await this.initStateStorage();
   }
 
+  async shutdown() {
+
+  }
+
   async initStateStorage(): Promise<void> {
     this.stateStorage = new StateStorage(this.blockStorage);
     this.stateStorage.poll();

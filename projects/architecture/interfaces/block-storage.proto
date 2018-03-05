@@ -1,12 +1,15 @@
 syntax = "proto3";
 
 import "primitives/transactions.proto";
+import "primitives/gossip-listener.proto";
 import "primitives/blocks.proto";
 
 service BlockStorage {
   rpc AddBlock (AddBlockInput) returns (AddBlockOutput);
   rpc GetBlocks (GetBlocksInput) returns (GetBlocksOutput);
   rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
+  rpc HasNewBlocks (HasNewBlocksInput) returns (HasNewBlocksOutput);
+  rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }
 
 message AddBlockInput {
@@ -29,4 +32,12 @@ message GetLastBlockIdInput {
 
 message GetLastBlockIdOutput {
   uint32 blockId = 1;
+}
+
+message HasNewBlocksInput {
+  uint32 blockId = 1;
+}
+
+message HasNewBlocksOutput {
+  bool hasNewBlocks = 1;
 }

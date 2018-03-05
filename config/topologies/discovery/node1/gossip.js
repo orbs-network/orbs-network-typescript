@@ -14,6 +14,10 @@ module.exports = {
       service: 'consensus',
       endpoint: 'consensus:51151',
     },
+    {
+      service: 'storage',
+      endpoint: 'storage:51151',
+    },
   ],
   gossipPort: 60001,
   gossipPeers: GOSSIP_PEERS || [

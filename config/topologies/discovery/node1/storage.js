@@ -8,5 +8,9 @@ module.exports = {
       service: 'storage',
       endpoint: 'storage:51151',
     },
+    {
+      service: 'gossip',
+      endpoint: 'gossip:51151',
+    },
   ],
 };

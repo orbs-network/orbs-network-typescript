@@ -7,7 +7,7 @@ export class Config {
   private static readonly DEV_ENV: string = "development";
   private static readonly PROD_ENV: string = "production";
   private static readonly STAGING_ENV: string = "staging";
-  private static readonly RELATIVE_PATH: string = "../../../../../config/";
+  private static readonly RELATIVE_PATH: string = "../../../../../../config/";
   private static readonly EXT: string = ".json";
 
   constructor() {
@@ -46,6 +46,16 @@ export class Config {
   // This is just a convenience wrapper for getting the environment name directly from an instance of the configuration.
   public getEnvironment(): string {
     return Config.getEnvironment();
+  }
+
+  public set(key: any, value: any) {
+    nconf.set(key, value);
+  }
+
+  public clear(...keys: Array<string>) {
+    keys.forEach(key => {
+      nconf.remove(key);
+    });
   }
 }
 
