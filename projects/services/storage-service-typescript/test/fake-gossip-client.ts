@@ -23,9 +23,9 @@ export default class FakeGossipClient implements types.GossipClient {
     }
 
     unicastMessage(input: types.UnicastMessageInput): types.UnicastMessageOutput {
-      const clientMap = <any> this.nodes.get(input.Recipient);
+      const clientMap = <any> this.nodes.get(input.recipient);
       if (clientMap) {
-        clientMap[input.BroadcastGroup].gossipMessageReceived({
+        clientMap[input.broadcastGroup].gossipMessageReceived({
           fromAddress: this.nodeName,
           broadcastGroup: input.broadcastGroup,
           messageType: input.messageType,
@@ -33,7 +33,7 @@ export default class FakeGossipClient implements types.GossipClient {
         });
         return {};
       } else {
-        throw new Error(`could not find recipient node ${input.Recipient}`);
+        throw new Error(`could not find recipient node ${input.recipient}`);
       }
     }
 
