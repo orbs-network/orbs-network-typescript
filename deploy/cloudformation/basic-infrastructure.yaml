@@ -6,7 +6,7 @@ Parameters:
     Type: String
     Description: >
       Specifies a name of DNS zone to which Elastic IP is going to be bound
-    Default: orbs-test.com
+    Default: ''
   NodeEnv:
     Type: String
     Description: >
@@ -15,6 +15,9 @@ Parameters:
   BucketName:
     Type: String
     Default: orbs-network-config
+
+Conditions:
+  HasDNSZone: !Not [!Equals [!Ref DNSZone, '']]
 
 # TODO: limit associate address to a certain namespace
 Resources:
@@ -123,8 +126,9 @@ Resources:
   # TODO: add condition, customize zone
   NodeDomainName:
     Type: AWS::Route53::RecordSet
+    Condition: HasDNSZone
     Properties:
-      HostedZoneName: orbs-test.com.
+      HostedZoneName: !Ref DNSZone
       Name: !Join ["", [!Ref "AWS::Region", ".global.nodes.", !Ref NodeEnv, ".", !Ref DNSZone, "."]]
       Type: A
       TTL: 900
@@ -153,6 +157,7 @@ Outputs:
       Name: !Join ["-", ["orbs-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
 
   NodeDomainName:
+    Condition: HasDNSZone
     Value: !Ref NodeDomainName
     Export:
       Name: !Join ["-", ["orbs-node-domain-name", !Ref NodeEnv, !Ref "AWS::Region"]]

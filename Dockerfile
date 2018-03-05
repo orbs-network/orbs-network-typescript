@@ -18,6 +18,4 @@ ADD . /opt/orbs
 
 RUN yarn run build && yarn cache clean
 
-RUN cd e2e && ./build.sh && yarn cache clean
-
 CMD echo

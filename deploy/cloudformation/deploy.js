@@ -16,8 +16,14 @@ const config = nconf.env(argsConfig).argv(argsConfig);
 
 const setParameter = (params, key, value) => {
     const param = _.find(params, p => p.ParameterKey === key);
+
     if (param) {
         param.ParameterValue = value;
+    } else {
+        params.push({
+            "ParameterKey": key,
+            "ParameterValue": value
+        })
     }
 };
 
@@ -114,20 +120,21 @@ const main = (options) => {
 
     if (options.createBasicInfrastructure) {
         console.log(`Creating basic infrastructure...`);
-        createStack(cloudFormation, basicInfrastructureStackName, "./basic-infrastructure.yaml", [
-            {
-                "ParameterKey": "NodeEnv",
-                "ParameterValue": options.NODE_ENV
-            },
-            {
-                "ParameterKey": "DNSZone",
-                "ParameterValue": options.dnsZone
-            },
-            {
-                "ParameterKey": "BucketName",
-                "ParameterValue": options.bucketName
-            }
-        ]);
+
+        const basicInfrastructureParams = [{
+            "ParameterKey": "NodeEnv",
+            "ParameterValue": options.NODE_ENV
+        }];
+
+        if (options.dnsZone) {
+            setParameter(basicInfrastructureParams, "DNSZone", options.dnsZone);
+        }
+
+        if (options.bucketName) {
+            setParameter(basicInfrastructureParams, "BucketName", options.bucketName);
+        }
+
+        createStack(cloudFormation, basicInfrastructureStackName, "./basic-infrastructure.yaml", basicInfrastructureParams).catch(process.exit);
     }
 
     waitForStacks(cloudFormation, (stacks) => {
