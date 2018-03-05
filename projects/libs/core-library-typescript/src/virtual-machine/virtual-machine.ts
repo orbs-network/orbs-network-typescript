@@ -2,6 +2,7 @@ import { types, logger } from "../common-library";
 
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
+import { stat } from "fs";
 
 export class VirtualMachine {
   private stateStorage: types.StateStorageClient;
@@ -17,17 +18,21 @@ export class VirtualMachine {
     const processedTransactions = [];
 
     for (const transaction of input.orderedTransactions) {
+      const transactionScopeStateCache = stateCache.fork();
       try {
         await this.processor.processTransaction({
           sender: transaction.sender,
           contractAddress: transaction.contractAddress,
           payload: transaction.payload
-        }, stateCache);
+        }, transactionScopeStateCache);
 
-        processedTransactions.push(transaction);
       } catch (err) {
         logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
+        continue;
       }
+
+      stateCache.merge(transactionScopeStateCache.getModifiedKeys());
+      processedTransactions.push(transaction);
     }
 
     const stateDiff = stateCache.getModifiedKeys().map(({ key, value}) => ({contractAddress: key.contractAddress, key: key.key, value }));
