@@ -13,7 +13,6 @@ Mappings:
       "64": ami-824c4ee2
     us-west-2:
       "64": ami-f2d3638a
-      Name: Portland
     ca-central-1:
       "64": ami-a954d1cd
     eu-west-1:
@@ -24,10 +23,8 @@ Mappings:
       "64": ami-8ee056f3
     eu-central-1:
       "64": ami-5652ce39
-      Name: Frakfurt
     ap-northeast-1:
       "64": ami-ceafcba8
-      Name: Tokyo
     ap-northeast-2:
       "64": ami-863090e8
     ap-southeast-1:
@@ -36,7 +33,6 @@ Mappings:
       "64": ami-942dd1f6
     ap-south-1:
       "64": ami-531a4c3c
-      Name: Mumbai
     sa-east-1:
       "64": ami-84175ae8
 

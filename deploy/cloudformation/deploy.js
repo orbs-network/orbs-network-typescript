@@ -79,16 +79,23 @@ const createStack = (cloudFormation, stackName, templatePath, parameters) => new
     const templateBody = fs.readFileSync(templatePath).toString();
 
     return new Promise((resolve, reject) => {
-      cloudFormation.createStack({
-        StackName: stackName,
-        Parameters: parameters,
-        TemplateBody: templateBody,
-        Capabilities: ["CAPABILITY_NAMED_IAM"]
-      }, (err, data) => {
-        err ? reject(err) : resolve(data);
-      });
+        cloudFormation.createStack({
+            StackName: stackName,
+            Parameters: parameters,
+            TemplateBody: templateBody,
+            Capabilities: ["CAPABILITY_NAMED_IAM"]
+        }, (err, data) => {
+            err ? reject(err) : resolve(data);
+        });
     });
 });
+
+const removeStack = (cloudFormation, stackName) => new Promise((resolve, reject) => {
+    cloudFormation.deleteStack({ StackName: stackName }, (err, data) => {
+        err ? reject(err) : resolve(data);
+    });
+});
+
 
 const main = (options) => {
     const cloudFormation = new AWS.CloudFormation({ region: options.region });
@@ -134,21 +141,28 @@ const main = (options) => {
             pushDockerImage(options);
         }
 
+        const stackName = `orbs-network-${options.network}`;
+
         if (options.deployNode) {
-            console.log(`Deploying new node...`);
-
-            const standaloneParams = JSON.parse(fs.readFileSync("./parameters.standalone.json").toString());
-            setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
-            setParameter(standaloneParams, "KeyName", keyName);
-
-            if (options.dockerTag) {
-                setParameter(standaloneParams, "DockerTag", options.dockerTag);
+            if (options.removeNode) {
+                console.log(`Removing old node...`);
+                removeStack(cloudFormation, stackName);
             }
 
-            createStack(cloudFormation, `orbs-network-${options.network}`, "./cloudformation.yaml", standaloneParams);
-        }
+            waitForStacks(cloudFormation, (stacks) => {
+                return _.size(stacks) === 1;
+            }).then(() => {
+                console.log(`Deploying new node...`);
 
-        console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${options.region}.global.nodes.${options.NODE_ENV}.${options.dnsZone}`);
+                const standaloneParams = JSON.parse(fs.readFileSync("./parameters.standalone.json").toString());
+                setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
+                setParameter(standaloneParams, "KeyName", keyName);
+
+                createStack(cloudFormation, stackName, "./cloudformation.yaml", standaloneParams);
+
+                console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${options.region}.global.nodes.${options.NODE_ENV}.${options.dnsZone}`);
+            });
+        }
     });
 };
 
@@ -162,5 +176,6 @@ main({
     createBasicInfrastructure: config.get("create-basic-infrastructure"),
     bucketName: config.get("s3-bucket-name"),
     pushDockerImage: config.get("push-docker-image"),
-    deployNode: config.get("deploy-node")
+    deployNode: config.get("deploy-node"),
+    removeNode: config.get("removeNode")
 });

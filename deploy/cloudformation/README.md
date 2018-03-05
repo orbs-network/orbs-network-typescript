@@ -91,13 +91,15 @@ ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_
 
 ## Deploying with a single script
 
-```
+```bash
 export REGION=eu-central-1
 export NETWORK=testnet
 export AWS_ACCOUNT_ID=
 export DNS_ZONE=
 export PUBLIC_KEY_PATH=
 export S3_BUCKET_NAME=orbs-network-config
+
+# deploy new node
 
 node deploy.js \
     --region $REGION \
@@ -107,6 +109,17 @@ node deploy.js \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
     --create-basic-infrastructure --push-docker-image --deploy-node
+
+# replace old node
+
+node deploy.js \
+    --region $REGION \
+    --dns-zone $DNS_ZONE \
+    --account-id $ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --remove-node --deploy-node
+
 ```
 
 ## PROPOSAL: Delivery to the clients
