@@ -89,6 +89,26 @@ aws cloudformation create-stack --region $REGION --template-body file://`pwd`/cl
 ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_ZONE
 ```
 
+## Deploying with a single script
+
+```
+export REGION=eu-central-1
+export NETWORK=testnet
+export AWS_ACCOUNT_ID=
+export DNS_ZONE=
+export PUBLIC_KEY_PATH=
+export S3_BUCKET_NAME=orbs-network-config
+
+node deploy.js \
+    --region $REGION \
+    --ssh-public-key $PUBLIC_KEY_PATH \
+    --dns-zone $DNS_ZONE \
+    --account-id $ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --create-basic-infrastructure --push-docker-image --deploy-node
+```
+
 ## PROPOSAL: Delivery to the clients
 
 Currently, we have no ability to deliver our code to the clients upon releasing a new version or new configuration.

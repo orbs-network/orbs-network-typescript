@@ -4,10 +4,6 @@
         "ParameterValue": "orbs-network-staging-key"
     },
     {
-        "ParameterKey": "CreateWithASG",
-        "ParameterValue": "true"
-    },
-    {
         "ParameterKey": "InstanceType",
         "ParameterValue": "c5.xlarge"
     },

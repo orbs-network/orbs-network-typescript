@@ -47,12 +47,6 @@ Parameters:
       Optional - Specifies the name of an existing Amazon EC2 key pair
       to enable SSH access to the EC2 instances in your cluster.
     Default: ''
-  CreateWithASG:
-    Type: String
-    Description: >
-      Optional - Specifies the name of an existing Amazon EC2 key pair
-      to enable SSH access to the EC2 instances in your cluster.
-    Default: ''
   InstanceType:
     Type: CommaDelimitedList
     Description: >
@@ -60,12 +54,6 @@ Parameters:
       Defaults to m4.large
     Default: m5.large
     ConstraintDescription: must be a valid EC2 instance type.
-  ClusterName:
-    Type: String
-    Description: >
-      Specifies the ECS Cluster Name with which the resources would be
-      associated
-    Default: default
   AmiId:
     Type: String
     Description: Specifies the AMI ID for your container instances.
@@ -205,7 +193,6 @@ Conditions:
     - !Not [!Equals [!Ref EbsVolumeSize, '0']]
     - !Not [!Equals [!Ref EbsVolumeType, '']]
     - !Not [!Equals [!Ref DeviceName, '']]
-  CreateWithASG: !Equals [!Ref CreateWithASG, 'true']
   UseCustomAMI: !Not [!Equals [!Ref AmiId, '']]
   ImportRole: !Equals [!Ref IamRoleInstanceProfile, '']
   ImportElasticIP: !Equals [!Ref ElasticIP, '']
@@ -302,7 +289,6 @@ Resources:
         CidrIp: !Ref SecurityIngressCidrIp
   InstanceLc:
     Type: AWS::AutoScaling::LaunchConfiguration
-    Condition: CreateWithASG
     Properties:
       ImageId: !If [ UseCustomAMI, !Ref AmiId, !FindInMap [ RegionMap, !Ref "AWS::Region", 64 ] ]
       InstanceType: !Select [ 0, !Ref InstanceType ]
@@ -356,7 +342,6 @@ Resources:
               Fn::ImportValue: !Join ["-", ["orbs-network-s3-bucket", !Ref NodeEnv, !Ref "AWS::Region"]]
   InstanceAsg:
     Type: AWS::AutoScaling::AutoScalingGroup
-    Condition: CreateWithASG
     Properties:
       VPCZoneIdentifier: !If
         - CreateSubnet1
@@ -384,7 +369,6 @@ Resources:
 
 Outputs:
   InstanceAsgName:
-    Condition: CreateWithASG
     Description: Auto Scaling Group Name for  Instances
     Value: !Ref InstanceAsg
   TemplateVersion:
