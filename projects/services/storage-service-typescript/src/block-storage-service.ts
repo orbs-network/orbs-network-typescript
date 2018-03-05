@@ -85,7 +85,7 @@ export default class BlockStorageService extends Service {
       broadcastGroup: "blockStorage",
       messageType: "HasNewBlocksMessage",
       buffer: new Buffer(JSON.stringify({ blockId })),
-      iMmmediate: true
+      immediate: true
     });
   }
 
