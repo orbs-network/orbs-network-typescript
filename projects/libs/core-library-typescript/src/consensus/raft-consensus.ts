@@ -34,20 +34,20 @@ class RPCConnector extends EventEmitter {
 
   public broadcast(data: any): void {
     this.gossip.broadcastMessage({
-      BroadcastGroup: "consensus",
-      MessageType: "RaftMessage",
-      Buffer: new Buffer(JSON.stringify(data)),
-      Immediate: true
+      broadcastGroup: "consensus",
+      messageType: "RaftMessage",
+      buffer: new Buffer(JSON.stringify(data)),
+      immediate: true
     });
   }
 
   public send(nodeId: string, data: any): void {
     this.gossip.unicastMessage({
-      Recipient: nodeId,
-      BroadcastGroup: "consensus",
-      MessageType: "RaftMessage",
-      Buffer: new Buffer(JSON.stringify(data)),
-      Immediate: true
+      recipient: nodeId,
+      broadcastGroup: "consensus",
+      messageType: "RaftMessage",
+      buffer: new Buffer(JSON.stringify(data)),
+      immediate: true
     });
   }
 }

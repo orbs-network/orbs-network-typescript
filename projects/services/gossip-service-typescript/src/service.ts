@@ -64,14 +64,14 @@ export default class GossipService extends Service {
 
   @Service.SilentRPCMethod
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
+    this.gossip.broadcastMessage(rpc.req.broadcastGroup, rpc.req.messageType, rpc.req.buffer, rpc.req.immediate);
 
     rpc.res = {};
   }
 
   @Service.SilentRPCMethod
   public async unicastMessage(rpc: types.UnicastMessageContext) {
-    this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
+    this.gossip.unicastMessage(rpc.req.recipient, rpc.req.broadcastGroup, rpc.req.messageType, rpc.req.buffer, rpc.req.immediate);
 
     rpc.res = {};
   }

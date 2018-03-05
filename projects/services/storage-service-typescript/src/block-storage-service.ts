@@ -82,10 +82,10 @@ export default class BlockStorageService extends Service {
     logger.debug(`Block storage ${this.config.nodeName} is polling for new blocks`, { lastBlockId: blockId });
 
     this.gossip.broadcastMessage({
-      BroadcastGroup: "blockStorage",
-      MessageType: "HasNewBlocksMessage",
-      Buffer: new Buffer(JSON.stringify({ blockId })),
-      Immediate: true
+      broadcastGroup: "blockStorage",
+      messageType: "HasNewBlocksMessage",
+      buffer: new Buffer(JSON.stringify({ blockId })),
+      iMmmediate: true
     });
   }
 
@@ -119,11 +119,11 @@ export default class BlockStorageService extends Service {
     const hasNewBlocks = await this.blockStorage.hasNewBlocks(payload.blockId);
 
     this.gossip.unicastMessage({
-      Recipient: fromAddress,
-      BroadcastGroup: "blockStorage",
-      MessageType: "HasNewBlocksResponse",
-      Buffer: new Buffer(JSON.stringify({ hasNewBlocks })),
-      Immediate: true,
+      recipient: fromAddress,
+      broadcastGroup: "blockStorage",
+      messageType: "HasNewBlocksResponse",
+      buffer: new Buffer(JSON.stringify({ hasNewBlocks })),
+      immediate: true,
     });
   }
 
@@ -145,11 +145,11 @@ export default class BlockStorageService extends Service {
       const blockId = await this.blockStorage.getLastBlockId();
 
       this.gossip.unicastMessage({
-        Recipient: this.sync.getNode(),
-        BroadcastGroup: "blockStorage",
-        MessageType: "SendNewBlocks",
-        Buffer: new Buffer(JSON.stringify({ blockId })),
-        Immediate: true,
+        recipient: this.sync.getNode(),
+        broadcastGroup: "blockStorage",
+        messageType: "SendNewBlocks",
+        buffer: new Buffer(JSON.stringify({ blockId })),
+        immediate: true,
       });
     }
   }
@@ -161,11 +161,11 @@ export default class BlockStorageService extends Service {
 
     blocks.forEach(async (block) => {
       this.gossip.unicastMessage({
-        Recipient: fromAddress,
-        BroadcastGroup: "blockStorage",
-        MessageType: "SendNewBlocksResponse",
-        Buffer: new Buffer(JSON.stringify({ block })),
-        Immediate: true,
+        recipient: fromAddress,
+        broadcastGroup: "blockStorage",
+        messageType: "SendNewBlocksResponse",
+        buffer: new Buffer(JSON.stringify({ block })),
+        immediate: true,
       });
     });
   }

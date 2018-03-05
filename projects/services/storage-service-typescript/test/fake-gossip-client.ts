@@ -12,11 +12,11 @@ export default class FakeGossipClient implements types.GossipClient {
     broadcastMessage(input: types.BroadcastMessageInput): types.BroadcastMessageOutput {
       for (const nodeName of this.nodes.keys()) {
         this.unicastMessage({
-          Recipient: nodeName,
-          BroadcastGroup: input.BroadcastGroup,
-          Buffer: input.Buffer,
-          MessageType: input.MessageType,
-          Immediate: input.Immediate
+          recipient: nodeName,
+          broadcastGroup: input.broadcastGroup,
+          buffer: input.buffer,
+          messageType: input.messageType,
+          immediate: input.immediate
         });
       }
       return {};
@@ -26,10 +26,10 @@ export default class FakeGossipClient implements types.GossipClient {
       const clientMap = <any> this.nodes.get(input.Recipient);
       if (clientMap) {
         clientMap[input.BroadcastGroup].gossipMessageReceived({
-          FromAddress: this.nodeName,
-          BroadcastGroup: input.BroadcastGroup,
-          MessageType: input.MessageType,
-          Buffer: input.Buffer
+          fromAddress: this.nodeName,
+          broadcastGroup: input.broadcastGroup,
+          messageType: input.messageType,
+          buffer: input.buffer
         });
         return {};
       } else {
