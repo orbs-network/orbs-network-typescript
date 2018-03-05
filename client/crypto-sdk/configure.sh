@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+mkdir -p build
 cd build
 
-make
+cmake ..
