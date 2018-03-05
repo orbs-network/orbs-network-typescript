@@ -31,7 +31,6 @@ describe("Block storage service", async function () {
       const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
 
       return expect(values).to.eventually.be.eql([100, 100, 100, 100]);
-
     });
 
     xit("finishes if we keep adding more and more blocks to other nodes");
