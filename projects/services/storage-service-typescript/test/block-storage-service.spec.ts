@@ -25,11 +25,11 @@ describe("Block storage service", async function () {
     });
 
     it("works with multiple nodes", async () => {
-      nodes = await initNodesWithBlocks([10, 20, 30]);
+      nodes = await initNodesWithBlocks([10, 20, 50, 100]);
 
       const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
 
-      return chai.expect(values).to.eventually.be.eql([30, 30, 30]);
+      return chai.expect(values).to.eventually.be.eql([100, 100, 100, 100]);
 
     });
 

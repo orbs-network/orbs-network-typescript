@@ -73,6 +73,9 @@ export default class BlockStorageService extends Service {
   }
 
   async pollForNewBlocks() {
+    // TODO: find a better way to do sync timeout
+    this.sync.off();
+
     await this.sync.appendBlocks();
 
     const blockId = await this.blockStorage.getLastBlockId();
