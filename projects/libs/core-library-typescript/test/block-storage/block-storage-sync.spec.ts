@@ -6,8 +6,10 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import * as fsExtra from "fs-extra";
 
+const LEVELDB_PATH = "/tmp/leveldb-test";
+
 async function init(): Promise<any> {
-  const blockStorage = new BlockStorage();
+  const blockStorage = new BlockStorage({ dbPath: LEVELDB_PATH });
   await blockStorage.load();
   const blockStorageSync = new BlockStorageSync(blockStorage);
   return { blockStorage, blockStorageSync };
@@ -31,7 +33,7 @@ describe("Block storage sync", () => {
 
   beforeEach(async () => {
     try {
-        fsExtra.removeSync(BlockStorage.LEVELDB_PATH);
+        fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
 
     const results = await init();

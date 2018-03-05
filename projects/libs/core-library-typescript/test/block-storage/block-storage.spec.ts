@@ -5,8 +5,10 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import * as fsExtra from "fs-extra";
 
+const LEVELDB_PATH = "/tmp/leveldb-test";
+
 async function initBlockStorage(): Promise<BlockStorage> {
-    const blockStorage = new BlockStorage();
+    const blockStorage = new BlockStorage({ dbPath: LEVELDB_PATH });
     await blockStorage.load();
     return blockStorage;
 }
@@ -16,7 +18,7 @@ describe("Block storage", () => {
 
     beforeEach(async () => {
         try {
-            fsExtra.removeSync(BlockStorage.LEVELDB_PATH);
+            fsExtra.removeSync(LEVELDB_PATH);
         } catch (e) { }
         blockStorage = await initBlockStorage();
     });
@@ -27,7 +29,7 @@ describe("Block storage", () => {
     });
 
     describe("has genesis block", () => {
-        it("on initialization", async () => { 
+        it("on initialization", async () => {
             const lastBlockId = await blockStorage.getLastBlockId();
             lastBlockId.should.be.eql(0);
 
