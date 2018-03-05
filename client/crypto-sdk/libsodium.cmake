@@ -21,5 +21,5 @@ ExternalProject_Get_Property(libsodium INSTALL_DIR)
 set(NACL_DIR ${INSTALL_DIR})
 include_directories(${NACL_DIR}/src/libsodium/src/libsodium/include)
 
-add_library(nacl_lib STATIC IMPORTED)
-set_property(TARGET nacl_lib PROPERTY IMPORTED_LOCATION ${NACL_DIR}/src/libsodium/src/libsodium/.libs/libsodium.a)
+add_library(nacl-lib STATIC IMPORTED)
+set_property(TARGET nacl-lib PROPERTY IMPORTED_LOCATION ${NACL_DIR}/src/libsodium/src/libsodium/.libs/libsodium.a)
