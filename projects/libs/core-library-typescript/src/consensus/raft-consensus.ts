@@ -76,6 +76,7 @@ export class RaftConsensus {
   private node: any;
   private lastBlockId: number;
   private readyForBlockAppend = false;
+  private pollIntervalMs = 500;
 
   public constructor(
     options: RaftConsensusConfig,
@@ -151,13 +152,12 @@ export class RaftConsensus {
     setInterval(async () => {
       try {
         if (this.readyForBlockAppend) {
-          logger.debug(`attempting append of new block`);
           await this.appendNextBlock();
         }
       } catch (err) {
         logger.error("newBlockAppendTick error: " + err);
       }
-    }, 500);
+    }, this.pollIntervalMs);
   }
 
   private async appendNextBlock() {

@@ -1,5 +1,6 @@
 import { types } from "../../src/common-library/types";
 import * as chai from "chai";
+import { expect } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
@@ -29,9 +30,9 @@ function aTransaction() {
 describe("new broadcast transaction", () => {
   it("is added to the transaction pool", async () => {
       const tx = aTransaction();
-      transactionPool.addNewPendingTransaction(tx);
+      await transactionPool.addNewPendingTransaction(tx);
       const { transactions } = await transactionPool.getAllPendingTransactions();
       transactions.should.eql([tx]);
-      gossip.broadcastMessage.should.have.been.called;
+      expect(gossip.broadcastMessage).to.have.been.called;
   });
 });

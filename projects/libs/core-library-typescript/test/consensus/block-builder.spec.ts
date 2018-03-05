@@ -18,7 +18,7 @@ function randomUInt() {
 
 function aRandomTransaction(): types.Transaction {
     return {
-        version: 1,
+        version: 0,
         sender: randomUInt().toString(16),
         contractAddress:  randomUInt().toString(16),
         payload: Math.random().toString(),
@@ -35,7 +35,7 @@ function aDummyTransactionSet(numberOfTransactions = 3) {
   return transactions;
 }
 
-function aRandomStateDiff(): types.modifiedStateKey[] {
+function aRandomStateDiff(): types.ModifiedStateKey[] {
   return [
     {
       contractAddress: randomUInt().toString(16),
@@ -73,5 +73,4 @@ describe("a block", () => {
 
     block.stateDiff.should.eql(processTransactionSetOutput.stateDiff);
   });
-
 });
