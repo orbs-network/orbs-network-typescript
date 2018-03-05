@@ -5,18 +5,40 @@ Description: >
 
 Mappings:
   RegionMap:
+    us-east-1:
+      "64": ami-97785bed
+    us-east-2:
+      "64": ami-f63b1193
+    us-west-1:
+      "64": ami-824c4ee2
     us-west-2:
       "64": ami-f2d3638a
       Name: Portland
+    ca-central-1:
+      "64": ami-a954d1cd
+    eu-west-1:
+      "64": ami-d834aba1
+    eu-west-2:
+      "64": ami-403e2524
+    eu-west-3:
+      "64": ami-8ee056f3
     eu-central-1:
       "64": ami-5652ce39
       Name: Frakfurt
     ap-northeast-1:
       "64": ami-ceafcba8
       Name: Tokyo
+    ap-northeast-2:
+      "64": ami-863090e8
+    ap-southeast-1:
+      "64": ami-942dd1f6
+    ap-southeast-2:
+      "64": ami-942dd1f6
     ap-south-1:
       "64": ami-531a4c3c
       Name: Mumbai
+    sa-east-1:
+      "64": ami-84175ae8
 
 Parameters:
   KeyName:
@@ -155,20 +177,9 @@ Parameters:
   NodeEnv:
     Type: String
     Default: 'staging'
-  DefaultBootstrapCommand:
-    Type: String
-    Default: |
-      # copy bootstrap script, env variables and secrets
-      aws s3 sync s3://${S3_CONFIG}/v1/ /opt/orbs/
-      bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
-  EthereumBootstrapCommand:
-    Type: String
-    Default: |
-      aws s3 sync s3://${S3_CONFIG}/parity/ /opt/parity/
-      bash /opt/parity/bootstrap.sh &>> /var/log/orbs-bootstrap.log
   Bootstrap:
     Type: String
-    Default: ''
+    Default: 'v1'
   DockerImage:
     Type: String
     Default: ''
@@ -195,7 +206,6 @@ Conditions:
     - !Not [!Equals [!Ref EbsVolumeType, '']]
     - !Not [!Equals [!Ref DeviceName, '']]
   CreateWithASG: !Equals [!Ref CreateWithASG, 'true']
-  DefaultBootstrap: !Equals [!Ref Bootstrap, '']
   UseCustomAMI: !Not [!Equals [!Ref AmiId, '']]
   ImportRole: !Equals [!Ref IamRoleInstanceProfile, '']
   ImportElasticIP: !Equals [!Ref ElasticIP, '']
@@ -315,10 +325,17 @@ Resources:
         Fn::Base64: !Sub
           - |
            #!/bin/bash -xe
+           mkdir -p /opt/scripts
+
+           cat > /opt/scripts/update.sh <<-EOF
+           #!/bin/bash -xe
            export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG}
            hostname $NODE_NAME
+           aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/orbs/
+           bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
+           EOF
 
-           ${BOOTSTRAP}
+           bash /opt/scripts/update.sh
           - EIP: !If
               - ImportElasticIP
               - Fn::ImportValue: !Join ["-", ["orbs-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
@@ -334,7 +351,7 @@ Resources:
               - !Ref DockerImage
             NODE_ENV: !Ref NodeEnv
             REGION: !Ref "AWS::Region"
-            BOOTSTRAP: !If [DefaultBootstrap, !Ref DefaultBootstrapCommand, !Ref EthereumBootstrapCommand]
+            BOOTSTRAP: !Ref Bootstrap
             S3_CONFIG:
               Fn::ImportValue: !Join ["-", ["orbs-network-s3-bucket", !Ref NodeEnv, !Ref "AWS::Region"]]
   InstanceAsg:
