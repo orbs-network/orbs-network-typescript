@@ -30,7 +30,7 @@ export default class ConsensusService extends Service {
 
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    const obj: any = JSON.parse(rpc.req.buffer.toString("utf8"));
-    this.consensus.gossipMessageReceived(rpc.req.fromAddress, rpc.req.messageType, obj);
+    const payload: any = JSON.parse(rpc.req.buffer.toString("utf8"));
+    this.consensus.gossipMessageReceived(rpc.req.fromAddress, rpc.req.messageType, payload);
   }
 }
