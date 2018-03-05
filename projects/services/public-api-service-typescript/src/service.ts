@@ -35,6 +35,10 @@ export default class PublicApiService extends Service {
 
   }
 
+  async shutdown() {
+
+  }
+
   @Service.RPCMethod
   async sendTransaction(rpc: types.SendTransactionContext) {
     await this.publicApi.sendTransaction(rpc.req);

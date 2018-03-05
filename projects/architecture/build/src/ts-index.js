@@ -22,5 +22,11 @@ _.forEach(json, (value, key) => {
     console.log(`  ${key}: [ ${fixedMethods.join(", ")} ],`);
   }
 });
+console.log(`
+getPathToProto(protoName) {
+  const resolve = require('path').resolve;
+  return resolve(__dirname + '/../interfaces/' + protoName);
+}
+`)
 console.log(`}`);
 console.log();

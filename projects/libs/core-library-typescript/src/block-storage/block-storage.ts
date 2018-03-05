@@ -2,15 +2,10 @@ import * as path from "path";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
-import { config } from "../common-library/config";
-
 import { LevelDBDriver } from "./leveldb-driver";
-
-const NODE_NAME = config.get("NODE_NAME");
 
 export class BlockStorage {
   public static readonly LAST_BLOCK_ID_KEY: string = "last";
-  public static readonly LEVELDB_PATH: string = path.resolve(`../../../db/blocks_${NODE_NAME}.db`);
   public static readonly GENESIS_BLOCK: types.Block = {
     header: {
       version: 0,
@@ -30,9 +25,9 @@ export class BlockStorage {
   private lastBlock: types.Block;
   private db: LevelDBDriver;
 
-  public constructor() {
+  public constructor(config: {dbPath: string}) {
     // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(BlockStorage.LEVELDB_PATH);
+    this.db = new LevelDBDriver(config.dbPath);
   }
 
   public async load(): Promise<void> {
@@ -56,6 +51,11 @@ export class BlockStorage {
     logger.info(`Got last block ID: ${lastBlockId}`);
 
     this.lastBlock = await this.getBlock(lastBlockId);
+  }
+
+  public async shutdown() {
+    logger.info(`Shutting down block storage`);
+    return this.db.close();
   }
 
   // Adds new block to the persistent block storage.
@@ -91,21 +91,25 @@ export class BlockStorage {
     return this.lastBlock.header.id;
   }
 
+  public async hasNewBlocks(fromLastBlockId: number): Promise<boolean> {
+    return await this.getLastBlockId() > fromLastBlockId;
+  }
+
   private verifyNewBlock(block: types.Block) {
     if (block.header.version !== 0) {
       throw new Error(`Invalid block version: ${block.header.version}!`);
     }
 
     if (block.header.id !== this.lastBlock.header.id + 1) {
-      throw new Error(`Invalid block ID of block: ${block}!`);
+      throw new Error(`Invalid block ID of block: ${JSON.stringify(block)}!`);
     }
 
     if (block.header.prevBlockId !== this.lastBlock.header.id) {
-      throw new Error(`Invalid prev block ID of block: ${block}! Should have been ${this.lastBlock.header.id}`);
+      throw new Error(`Invalid prev block ID of block: ${JSON.stringify(block)}! Should have been ${this.lastBlock.header.id}`);
     }
   }
 
-  private async getBlock(id: number): Promise<types.Block> {
+  public async getBlock(id: number): Promise<types.Block> {
     return JSON.parse(await this.db.get<string>(id.toString()));
   }
 

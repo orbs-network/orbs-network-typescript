@@ -1,9 +1,6 @@
 import * as WebSocket from "ws";
 
 import { logger } from "../common-library/logger";
-import { topology } from "../common-library/topology";
-import { topologyPeers } from "../common-library/topologyPeers";
-
 import { includes } from "lodash";
 import { platform, networkInterfaces } from "os";
 
@@ -28,16 +25,19 @@ export class Gossip {
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
   listeners: Map<string, any> = new Map();
-  peers: any = topologyPeers(topology().peers);
+  gossipPeers: any;
+  peers: any;
   nodeIp: string;
 
-  constructor(port: number, localAddress: string, nodeIp: string) {
-    this.server = new WebSocket.Server({ port });
+  constructor(gossipPort: any, gossipPeers: any, peers: any, localAddress: string, nodeIp: string) {
+    this.server = new WebSocket.Server({ port: gossipPort });
     this.nodeIp = nodeIp;
     this.localAddress = localAddress;
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
     });
+    this.peers = peers;
+    this.gossipPeers = gossipPeers;
   }
 
   helloMessage(): Buffer {
@@ -132,14 +132,24 @@ export class Gossip {
       me = this.localAddress;
 
     // TODO: better self-exclusion policy
-    return topology().gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
+    return this.gossipPeers.filter((p: string) => !includes(p, ip) && !includes(p, me));
   }
 
   public activePeers() {
     return this.clients.keys();
   }
 
+  public activeBroadcastGroups() {
+    return Object.keys(this.peers);
+  }
+
   async discoverPeers(): Promise<string[]> {
     return Promise.resolve(this.possiblePeers());
+  }
+
+  async shutdown(): Promise<void> {
+    return new Promise<void>((resolve, reject) => this.server.close((err) => {
+      err ? reject(err) : resolve();
+    }));
   }
 }

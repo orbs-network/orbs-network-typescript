@@ -17,6 +17,10 @@ export default class TransactionPoolService extends Service {
   async initialize() {
   }
 
+  async shutdown() {
+
+  }
+
   @Service.RPCMethod
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
     this.transactionPool.addNewPendingTransaction(rpc.req.transaction);
