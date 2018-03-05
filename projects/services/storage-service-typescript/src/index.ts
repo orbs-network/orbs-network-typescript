@@ -5,7 +5,7 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 import BlockStorageService from "./block-storage-service";
 import StateStorageService from "./state-storage-service";
 
-const { NODE_NAME, NODE_ENV, LOGZIO_API_KEY, BLOCK_STORAGE_POLL_INTERVAL } = process.env;
+const { NODE_NAME, NODE_ENV, LOGZIO_API_KEY, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = process.env;
 
 ErrorHandler.setup();
 
@@ -25,7 +25,7 @@ if (!NODE_NAME) {
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 
-const blockStorageDBPath = path.resolve(path.join("../../../db", NODE_ENV || "development") + "blocks.db");
+const blockStorageDBPath = BLOCK_STORAGE_DB_PATH || path.resolve(path.join("../../../db", NODE_ENV || "development") + "blocks.db");
 
 const blockStorageConfig = {
   nodeName: NODE_NAME,
