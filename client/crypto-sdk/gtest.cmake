@@ -10,8 +10,11 @@ ExternalProject_Add(
   UPDATE_COMMAND ""
   INSTALL_COMMAND ""
   LOG_DOWNLOAD ON
+  LOG_UPDATE ON
   LOG_CONFIGURE ON
-  LOG_BUILD ON)
+  LOG_BUILD ON
+  LOG_INSTALL ON
+)
 
 ExternalProject_Get_Property(googletest source_dir)
 set(GTEST_INCLUDE_DIRS ${source_dir}/googletest/include)
