@@ -1,0 +1,15 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+---
+Language: Cpp
+NamespaceIndentation: None
+AccessModifierOffset: -4
+BreakConstructorInitializersBeforeComma: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortFunctionsOnASingleLine: None
+AlwaysBreakTemplateDeclarations: true
+AllowShortCaseLabelsOnASingleLine: false
+IndentCaseLabels: true
+---
