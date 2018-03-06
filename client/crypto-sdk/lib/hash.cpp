@@ -1,10 +1,10 @@
 #include "hash.h"
 
-#include <exception>
+#include <gcrypt.h>
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <sodium.h>
 
 using namespace std;
 using namespace Orbs;
@@ -20,14 +20,10 @@ static const string vec2hex(const vector<uint8_t> &data) {
 }
 
 void Hash::SHA256(const vector<uint8_t> &data, vector<uint8_t> &res) {
-    res.clear();
+    size_t digestLength = gcry_md_get_algo_dlen(GCRY_MD_SHA256);
+    res.resize(digestLength);
 
-    unsigned char out[crypto_hash_sha256_BYTES];
-    if (crypto_hash_sha256(out, &data[0], data.size())) {
-        throw runtime_error("crypto_hash_sha256 failed!");
-    }
-
-    res.insert(res.end(), out, out + sizeof(out));
+    gcry_md_hash_buffer(GCRY_MD_SHA256, &res[0], &data[0], data.size());
 }
 
 void Hash::SHA256(const vector<uint8_t> &data, string &res) {
