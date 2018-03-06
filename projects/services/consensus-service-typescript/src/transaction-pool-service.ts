@@ -40,7 +40,7 @@ export default class TransactionPoolService extends Service {
 
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    const obj: any = JSON.parse(rpc.req.Buffer.toString("utf8"));
-    await this.transactionPool.gossipMessageReceived(rpc.req.FromAddress, rpc.req.MessageType, obj);
+    const obj: any = JSON.parse(rpc.req.buffer.toString("utf8"));
+    await this.transactionPool.gossipMessageReceived(rpc.req.fromAddress, rpc.req.messageType, obj);
   }
 }

@@ -10,11 +10,11 @@ export class Consensus {
   private raftConsensus: RaftConsensus;
 
   constructor(
-    options: RaftConsensusConfig, gossip: types.GossipClient,
+    config: RaftConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
     this.raftConsensus = new RaftConsensus(
-      options, gossip, blockStorage, transactionPool, new BlockBuilder({ virtualMachine, transactionPool }));
+      config, gossip, blockStorage, transactionPool, new BlockBuilder({ virtualMachine, transactionPool }));
   }
 
   async initialize() {

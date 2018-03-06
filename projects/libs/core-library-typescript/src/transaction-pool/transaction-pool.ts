@@ -57,10 +57,10 @@ export class TransactionPool {
 
   private async broadcastTransactionToOtherNodes(transaction: types.Transaction) {
     await this.gossip.broadcastMessage({
-      BroadcastGroup: "transactionPool",
-      MessageType: "newTransaction",
-      Buffer: new Buffer(JSON.stringify({transaction})),
-      Immediate: true
+      broadcastGroup: "transactionPool",
+      messageType: "newTransaction",
+      buffer: new Buffer(JSON.stringify({transaction})),
+      immediate: true
     });
   }
 }
