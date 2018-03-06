@@ -7,6 +7,8 @@ using namespace std;
 using namespace testing;
 using namespace Orbs;
 
+// SHA256 tests:
+
 TEST(Hash, returns_binary_SHA256_of_binary) {
     vector<uint8_t> res;
     vector<uint8_t> data;
@@ -22,10 +24,10 @@ TEST(Hash, returns_binary_SHA256_of_binary) {
     Hash::SHA256(data, res);
     EXPECT_THAT(res, ElementsAreArray("\x7f\x83\xb1\x65\x7f\xf1\xfc\x53\xb9\x2d\xc1\x81\x48\xa1\xd6\x5d\xfc\x2d\x4b\x1f\xa3\xd6\x77\x28\x4a\xdd\xd2\x00\x12\x6d\x90\x69", 32));
 
-    rawData = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prizewinner.";
+    rawData = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::SHA256(data, res);
-    EXPECT_THAT(res, ElementsAreArray("\xc8\x5e\x3c\x7e\x98\xcb\x5f\xf5\x72\xf1\x47\x57\x2c\xad\xf9\xef\x06\x5f\x1a\x27\xc9\xe7\xc2\xef\xfe\xe2\xe2\xa4\xdf\x97\x46\x7f", 32));
+    EXPECT_THAT(res, ElementsAreArray("\x24\x87\x08\x58\xd5\xc3\xe7\x67\xcf\x2d\x3c\xeb\x2e\x27\xdd\xa0\x9c\x56\x6d\x1e\xc5\xc7\xd5\x25\x41\x82\x97\x11\x14\xf2\xea\x66", 32));
 
     rawData = "אורבס";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
@@ -42,8 +44,8 @@ TEST(Hash, returns_binary_SHA256_of_string) {
     Hash::SHA256("Hello World!", res);
     EXPECT_THAT(res, ElementsAreArray("\x7f\x83\xb1\x65\x7f\xf1\xfc\x53\xb9\x2d\xc1\x81\x48\xa1\xd6\x5d\xfc\x2d\x4b\x1f\xa3\xd6\x77\x28\x4a\xdd\xd2\x00\x12\x6d\x90\x69", 32));
 
-    Hash::SHA256("If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prizewinner.", res);
-    EXPECT_THAT(res, ElementsAreArray("\xc8\x5e\x3c\x7e\x98\xcb\x5f\xf5\x72\xf1\x47\x57\x2c\xad\xf9\xef\x06\x5f\x1a\x27\xc9\xe7\xc2\xef\xfe\xe2\xe2\xa4\xdf\x97\x46\x7f", 32));
+    Hash::SHA256("If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.", res);
+    EXPECT_THAT(res, ElementsAreArray("\x24\x87\x08\x58\xd5\xc3\xe7\x67\xcf\x2d\x3c\xeb\x2e\x27\xdd\xa0\x9c\x56\x6d\x1e\xc5\xc7\xd5\x25\x41\x82\x97\x11\x14\xf2\xea\x66", 32));
 
     Hash::SHA256("אורבס", res);
     EXPECT_THAT(res, ElementsAreArray("\xb4\x84\xa0\x30\xe6\xea\x71\x5b\x5a\xdb\x74\x30\x1a\x7f\x46\x74\xd1\x44\xaf\x61\xf0\x8f\x77\x6c\x69\xcf\x16\xc2\x8a\x86\xb3\x4b", 32));
@@ -64,10 +66,10 @@ TEST(Hash, returns_string_SHA256_of_binary) {
     Hash::SHA256(data, res);
     EXPECT_EQ(res, "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069");
 
-    rawData = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prizewinner.";
+    rawData = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::SHA256(data, res);
-    EXPECT_EQ(res, "c85e3c7e98cb5ff572f147572cadf9ef065f1a27c9e7c2effee2e2a4df97467f");
+    EXPECT_EQ(res, "24870858d5c3e767cf2d3ceb2e27dda09c566d1ec5c7d5254182971114f2ea66");
 
     rawData = "אורבס";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
@@ -84,8 +86,8 @@ TEST(Hash, returns_string_SHA256_of_string) {
     Hash::SHA256("Hello World!", res);
     EXPECT_EQ(res, "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069");
 
-    Hash::SHA256("If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prizewinner.", res);
-    EXPECT_EQ(res, "c85e3c7e98cb5ff572f147572cadf9ef065f1a27c9e7c2effee2e2a4df97467f");
+    Hash::SHA256("If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.", res);
+    EXPECT_EQ(res, "24870858d5c3e767cf2d3ceb2e27dda09c566d1ec5c7d5254182971114f2ea66");
 
     Hash::SHA256("אורבס", res);
     EXPECT_EQ(res, "b484a030e6ea715b5adb74301a7f4674d144af61f08f776c69cf16c28a86b34b");
