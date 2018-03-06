@@ -71,7 +71,8 @@ const waitForStacks = (cloudFormation, condition) => new Promise((resolve, rejec
 });
 
 const uploadBootstrap = (options) => {
-    shell.exec(`aws s3 sync ${__dirname}/../bootstrap/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/v1/`);
+    const { s3Path, localPath } = options.parity ? { s3Path: "parity", localPath: "parity" } : { s3Path: "v1", localPath: "bootstrap" };
+    shell.exec(`aws s3 sync ${__dirname}/../${localPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
 };
 
 const pushDockerImage = (options) => {
@@ -134,7 +135,10 @@ const main = (options) => {
             setParameter(basicInfrastructureParams, "BucketName", options.bucketName);
         }
 
-        createStack(cloudFormation, basicInfrastructureStackName, "../cloudformation/basic-infrastructure.yaml", basicInfrastructureParams).catch(process.exit);
+        createStack(cloudFormation, basicInfrastructureStackName, `${__dirname}/../cloudformation/basic-infrastructure.yaml`, basicInfrastructureParams).catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
     }
 
     waitForStacks(cloudFormation, (stacks) => {
@@ -148,7 +152,7 @@ const main = (options) => {
             pushDockerImage(options);
         }
 
-        const stackName = `orbs-network-${options.network}`;
+        const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
 
         if (options.deployNode) {
             if (options.removeNode) {
@@ -161,13 +165,17 @@ const main = (options) => {
             }).then(() => {
                 console.log(`Deploying new node...`);
 
-                const standaloneParams = JSON.parse(fs.readFileSync("../cloudformation/parameters.standalone.json").toString());
+                const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
+
+                const standaloneParams = JSON.parse(fs.readFileSync(`${__dirname}/../cloudformation/${paramsFileName}`).toString());
                 setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
                 setParameter(standaloneParams, "KeyName", keyName);
 
-                createStack(cloudFormation, stackName, "../cloudformation/node.yaml", standaloneParams);
+                createStack(cloudFormation, stackName, `${__dirname}/../cloudformation/node.yaml`, standaloneParams);
 
-                console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${options.region}.global.nodes.${options.NODE_ENV}.${options.dnsZone}`);
+                const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
+
+                console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
             });
         }
     });
@@ -184,5 +192,6 @@ main({
     bucketName: config.get("s3-bucket-name"),
     pushDockerImage: config.get("push-docker-image"),
     deployNode: config.get("deploy-node"),
-    removeNode: config.get("removeNode")
+    removeNode: config.get("removeNode"),
+    parity: config.get("parity")
 });

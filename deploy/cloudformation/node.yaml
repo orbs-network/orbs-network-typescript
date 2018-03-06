@@ -35,6 +35,13 @@ Mappings:
       "64": ami-531a4c3c
     sa-east-1:
       "64": ami-84175ae8
+  NodeNames:
+    parity:
+      name: ethereum
+      path: parity
+    v1:
+      name: orbs
+      path: orbs
 
 Parameters:
   KeyName:
@@ -313,18 +320,18 @@ Resources:
            #!/bin/bash -xe
            export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG}
            hostname $NODE_NAME
-           aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/orbs/
-           bash /opt/orbs/bootstrap.sh &>> /var/log/orbs-bootstrap.log
+           aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/${BOOTSTRAP_PATH}/
+           bash /opt/${BOOTSTRAP_PATH}/bootstrap.sh &>> /var/log/orbs-bootstrap.log
            EOF
 
            bash /opt/scripts/update.sh
           - EIP: !If
               - ImportElasticIP
-              - Fn::ImportValue: !Join ["-", ["orbs-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
+              - Fn::ImportValue: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
               - !Ref ElasticIP
             NODE_NAME: !If
               - ImportNodeName
-              - !Join ["-", ["global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
+              - !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
               - !Ref NodeName
             DOCKER_TAG: !Ref DockerTag
             DOCKER_IMAGE: !If
@@ -334,6 +341,7 @@ Resources:
             NODE_ENV: !Ref NodeEnv
             REGION: !Ref "AWS::Region"
             BOOTSTRAP: !Ref Bootstrap
+            BOOTSTRAP_PATH: !FindInMap [ NodeNames, !Ref Bootstrap, "path" ]
             S3_CONFIG:
               Fn::ImportValue: !Join ["-", ["orbs-network-s3-bucket", !Ref NodeEnv, !Ref "AWS::Region"]]
   InstanceAsg:

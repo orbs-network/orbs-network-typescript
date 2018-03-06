@@ -8,14 +8,6 @@
         "ParameterValue": "c5.xlarge"
     },
     {
-        "ParameterKey": "IamRoleInstanceProfile",
-        "ParameterValue": "orbs-network"
-    },
-    {
-        "ParameterKey": "AmiId",
-        "ParameterValue": "ami-f2d3638a"
-    },
-    {
         "ParameterKey": "SecurityIngressFromPort",
         "ParameterValue": "22"
     },
@@ -34,10 +26,6 @@
     {
         "ParameterKey": "SubnetCidr2",
         "ParameterValue": "10.0.1.0/24"
-    },
-    {
-        "ParameterKey": "ElasticIP",
-        "ParameterValue": "eipalloc-fe9f72c2"
     },
     {
         "ParameterKey": "DockerTag",

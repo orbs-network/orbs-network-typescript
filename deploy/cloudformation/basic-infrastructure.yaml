@@ -46,6 +46,7 @@ Resources:
       BucketName: !Join ["-", [!Ref BucketName, !Ref NodeEnv, !Ref "AWS::Region"]]
 
   # TODO: only give access to region bucket
+  # TODO: different infrastructure for parity node
   NetworkAccessS3Policy:
     Type: "AWS::IAM::Policy"
     Properties:
@@ -67,9 +68,7 @@ Resources:
               ],
               "Resource": [
                 !Join ["", ["arn:aws:s3:::", !Ref BucketName, "-", !Ref NodeEnv, "-", !Ref "AWS::Region", ""]],
-                !Join ["", ["arn:aws:s3:::", !Ref BucketName, "-", !Ref NodeEnv, "-", !Ref "AWS::Region", "/*"]],
-                # TODO: remove later
-                "arn:aws:s3:::orbs-network-config-staging*"
+                !Join ["", ["arn:aws:s3:::", !Ref BucketName, "-", !Ref NodeEnv, "-", !Ref "AWS::Region", "/*"]]
               ]
             },
             {
@@ -123,17 +122,32 @@ Resources:
     Properties:
       Domain: vpc
 
-  # TODO: add condition, customize zone
+  EthereumNodeElasticIP:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+
   NodeDomainName:
     Type: AWS::Route53::RecordSet
     Condition: HasDNSZone
     Properties:
-      HostedZoneName: !Ref DNSZone
-      Name: !Join ["", [!Ref "AWS::Region", ".global.nodes.", !Ref NodeEnv, ".", !Ref DNSZone, "."]]
+      HostedZoneName: !Join ["", [!Ref DNSZone, "."]]
+      Name: !Join [".", [!Ref "AWS::Region", "global.nodes", !Ref NodeEnv, !Ref DNSZone, ""]]
       Type: A
       TTL: 900
       ResourceRecords:
         - !Ref NodeElasticIP
+
+  EthereumNodeDomainName:
+    Type: AWS::Route53::RecordSet
+    Condition: HasDNSZone
+    Properties:
+      HostedZoneName: !Join ["", [!Ref DNSZone, "."]]
+      Name: !Join [".", ["ethereum", !Ref "AWS::Region", "global.services", !Ref NodeEnv, !Ref DNSZone, ""]]
+      Type: A
+      TTL: 900
+      ResourceRecords:
+        - !Ref EthereumNodeElasticIP
 
 Outputs:
   NetworkRole:
@@ -156,11 +170,22 @@ Outputs:
     Export:
       Name: !Join ["-", ["orbs-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
 
+  EthereumNodeElasticIP:
+    Value: !GetAtt EthereumNodeElasticIP.AllocationId
+    Export:
+      Name: !Join ["-", ["ethereum-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
+
   NodeDomainName:
     Condition: HasDNSZone
     Value: !Ref NodeDomainName
     Export:
       Name: !Join ["-", ["orbs-node-domain-name", !Ref NodeEnv, !Ref "AWS::Region"]]
+
+  EthereumNodeDomainName:
+    Condition: HasDNSZone
+    Value: !Ref EthereumNodeDomainName
+    Export:
+      Name: !Join ["-", ["ethereum-node-domain-name", !Ref NodeEnv, !Ref "AWS::Region"]]
 
   NetworkS3Bucket:
     Value: !Ref NetworkS3Bucket
