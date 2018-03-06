@@ -201,6 +201,10 @@ const main = (options) => {
                 setParameter(standaloneParams, "KeyName", keyName);
                 setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag(options));
 
+                if (options.nodes) {
+                    setParameter("NumOfNodes", options.numOfNodes);
+                }
+
                 createStack(cloudFormation, stackName, `${__dirname}/../cloudformation/node.yaml`, standaloneParams);
 
                 const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
@@ -222,6 +226,7 @@ main({
     bucketName: config.get("s3-bucket-name"),
     pushDockerImage: config.get("push-docker-image"),
     tagDockerImage: config.get("tag-docker-image"),
+    numOfNodes: config.get("nodes"),
     dockerTag: config.get("docker-tag"),
     deployNode: config.get("deploy-node"),
     removeNode: config.get("removeNode"),
