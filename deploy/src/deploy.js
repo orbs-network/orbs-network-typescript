@@ -190,6 +190,7 @@ const main = (options) => {
             }
 
             waitForStacks(cloudFormation, (stacks) => {
+                // TODO: fix to accommodate both parity node and basic infrastructure node
                 return _.size(stacks) === 1;
             }).then(() => {
                 console.log(`Deploying new node...`);

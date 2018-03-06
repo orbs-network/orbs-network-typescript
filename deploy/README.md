@@ -64,7 +64,7 @@ node deploy.js \
     --region $REGION \
     --ssh-public-key $PUBLIC_KEY_PATH \
     --dns-zone $DNS_ZONE \
-    --account-id $ACCOUNT_ID \
+    --account-id $AWS_ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
     --create-basic-infrastructure --tag-docker-image --push-docker-image --deploy-node
@@ -75,7 +75,7 @@ node deploy.js \
     --region $REGION \
     --ssh-public-key $PUBLIC_KEY_PATH \
     --dns-zone $DNS_ZONE \
-    --account-id $ACCOUNT_ID \
+    --account-id $AWS_ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
     --deploy-node --parity
@@ -85,7 +85,7 @@ node deploy.js \
 node deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
-    --account-id $ACCOUNT_ID \
+    --account-id $AWS_ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
     --remove-node --deploy-node

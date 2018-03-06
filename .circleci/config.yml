@@ -15,7 +15,7 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: cd deploy/cloudformation && npm install && ./create-stacks.sh
+      - run: cd deploy && yarn install && ./deploy-staging.sh
 
 workflows:
   version: 2
@@ -27,4 +27,4 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: feature/delivery-to-clients
