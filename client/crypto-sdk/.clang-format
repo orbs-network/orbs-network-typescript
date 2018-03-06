@@ -1,15 +1,13 @@
 ---
-BasedOnStyle: LLVM
+BasedOnStyle: None
 IndentWidth: 4
 UseTab: Never
 ---
 Language: Cpp
+ColumnLimit: 120
 NamespaceIndentation: None
 AccessModifierOffset: -4
-BreakConstructorInitializersBeforeComma: false
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
-AllowShortFunctionsOnASingleLine: None
-AlwaysBreakTemplateDeclarations: true
-AllowShortCaseLabelsOnASingleLine: false
-IndentCaseLabels: true
+AlignAfterOpenBracket: false
+BinPackParameters: false
+ContinuationIndentWidth: 0
 ---
