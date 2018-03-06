@@ -91,7 +91,12 @@ export class Gossip {
         this.listeners.set(broadcastGroup, peer);
       }
 
-      this.listeners.get(broadcastGroup).gossipMessageReceived({FromAddress: sender.toString(), BroadcastGroup: broadcastGroup, MessageType: objectType, Buffer: objectRaw});
+      this.listeners.get(broadcastGroup).gossipMessageReceived({
+        fromAddress: sender.toString(),
+        broadcastGroup,
+        messageType: objectType,
+        buffer: objectRaw
+      });
     });
 
     ws.send(this.helloMessage());

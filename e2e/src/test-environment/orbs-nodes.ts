@@ -11,7 +11,7 @@ const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 
 export interface OrbsNodeConfig {
     nodeName: string;
-    nodeOrbsNetworkIp: string;
+    numOfNodes: number;
     nodePublicApiIp: string;
     privateSubnet: string;
     forceRecreate?: boolean;
@@ -65,13 +65,13 @@ export class OrbsNode implements TestComponent {
                     NODE_CONFIG_PATH : NODE_CONFIG_PATH,
                     PRIVATE_NETWORK: this.config.privateSubnet,
                     NODE_NAME: this.config.nodeName,
-                    NODE_IP: this.config.nodeOrbsNetworkIp,
+                    NUM_OF_NODES: this.config.numOfNodes,
                     PUBLIC_API_IP: this.config.nodePublicApiIp,
                     GOSSIP_PEERS: this.config.gossipPeers,
                     PUBLIC_API_HOST_PORT: this.config.publicApiHostPort,
-                    SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
-                    SIDECHAIN_CONNECTOR__PUBLIC_IP: this.config.sidechainConnectorPublicIp,
-                    SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS : this.config.ethereumSubscriptionContractAddress,
+                    SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
+                    SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
+                    SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS : this.config.ethereumSubscriptionContractAddress,
                     DEBUG_PORT: this.config.debugPort }
                 }
             }, (code: any, stdout: any, stderr: any) => {
@@ -96,8 +96,6 @@ export class OrbsNodeCluster implements TestComponent {
     readonly nodes: OrbsNode[];
     readonly config: OrbsNodeClusterConfig;
 
-
-
     private generateNodeInstances(numOfNodes: number) {
         const gossipPeerIps = [];
         for (let i = 0; i < numOfNodes; i++) {
@@ -108,7 +106,7 @@ export class OrbsNodeCluster implements TestComponent {
         for (let i = 0; i < numOfNodes; i++) {
             nodes.push(new OrbsNode({
                 nodeName: `node${i + 1}`,
-                nodeOrbsNetworkIp: gossipPeerIps[i],
+                numOfNodes: numOfNodes,
                 nodePublicApiIp: this.config.publicApiNetwork.allocateAddress(),
                 gossipPeers,
                 privateSubnet: `162.100.${i + 1}`,

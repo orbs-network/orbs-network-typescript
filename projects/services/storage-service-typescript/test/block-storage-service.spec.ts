@@ -4,10 +4,11 @@ import * as chaiAsPromised from "chai-as-promised";
 import { delay } from "bluebird";
 import { initNodesWithBlocks, NodeLoader } from "./node-loader";
 
+const { expect } = chai;
+
 ErrorHandler.setup();
 
 chai.use(chaiAsPromised);
-
 
 describe("Block storage service", async function () {
   this.timeout(200000);
@@ -20,7 +21,7 @@ describe("Block storage service", async function () {
 
       const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
 
-      return chai.expect(values).to.eventually.be.eql([20, 20]);
+      return expect(values).to.eventually.be.eql([20, 20]);
 
     });
 
@@ -29,8 +30,7 @@ describe("Block storage service", async function () {
 
       const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
 
-      return chai.expect(values).to.eventually.be.eql([100, 100, 100, 100]);
-
+      return expect(values).to.eventually.be.eql([100, 100, 100, 100]);
     });
 
     xit("finishes if we keep adding more and more blocks to other nodes");

@@ -30,7 +30,6 @@
     "lodash": "^4.17.4",
     "mali": "^0.7.1",
     "mkdirp": "^0.5.1",
-    "nconf": "^0.10.0",
     "orbs-interfaces": "file:../../architecture",
     "protobufjs": "^6.8.4",
     "solc": "0.4.18",

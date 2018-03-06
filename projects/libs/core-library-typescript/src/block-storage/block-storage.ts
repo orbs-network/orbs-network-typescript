@@ -2,6 +2,7 @@ import * as path from "path";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
+
 import { LevelDBDriver } from "./leveldb-driver";
 
 export class BlockStorage {
@@ -25,9 +26,9 @@ export class BlockStorage {
   private lastBlock: types.Block;
   private db: LevelDBDriver;
 
-  public constructor(config: {dbPath: string}) {
+  public constructor(dbPath: string) {
     // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(config.dbPath);
+    this.db = new LevelDBDriver(dbPath);
   }
 
   public async load(): Promise<void> {

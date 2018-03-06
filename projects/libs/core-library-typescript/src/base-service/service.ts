@@ -11,8 +11,9 @@ export interface ServiceConfig {
 }
 
 export abstract class Service {
+  public config: ServiceConfig;
   public name: string;
-  public nodeName: string;
+
   protected static RPCMethod(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<Function>,
     silent: boolean = false): any {
     if (!descriptor || (typeof descriptor.value !== "function")) {
@@ -22,7 +23,7 @@ export abstract class Service {
     if (!silent) {
       const originalMethod = descriptor.value;
       descriptor.value = function(rpc: any) {
-        logger.debug(`${this.nodeName}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
+        logger.debug(`${this.config.nodeName}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
 
         return originalMethod.apply(this, [rpc]);
       };
@@ -36,9 +37,9 @@ export abstract class Service {
     return Service.RPCMethod(target, propertyKey, descriptor, true);
   }
 
-  public constructor(serviceConfig: ServiceConfig) {
+  public constructor(config: ServiceConfig) {
     this.name = this.constructor.name;
-    this.nodeName = serviceConfig.nodeName;
+    this.config = config;
   }
 
   abstract async initialize(): Promise<void>;
@@ -46,7 +47,7 @@ export abstract class Service {
   public async start() {
     await this.initialize();
 
-    logger.info(`${this.nodeName} (${this.name}): service started`);
+    logger.info(`${this.config.nodeName} (${this.name}): service started`);
   }
 
   abstract async shutdown(): Promise<void>;
@@ -54,7 +55,6 @@ export abstract class Service {
   public async stop() {
     await this.shutdown();
 
-    logger.info(`${this.nodeName} (${this.name}): service shut down`);
+    logger.info(`${this.config.nodeName} (${this.name}): service shut down`);
   }
-
 }

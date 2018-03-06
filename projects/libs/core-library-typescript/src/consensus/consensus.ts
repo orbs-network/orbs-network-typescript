@@ -1,5 +1,4 @@
 import { logger } from "../common-library/logger";
-import { config } from "../common-library/config";
 import { types } from "../common-library/types";
 
 import { Gossip } from "../gossip";

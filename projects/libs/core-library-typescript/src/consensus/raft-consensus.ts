@@ -3,11 +3,8 @@ import { EventEmitter } from "events";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
-import { config } from "../common-library/config";
 
 import { Gossip } from "../gossip";
-
-const NODE_NAME = config.get("NODE_NAME");
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
@@ -37,20 +34,20 @@ class RPCConnector extends EventEmitter {
 
   public broadcast(data: any): void {
     this.gossip.broadcastMessage({
-      BroadcastGroup: "consensus",
-      MessageType: "RaftMessage",
-      Buffer: new Buffer(JSON.stringify(data)),
-      Immediate: true
+      broadcastGroup: "consensus",
+      messageType: "RaftMessage",
+      buffer: new Buffer(JSON.stringify(data)),
+      immediate: true
     });
   }
 
   public send(nodeId: string, data: any): void {
     this.gossip.unicastMessage({
-      Recipient: nodeId,
-      BroadcastGroup: "consensus",
-      MessageType: "RaftMessage",
-      Buffer: new Buffer(JSON.stringify(data)),
-      Immediate: true
+      recipient: nodeId,
+      broadcastGroup: "consensus",
+      messageType: "RaftMessage",
+      buffer: new Buffer(JSON.stringify(data)),
+      immediate: true
     });
   }
 }
@@ -61,6 +58,8 @@ export interface ElectionTimeoutConfig {
 }
 
 export interface RaftConsensusConfig {
+  nodeName: string;
+
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
@@ -79,10 +78,10 @@ export class RaftConsensus {
     this.virtualMachine = virtualMachine;
     this.blockStorage = storage;
     this.lastBlockId = -1;
-    this.connector = new RPCConnector(NODE_NAME, gossip);
+    this.connector = new RPCConnector(options.nodeName, gossip);
 
     this.node = gaggle({
-      id: NODE_NAME,
+      id: options.nodeName,
       clusterSize: options.clusterSize,
       channel: {
         name: "custom",
