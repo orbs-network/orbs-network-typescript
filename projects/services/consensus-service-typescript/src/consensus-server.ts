@@ -50,5 +50,5 @@ export default function(nodeTopology: any) {
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers), nodeConfig))
     .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers), nodeConfig))
-    .withService("TransactionPool", new TransactionPoolService(new TransactionPool(), nodeConfig));
+    .withService("TransactionPool", new TransactionPoolService(new TransactionPool(peers.gossip), nodeConfig));
 }

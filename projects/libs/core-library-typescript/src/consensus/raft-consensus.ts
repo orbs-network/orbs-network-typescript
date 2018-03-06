@@ -80,20 +80,20 @@ export class RaftConsensus {
   private pollInterval: NodeJS.Timer;
 
   public constructor(
-    options: RaftConsensusConfig,
+    config: RaftConsensusConfig,
     gossip: types.GossipClient,
-    virtualMachine: types.VirtualMachineClient,
     blockStorage: types.BlockStorageClient,
-    transactionPool: types.TransactionPoolClient
+    transactionPool: types.TransactionPoolClient,
+    blockBuilder: BlockBuilder
   ) {
     this.blockStorage = blockStorage;
-    this.connector = new RPCConnector(options.nodeName, gossip);
-    this.blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
+    this.connector = new RPCConnector(config.nodeName, gossip);
+    this.blockBuilder = blockBuilder;
     this.transactionPool = transactionPool;
 
     this.node = gaggle({
-      id: options.nodeName,
-      clusterSize: options.clusterSize,
+      id: config.nodeName,
+      clusterSize: config.clusterSize,
       channel: {
         name: "custom",
         connector: this.connector
@@ -101,12 +101,12 @@ export class RaftConsensus {
 
       // How long to wait before declaring the leader dead?
       electionTimeout: {
-        min: options.electionTimeout.min,
-        max: options.electionTimeout.max,
+        min: config.electionTimeout.min,
+        max: config.electionTimeout.max,
       },
 
       // How often should the leader send heartbeats?
-      heartbeatInterval: options.heartbeatInterval
+      heartbeatInterval: config.heartbeatInterval
     });
 
     // Nodes will emit "committed" events whenever the cluster comes to consensus about an entry.
