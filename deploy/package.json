@@ -2,9 +2,9 @@
   "name": "cloudformation",
   "version": "0.1.0",
   "description": "## Template and parameters",
-  "main": "create-stacks.js",
+  "main": "src/deploy.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ssh -t -o StrictHostKeyChecking=no ec2-user@pelmeni.nodes.orbs-test.com \"sudo docker exec -ti orbs_public-api_1 /bin/bash -c 'cd /opt/orbs/e2e && yarn test'\""
   },
   "author": "",
   "license": "MIT",
