@@ -45,7 +45,7 @@ describe("Gossip", function() {
             const consensus = consensuses[i];
             if (i == recipientId) {
                 expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-                expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("Buffer").which.equalBytes(buffer);
+                expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
             } else {
                 expect(consensus.gossipMessageReceived).to.have.not.been.called;
             }
@@ -63,7 +63,7 @@ describe("Gossip", function() {
             const consensus = consensuses[i];
             if (i != senderId) {
                 expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-                expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("Buffer").which.equalBytes(buffer);
+                expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
             } else {
                 expect(consensus.gossipMessageReceived).to.have.not.been.called;
             }
