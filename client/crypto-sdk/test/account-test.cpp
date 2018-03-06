@@ -5,7 +5,7 @@
 using namespace Orbs;
 
 TEST(sample_test_case, sample_test) {
-    Orbs::Account a;
+    Account a;
 
     EXPECT_EQ(1, 1);
 }
