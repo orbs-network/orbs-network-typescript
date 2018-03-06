@@ -42,56 +42,11 @@ Create new EC2 pair of keys named `orbs-network-staging-key`.
 
 Please fisrt make sure you have admin credentials on AWS.
 
-```bash
-# Set environment variables
-export REGION=eu-central-1
-export NODE_ENV=staging
-export AWS_ACCOUNT_ID=
-export DNS_ZONE=
-```
-
-```bash
-# Create set of SSH keys that you are going to use to access EC2 instances. Then import them.
-aws ec2 import-key-pair --key-name orbs-network-$NODE_ENV-key --public-key-material "$(cat ~/.ssh/orbs-network-$NODE_ENV-key.pub)" --region $REGION
-```
-
-
-```bash
-# Create basic infrastructure (roles, buckets, elastic ips)
-# TODO: configurable DNS zone, disable Route 53 for any NODE_ENV except staging
-aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --region $REGION --template-body file://`pwd`/basic-infrastructure.yaml --parameters "$(cat parameters.basic-infrastracture.json)" --stack-name basic-infrastructure-$NODE_ENV
-```
-
-```bash
-# This is a stub
-# Copy bootstrap script to a new bucket
-# TODO: update cloudformation.yaml to boot from regional URL
-aws s3 sync ../bootstrap/ s3://orbs-network-config-$NODE_ENV-$REGION/v1/
-```
-
-```bash
-# Push docker image to your new docker repository
-export DOCKER_IMAGE=$AWS_ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/orbs-network-$NODE_ENV-$REGION
-
-$(aws ecr get-login --no-include-email --region $REGION)
-
-docker build -t $DOCKER_IMAGE .
-docker push $DOCKER_IMAGE
-```
-
-```bash
-# Create node stack
-aws cloudformation create-stack --region $REGION --template-body file://`pwd`/cloudformation.yaml --parameters "$(cat parameters.standalone.json)" --stack-name orbs-network-node-$NODE_ENV
-```
-
-```bash
-# SSH into your newly created node
-ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_ZONE
-```
-
 ## Deploying with a single script
 
 ```bash
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
 export REGION=eu-central-1
 export NETWORK=testnet
 export AWS_ACCOUNT_ID=
@@ -135,6 +90,11 @@ node deploy.js \
     --s3-bucket-name $S3_BUCKET_NAME \
     --remove-node --deploy-node
 
+```
+
+```bash
+# SSH into your newly created node
+ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_ZONE
 ```
 
 ## PROPOSAL: Delivery to the clients
