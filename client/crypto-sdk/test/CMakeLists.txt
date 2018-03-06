@@ -6,9 +6,9 @@ file(GLOB CRYPTO_SDK_TEST_SRC
 )
 
 add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
-add_dependencies(crypto-test googletest)
+add_dependencies(crypto-test googletest libgcrypt)
 
-target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY} ${GMOCK_LIBRARY})
+target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY} ${GMOCK_LIBRARY} gcrypt)
 
 # Tell ctest about my tests
 include(GoogleTest)
