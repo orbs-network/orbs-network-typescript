@@ -11,7 +11,7 @@ using namespace Orbs;
 
 static const uint SHA256_DIGEST_LENGTH = 32;
 
-TEST(Hash, returns_binary_SHA256_of_binary) {
+TEST(Hash, computes_binary_SHA256_of_binary) {
     vector<uint8_t> res;
     vector<uint8_t> data;
     string rawData;
@@ -37,7 +37,7 @@ TEST(Hash, returns_binary_SHA256_of_binary) {
     EXPECT_THAT(res, ElementsAreArray("\xb4\x84\xa0\x30\xe6\xea\x71\x5b\x5a\xdb\x74\x30\x1a\x7f\x46\x74\xd1\x44\xaf\x61\xf0\x8f\x77\x6c\x69\xcf\x16\xc2\x8a\x86\xb3\x4b", SHA256_DIGEST_LENGTH));
 }
 
-TEST(Hash, returns_binary_SHA256_of_string) {
+TEST(Hash, computes_binary_SHA256_of_string) {
     vector<uint8_t> res;
 
     Hash::SHA256("", res);
@@ -53,7 +53,7 @@ TEST(Hash, returns_binary_SHA256_of_string) {
     EXPECT_THAT(res, ElementsAreArray("\xb4\x84\xa0\x30\xe6\xea\x71\x5b\x5a\xdb\x74\x30\x1a\x7f\x46\x74\xd1\x44\xaf\x61\xf0\x8f\x77\x6c\x69\xcf\x16\xc2\x8a\x86\xb3\x4b", SHA256_DIGEST_LENGTH));
 }
 
-TEST(Hash, returns_string_SHA256_of_binary) {
+TEST(Hash, computes_string_SHA256_of_binary) {
     string res;
     vector<uint8_t> data;
     string rawData;
@@ -61,45 +61,45 @@ TEST(Hash, returns_string_SHA256_of_binary) {
     rawData = "";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::SHA256(data, res);
-    EXPECT_EQ(res, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    EXPECT_STREQ(res.c_str(), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 
     rawData = "Hello World!";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::SHA256(data, res);
-    EXPECT_EQ(res, "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069");
+    EXPECT_STREQ(res.c_str(), "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069");
 
     rawData = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::SHA256(data, res);
-    EXPECT_EQ(res, "24870858d5c3e767cf2d3ceb2e27dda09c566d1ec5c7d5254182971114f2ea66");
+    EXPECT_STREQ(res.c_str(), "24870858d5c3e767cf2d3ceb2e27dda09c566d1ec5c7d5254182971114f2ea66");
 
     rawData = "אורבס";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::SHA256(data, res);
-    EXPECT_EQ(res, "b484a030e6ea715b5adb74301a7f4674d144af61f08f776c69cf16c28a86b34b");
+    EXPECT_STREQ(res.c_str(), "b484a030e6ea715b5adb74301a7f4674d144af61f08f776c69cf16c28a86b34b");
 }
 
-TEST(Hash, returns_string_SHA256_of_string) {
+TEST(Hash, computes_string_SHA256_of_string) {
     string res;
 
     Hash::SHA256("", res);
-    EXPECT_EQ(res, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    EXPECT_STREQ(res.c_str(), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
 
     Hash::SHA256("Hello World!", res);
-    EXPECT_EQ(res, "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069");
+    EXPECT_STREQ(res.c_str(), "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069");
 
     Hash::SHA256("If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.", res);
-    EXPECT_EQ(res, "24870858d5c3e767cf2d3ceb2e27dda09c566d1ec5c7d5254182971114f2ea66");
+    EXPECT_STREQ(res.c_str(), "24870858d5c3e767cf2d3ceb2e27dda09c566d1ec5c7d5254182971114f2ea66");
 
     Hash::SHA256("אורבס", res);
-    EXPECT_EQ(res, "b484a030e6ea715b5adb74301a7f4674d144af61f08f776c69cf16c28a86b34b");
+    EXPECT_STREQ(res.c_str(), "b484a030e6ea715b5adb74301a7f4674d144af61f08f776c69cf16c28a86b34b");
 }
 
 // RIPEMD160 tests:
 
 static const uint RIPEMD160_DIGEST_LENGTH = 20;
 
-TEST(Hash, returns_binary_RIPEMD160_of_binary) {
+TEST(Hash, computes_binary_RIPEMD160_of_binary) {
     vector<uint8_t> res;
     vector<uint8_t> data;
     string rawData;
@@ -125,7 +125,7 @@ TEST(Hash, returns_binary_RIPEMD160_of_binary) {
     EXPECT_THAT(res, ElementsAreArray("\x00\xd2\x29\xfc\x91\x59\x9f\x0c\x5f\x67\x6b\x45\x06\x07\x3c\xd6\x3f\x19\x69\x86", RIPEMD160_DIGEST_LENGTH));
 }
 
-TEST(Hash, returns_binary_RIPEMD160_of_string) {
+TEST(Hash, computes_binary_RIPEMD160_of_string) {
     vector<uint8_t> res;
 
     Hash::RIPEMD160("", res);
@@ -141,7 +141,7 @@ TEST(Hash, returns_binary_RIPEMD160_of_string) {
     EXPECT_THAT(res, ElementsAreArray("\x00\xd2\x29\xfc\x91\x59\x9f\x0c\x5f\x67\x6b\x45\x06\x07\x3c\xd6\x3f\x19\x69\x86", RIPEMD160_DIGEST_LENGTH));
 }
 
-TEST(Hash, returns_string_RIPEMD160_of_binary) {
+TEST(Hash, computes_string_RIPEMD160_of_binary) {
     string res;
     vector<uint8_t> data;
     string rawData;
@@ -149,36 +149,36 @@ TEST(Hash, returns_string_RIPEMD160_of_binary) {
     rawData = "";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::RIPEMD160(data, res);
-    EXPECT_EQ(res, "9c1185a5c5e9fc54612808977ee8f548b2258d31");
+    EXPECT_STREQ(res.c_str(), "9c1185a5c5e9fc54612808977ee8f548b2258d31");
 
     rawData = "Hello World!";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::RIPEMD160(data, res);
-    EXPECT_EQ(res, "8476ee4631b9b30ac2754b0ee0c47e161d3f724c");
+    EXPECT_STREQ(res.c_str(), "8476ee4631b9b30ac2754b0ee0c47e161d3f724c");
 
     rawData = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::RIPEMD160(data, res);
-    EXPECT_EQ(res, "128c3544ca79c4c04cadd7eba5053eb6f5dadfdf");
+    EXPECT_STREQ(res.c_str(), "128c3544ca79c4c04cadd7eba5053eb6f5dadfdf");
 
     rawData = "אורבס";
     data = vector<uint8_t>(rawData.begin(), rawData.end());
     Hash::RIPEMD160(data, res);
-    EXPECT_EQ(res, "00d229fc91599f0c5f676b4506073cd63f196986");
+    EXPECT_STREQ(res.c_str(), "00d229fc91599f0c5f676b4506073cd63f196986");
 }
 
-TEST(Hash, returns_string_RIPEMD160_of_string) {
+TEST(Hash, computes_string_RIPEMD160_of_string) {
     string res;
 
     Hash::RIPEMD160("", res);
-    EXPECT_EQ(res, "9c1185a5c5e9fc54612808977ee8f548b2258d31");
+    EXPECT_STREQ(res.c_str(), "9c1185a5c5e9fc54612808977ee8f548b2258d31");
 
     Hash::RIPEMD160("Hello World!", res);
-    EXPECT_EQ(res, "8476ee4631b9b30ac2754b0ee0c47e161d3f724c");
+    EXPECT_STREQ(res.c_str(), "8476ee4631b9b30ac2754b0ee0c47e161d3f724c");
 
     Hash::RIPEMD160("If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.", res);
-    EXPECT_EQ(res, "128c3544ca79c4c04cadd7eba5053eb6f5dadfdf");
+    EXPECT_STREQ(res.c_str(), "128c3544ca79c4c04cadd7eba5053eb6f5dadfdf");
 
     Hash::RIPEMD160("אורבס", res);
-    EXPECT_EQ(res, "00d229fc91599f0c5f676b4506073cd63f196986");
+    EXPECT_STREQ(res.c_str(), "00d229fc91599f0c5f676b4506073cd63f196986");
 }
