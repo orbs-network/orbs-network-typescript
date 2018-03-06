@@ -318,7 +318,7 @@ Resources:
 
            cat > /opt/scripts/update.sh <<-EOF
            #!/bin/bash -xe
-           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG}
+           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} NUM_OF_NODES=${NUM_OF_NODES}
            hostname ${NODE_NAME}
            aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/${BOOTSTRAP_PATH}/
            bash /opt/${BOOTSTRAP_PATH}/bootstrap.sh &>> /var/log/orbs-bootstrap.log
@@ -333,6 +333,8 @@ Resources:
               - ImportNodeName
               - !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
               - !Ref NodeName
+            NUM_OF_NODES: 7
+            ETHEREUM_NODE_ADDRESS: "http://ethereum.services.orbs-test.com:8545"
             DOCKER_TAG: !Ref DockerTag
             DOCKER_IMAGE: !If
               - ImportDockerImage

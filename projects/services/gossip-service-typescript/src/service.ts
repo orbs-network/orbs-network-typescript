@@ -1,7 +1,6 @@
 import * as _ from "lodash";
 
-import { logger, config, types } from "orbs-core-library";
-
+import { logger, types, topology, topologyPeers } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
@@ -13,13 +12,11 @@ export interface GossipServiceConfig extends ServiceConfig {
 }
 
 export default class GossipService extends Service {
-  private serviceConfig: GossipServiceConfig;
   private gossip: Gossip;
   private peerPollInterval: any;
 
   public constructor(serviceConfig: GossipServiceConfig) {
     super(serviceConfig);
-    this.serviceConfig = serviceConfig;
   }
 
   async initialize() {
@@ -27,7 +24,9 @@ export default class GossipService extends Service {
   }
 
   async initGossip(): Promise<void> {
-    this.gossip = new Gossip(this.serviceConfig.gossipPort, this.serviceConfig.gossipPeers, this.serviceConfig.peers, this.serviceConfig.nodeName, config.get("NODE_IP"));
+    const gossipConfig = <GossipServiceConfig>this.config;
+    this.gossip = new Gossip({ port: gossipConfig.gossipPort, localAddress: gossipConfig.nodeName,
+      peers: topologyPeers(topology().peers)});
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
@@ -48,11 +47,7 @@ export default class GossipService extends Service {
     }, 5000);
 
     setTimeout(() => {
-      this.gossip.discoverPeers().then((gossipPeers: string[]) => {
-        logger.info(`Found gossip peers`, { peers: gossipPeers });
-
-        this.gossip.connect(gossipPeers);
-      }).catch(logger.error);
+      this.gossip.connect(topology().gossipPeers);
     }, Math.ceil(Math.random() * 3000));
   }
 
@@ -63,14 +58,14 @@ export default class GossipService extends Service {
 
   @Service.SilentRPCMethod
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
-    this.gossip.broadcastMessage(rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
+    this.gossip.broadcastMessage(rpc.req.broadcastGroup, rpc.req.messageType, rpc.req.buffer, rpc.req.immediate);
 
     rpc.res = {};
   }
 
   @Service.SilentRPCMethod
   public async unicastMessage(rpc: types.UnicastMessageContext) {
-    this.gossip.unicastMessage(rpc.req.Recipient, rpc.req.BroadcastGroup, rpc.req.MessageType, rpc.req.Buffer, rpc.req.Immediate);
+    this.gossip.unicastMessage(rpc.req.recipient, rpc.req.broadcastGroup, rpc.req.messageType, rpc.req.buffer, rpc.req.immediate);
 
     rpc.res = {};
   }

@@ -1,15 +1,17 @@
-import { types } from "../../src/common-library/types";
-import { BlockStorage } from "../../src/block-storage/block-storage";
-import { BlockStorageSync } from "../../src/block-storage/block-storage-sync";
+import * as path from "path";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import * as fsExtra from "fs-extra";
 
+import { types } from "../../src/common-library/types";
+import { BlockStorage } from "../../src/block-storage/block-storage";
+import { BlockStorageSync } from "../../src/block-storage/block-storage-sync";
+
 const LEVELDB_PATH = "/tmp/leveldb-test";
 
 async function init(): Promise<any> {
-  const blockStorage = new BlockStorage({ dbPath: LEVELDB_PATH });
+  const blockStorage = new BlockStorage(LEVELDB_PATH);
   await blockStorage.load();
   const blockStorageSync = new BlockStorageSync(blockStorage);
   return { blockStorage, blockStorageSync };
@@ -22,7 +24,7 @@ function generateBlock(prevBlockId: number): types.Block {
       id: prevBlockId + 1,
       prevBlockId: prevBlockId
     },
-    tx: { contractAddress: "0", sender: "", signature: "", payload: "{}" },
+    tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
     modifiedAddressesJson: "{}"
   };
 }
@@ -33,7 +35,7 @@ describe("Block storage sync", () => {
 
   beforeEach(async () => {
     try {
-        fsExtra.removeSync(LEVELDB_PATH);
+      fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
 
     const results = await init();
@@ -79,7 +81,7 @@ describe("Block storage sync", () => {
       await blockStorage.getBlocks(4).should.eventually.be.empty;
     });
 
-    it("does not return blocks back to the queue in case something happends", async () => {
+    it("does not return blocks back to the queue in case something happens", async () => {
       const blocks = [
         generateBlock(0),
         generateBlock(1),
@@ -99,7 +101,8 @@ describe("Block storage sync", () => {
       const appendBlocksPromise = blockStorageSync.appendBlocks();
       try {
         await appendBlocksPromise;
-      } catch (e) { }
+      } catch (e) {
+      }
 
       appendBlocksPromise.should.eventually.be.rejected;
       blockStorageSync.getQueueSize().should.be.eql(0);

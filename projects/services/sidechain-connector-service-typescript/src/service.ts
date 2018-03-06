@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-import { logger, config, types } from "orbs-core-library";
+import { logger, types } from "orbs-core-library";
 
 import { Service } from "orbs-core-library";
 import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library";

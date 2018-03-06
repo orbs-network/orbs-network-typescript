@@ -8,7 +8,8 @@ services:
     working_dir: /opt/orbs/projects/services/consensus-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/consensus.js
     environment:
-      - ethereumContractAddress=${SUBSCRIPTION_MANAGER__ETHEREUM_CONTRACT_ADDRESS}
+      - NUM_OF_NODES=${NUM_OF_NODES}
+      - ETHEREUM_CONTRACT_ADDRESS=${SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS}
     networks:
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.15
@@ -108,13 +109,13 @@ services:
       service: base-service
     working_dir: /opt/orbs/projects/services/sidechain-connector-service-typescript/
     environment:
-    - ethereumNodeAddress=${SIDECHAIN_CONNECTOR__ETHEREUM_NODE_HTTP_ADDRESS}
+    - ETHEREUM_NODE_HTTP_ADDRESS=${SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS}
     command: node dist/index.js ${NODE_CONFIG_PATH}/sidechain-connector.js
     volumes_from:
       - shared_volumes
     networks:
       public-network:
-        ipv4_address: ${SIDECHAIN_CONNECTOR__PUBLIC_IP}
+        ipv4_address: ${SIDECHAIN_CONNECTOR_PUBLIC_IP}
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.20
     extra_hosts:

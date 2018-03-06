@@ -14,6 +14,8 @@ echo NODE_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4) >> $ENV
 echo NODE_NAME=$NODE_NAME >> $ENV_FILE
 echo NODE_ENV=$NODE_ENV >> $ENV_FILE
 echo INSTANCE_ID=$INSTANCE_ID >> $ENV_FILE
+echo NUM_OF_NODES=$NUM_OF_NODES >> $ENV_FILE
+echo ETHEREUM_NODE_ADDRESS=$ETHEREUM_NODE_ADDRESS >> $ENV_FILE
 
 export DOCKER_TAG=${DOCKER_TAG-master}
 # TODO: remove default image
