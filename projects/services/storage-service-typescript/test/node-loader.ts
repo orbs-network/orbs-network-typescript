@@ -1,10 +1,12 @@
-import { types } from "orbs-core-library";
-import { generateServiceIPCClient } from "./service-ipc-client";
 import { tmpdir } from "os";
 import * as path from "path";
+import * as fs from "fs-extra";
+
+import { types } from "orbs-core-library";
+import { generateServiceIPCClient } from "./service-ipc-client";
+
 import FakeGossipClient from "./fake-gossip-client";
 import BlockStorageService from "../src/block-storage-service";
-import * as fs from "fs-extra";
 
 function generateBlock(prevBlockId: number): types.Block {
   return {
@@ -13,8 +15,8 @@ function generateBlock(prevBlockId: number): types.Block {
       id: prevBlockId + 1,
       prevBlockId: prevBlockId
     },
-    tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
-    modifiedAddressesJson: "{}"
+    transactions: [{ version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" }],
+    stateDiff: []
   };
 }
 
@@ -56,7 +58,6 @@ export class NodeLoader {
     await this.blockStorageService.initialize();
   }
 
-
   async cleanup() {
     await this.blockStorageService.shutdown();
     return new Promise((resolve, reject) => {
@@ -88,7 +89,7 @@ export async function initNodesWithBlocks(numOfBlocksPerNode: number[]): Promise
     blocks.push(generateBlock(i));
   }
 
-  // instantiate node
+  // Instantiate node.
   for (let nodeIndex = 0; nodeIndex < numOfNodes; nodeIndex++) {
     const node = new NodeLoader(`node${nodeIndex}`);
     await node.initialize();
@@ -96,7 +97,7 @@ export async function initNodesWithBlocks(numOfBlocksPerNode: number[]): Promise
     nodes.push(node);
   }
 
-  // configure gossips
+  // Configure gossips.
   for (const node of nodes) {
     for (const otherNode of nodes) {
       if (node != otherNode) {
