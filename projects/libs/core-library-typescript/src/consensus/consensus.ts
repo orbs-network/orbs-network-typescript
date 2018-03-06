@@ -17,6 +17,14 @@ export class Consensus {
       options, gossip, blockStorage, transactionPool, new BlockBuilder({ virtualMachine, transactionPool }));
   }
 
+  async initialize() {
+    return this.raftConsensus.initialize();
+  }
+
+  async shutdown() {
+    return this.raftConsensus.shutdown();
+  }
+
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
     await this.raftConsensus.onMessageReceived(fromAddress, messageType, message);
   }

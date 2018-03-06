@@ -77,6 +77,7 @@ export class RaftConsensus {
   private lastBlockId: number;
   private readyForBlockAppend = false;
   private pollIntervalMs = 500;
+  private pollInterval: NodeJS.Timer;
 
   public constructor(
     options: RaftConsensusConfig,
@@ -117,7 +118,6 @@ export class RaftConsensus {
 
     this.node.on("leaderElected", () => this.onLeaderElected());
 
-    this.pollForPendingTransactions();
   }
 
   private async onCommitted(data: any) {
@@ -149,7 +149,7 @@ export class RaftConsensus {
   }
 
   private pollForPendingTransactions() {
-    setInterval(async () => {
+    this.pollInterval = setInterval(async () => {
       try {
         if (this.readyForBlockAppend) {
           await this.appendNextBlock();
@@ -186,6 +186,16 @@ export class RaftConsensus {
       case "RaftMessage": {
         this.connector.received(message.from, message.data);
       }
+    }
+  }
+
+  async initialize() {
+    this.pollForPendingTransactions();
+  }
+
+  async shutdown() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
     }
   }
 }
