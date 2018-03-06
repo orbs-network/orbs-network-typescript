@@ -7,7 +7,6 @@ import { Gossip } from "orbs-core-library";
 
 export interface GossipServiceConfig extends ServiceConfig {
   gossipPort: number;
-  nodeIp: string;
   peers: any;
   gossipPeers: any;
 }

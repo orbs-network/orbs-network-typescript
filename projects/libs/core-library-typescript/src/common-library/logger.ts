@@ -6,7 +6,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { defaults } from "lodash";
 
-const { NODE_NAME, NODE_IP, NODE_ENV, SERVICE_NAME } = process.env;
+const { NODE_NAME, NODE_ENV, SERVICE_NAME } = process.env;
 
 export interface LogzIoOptions {
   apiKey: string;
@@ -64,7 +64,6 @@ export class Logger {
       rewriters: [
         (level, msg, meta) => {
           meta.node = NODE_NAME;
-          meta.node_ip = NODE_IP;
           meta.environment = NODE_ENV;
           meta.service = SERVICE_NAME;
 
