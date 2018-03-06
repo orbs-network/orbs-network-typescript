@@ -5,13 +5,13 @@ export = gaggle;
 declare function gaggle(opts: any): any;
 
 declare namespace gaggle {
+  const prototype: {
+  };
+
+  function enhanceServerForSocketIOChannel(server: any): any;
+
+  namespace enhanceServerForSocketIOChannel {
     const prototype: {
     };
-
-    function enhanceServerForSocketIOChannel(server: any): any;
-
-    namespace enhanceServerForSocketIOChannel {
-        const prototype: {
-        };
-    }
+  }
 }

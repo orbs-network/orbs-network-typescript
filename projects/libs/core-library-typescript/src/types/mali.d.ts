@@ -3,328 +3,328 @@
 export = mali;
 
 declare class mali {
-    constructor(...args: any[]);
+  constructor(...args: any[]);
 
-    callback(...args: any[]): void;
+  callback(...args: any[]): void;
 
-    close(...args: any[]): void;
+  close(...args: any[]): void;
 
-    addService(...args: any[]): void;
+  addService(...args: any[]): void;
 
-    inspect(...args: any[]): void;
+  inspect(...args: any[]): void;
 
-    onerror(...args: any[]): void;
+  onerror(...args: any[]): void;
 
-    start(...args: any[]): void;
+  start(...args: any[]): void;
 
-    toJSON(...args: any[]): void;
+  toJSON(...args: any[]): void;
 
-    use(...args: any[]): void;
+  use(...args: any[]): void;
 
+
+  static defaultMaxListeners: number;
+
+  static usingDomains: boolean;
+
+}
+
+declare namespace mali {
+  class EventEmitter {
+    constructor();
+
+    addListener(type: any, listener: any): any;
+
+    emit(type: any, ...args: any[]): any;
+
+    eventNames(): any;
+
+    getMaxListeners(): any;
+
+    listenerCount(type: any): any;
+
+    listeners(type: any): any;
+
+    on(type: any, listener: any): any;
+
+    once(type: any, listener: any): any;
+
+    prependListener(type: any, listener: any): any;
+
+    prependOnceListener(type: any, listener: any): any;
+
+    removeAllListeners(type: any, ...args: any[]): any;
+
+    removeListener(type: any, listener: any): any;
+
+    setMaxListeners(n: any): any;
+
+    static EventEmitter: any;
 
     static defaultMaxListeners: number;
 
     static usingDomains: boolean;
 
-}
+  }
 
-declare namespace mali {
-    class EventEmitter {
-        constructor();
-
-        addListener(type: any, listener: any): any;
-
-        emit(type: any, ...args: any[]): any;
-
-        eventNames(): any;
-
-        getMaxListeners(): any;
-
-        listenerCount(type: any): any;
-
-        listeners(type: any): any;
-
-        on(type: any, listener: any): any;
-
-        once(type: any, listener: any): any;
-
-        prependListener(type: any, listener: any): any;
-
-        prependOnceListener(type: any, listener: any): any;
-
-        removeAllListeners(type: any, ...args: any[]): any;
-
-        removeListener(type: any, listener: any): any;
-
-        setMaxListeners(n: any): any;
-
-        static EventEmitter: any;
-
-        static defaultMaxListeners: number;
-
-        static usingDomains: boolean;
-
-    }
-
-    namespace EventEmitter {
-        namespace init {
-            const prototype: {
-            };
-
-        }
-
-        namespace listenerCount {
-            const prototype: {
-            };
-
-        }
-
-        namespace prototype2 {
-            const domain: any;
-
-            function addListener(type: any, listener: any): any;
-
-            function emit(type: any, ...args: any[]): any;
-
-            function eventNames(): any;
-
-            function getMaxListeners(): any;
-
-            function listenerCount(type: any): any;
-
-            function listeners(type: any): any;
-
-            function on(type: any, listener: any): any;
-
-            function once(type: any, listener: any): any;
-
-            function prependListener(type: any, listener: any): any;
-
-            function prependOnceListener(type: any, listener: any): any;
-
-            function removeAllListeners(type: any, ...args: any[]): any;
-
-            function removeListener(type: any, listener: any): any;
-
-            function setMaxListeners(n: any): any;
-
-            namespace addListener {
-                const prototype: {
-                };
-
-            }
-
-            namespace emit {
-                const prototype: {
-                };
-
-            }
-
-            namespace eventNames {
-                const prototype: {
-                };
-
-            }
-
-            namespace getMaxListeners {
-                const prototype: {
-                };
-
-            }
-
-            namespace listenerCount {
-                const prototype: {
-                };
-
-            }
-
-            namespace listeners {
-                const prototype: {
-                };
-
-            }
-
-            namespace on {
-                const prototype: {
-                };
-
-            }
-
-            namespace once {
-                const prototype: {
-                };
-
-            }
-
-            namespace prependListener {
-                const prototype: {
-                };
-
-            }
-
-            namespace prependOnceListener {
-                const prototype: {
-                };
-
-            }
-
-            namespace removeAllListeners {
-                const prototype: {
-                };
-
-            }
-
-            namespace removeListener {
-                const prototype: {
-                };
-
-            }
-
-            namespace setMaxListeners {
-                const prototype: {
-                };
-
-            }
-
-        }
-
-    }
-
+  namespace EventEmitter {
     namespace init {
-        const prototype: {
-        };
+      const prototype: {
+      };
 
     }
 
     namespace listenerCount {
+      const prototype: {
+      };
+
+    }
+
+    namespace prototype2 {
+      const domain: any;
+
+      function addListener(type: any, listener: any): any;
+
+      function emit(type: any, ...args: any[]): any;
+
+      function eventNames(): any;
+
+      function getMaxListeners(): any;
+
+      function listenerCount(type: any): any;
+
+      function listeners(type: any): any;
+
+      function on(type: any, listener: any): any;
+
+      function once(type: any, listener: any): any;
+
+      function prependListener(type: any, listener: any): any;
+
+      function prependOnceListener(type: any, listener: any): any;
+
+      function removeAllListeners(type: any, ...args: any[]): any;
+
+      function removeListener(type: any, listener: any): any;
+
+      function setMaxListeners(n: any): any;
+
+      namespace addListener {
         const prototype: {
         };
 
-    }
+      }
 
-    namespace prototype3 {
-        const domain: any;
+      namespace emit {
+        const prototype: {
+        };
 
-        function addListener(type: any, listener: any): any;
+      }
 
-        function callback(...args: any[]): void;
+      namespace eventNames {
+        const prototype: {
+        };
 
-        function close(...args: any[]): void;
+      }
 
-        function emit(type: any, ...args: any[]): any;
+      namespace getMaxListeners {
+        const prototype: {
+        };
 
-        function eventNames(): any;
+      }
 
-        function getMaxListeners(): any;
+      namespace listenerCount {
+        const prototype: {
+        };
 
-        function init(...args: any[]): void;
+      }
 
-        function inspect(...args: any[]): void;
+      namespace listeners {
+        const prototype: {
+        };
 
-        function listenerCount(type: any): any;
+      }
 
-        function listeners(type: any): any;
+      namespace on {
+        const prototype: {
+        };
 
-        function on(type: any, listener: any): any;
+      }
 
-        function once(type: any, listener: any): any;
+      namespace once {
+        const prototype: {
+        };
 
-        function onerror(...args: any[]): void;
+      }
 
-        function prependListener(type: any, listener: any): any;
+      namespace prependListener {
+        const prototype: {
+        };
 
-        function prependOnceListener(type: any, listener: any): any;
+      }
 
-        function removeAllListeners(type: any, ...args: any[]): any;
+      namespace prependOnceListener {
+        const prototype: {
+        };
 
-        function removeListener(type: any, listener: any): any;
+      }
 
-        function setMaxListeners(n: any): any;
+      namespace removeAllListeners {
+        const prototype: {
+        };
 
-        function start(...args: any[]): void;
+      }
 
-        function toJSON(...args: any[]): void;
+      namespace removeListener {
+        const prototype: {
+        };
 
-        function use(...args: any[]): void;
+      }
 
-        namespace addListener {
-            const prototype: {
-            };
+      namespace setMaxListeners {
+        const prototype: {
+        };
 
-        }
-
-        namespace emit {
-            const prototype: {
-            };
-
-        }
-
-        namespace eventNames {
-            const prototype: {
-            };
-
-        }
-
-        namespace getMaxListeners {
-            const prototype: {
-            };
-
-        }
-
-        namespace listenerCount {
-            const prototype: {
-            };
-
-        }
-
-        namespace listeners {
-            const prototype: {
-            };
-
-        }
-
-        namespace on {
-            const prototype: {
-            };
-
-        }
-
-        namespace once {
-            const prototype: {
-            };
-
-        }
-
-        namespace prependListener {
-            const prototype: {
-            };
-
-        }
-
-        namespace prependOnceListener {
-            const prototype: {
-            };
-
-        }
-
-        namespace removeAllListeners {
-            const prototype: {
-            };
-
-        }
-
-        namespace removeListener {
-            const prototype: {
-            };
-
-        }
-
-        namespace setMaxListeners {
-            const prototype: {
-            };
-
-        }
+      }
 
     }
+
+  }
+
+  namespace init {
+    const prototype: {
+    };
+
+  }
+
+  namespace listenerCount {
+    const prototype: {
+    };
+
+  }
+
+  namespace prototype3 {
+    const domain: any;
+
+    function addListener(type: any, listener: any): any;
+
+    function callback(...args: any[]): void;
+
+    function close(...args: any[]): void;
+
+    function emit(type: any, ...args: any[]): any;
+
+    function eventNames(): any;
+
+    function getMaxListeners(): any;
+
+    function init(...args: any[]): void;
+
+    function inspect(...args: any[]): void;
+
+    function listenerCount(type: any): any;
+
+    function listeners(type: any): any;
+
+    function on(type: any, listener: any): any;
+
+    function once(type: any, listener: any): any;
+
+    function onerror(...args: any[]): void;
+
+    function prependListener(type: any, listener: any): any;
+
+    function prependOnceListener(type: any, listener: any): any;
+
+    function removeAllListeners(type: any, ...args: any[]): any;
+
+    function removeListener(type: any, listener: any): any;
+
+    function setMaxListeners(n: any): any;
+
+    function start(...args: any[]): void;
+
+    function toJSON(...args: any[]): void;
+
+    function use(...args: any[]): void;
+
+    namespace addListener {
+      const prototype: {
+      };
+
+    }
+
+    namespace emit {
+      const prototype: {
+      };
+
+    }
+
+    namespace eventNames {
+      const prototype: {
+      };
+
+    }
+
+    namespace getMaxListeners {
+      const prototype: {
+      };
+
+    }
+
+    namespace listenerCount {
+      const prototype: {
+      };
+
+    }
+
+    namespace listeners {
+      const prototype: {
+      };
+
+    }
+
+    namespace on {
+      const prototype: {
+      };
+
+    }
+
+    namespace once {
+      const prototype: {
+      };
+
+    }
+
+    namespace prependListener {
+      const prototype: {
+      };
+
+    }
+
+    namespace prependOnceListener {
+      const prototype: {
+      };
+
+    }
+
+    namespace removeAllListeners {
+      const prototype: {
+      };
+
+    }
+
+    namespace removeListener {
+      const prototype: {
+      };
+
+    }
+
+    namespace setMaxListeners {
+      const prototype: {
+      };
+
+    }
+
+  }
 
 }
