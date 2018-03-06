@@ -99,6 +99,10 @@ export DNS_ZONE=
 export PUBLIC_KEY_PATH=
 export S3_BUCKET_NAME=orbs-network-config
 
+# build docker image (in the root of the project)
+
+./docker-build.sh
+
 # deploy new node
 
 node deploy.js \
@@ -108,7 +112,7 @@ node deploy.js \
     --account-id $ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
-    --create-basic-infrastructure --push-docker-image --deploy-node
+    --create-basic-infrastructure --tag-docker-image --push-docker-image --deploy-node
 
 # deploy parity node
 
@@ -120,7 +124,6 @@ node deploy.js \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
     --deploy-node --parity
-
 
 # replace old node
 

@@ -59,8 +59,16 @@ const getStacks = (cloudFormation) => new Promise((resolve, reject) => {
 
 // confition is a function that returns true or false
 const waitForStacks = (cloudFormation, condition) => new Promise((resolve, reject) => {
+    const start = new Date().getTime();
+
     const interval = setInterval(() => {
         console.log("Waiting for CloudFormation to meet the condition...");
+
+        // Reject after 10 minutes
+        if ((new Date().getTime() - start) / 1000 > 60 * 10) {
+            reject();
+        }
+
         getStacks(cloudFormation).then(stacks => {
             if (condition(stacks)) {
                 clearInterval(interval);
@@ -75,11 +83,29 @@ const uploadBootstrap = (options) => {
     shell.exec(`aws s3 sync ${__dirname}/../${localPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
 };
 
+const getDockerImageName = (options) => {
+    return `${options.accoundId}.dkr.ecr.${options.region}.amazonaws.com/orbs-network-${options.NODE_ENV}-${options.region}`;
+};
+
+const getDefaultDockerImageTag = () => {
+    return shell.exec("git rev-parse --abbrev-ref HEAD").stdout.replace(/\//g, "-").trim();
+};
+
 const pushDockerImage = (options) => {
-    const dockerImage = `${options.accoundId}.dkr.ecr.${options.region}.amazonaws.com/orbs-network-${options.NODE_ENV}-${options.region}`;
+    const dockerImage = getDockerImageName(options);
 
     shell.exec(`$(aws ecr get-login --no-include-email --region ${options.region})`);
     shell.exec(`docker push ${dockerImage}`);
+};
+
+const tagDockerImage = (options) => {
+    const defaultImage = "orbs";
+    const defaultTag = getDefaultDockerImageTag(options);
+    const dockerImage = getDockerImageName(options);
+    const dockerTag = options.dockerTag || defaultTag;
+
+    console.log(`docker tag ${defaultImage}:${defaultTag} ${dockerImage}:${dockerTag}`);
+    shell.exec(`docker tag ${defaultImage}:${defaultTag} ${dockerImage}:${dockerTag}`);
 };
 
 const createStack = (cloudFormation, stackName, templatePath, parameters) => new Promise((resolve, reject) => {
@@ -102,7 +128,6 @@ const removeStack = (cloudFormation, stackName) => new Promise((resolve, reject)
         err ? reject(err) : resolve(data);
     });
 });
-
 
 const main = (options) => {
     const cloudFormation = new AWS.CloudFormation({ region: options.region });
@@ -144,8 +169,9 @@ const main = (options) => {
     waitForStacks(cloudFormation, (stacks) => {
         return _.isObject(_.find(stacks, (s) => s.StackName === basicInfrastructureStackName && s.StackStatus === "CREATE_COMPLETE"));
     }).then(() => {
-        console.log(`Uploading bootstrap files...`);
-        uploadBootstrap(options);
+        if (options.tagDockerImage) {
+            tagDockerImage(options);
+        }
 
         if (options.pushDockerImage) {
             console.log(`Pushing docker image...`);
@@ -155,6 +181,9 @@ const main = (options) => {
         const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
 
         if (options.deployNode) {
+            console.log(`Uploading bootstrap files...`);
+            uploadBootstrap(options);
+
             if (options.removeNode) {
                 console.log(`Removing old node...`);
                 removeStack(cloudFormation, stackName);
@@ -170,6 +199,7 @@ const main = (options) => {
                 const standaloneParams = JSON.parse(fs.readFileSync(`${__dirname}/../cloudformation/${paramsFileName}`).toString());
                 setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
                 setParameter(standaloneParams, "KeyName", keyName);
+                setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag(options));
 
                 createStack(cloudFormation, stackName, `${__dirname}/../cloudformation/node.yaml`, standaloneParams);
 
@@ -191,6 +221,8 @@ main({
     createBasicInfrastructure: config.get("create-basic-infrastructure"),
     bucketName: config.get("s3-bucket-name"),
     pushDockerImage: config.get("push-docker-image"),
+    tagDockerImage: config.get("tag-docker-image"),
+    dockerTag: config.get("docker-tag"),
     deployNode: config.get("deploy-node"),
     removeNode: config.get("removeNode"),
     parity: config.get("parity")
