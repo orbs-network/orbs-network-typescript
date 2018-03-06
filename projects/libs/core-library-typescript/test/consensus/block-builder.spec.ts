@@ -1,11 +1,11 @@
 import { types } from "../../src/common-library/types";
 import * as chai from "chai";
+import { expect } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 
-chai.should();
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
@@ -62,15 +62,15 @@ describe("a block", () => {
   it("is built with the transactions on transaction pool", async () => {
     const block = await blockBuilder.buildNextBlock(1);
 
-    block.transactions.should.eql(dummyTransactionSet);
+    expect(block.transactions).to.eql(dummyTransactionSet);
 
   });
 
   it("is built with the transaction on transaction pool", async () => {
     const block = await blockBuilder.buildNextBlock(2);
 
-    block.transactions.should.eql(dummyTransactionSet);
+    expect(block.transactions).to.eql(dummyTransactionSet);
 
-    block.stateDiff.should.eql(processTransactionSetOutput.stateDiff);
+    expect(block.stateDiff).to.eql(processTransactionSetOutput.stateDiff);
   });
 });
