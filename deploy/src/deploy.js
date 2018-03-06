@@ -134,7 +134,7 @@ const main = (options) => {
             setParameter(basicInfrastructureParams, "BucketName", options.bucketName);
         }
 
-        createStack(cloudFormation, basicInfrastructureStackName, "./basic-infrastructure.yaml", basicInfrastructureParams).catch(process.exit);
+        createStack(cloudFormation, basicInfrastructureStackName, "../cloudformation/basic-infrastructure.yaml", basicInfrastructureParams).catch(process.exit);
     }
 
     waitForStacks(cloudFormation, (stacks) => {
@@ -161,11 +161,11 @@ const main = (options) => {
             }).then(() => {
                 console.log(`Deploying new node...`);
 
-                const standaloneParams = JSON.parse(fs.readFileSync("./parameters.standalone.json").toString());
+                const standaloneParams = JSON.parse(fs.readFileSync("../cloudformation/parameters.standalone.json").toString());
                 setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
                 setParameter(standaloneParams, "KeyName", keyName);
 
-                createStack(cloudFormation, stackName, "./cloudformation.yaml", standaloneParams);
+                createStack(cloudFormation, stackName, "../cloudformation/node.yaml", standaloneParams);
 
                 console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${options.region}.global.nodes.${options.NODE_ENV}.${options.dnsZone}`);
             });
