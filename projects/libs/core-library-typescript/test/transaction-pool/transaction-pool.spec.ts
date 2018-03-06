@@ -35,4 +35,6 @@ describe("new broadcast transaction", () => {
       transactions.should.eql([tx]);
       expect(gossip.broadcastMessage).to.have.been.called;
   });
+
+  xit("two identical transaction are processed only once");
 });
