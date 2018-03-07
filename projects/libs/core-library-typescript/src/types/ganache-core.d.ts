@@ -5,14 +5,14 @@ export function provider(options: any): any;
 export function server(options: any): any;
 
 export namespace provider {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace server {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 

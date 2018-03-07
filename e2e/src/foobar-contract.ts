@@ -42,7 +42,6 @@ export class FooBarAccount {
   }
 }
 
-
 const { Assertion } = require("chai");
 
 async function assertFooBarAccountBalance(n: number) {

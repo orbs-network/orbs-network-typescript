@@ -22,7 +22,7 @@ export class ServiceRunner {
 
   public static async stop(...runtime: GRPCRuntime[]) {
     return Promise.all(flatMap(runtime, (r) => {
-      const {app, services} = r;
+      const { app, services } = r;
 
       const promises: any[] = map(services, (s: Service, key: string) => s.stop());
       promises.push(app.close());
