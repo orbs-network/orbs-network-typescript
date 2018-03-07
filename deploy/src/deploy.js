@@ -52,7 +52,7 @@ const getStacks = (cloudFormation) => new Promise((resolve, reject) => {
 
         const stacks = data.StackSummaries;
 
-        console.log(`Found ${stacks.length} stacks: ${_.map(stacks, "StackName").join(", ")}`);
+        console.log(`Found ${stacks.length} stack${stacks.length > 1 ? "s" : ""}: ${_.map(stacks, "StackName").join(", ")}`);
         resolve(stacks);
     });
 });
@@ -64,9 +64,9 @@ const waitForStacks = (cloudFormation, condition) => new Promise((resolve, rejec
     const interval = setInterval(() => {
         console.log("Waiting for CloudFormation to meet the condition...");
 
-        // Reject after 10 minutes
-        if ((new Date().getTime() - start) / 1000 > 60 * 10) {
-            reject();
+        // Reject after 5 minutes
+        if ((new Date().getTime() - start) / 1000 > 60 * 5) {
+            reject("Timed out");
         }
 
         getStacks(cloudFormation).then(stacks => {
@@ -190,8 +190,10 @@ const main = (options) => {
             }
 
             waitForStacks(cloudFormation, (stacks) => {
-                // TODO: fix to accommodate both parity node and basic infrastructure node
-                return _.size(stacks) === 1;
+                // TODO: fix to accommodate both parity node and regular node
+                console.log(stacks);
+                const nodeStack = _.find(stacks, {StackName: stackName});
+                return _.isEmpty(nodeStack);
             }).then(() => {
                 console.log(`Deploying new node...`);
 
