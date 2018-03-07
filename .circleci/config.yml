@@ -4,10 +4,11 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: docker build -t ${DOCKER_IMAGE}:$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') .
-      - run: DOCKER_TAG=$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') ./docker-test.sh
-      - run: $(aws ecr get-login --no-include-email --region us-west-2)
-      - run: docker push ${DOCKER_IMAGE}:$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g')
+      - run: echo "Placeholder"
+      #- run: docker build -t ${DOCKER_IMAGE}:$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') .
+      #- run: DOCKER_TAG=$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') ./docker-test.sh
+      #- run: $(aws ecr get-login --no-include-email --region us-west-2)
+      #- run: docker push ${DOCKER_IMAGE}:$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g')
       - store_artifacts:
           path: logs
 
@@ -15,6 +16,8 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run: $(aws ecr get-login --no-include-email --region us-west-2)
+      - run: export DOCKER_TAG=$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') && docker pull $DOCKER_IMAGE:$DOCKER_TAG && docker tag $DOCKER_IMAGE:$DOCKER_TAG orbs:$DOCKER_TAG
       - run: cd deploy && npm install && ./deploy-staging.sh
 
 workflows:
