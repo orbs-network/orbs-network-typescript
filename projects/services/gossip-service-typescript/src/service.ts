@@ -26,13 +26,14 @@ export default class GossipService extends Service {
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
     this.gossip = new Gossip({ port: gossipConfig.gossipPort, localAddress: gossipConfig.nodeName,
-      peers: topologyPeers(topology().peers)});
+      peers: topologyPeers((<GossipServiceConfig>this.config).peers)});
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
 
       if (activePeers.length == 0) {
         logger.warn(`${this.gossip.localAddress} has no active peers`);
+        this.connectToGossipPeers();
       } else {
         logger.info(`${this.gossip.localAddress} has active peers`, { activePeers });
       }
@@ -47,8 +48,13 @@ export default class GossipService extends Service {
     }, 5000);
 
     setTimeout(() => {
-      this.gossip.connect(topology().gossipPeers);
+      this.connectToGossipPeers();
     }, Math.ceil(Math.random() * 3000));
+  }
+
+  async connectToGossipPeers() {
+    logger.info(`${this.gossip.localAddress} is trying to connect to its peers`);
+    return this.gossip.connect((<GossipServiceConfig>this.config).gossipPeers);
   }
 
   async shutdown() {

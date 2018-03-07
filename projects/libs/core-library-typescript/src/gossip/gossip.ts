@@ -25,7 +25,6 @@ export class Gossip {
   listeners: Map<string, any> = new Map();
   peers: any;
   readonly port: number;
-  gossipPeers: string[];
 
   constructor(input: {localAddress: string, port: number, peers: types.ClientMap}) {
     this.port = input.port;
