@@ -19,6 +19,8 @@ static const float LOG58_OVER_LOG256 = 733.0f / 1000;
 // All alphanumeric characters except for "0", "I", "O", and "l".
 static const string BASE58_CHARACTERS("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
+static const uint32_t B256 = 256;
+static const uint32_t B58 = 58;
 static const char WHITESPACE = ' ';
 static const char ENCODED_ZERO = '1';
 
@@ -47,9 +49,9 @@ const string Base58::Encode(const vector<uint8_t> &data) {
     for (i = zeroes, high = size - 1; i < data.size(); ++i, high = j) {
         int carry;
 		for (carry = data[i], j = size - 1; (j > high) || carry; --j) {
-			carry += 256 * buf[j];
-			buf[j] = carry % 58;
-			carry /= 58;
+			carry += B256 * buf[j];
+			buf[j] = carry % B58;
+			carry /= B58;
 		}
 
         assert(carry == 0);
@@ -100,16 +102,16 @@ const vector<uint8_t> Base58::Decode(const string &data) {
         // Decode base58 character
         const size_t ch = BASE58_CHARACTERS.find_first_of(c);
         if (ch == string::npos) {
-            throw runtime_error("Invalid character: " + ch);
+            throw runtime_error("Invalid character: " + to_string(c));
         }
 
         // Apply "b256 = b256 * 58 + ch".
         int carry = ch;
         int i = 0;
         for (vector<uint8_t>::reverse_iterator it = b256.rbegin(); (carry != 0 || i < length) && (it != b256.rend()); ++it, ++i) {
-            carry += 58 * (*it);
-            *it = carry % 256;
-            carry /= 256;
+            carry += B58 * (*it);
+            *it = carry % B256;
+            carry /= B256;
         }
 
         assert(carry == 0);
