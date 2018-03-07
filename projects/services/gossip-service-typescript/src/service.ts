@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-import { logger, types, topology, topologyPeers } from "orbs-core-library";
+import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip } from "orbs-core-library";
@@ -26,7 +26,7 @@ export default class GossipService extends Service {
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
     this.gossip = new Gossip({ port: gossipConfig.gossipPort, localAddress: gossipConfig.nodeName,
-      peers: topologyPeers((<GossipServiceConfig>this.config).peers)});
+      peers: (<GossipServiceConfig>this.config).peers });
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
