@@ -2,8 +2,8 @@ version: '2'
 
 services:
   ganache-server:
-    image: ganache-cli
-    build: https://github.com/trufflesuite/ganache-cli.git
+    image: ganache-cli:v6.0.3
+    build: https://github.com/trufflesuite/ganache-cli.git#v6.0.3
     ports:
       - 8545:8545
     networks:
