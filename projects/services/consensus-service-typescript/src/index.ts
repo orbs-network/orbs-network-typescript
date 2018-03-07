@@ -13,6 +13,7 @@ logger.configure({
   logzio: {
     apiKey: LOGZIO_API_KEY
   },
+  console: true
 });
 
 const nodeTopology = topology();
