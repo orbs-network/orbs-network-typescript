@@ -13,8 +13,8 @@ function generateBlock(prevBlockId: number): types.Block {
             id: prevBlockId + 1,
             prevBlockId: prevBlockId
         },
-        tx: { version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" },
-        modifiedAddressesJson: "{}"
+        transactions: [{ version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" }],
+        stateDiff: []
     };
 }
 

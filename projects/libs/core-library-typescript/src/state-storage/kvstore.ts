@@ -1,8 +1,6 @@
-import { logger } from "../../common-library/logger";
+import { logger } from "../common-library/logger";
 
-import BaseKVStore from "./base-kvstore";
-
-export default class MemoryKVStore extends BaseKVStore {
+export class InMemoryKVStore {
   private storeMap = new Map<string, string>();
 
   public async get(contractAddress: string, key: string) {

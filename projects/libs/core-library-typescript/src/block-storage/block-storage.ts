@@ -13,14 +13,8 @@ export class BlockStorage {
       id: 0,
       prevBlockId: -1
     },
-    tx: {
-      version: 0,
-      contractAddress: "0",
-      sender: "",
-      signature: "",
-      payload: "{}"
-    },
-    modifiedAddressesJson: "{}"
+    transactions: [],
+    stateDiff: []
   };
 
   private lastBlock: types.Block;

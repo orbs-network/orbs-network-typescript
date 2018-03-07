@@ -1,20 +1,20 @@
 syntax = "proto3";
 
 import "primitives/transactions.proto";
+import "primitives/blocks.proto";
 
 service VirtualMachine {
-  rpc ExecuteTransaction (ExecuteTransactionInput) returns (ExecuteTransactionOutput);
   rpc CallContract (CallContractInput) returns (CallContractOutput);
+  rpc ProcessTransactionSet(ProcessTransactionSetInput) returns (ProcessTransactionSetOutput);
 }
 
-message ExecuteTransactionInput {
-  Transaction transaction = 1;
-  TransactionAppendix transactionAppendix = 2;
+message ProcessTransactionSetInput {
+  repeated Transaction orderedTransactions = 1;
 }
 
-message ExecuteTransactionOutput {
-  bool success = 1;
-  string modifiedAddressesJson = 2;
+message ProcessTransactionSetOutput {
+  repeated Transaction processedTransactions = 1;
+  repeated ModifiedStateKey stateDiff = 2;
 }
 
 message CallContractInput {

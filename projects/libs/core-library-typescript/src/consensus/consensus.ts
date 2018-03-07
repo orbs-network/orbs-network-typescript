@@ -4,20 +4,28 @@ import { types } from "../common-library/types";
 import { Gossip } from "../gossip";
 
 import { RaftConsensusConfig, RaftConsensus } from "./raft-consensus";
+import BlockBuilder from "./block-builder";
 
 export class Consensus {
-  private consensus: RaftConsensus;
+  private raftConsensus: RaftConsensus;
 
-  constructor(options: RaftConsensusConfig, gossip: types.GossipClient, virtualMachine: types.VirtualMachineClient,
-    blockStorage: types.BlockStorageClient) {
-    this.consensus = new RaftConsensus(options, gossip, virtualMachine, blockStorage);
+  constructor(
+    config: RaftConsensusConfig, gossip: types.GossipClient,
+    virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
+     transactionPool: types.TransactionPoolClient) {
+    this.raftConsensus = new RaftConsensus(
+      config, gossip, blockStorage, transactionPool, new BlockBuilder({ virtualMachine, transactionPool }));
   }
 
-  public async sendTransaction(transactionContext: types.SendTransactionInput) {
-    await this.consensus.onAppend(transactionContext.transaction, transactionContext.transactionAppendix);
+  async initialize() {
+    return this.raftConsensus.initialize();
+  }
+
+  async shutdown() {
+    return this.raftConsensus.shutdown();
   }
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
-    await this.consensus.gossipMessageReceived(fromAddress, messageType, message);
+    await this.raftConsensus.onMessageReceived(fromAddress, messageType, message);
   }
 }

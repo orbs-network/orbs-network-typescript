@@ -1,23 +1,66 @@
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
+import { createHash } from "crypto";
 
 export class TransactionPool {
   private pendingTransactions = new Map<string, types.Transaction>();
+  private gossip: types.GossipClient;
 
-  public async addNewPendingTransaction(transaction: types.Transaction) {
-    // if (!this.pendingTransactions.has(transaction.id)) {
-    //   this.pendingTransactions.set(transaction.id, transaction);
-    //   logger.info(`${topology.name}: after adding we have ${this.pendingTransactions.size} pending transactions`);
-    // }
-    // For example:
-    // await this.peers.gossip.announceTransaction({ transaction: transaction });
+  constructor(gossip: types.GossipClient) {
+    this.gossip = gossip;
   }
 
-  public async addExistingPendingTransaction(transaction: types.Transaction) {
-    // logger.info(`${topology.name}: addExistingPendingTransaction ${JSON.stringify(transaction)}`);
-    // if (!this.pendingTransactions.has(transaction.id)) {
-    //   this.pendingTransactions.set(transaction.id, transaction);
-    //   logger.info(`${topology.name}: after adding we have ${this.pendingTransactions.size} pending transactions`);
-    // }
+  public async addNewPendingTransaction(transaction: types.Transaction) {
+    await this.storePendingTransaction(transaction);
+    await this.broadcastTransactionToOtherNodes(transaction);
+  }
+
+  public getAllPendingTransactions(): types.GetAllPendingTransactionsOutput {
+    // TODO: pull FIFO
+    // TODO: solve concurrency issues
+    const transactions = Array.from(this.pendingTransactions.values());
+    return { transactions };
+  }
+
+  public clearPendingTransactions(transactions: types.Transaction[]) {
+    for (const transaction of transactions) {
+      const txHash = this.calculateTransactionHash(transaction);
+      this.pendingTransactions.delete(txHash);
+    }
+  }
+
+  public async gossipMessageReceived(fromAddress: string, messageType: string, message: types.GossipMessageReceivedData) {
+    if (messageType == "newTransaction") {
+      this.storePendingTransaction(message.transaction);
+    } else {
+      throw `Unsupported message type ${messageType}`;
+    }
+  }
+
+  private async storePendingTransaction(transaction: types.Transaction) {
+    const txHash = this.calculateTransactionHash(transaction);
+    if (this.pendingTransactions.has(txHash)) {
+      throw `transaction with hash ${txHash} already exists in the pool`;
+    }
+    this.pendingTransactions.set(txHash, transaction);
+
+    logger.debug(`added a new transaction ${JSON.stringify(transaction)} to the pool`);
+  }
+
+  private calculateTransactionHash(transaction: types.Transaction) {
+    const hash = createHash("sha256");
+    hash.update(JSON.stringify(transaction));
+    return hash.digest("hex");
+  }
+
+
+
+  private async broadcastTransactionToOtherNodes(transaction: types.Transaction) {
+    await this.gossip.broadcastMessage({
+      broadcastGroup: "transactionPool",
+      messageType: "newTransaction",
+      buffer: new Buffer(JSON.stringify({transaction})),
+      immediate: true
+    });
   }
 }

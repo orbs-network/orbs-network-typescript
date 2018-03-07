@@ -1,11 +1,17 @@
+import { cloneDeep } from "lodash";
+
 export interface StateCacheKey {
   contractAddress: string;
   key: string;
 }
 
 export class StateCache {
-  private cache = new Map<string, string>();
-  private modifiedKeys = new Set<string>();
+  private cache: Map<string, string>;
+  private modifiedKeys: Set<string> = new Set<string>();
+
+  constructor(cache = new Map<string, string>()) {
+    this.cache = cache;
+  }
 
   public get(key: StateCacheKey) {
     return this.cache.get(this.encodeMapKey(key));
@@ -22,10 +28,10 @@ export class StateCache {
     this.cache.set(encodedKey, value);
   }
 
-  public getModifiedKeys() {
-    const res = new Map<StateCacheKey, string>();
+  public getModifiedKeys(): {key: StateCacheKey, value: string}[] {
+    const res = [];
     for (const key of this.modifiedKeys) {
-      res.set(this.decodeMapKey(key), this.cache.get(key));
+      res.push({key: this.decodeMapKey(key), value: this.cache.get(key)});
     }
     return res;
   }
@@ -38,5 +44,15 @@ export class StateCache {
   private decodeMapKey(encodedKey: string): StateCacheKey {
     const [contractAddress, key] = encodedKey.split("|");
     return { contractAddress, key };
+  }
+
+  public fork() {
+    return new StateCache(cloneDeep(this.cache));
+  }
+
+  public merge(modifiedKeys: {key: StateCacheKey, value: string}[]) {
+    for (const item of modifiedKeys) {
+      this.set(item.key, item.value);
+    }
   }
 }

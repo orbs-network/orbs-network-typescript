@@ -31,18 +31,14 @@ export default class HardCodedSmartContractProcessor {
     this.contractAddresses.set(toAddress, contractModule);
   }
 
-  public async processTransaction(request: CallRequest) {
-    const transactionScopeStateCache = new StateCache();
+  public async processTransaction(request: CallRequest, stateCache: StateCache) {
     const writeAdapter = new ContractStateReadWriteAccessor(
       request.contractAddress,
-      transactionScopeStateCache,
+      stateCache,
       this.stateStorageClient
     );
 
     await this.processMethod(request, writeAdapter);
-
-    // the cache documented all changes. TODO: cache will also set prefetched that don't change..
-    return transactionScopeStateCache.getModifiedKeys();
   }
 
   public async call(request: CallRequest) {

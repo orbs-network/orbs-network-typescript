@@ -24,22 +24,8 @@ export default class VirtualMachineService extends Service {
   }
 
   @Service.RPCMethod
-  public async executeTransaction(rpc: types.ExecuteTransactionContext) {
-    // Currently only a "simple" contract type is supported
-    try {
-      const modifiedKeys = await this.virtualMachine.executeTransaction(rpc.req);
-
-      rpc.res = {
-        success: true,
-        modifiedAddressesJson: JSON.stringify(_.fromPairs([...modifiedKeys].map(
-          ([{ contractAddress, key }, value]) => [key, value])))
-      };
-
-    } catch (err) {
-      logger.error("executeTransaction() error: " + err);
-
-      rpc.res = { success: false, modifiedAddressesJson: undefined };
-    }
+  public async processTransactionSet(rpc: types.ProcessTransactionSetContext) {
+    rpc.res = await this.virtualMachine.processTransactionSet(rpc.req);
   }
 
   @Service.RPCMethod

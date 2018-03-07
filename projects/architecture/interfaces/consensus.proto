@@ -1,12 +1,15 @@
 syntax = "proto3";
 
+import "primitives/blocks.proto";
 import "primitives/gossip-listener.proto";
 
-import "./gossip.proto";
-
 service Consensus {
-  rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
+}
+
+
+message ConsensusMessage {
+  Block block = 1;
 }
 
 message SendTransactionInput {
