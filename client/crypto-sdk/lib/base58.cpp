@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <iterator>
+#include <stdexcept>
+#include <string>
 
 #include <assert.h>
 
@@ -11,9 +13,13 @@ using namespace Orbs;
 // log(256) / log(58), rounded up.
 static const float LOG256_OVER_LOG58 = 138.0f / 100;
 
+// log(58) / log(256), rounded up.
+static const float LOG58_OVER_LOG256 = 733.0f / 1000;
+
 // All alphanumeric characters except for "0", "I", "O", and "l".
 static const string BASE58_CHARACTERS("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
 
+static const char WHITESPACE = ' ';
 static const char ENCODED_ZERO = '1';
 
 // Encode a byte vector to a base58 encoded string.
@@ -64,5 +70,66 @@ const string Base58::Encode(const vector<uint8_t> &data) {
 
 // Decode a a base58 encoded strin to a byte vector.
 const vector<uint8_t> Base58::Decode(const string &data) {
-    return vector<uint8_t>();
+    // Skip leading and trailing spaces.
+    string str;
+    const size_t strBegin = data.find_first_not_of(WHITESPACE);
+    if (strBegin != string::npos) {
+        const size_t strEnd = data.find_last_not_of(WHITESPACE);
+        str = data.substr(strBegin, strEnd - strBegin + 1);
+    } else {
+        str = data;
+    }
+
+    // Skip and count leading '1's.
+    size_t zeroes = 0;
+    for (char c : str) {
+        if (c != ENCODED_ZERO) {
+            break;
+        }
+
+        ++zeroes;
+    }
+
+    // Allocate enough space in big-endian base256 representation.
+    size_t size = str.length() * LOG58_OVER_LOG256 + 1;
+    vector<uint8_t> b256(size, 0);
+
+    // Process the characters.
+    int length = 0;
+    for (char c : str) {
+        // Decode base58 character
+        const size_t ch = BASE58_CHARACTERS.find_first_of(c);
+        if (ch == string::npos) {
+            throw runtime_error("Invalid character: " + ch);
+        }
+
+        // Apply "b256 = b256 * 58 + ch".
+        int carry = ch;
+        int i = 0;
+        for (vector<uint8_t>::reverse_iterator it = b256.rbegin(); (carry != 0 || i < length) && (it != b256.rend()); ++it, ++i) {
+            carry += 58 * (*it);
+            *it = carry % 256;
+            carry /= 256;
+        }
+
+        assert(carry == 0);
+
+        length = i;
+    }
+
+    // Skip leading zeroes in b256.
+    vector<uint8_t>::iterator it = b256.begin() + (size - length);
+    while (it != b256.end() && *it == 0) {
+        it++;
+    }
+
+    // Copy result into output vector.
+    vector<uint8_t> res;
+    res.reserve(zeroes + (b256.end() - it));
+    res.assign(zeroes, 0x00);
+    while (it != b256.end()) {
+        res.push_back(*(it++));
+    }
+
+    return res;
 }
