@@ -15,7 +15,7 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: cd deploy && yarn install && ./deploy-staging.sh
+      - run: cd deploy && npm install && ./deploy-staging.sh
 
 workflows:
   version: 2
