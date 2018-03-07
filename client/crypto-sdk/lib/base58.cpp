@@ -12,7 +12,9 @@ using namespace Orbs;
 static const float LOG256_OVER_LOG58 = 138.0f / 100;
 
 // All alphanumeric characters except for "0", "I", "O", and "l".
-static const char* BASE58_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+static const string BASE58_CHARACTERS("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+
+static const char ENCODED_ZERO = '1';
 
 // Encode a byte vector to a base58 encoded string.
 const string Base58::Encode(const vector<uint8_t> &data) {
@@ -20,14 +22,14 @@ const string Base58::Encode(const vector<uint8_t> &data) {
         return string();
     }
 
-    // Skip & count leading zeroes.
+    // Skip and count leading zeroes.
     size_t zeroes = 0;
     for (uint8_t c : data) {
         if (c != 0) {
             break;
         }
 
-        zeroes++;
+        ++zeroes;
     }
 
     size_t size = (data.size() - zeroes) * LOG256_OVER_LOG58 + 1;
@@ -43,13 +45,15 @@ const string Base58::Encode(const vector<uint8_t> &data) {
 			buf[j] = carry % 58;
 			carry /= 58;
 		}
+
+        assert(carry == 0);
 	}
 
     for (j = 0; j < size && !buf[j]; ++j);
 
     string str;
     str.reserve(size + zeroes);
-    str.assign(zeroes, '1');
+    str.assign(zeroes, ENCODED_ZERO);
 
     for (i = zeroes; j < size; ++i, ++j) {
         str += BASE58_CHARACTERS[buf[j]];
