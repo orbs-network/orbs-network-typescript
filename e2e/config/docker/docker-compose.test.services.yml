@@ -88,6 +88,8 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/gossip-service-typescript/
+    environment:
+      - NODE_IP=${NODE_IP}
     command: node --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/gossip.js
     volumes_from:
       - shared_volumes
