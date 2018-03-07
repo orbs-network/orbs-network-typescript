@@ -16,24 +16,24 @@ const transactionPool = new TransactionPool(gossip);
 
 
 function aTransaction() {
-    const transaction: types.Transaction = {
-        version: 0,
-        sender: "sender",
-        contractAddress: "address",
-        signature: "signature",
-        payload: "payload"
-    };
+  const transaction: types.Transaction = {
+    version: 0,
+    sender: "sender",
+    contractAddress: "address",
+    signature: "signature",
+    payload: "payload"
+  };
 
-    return transaction;
+  return transaction;
 }
 
 describe("new broadcast transaction", () => {
   it("is added to the transaction pool", async () => {
-      const tx = aTransaction();
-      await transactionPool.addNewPendingTransaction(tx);
-      const { transactions } = await transactionPool.getAllPendingTransactions();
-      transactions.should.eql([tx]);
-      expect(gossip.broadcastMessage).to.have.been.called;
+    const tx = aTransaction();
+    await transactionPool.addNewPendingTransaction(tx);
+    const { transactions } = await transactionPool.getAllPendingTransactions();
+    transactions.should.eql([tx]);
+    expect(gossip.broadcastMessage).to.have.been.called;
   });
 
   xit("two identical transaction are processed only once");
