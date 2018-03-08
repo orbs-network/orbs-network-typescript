@@ -1,15 +1,32 @@
 syntax = "proto3";
 
-message Transaction {
+import "./addresses.proto";
+
+
+message TransactionHeader {
   uint32 version = 1;
-  string sender = 2;
-  string contractAddress = 3;
-  string payload = 4;
-  string signature = 5;
+  UniversalAddress sender = 2;
+  TransactionLifespan lifespan = 3;
+  uint32 seqNumber = 4;
 }
 
-message TransactionAppendix {
-  uint32 version = 1;
-  repeated string prefetchAddresses = 2;
-  string subscriptionKey = 3;
+message TranasactionLifespan {
+  bytes refBlockHash = 1;
+  uint32 blocksToLive = 2;
+}
+
+message TransactionBody {
+  bytes contractAddress = 1;
+  bytes payload = 2;
+}
+
+message Transaction {
+  TransactionHeader header = 1;
+  TransactionBody body = 2;
+  bytes signature = 3;
+}
+
+message TransactionSubscriptionAppendix {
+  bytes subscriptionKey = 1;
+  bytes subscriptionSignature = 2;
 }
