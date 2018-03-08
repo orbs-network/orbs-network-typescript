@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "./addresses.proto";
+import "addresses.proto";
 
 
 message TransactionHeader {
@@ -16,7 +16,7 @@ message TranasactionLifespan {
 }
 
 message TransactionBody {
-  bytes contractAddress = 1;
+  ContractAddress contractAddress = 1;
   bytes payload = 2;
 }
 
