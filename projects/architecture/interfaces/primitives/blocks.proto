@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "transactions.proto";
-import "addresses.proto.proto";
+import "addresses.proto";
 
 message BlockHeader {
   uint32 version = 1;
