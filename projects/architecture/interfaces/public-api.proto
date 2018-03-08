@@ -1,26 +1,16 @@
 syntax = "proto3";
 
 import "primitives/transactions.proto";
+import "call-contract.proto";
 
-message PublicApiSendTransactionInput {
-  Transaction transaction = 1;
-  TransactionAppendix transactionAppendix = 2;
+message SendTransactionInput {
+  SubscriptionSignedTransaction transaction = 1;
 }
 
-message PublicApiSendTransactionOutput {
-}
-
-message PublicApiCallInput {
-  string sender = 1;
-  string contractAddress = 2;
-  string payload = 3;
-}
-
-message PublicApiCallOutput {
-  string resultJson = 1;
+message SendTransactionOutput {
 }
 
 service PublicApi {
-  rpc SendTransaction (PublicApiSendTransactionInput) returns (PublicApiSendTransactionOutput);
-  rpc Call (PublicApiCallInput) returns (PublicApiCallOutput);
+  rpc SendTransaction (SendTransactionInput) returns (SendTransactionOutput);
+  rpc CallContract (CallContractInput) returns (CallContractOutput);
 }
