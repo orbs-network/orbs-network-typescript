@@ -1,24 +1,6 @@
 syntax = "proto3";
 
-import "addresses.proto";
-
-
-message TransactionHeader {
-  uint32 version = 1;
-  UniversalAddress sender = 2;
-  TransactionLifespan lifespan = 3;
-  uint32 seqNumber = 4;
-}
-
-message TranasactionLifespan {
-  bytes refBlockHash = 1;
-  uint32 blocksToLive = 2;
-}
-
-message TransactionBody {
-  ContractAddress contractAddress = 1;
-  bytes payload = 2;
-}
+import "./addresses.proto";
 
 message Transaction {
   TransactionHeader header = 1;
@@ -26,7 +8,29 @@ message Transaction {
   bytes signature = 3;
 }
 
+message TransactionHeader {
+  uint32 version = 1;
+  UniversalAddress sender = 2;
+  TransactionLifespan lifespan = 3;
+  uint32 sequenceNumber = 4;
+}
+
+message TransactionBody {
+  ContractAddress contractAddress = 1;
+  bytes payload = 2;
+}
+
+message TransactionLifespan {
+  bytes refBlockHash = 1;
+  uint32 blocksToLive = 2;
+}
+
 message TransactionSubscriptionAppendix {
-  bytes subscriptionKey = 1;
-  bytes subscriptionSignature = 2;
+  string subscriptionKey = 1; // TODO: what's the key format?
+  bytes subscriptionSignature = 2; // TODO: how is it calculated?
+}
+
+message SubscriptionSignedTransaction {
+  Transaction transaction = 1;
+  TransactionSubscriptionAppendix transactionSubscriptionAppendix = 2;
 }

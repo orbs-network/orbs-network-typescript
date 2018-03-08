@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+message CallContractInput {
+  string sender = 1;
+  string contractAddress = 2;
+  string payload = 3;
+}
+
+message CallContractOutput {
+  string resultJson = 1;
+}
