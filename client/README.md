@@ -55,7 +55,7 @@ brew install cmake
 
 ## Build
 
-> First, you'd need to run the `./configure.sh` script. It will configure the release build by default, but if you require a debug build, make sure to run it with the `DEBUG` environment variable set:
+> First, you'd need to run the `configure.sh` script. It will configure the release build by default, but if you require a debug build, make sure to run it with the `DEBUG` environment variable set:
 
 Release:
 
@@ -69,7 +69,13 @@ Debug:
 DEBUG=1 ./configure.sh
 ```
 
-> After the project is configured, you'd need to run the `./build.sh` script:
+> If you want to configure the build from scratch, make sure to run the `clean.sh` script before:
+
+```bash
+./clean.sh
+```
+
+> After the project is configured, you'd need to run the `build.sh` script:
 
 ```bash
 ./build.sh
@@ -77,7 +83,7 @@ DEBUG=1 ./configure.sh
 
 ## Test
 
-> In order to run the tests, you'd need to run the `./test.sh` script:
+> In order to run the tests, you'd need to run the `test.sh` script:
 
 ```bash
 ./test.sh
