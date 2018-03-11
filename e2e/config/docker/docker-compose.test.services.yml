@@ -6,7 +6,7 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/consensus-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/consensus.js
+    command: node --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/consensus.js
     environment:
       - NUM_OF_NODES=${NUM_OF_NODES}
       - ETHEREUM_CONTRACT_ADDRESS=${SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS}
@@ -30,7 +30,7 @@ services:
     working_dir: /opt/orbs/projects/services/public-api-service-typescript/
     environment:
       - validateSubscription=true
-    command: node dist/index.js ${NODE_CONFIG_PATH}/public-api.js
+    command: node  --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/public-api.js
     ports:
       - ${PUBLIC_API_HOST_PORT}:51151
     volumes_from:
@@ -70,7 +70,7 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/virtual-machine-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/virtual-machine.js
+    command: node --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/virtual-machine.js
     volumes_from:
       - shared_volumes
     networks:
@@ -88,7 +88,9 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/gossip-service-typescript/
-    command: node dist/index.js ${NODE_CONFIG_PATH}/gossip.js
+    environment:
+      - NODE_IP=${NODE_IP}
+    command: node --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/gossip.js
     volumes_from:
       - shared_volumes
     networks:

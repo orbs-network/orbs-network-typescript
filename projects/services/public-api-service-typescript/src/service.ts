@@ -15,20 +15,13 @@ class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
 export default class PublicApiService extends Service {
   private publicApi: PublicApi;
 
-  private virtualMachine: types.VirtualMachineClient;
-  private consensus: types.ConsensusClient;
-  private subscriptionManager: types.SubscriptionManagerClient;
   private transactionHandler: TransactionHandler;
 
-  public constructor(virtualMachine: types.VirtualMachineClient, consensus: types.ConsensusClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
+  public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.virtualMachine = virtualMachine;
-    this.consensus = consensus;
-    this.subscriptionManager = subscriptionManager;
+    this.transactionHandler = new TransactionHandler(transactionPool, subscriptionManager, new ConstantTransactionHandlerConfig());
 
-    this.transactionHandler = new TransactionHandler(this.consensus, this.subscriptionManager, new ConstantTransactionHandlerConfig());
-
-    this.publicApi = new PublicApi(this.transactionHandler, this.virtualMachine);
+    this.publicApi = new PublicApi(this.transactionHandler, virtualMachine);
   }
 
   async initialize() {

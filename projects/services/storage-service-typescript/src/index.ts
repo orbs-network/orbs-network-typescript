@@ -31,8 +31,7 @@ const blockStorageDBPath = BLOCK_STORAGE_DB_PATH || path.resolve(path.join("../.
 const blockStorageConfig = {
   nodeName: NODE_NAME,
   dbPath: blockStorageDBPath,
-  pollInterval:
-  Number(BLOCK_STORAGE_POLL_INTERVAL) || 5000
+  pollInterval: Number(BLOCK_STORAGE_POLL_INTERVAL) || 5000
 };
 
 const stateStorageConfig = { nodeName: NODE_NAME };

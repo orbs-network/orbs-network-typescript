@@ -38,7 +38,7 @@ function client(grpc: GRPCClient) {
 function runServer(grpc: GRPServer): GRPCRuntime {
   const protoPath = interfaces.getPathToProto(grpc.proto);
   const app = new Mali(protoPath, grpc.name);
-  const serviceFuncs: {[key: string]: Function} = {};
+  const serviceFuncs: { [key: string]: Function } = {};
   for (const funcName of (<any>types)[grpc.name]) {
     serviceFuncs[funcName] = (grpc.service)[funcName];
   }
@@ -104,8 +104,10 @@ export namespace grpc {
   export function consensusServiceServer({ endpoint, services }: {
     endpoint: string, services: [types.ConsensusServer, types.SubscriptionManagerServer, types.TransactionPoolServer]
   }) {
-    return servers({ multiProto: "consensus-service.proto", names: ["Consensus", "SubscriptionManager", "TransactionPool"],
-      endpoint, services });
+    return servers({
+      multiProto: "consensus-service.proto", names: ["Consensus", "SubscriptionManager", "TransactionPool"],
+      endpoint, services
+    });
   }
 
   export function consensusServer({ endpoint, service }: { endpoint: string, service: types.ConsensusServer }) {

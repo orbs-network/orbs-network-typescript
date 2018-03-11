@@ -7,7 +7,7 @@ import { sortBy } from "lodash";
 
 function copyArray<T>(source: Array<T>, destination: Array<T>) {
   while (source.length > 0) {
-      destination.push(source.pop());
+    destination.push(source.pop());
   }
 }
 

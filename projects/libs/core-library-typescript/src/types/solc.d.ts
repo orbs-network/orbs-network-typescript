@@ -23,50 +23,50 @@ export function setupMethods(soljson: any): any;
 export function version(...args: any[]): any;
 
 export namespace compile {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace compileStandard {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace compileStandardWrapper {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace license {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace linkBytecode {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace loadRemoteVersion {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace setupMethods {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 
 export namespace version {
-    const prototype: {
-    };
+  const prototype: {
+  };
 
 }
 

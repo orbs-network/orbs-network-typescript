@@ -12,7 +12,7 @@ function stringToBuffer(str: string): Buffer {
 function handleWSError(address: string, url: string) {
   return (err: Error) => {
     if (err) {
-      logger.error(`WebSocket error`, {err});
+      logger.error(`WebSocket error`, { err });
       logger.error(`Error sending unicast message to ${address} (${url})`);
     }
   };
@@ -26,7 +26,7 @@ export class Gossip {
   peers: any;
   readonly port: number;
 
-  constructor(input: {localAddress: string, port: number, peers: types.ClientMap}) {
+  constructor(input: { localAddress: string, port: number, peers: types.ClientMap }) {
     this.port = input.port;
     this.server = new WebSocket.Server({ port: input.port });
     this.peers = input.peers;
@@ -82,9 +82,9 @@ export class Gossip {
         return;
       }
 
-      if (! this.listeners.has(broadcastGroup)) {
+      if (!this.listeners.has(broadcastGroup)) {
         const peer = this.peers[broadcastGroup];
-        if (! peer) {
+        if (!peer) {
           throw new Error(`Invalid broadcast group: [${broadcastGroup}]`);
         }
         this.listeners.set(broadcastGroup, peer);
