@@ -46,7 +46,7 @@ const string Base58::Encode(const vector<uint8_t> &data) {
     ssize_t i = 0;
     ssize_t j = 0;
     ssize_t high = 0;
-    for (i = zeroes, high = size - 1; i < data.size(); ++i, high = j) {
+    for (i = zeroes, high = size - 1; i < static_cast<ssize_t>(data.size()); ++i, high = j) {
         int carry;
 		for (carry = data[i], j = size - 1; (j > high) || carry; --j) {
 			carry += B256 * buf[j];
@@ -57,13 +57,13 @@ const string Base58::Encode(const vector<uint8_t> &data) {
         assert(carry == 0);
 	}
 
-    for (j = 0; j < size && !buf[j]; ++j);
+    for (j = 0; j < static_cast<ssize_t>(size) && !buf[j]; ++j);
 
     string str;
     str.reserve(size + zeroes);
     str.assign(zeroes, ENCODED_ZERO);
 
-    for (i = zeroes; j < size; ++i, ++j) {
+    for (i = zeroes; j < static_cast<ssize_t>(size); ++i, ++j) {
         str += BASE58_CHARACTERS[buf[j]];
     }
 
