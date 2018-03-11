@@ -55,6 +55,9 @@ services:
       - .env-secrets
     environment:
       SERVICE: storage
+      BLOCK_STORAGE_DB_PATH: /opt/orbs/db
+    volumes:
+      - /opt/orbs/db:/opt/orbs/db
     networks:
       default:
 
