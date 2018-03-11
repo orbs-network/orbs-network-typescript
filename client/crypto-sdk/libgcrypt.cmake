@@ -32,7 +32,6 @@ set(LIBGCRYPT_INCLUDE_DIRS ${BINARY_DIR}/src/)
 # INTERFACE_INCLUDE_DIRECTORIES will throw an error. To make it work, we just create the directory now during config.
 file(MAKE_DIRECTORY ${LIBGCRYPT_INCLUDE_DIRS})
 
-ExternalProject_Get_Property(libgcrypt BINARY_DIR)
 set(LIBGCRYPT_LIBRARY_PATH ${BINARY_DIR}/src/.libs/libgcrypt.a)
 set(LIBGCRYPT_LIBRARY gcrypt)
 add_library(${LIBGCRYPT_LIBRARY} UNKNOWN IMPORTED)
