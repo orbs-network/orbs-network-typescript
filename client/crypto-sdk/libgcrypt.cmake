@@ -31,7 +31,6 @@ set(LIBGCRYPT_INCLUDE_DIRS ${BINARY_DIR}/src/)
 # The cloning of the above repo doesn't happen until make, however if the dir doesn't exist,
 # INTERFACE_INCLUDE_DIRECTORIES will throw an error. To make it work, we just create the directory now during config.
 file(MAKE_DIRECTORY ${LIBGCRYPT_INCLUDE_DIRS})
-message("sfsdf ${LIBGCRYPT_INCLUDE_DIRS}")
 
 ExternalProject_Get_Property(libgcrypt BINARY_DIR)
 set(LIBGCRYPT_LIBRARY_PATH ${BINARY_DIR}/src/.libs/libgcrypt.a)
