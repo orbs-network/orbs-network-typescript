@@ -8,6 +8,43 @@ In order to implement some of the functionality, we have elected to use libgcryp
 2. FIPS 140 validated.
 3. Support FIPS 140-2 mode.
 
+## Functionality
+
+### Build System
+
+Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`.
+
+### Algorithms
+
+#### Hashing
+
+* SHA256
+* SHA512
+* RIPEMD160
+
+#### Encoding
+
+* BASE58
+
+#### Checksum
+
+* CRC32
+
+### External Dependencies
+
+* Google Test (`gtest`): Google Test is a unit testing library for the C++ programming language, based on the xUnit architecture.
+  * Source: [https://github.com/google/googletest.git](https://github.com/google/googletest.git)
+  * Version: `release-1.8.0` git tag.
+* Google Mock (`gmock`): Google Mock is an extension to Google Test for writing and using C++ mock classes.
+  * Source: [https://github.com/google/googletest.git](https://github.com/google/googletest.git)
+  * Version: `release-1.8.0` git tag.
+* Libgpg-error (`libgpg_error`): Libgpg-error is a small library that originally defined common error values for all GnuPG components.
+  * Source: [https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2)
+  * Version: 1.27.
+* Libgcrypt (`libgcrypt`): Libgcrypt is a general purpose cryptographic library originally based on code from GnuPG.
+  * Source: [https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2)
+  * Version: 1.8.2.
+
 ## Prerequisites
 
 1. [CMake](https://cmake.org)
