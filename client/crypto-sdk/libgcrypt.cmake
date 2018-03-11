@@ -25,9 +25,20 @@ ExternalProject_Add(libgcrypt
   LOG_INSTALL ON
 )
 
-ExternalProject_Get_Property(libgcrypt INSTALL_DIR)
-set(LIBGCRYPT_DIR ${INSTALL_DIR})
-include_directories(${LIBGCRYPT_DIR}/src/libgcrypt/src/libgcrypt/include)
+ExternalProject_Get_Property(libgcrypt BINARY_DIR)
+set(LIBGCRYPT_INCLUDE_DIRS ${BINARY_DIR}/src/)
 
-add_library(gcrypt STATIC IMPORTED)
-set_property(TARGET gcrypt PROPERTY IMPORTED_LOCATION ${LIBGCRYPT_DIR}/src/libgcrypt/src/libgcrypt/.libs/libgcrypt.a)
+# The cloning of the above repo doesn't happen until make, however if the dir doesn't exist,
+# INTERFACE_INCLUDE_DIRECTORIES will throw an error. To make it work, we just create the directory now during config.
+file(MAKE_DIRECTORY ${LIBGCRYPT_INCLUDE_DIRS})
+message("sfsdf ${LIBGCRYPT_INCLUDE_DIRS}")
+
+ExternalProject_Get_Property(libgcrypt BINARY_DIR)
+set(LIBGCRYPT_LIBRARY_PATH ${BINARY_DIR}/src/.libs/libgcrypt.a)
+set(LIBGCRYPT_LIBRARY gcrypt)
+add_library(${LIBGCRYPT_LIBRARY} UNKNOWN IMPORTED)
+set_target_properties(${LIBGCRYPT_LIBRARY} PROPERTIES
+    "IMPORTED_LOCATION" "${LIBGCRYPT_LIBRARY_PATH}"
+    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+    "INTERFACE_INCLUDE_DIRECTORIES" "${LIBGCRYPT_INCLUDE_DIRS}")
+add_dependencies(${LIBGCRYPT_LIBRARY} libgcrypt)
