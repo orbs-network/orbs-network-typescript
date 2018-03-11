@@ -13,7 +13,9 @@ services:
       - .env
       - .env-secrets
     environment:
-      SERVICE: gossip
+      SERVICE_NAME: gossip
+    volumes:
+      - /opt/orbs/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -28,7 +30,9 @@ services:
       - .env
       - .env-secrets
     environment:
-      SERVICE: consensus
+      SERVICE_NAME: consensus
+    volumes:
+      - /opt/orbs/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -42,7 +46,9 @@ services:
       - .env
       - .env-secrets
     environment:
-      SERVICE: public-api
+      SERVICE_NAME: public-api
+    volumes:
+      - /opt/orbs/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -54,10 +60,11 @@ services:
       - .env
       - .env-secrets
     environment:
-      SERVICE: storage
+      SERVICE_NAME: storage
       BLOCK_STORAGE_DB_PATH: /opt/orbs/db
     volumes:
       - /opt/orbs/db:/opt/orbs/db
+      - /opt/orbs/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -69,7 +76,9 @@ services:
       - .env
       - .env-secrets
     environment:
-      SERVICE: virtual-machine
+      SERVICE_NAME: virtual-machine
+    volumes:
+      - /opt/orbs/logs:/opt/orbs/logs
     networks:
       default:
 
