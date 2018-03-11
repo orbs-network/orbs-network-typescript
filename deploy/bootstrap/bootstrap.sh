@@ -21,4 +21,6 @@ export DOCKER_TAG=${DOCKER_TAG-master}
 # TODO: remove default image
 export DOCKER_IMAGE=${DOCKER_IMAGE-506367651493.dkr.ecr.us-west-2.amazonaws.com/orbs-network}
 
+crontab /opt/orbs/crontab
+
 /usr/local/bin/docker-compose -f /opt/orbs/docker-compose.yml up -d

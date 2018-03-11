@@ -180,6 +180,11 @@ const main = (options) => {
 
         const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
 
+        if (options.deployNode || options.updateConfiguration) {
+            console.log(`Uploading bootstrap files...`);
+            uploadBootstrap(options);
+        }
+
         if (options.deployNode) {
             console.log(`Uploading bootstrap files...`);
             uploadBootstrap(options);
@@ -233,5 +238,6 @@ main({
     dockerTag: config.get("docker-tag"),
     deployNode: config.get("deploy-node"),
     removeNode: config.get("removeNode"),
+    updateConfiguration: config.get("update-configuration"),
     parity: config.get("parity")
 });

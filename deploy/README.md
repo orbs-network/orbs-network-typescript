@@ -1,41 +1,5 @@
 # Deployment to CloudFormation
 
-## Template and parameters
-
-`cloudformation.yaml` contains a template for a new node. It creates new VPC and bootstraps a server from `s3://orbs-network-config-staging/v1/` (please check out `deploy/bootstrap` directory for sources).
-
-## Create new stacks
-
-```bash
-./create-stacks.sh
-```
-
-## Removing old stacks
-
-```bash
-./create-stacks.sh --remove-all
-```
-
-## Testing
-
-```bash
-./test.sh
-```
-
-## Parity node
-
-Parity Etherium node is not part of ORBS network and is deployed as a separate service.
-
-TODO: extract to a different repo.
-
-```bash
-./create-stacks.parity.sh
-```
-
-```bash
-./test.parity.sh
-```
-
 ## Deploying a node from scratch
 
 Create new EC2 pair of keys named `orbs-network-staging-key`.
@@ -89,6 +53,18 @@ node deploy.js \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
     --remove-node --deploy-node
+
+# update node configuration
+
+node deploy.js \
+    --region $REGION \
+    --dns-zone $DNS_ZONE \
+    --account-id $AWS_ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --update-configuration
+
+Cron pulls bootstrap configuration automatically every five minutes to recreate containers.
 
 ```
 
