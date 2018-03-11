@@ -2,8 +2,8 @@ include(../libgpg-error.cmake)
 include(../libgcrypt.cmake)
 
 file(GLOB CRYPTO_SDK_SRC
-    "*.h"
-    "*.cpp"
+  "*.h"
+  "*.cpp"
 )
 
 add_library(crypto STATIC ${CRYPTO_SDK_SRC})

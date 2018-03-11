@@ -1,8 +1,8 @@
 include(../gtest.cmake)
 
 file(GLOB CRYPTO_SDK_TEST_SRC
-    "*.h"
-    "*.cpp"
+  "*.h"
+  "*.cpp"
 )
 
 add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
