@@ -26,9 +26,12 @@ ExternalProject_Add(libgpg-error
 ExternalProject_Get_Property(libgpg-error BINARY_DIR)
 set(LIBGPG_ERROR_INCLUDE_DIRS ${BINARY_DIR}/src/)
 
-ExternalProject_Add_Step(libgpg-error copy-gpg-error-config
+ExternalProject_Add_Step(libgpg-error post-install
   DEPENDEES install
-  COMMAND mkdir -p ${BINARY_DIR}/src/bin && cp ${BINARY_DIR}/src/gpg-error-config ${BINARY_DIR}/src/bin
+  COMMAND
+    mkdir -p ${BINARY_DIR}/src/bin && cp ${BINARY_DIR}/src/gpg-error-config ${BINARY_DIR}/src/bin &&
+    ln -fs ${BINARY_DIR}/src/gpg-error.h /usr/local/include/gpg-error.h &&
+    ln -fs ${BINARY_DIR}/src/.libs/libgpg-error.a /usr/local/lib/libgpg-error.a
 )
 
 # The cloning of the above repo doesn't happen until make, however if the dir doesn't exist,
