@@ -178,15 +178,12 @@ const main = (options) => {
 
         const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
 
-        if (options.deployNode || options.updateConfiguration) {
+        if (options.deployNode || options.updateNode || options.updateConfiguration) {
             console.log(`Uploading bootstrap files...`);
             uploadBootstrap(options);
         }
 
         if (options.deployNode || options.updateNode) {
-            console.log(`Uploading bootstrap files...`);
-            uploadBootstrap(options);
-
             if (options.removeNode) {
                 console.log(`Removing old node...`);
                 removeStack(cloudFormation, stackName);
