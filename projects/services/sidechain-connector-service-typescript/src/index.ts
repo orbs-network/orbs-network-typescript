@@ -15,6 +15,7 @@ logger.configure({
   logzio: {
     apiKey: LOGZIO_API_KEY
   },
+  console: true
 });
 
 if (!NODE_NAME) {

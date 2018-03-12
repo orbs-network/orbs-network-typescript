@@ -126,7 +126,7 @@ export class RaftConsensus {
     // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
     // committed entry.
     const block: types.Block = msg.block;
-    logger.debug("new block to be committed ${JSON.stringify(block)}");
+    logger.debug("New block to be committed ${JSON.stringify(block)}");
     await this.blockStorage.addBlock({
       block: block
     });
@@ -168,7 +168,7 @@ export class RaftConsensus {
 
     this.node.append(appendMessage);
 
-    logger.debug(`appended new block ${JSON.stringify(block)}`);
+    logger.debug(`Appended new block ${JSON.stringify(block)}`);
 
     this.readyForBlockAppend = false;
   }
