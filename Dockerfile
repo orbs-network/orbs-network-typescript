@@ -1,8 +1,8 @@
-FROM node:9
+FROM node:9-slim
 
-RUN apt-get update && apt-get install -y git build-essential
+RUN apt-get update && apt-get install -y git python build-essential && apt-get clean
 
-VOLUME [ "/opt/orbs/logs" ]
+VOLUME [ "/opt/orbs/logs", "/opt/orbs/db" ]
 
 # TODO: move to later stage, use cache for ts compiler & top level software
 
@@ -17,7 +17,5 @@ RUN yarn config list && \
 ADD . /opt/orbs
 
 RUN yarn run build && yarn cache clean
-
-RUN cd e2e && ./build.sh && yarn cache clean
 
 CMD echo

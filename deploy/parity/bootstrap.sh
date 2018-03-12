@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-aws ec2 associate-address --region us-west-2 --instance-id $INSTANCE_ID --allocation-id $EIP
+aws ec2 associate-address --region ${REGION} --instance-id $INSTANCE_ID --allocation-id $EIP
 
 export ETHERIUM_CHAIN=${ETHERIUM_CHAIN-ropsten}
 export PARITY_LOCAL_PATH=/mnt/data/

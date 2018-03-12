@@ -1,0 +1,1 @@
+*/5 * * * * flock /var/lock/update-bootstrap bash /opt/scripts/update.sh
