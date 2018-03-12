@@ -11,6 +11,12 @@ jobs:
       - store_artifacts:
           path: logs
 
+  build-sdk:
+    machine: true
+    steps:
+      - checkout
+      - run: cd client/crypto-sdk && ./docker-build.sh
+
   deploy:
     machine: true
     steps:
@@ -22,6 +28,7 @@ workflows:
   build-deploy:
     jobs:
       - build
+      - build-sdk
       - deploy:
           requires:
             - build
