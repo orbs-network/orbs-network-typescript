@@ -10,7 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "aws-sdk": "^2.192.0",
-    "js-yaml": "^3.11.0",
     "lodash": "^4.17.5",
     "nconf": "^0.10.0",
     "shelljs": "^0.8.1",
