@@ -108,11 +108,9 @@ const tagDockerImage = (options) => {
     shell.exec(`docker tag ${defaultImage}:${defaultTag} ${dockerImage}:${dockerTag}`);
 };
 
-const createStack = (cloudFormation, stackName, templatePath, parameters) => new Promise((resolve, reject) => {
-    const templateBody = fs.readFileSync(templatePath).toString();
-
+const stackAction = (stackAction, cloudFormation, stackName, templateBody, parameters) => new Promise((resolve, reject) => {
     return new Promise((resolve, reject) => {
-        cloudFormation.createStack({
+        cloudFormation[stackAction]({
             StackName: stackName,
             Parameters: parameters,
             TemplateBody: templateBody,
@@ -185,7 +183,7 @@ const main = (options) => {
             uploadBootstrap(options);
         }
 
-        if (options.deployNode) {
+        if (options.deployNode || options.updateNode) {
             console.log(`Uploading bootstrap files...`);
             uploadBootstrap(options);
 
@@ -195,25 +193,43 @@ const main = (options) => {
             }
 
             waitForStacks(cloudFormation, (stacks) => {
-                // TODO: fix to accommodate both parity node and regular node
                 console.log(stacks);
                 const nodeStack = _.find(stacks, {StackName: stackName});
-                return _.isEmpty(nodeStack);
+
+                const check = options.updateNode ? _.isObject : _.isEmpty;
+                return check(nodeStack);
             }).then(() => {
-                console.log(`Deploying new node...`);
+                if (options.deployNode) {
+                    console.log(`Deploying new node...`);
+                }
+
+                if (options.updateNode) {
+                    console.log(`Updating node...`);
+                }
 
                 const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
 
                 const standaloneParams = JSON.parse(fs.readFileSync(`${__dirname}/../cloudformation/${paramsFileName}`).toString());
+
                 setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
                 setParameter(standaloneParams, "KeyName", keyName);
                 setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag(options));
 
                 if (options.nodes) {
-                    setParameter("NumOfNodes", options.numOfNodes);
+                    setParameter(standaloneParams, "NumOfNodes", options.numOfNodes);
                 }
 
-                createStack(cloudFormation, stackName, `${__dirname}/../cloudformation/node.yaml`, standaloneParams);
+                const sshCidr = (options.sshCidr || "0.0.0.0/0").split(",");
+                const peersCidr = (options.peersCidr || "0.0.0.0/0").split(",");
+
+                // TODO: move to Kubernetes, this is getting ridiculous
+                _.templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
+                const template = _.template(fs.readFileSync(`${__dirname}/../cloudformation/node.yaml`).toString())({
+                    sshCidr, peersCidr
+                });
+
+                const action = options.updateNode ? "updateStack" : "createStack";
+                stackAction(action, cloudFormation, stackName, template, standaloneParams);
 
                 const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
 
@@ -237,7 +253,10 @@ main({
     numOfNodes: config.get("nodes"),
     dockerTag: config.get("docker-tag"),
     deployNode: config.get("deploy-node"),
-    removeNode: config.get("removeNode"),
+    removeNode: config.get("remove-node"),
+    updateNode: config.get("update-node"),
     updateConfiguration: config.get("update-configuration"),
-    parity: config.get("parity")
+    parity: config.get("parity"),
+    sshCidr: config.get("ssh-cidr"),
+    peersCidr: config.get("peers-cidr")
 });

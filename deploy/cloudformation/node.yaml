@@ -125,11 +125,10 @@ Parameters:
       Optional - Specifies the End of Security Group port to open on
       instances - defaults to port 65535
     Default: '65535'
-  SecurityIngressCidrIp:
+  PublicAPICidrIp:
     Type: String
     Description: >
-      Optional - Specifies the CIDR/IP range for Security Ports - defaults
-      to 0.0.0.0/0
+      Public API addresses.
     Default: 0.0.0.0/0
   EbsVolumeSize:
     Type: Number
@@ -289,11 +288,23 @@ Resources:
       GroupDescription:  Allowed Ports
       VpcId: !If [ CreateSubnet1, !Ref Vpc, !Ref VpcId ]
       SecurityGroupIngress:
-        IpProtocol: tcp
-        FromPort: !Ref SecurityIngressFromPort
-        ToPort: !Ref SecurityIngressToPort
-        CidrIp: !Ref SecurityIngressCidrIp
-  InstanceLc:
+        <% _.each(sshCidr, function(ip) { %>
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: <%= ip %>
+        <% }); %>
+        <% _.each(peersCidr, function(ip) { %>
+        - IpProtocol: tcp
+          FromPort: 60001
+          ToPort: 60001
+          CidrIp: <%= ip %>
+        <% }); %>
+        - IpProtocol: tcp
+          FromPort: 51151
+          ToPort: 51151
+          CidrIp: !Ref PublicAPICidrIp
+  InstanceLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
       ImageId: !If [ UseCustomAMI, !Ref AmiId, !FindInMap [ RegionMap, !Ref "AWS::Region", 64 ] ]
@@ -362,7 +373,7 @@ Resources:
             - [ !Sub "${PubSubnetAz1}, ${PubSubnetAz2}" ]
           - [ !Sub "${PubSubnetAz1}" ]
         - !Ref SubnetIds
-      LaunchConfigurationName: !Ref InstanceLc
+      LaunchConfigurationName: !Ref InstanceLaunchConfiguration
       MinSize: '0'
       MaxSize: !Ref AsgMaxSize
       DesiredCapacity: !Ref AsgMaxSize

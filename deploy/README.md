@@ -66,6 +66,19 @@ node deploy.js \
 
 Cron pulls bootstrap configuration automatically every five minutes to recreate containers.
 
+# update node stack configuration
+
+node deploy.js \
+    --region $REGION \
+    --dns-zone $DNS_ZONE \
+    --account-id $AWS_ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --peers-cidr 1.2.3.4/32,5.6.7.8/32 \
+    --ssh-cidr 10.20.30.40/32 \
+    --update-node
+
+
 ```
 
 ```bash
