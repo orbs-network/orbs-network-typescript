@@ -30,4 +30,4 @@ workflows:
             - build
           filters:
             branches:
-              only: feature/delivery-to-clients
+              only: master
