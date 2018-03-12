@@ -8,7 +8,9 @@ file(GLOB CRYPTO_SDK_TEST_SRC
 add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
 add_dependencies(crypto-test googletest libgcrypt)
 
-target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY} ${GMOCK_LIBRARY} gcrypt)
+ExternalProject_Get_Property(libgcrypt BINARY_DIR)
+set(LIBGCRYPT_LIBRARY ${BINARY_DIR}/src/.libs/libgcrypt.a)
+target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${LIBGCRYPT_LIBRARY} gpg-error)
 
 # Tell ctest about my tests
 include(GoogleTest)
