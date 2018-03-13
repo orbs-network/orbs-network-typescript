@@ -67,11 +67,11 @@ TEST(Base58, decodes_base58_encoded_string_with_leading_or_trailing_spaces_to_by
 TEST(Base58, throws_on_invalid_base58_encoded_strings) {
     vector<uint8_t> res;
 
-    EXPECT_THROW(Base58::Decode("  11117bo   9qr42A5krwASCZ1XegbfsPucae6U9E             "), runtime_error);
-    EXPECT_THROW(Base58::Decode("2NEpO7TZRRrLZSi2U"), runtime_error);
-    EXPECT_THROW(Base58::Decode("2NEpo7TZRRrIZSi2U"), runtime_error);
-    EXPECT_THROW(Base58::Decode("2NEpo7TZRRrLZSi20"), runtime_error);
-    EXPECT_THROW(Base58::Decode("lNEpo7TZRRrLZSi20"), runtime_error);
-    EXPECT_THROW(Base58::Decode("2NEpo+TZRRrLZSi2U"), runtime_error);
-    EXPECT_THROW(Base58::Decode("2NEpo7TZRRrL/Si2U"), runtime_error);
+    EXPECT_THROW(Base58::Decode("  11117bo   9qr42A5krwASCZ1XegbfsPucae6U9E             "), logic_error);
+    EXPECT_THROW(Base58::Decode("2NEpO7TZRRrLZSi2U"), logic_error);
+    EXPECT_THROW(Base58::Decode("2NEpo7TZRRrIZSi2U"), logic_error);
+    EXPECT_THROW(Base58::Decode("2NEpo7TZRRrLZSi20"), logic_error);
+    EXPECT_THROW(Base58::Decode("lNEpo7TZRRrLZSi20"), logic_error);
+    EXPECT_THROW(Base58::Decode("2NEpo+TZRRrLZSi2U"), logic_error);
+    EXPECT_THROW(Base58::Decode("2NEpo7TZRRrL/Si2U"), logic_error);
 }
