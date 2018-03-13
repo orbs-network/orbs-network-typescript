@@ -9,15 +9,10 @@ interface Config {
   publicApiClient: PublicApiClient;
 }
 
-async function getAccount(senderAddress: string, config: Config) {
-  const orbsSession = new OrbsClientSession(senderAddress, config.subscriptionKey, config.publicApiClient);
-  const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "text-message");
-  const account = new FooBarAccount(senderAddress, contractAdapter);
-
-  return account;
-}
-
 const { SLACK_VERIFICATION_TOKEN, SLACK_TOKEN, CONVERSATION_ID } = process.env;
+
+const BOT_ADDRESS = "0000";
+const PULL_REQUEST_AWARD = 100;
 
 const config = {
   subscriptionKey: "00000",
@@ -26,16 +21,28 @@ const config = {
   })
 };
 
-const rtm = new RTMClient(SLACK_TOKEN, {autoReconnect: true, useRtmConnect: true});
-// rtm.start({scope: "identify,read,post,client"});
+async function getAccount(senderAddress: string, config: Config): Promise<FooBarAccount> {
+  const orbsSession = new OrbsClientSession(senderAddress, config.subscriptionKey, config.publicApiClient);
+  const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
+  const account = new FooBarAccount(senderAddress, contractAdapter);
+
+  return Promise.resolve(account);
+}
+
+async function getBotAccount(config: Config) {
+  const botAccount = await getAccount(BOT_ADDRESS, config);
+  return botAccount;
+}
+
+const rtm = new RTMClient(SLACK_TOKEN, { autoReconnect: true, useRtmConnect: true });
 rtm.start({});
 
 rtm.on("message", async (message) => {
   // For structure of `event`, see https://api.slack.com/events/message
 
   // Skip messages that are from a bot or my own user ID
-  if ( (message.subtype && message.subtype === "bot_message") ||
-       (!message.subtype && message.user === rtm.activeUserId) ) {
+  if ((message.subtype && message.subtype === "bot_message") ||
+    (!message.subtype && message.user === rtm.activeUserId)) {
     return;
   }
 
@@ -44,21 +51,79 @@ rtm.on("message", async (message) => {
   // Log the message
   console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
 
-  const matches = message.text.match(/transfer (\d+) to <@(\w+)>/);
-  console.log(matches);
+  try {
+    if (message.text === "get my balance") {
+      const account = await getAccount(message.user, config);
+      const userBalance = await account.getMyBalance();
+      console.log(`You now have ${userBalance} magic internet money`);
 
-  if (matches) {
-    const to = matches[1];
-    const amount = Number(matches[2]);
+      return;
+    }
 
-    try {
+    if (message.text === "get bot balance") {
+      const botAccount = await getBotAccount(config);
+      const botBalance = await botAccount.getMyBalance();
+      console.log(`Bot now has ${botBalance} magic internet money`);
+
+      return;
+    }
+
+    const botInitMatch = message.text.match(/good bot gets (\d+)/);
+
+    if (botInitMatch) {
+      const botAccount = await getBotAccount(config);
+      const botBalance = await botAccount.getMyBalance();
+      const amount = Number(botInitMatch[1]);
+
+      console.log(`Init bot balance with ${amount} magic internet money`);
+
+      if (botBalance === 0) {
+        await botAccount.initBalance(BOT_ADDRESS, amount);
+      }
+
+      const newBotBalance = await botAccount.getMyBalance();
+      console.log(`Bot now has ${newBotBalance} magic internet money`);
+
+      return;
+    }
+
+    const transferMatch = message.text.match(/transfer (\d+) to <@(\w+)>/);
+
+    if (transferMatch) {
+      const to = transferMatch[1];
+      const amount = Number(transferMatch[2]);
+
       const account = await getAccount(message.user, config);
       await account.transfer(to, amount);
 
       const userBalance = await account.getMyBalance();
       console.log(`You now have ${userBalance} magic internet money`);
-    } catch (e) {
-      console.log(`Error occurred: ${e}`);
+
+      return;
     }
+
+    const freeMoneyMatch = message.text.match(/I opened a pull request/);
+
+    if (freeMoneyMatch) {
+      const to = freeMoneyMatch[1];
+      const amount = Number(freeMoneyMatch[2]);
+
+      const account = await getAccount(message.user, config);
+      const botAccount = await getBotAccount(config);
+
+      console.log(`Transfering ${PULL_REQUEST_AWARD} to ${message.user}`);
+      await botAccount.transfer(message.user, PULL_REQUEST_AWARD);
+
+      const userBalance = await account.getMyBalance();
+      console.log(`You now have ${userBalance} magic internet money`);
+
+      const botBalance = await botAccount.getMyBalance();
+      console.log(`Bot now has ${botBalance} magic internet money`);
+      return;
+    }
+
+  } catch (e) {
+    console.log(`Error occurred: ${e}`);
   }
+
 });

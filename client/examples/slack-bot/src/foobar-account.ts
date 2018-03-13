@@ -22,6 +22,10 @@ export class FooBarAccount {
     return await this.adapter.sendTransaction("transfer", [to, amount]);
   }
 
+  public async initBalance(account: string, balance: number) {
+    return await this.adapter.sendTransaction("initBalance", [account, balance]);
+  }
+
   public async getMyBalance() {
     return this.adapter.call("getMyBalance", []);
   }
