@@ -3,7 +3,7 @@ import * as path from "path";
 import TestComponent from "./test-component";
 import TestSubnet from "./test-subnet";
 import { delay } from "bluebird";
-import { initPublicApiClient } from "../public-api-client";
+import { initPublicApiClient } from "orbs-typescript-sdk";
 
 
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));

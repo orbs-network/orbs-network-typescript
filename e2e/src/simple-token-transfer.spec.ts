@@ -1,4 +1,4 @@
-import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
+import { OrbsClientSession, OrbsHardCodedContractAdapter } from "orbs-typescript-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";

@@ -3,6 +3,10 @@
     "runtime": "protobuf",
     "type": "static"
   },
+  "typescript-sdk": {
+    "runtime": "typescript",
+    "type": "library"
+  },
   "core-library-typescript": {
     "runtime": "typescript",
     "type": "library"
@@ -33,6 +37,7 @@
   },
   "order": [
     "architecture",
+    "typescript-sdk",
     "core-library-typescript",
     "gossip-service-typescript",
     "consensus-service-typescript",

@@ -1,4 +1,4 @@
-import { OrbsHardCodedContractAdapter } from "./orbs-client";
+import { OrbsHardCodedContractAdapter } from "orbs-typescript-sdk";
 export class FooBarContractClient {
   adapter: OrbsHardCodedContractAdapter;
 

@@ -1,16 +1,18 @@
 {
-  "name": "orbs-e2e",
+  "name": "orbs-typescript-sdk",
   "version": "0.1.0",
-  "description": "Orbs end-to-end tests",
+  "description": "Orbs Typescript SDK",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
   },
   "author": "Orbs Team",
   "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf ../db/test",
-    "test": "yarn run clean && NODE_ENV=test ./node_modules/.bin/mocha dist/**/*.spec.js --exit",
+    "test": "echo 'No tests avaiable'",
     "build": "yarn run build-ts && yarn run tslint",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",
     "build-ts": "tsc",
@@ -18,31 +20,16 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "@types/shelljs": "^0.7.7",
     "bluebird": "^3.5.1",
-    "ganache-core": "^2.0.2",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",
-    "nconf": "^0.10.0",
-    "solc": "0.4.18",
-    "underscore": "^1.8.3",
-    "web3": "1.0.0-beta.29",
-    "orbs-typescript-sdk": "file:../client/typescript-sdk",
-    "orbs-intefaces": "file:../projects/architecture"
+    "lodash": "^4.14.98",
+    "orbs-interfaces": "file:../../projects/architecture"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
-    "@types/chai": "^4.1.2",
-    "@types/expect": "^1.20.2",
     "@types/lodash": "^4.14.98",
-    "@types/mocha": "^2.2.47",
-    "@types/nconf": "0.0.37",
     "@types/node": "^9.4.4",
-    "@types/supertest": "^2.0.4",
-    "@types/underscore": "^1.8.7",
     "chai": "^4.1.2",
-    "mocha": "^5.0.0",
-    "shelljs": "^0.8.1",
-    "supertest": "^3.0.0",
     "tslint": "^5.9.1",
     "typescript": "^2.7.1"
   }
