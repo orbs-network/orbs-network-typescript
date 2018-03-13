@@ -4,6 +4,7 @@ import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
 import * as chai from "chai";
 import ChaiBarsPlugin from "./chai-bars-plugin";
+import * as _ from "lodash";
 
 const expect = chai.expect;
 
@@ -57,25 +58,27 @@ describe("simple token transfer", async function () {
 
   });
 
-  it.only("sends text messages between accounts", async function () {
+  it("sends text messages between accounts", async function () {
     console.log("Initiating account for Alice");
     const alice = await aTextMessageAccount();
 
     console.log("Initiating account for Bob");
     const bob = await aTextMessageAccount();
 
-    alice.sendMessage(bob.address, "hello");
-    alice.sendMessage(bob.address, "sup");
-    bob.sendMessage(alice.address, "is anybody in here?");
+    console.log("Sending messages from Alice to Bob and from Bob to Alice");
 
-    const bobMessages = await bob.getMyMessages();
-    const [ bobMessage1, bobMessage2 ] = bobMessages;
+    await Promise.all([
+      alice.sendMessage(bob.address, "hello"),
+      alice.sendMessage(bob.address, "sup"),
+      bob.sendMessage(alice.address, "is anybody in here?")
+    ]);
+
+    const [ bobMessages, aliceMessages ] = await Promise.all([bob.getMyMessages(), alice.getMyMessages()]);
+    const [ bobMessage1, bobMessage2 ] = _.sortBy(bobMessages, "timestamp");
 
     expect(bobMessages.length).to.equal(2);
     expect(bobMessage1.message).to.equal("hello");
     expect(bobMessage2.message).to.equal("sup");
-
-    const aliceMessages = await alice.getMyMessages();
 
     expect(aliceMessages.length).to.equal(1);
     expect(aliceMessages[0].message).to.equal("is anybody in here?");
