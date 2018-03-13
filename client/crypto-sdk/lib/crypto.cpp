@@ -9,6 +9,7 @@ using namespace Orbs;
 
 static const uint SECMEM_SIZE = 16384;
 
+// Initializes the Crypto SDK. This method have to be called before using any of the underlying functions.
 void CryptoSDK::Init() {
     if (!gcry_check_version(GCRYPT_VERSION)) {
         throw runtime_error("libgcrypt version mismatch!");
@@ -37,4 +38,14 @@ void CryptoSDK::Init() {
     if ((err = gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0))) {
         throw runtime_error("Failed to initialize GCRYCTL_INITIALIZATION_FINISHED with: " + to_string(err));
     }
+}
+
+// Initializes the Crypto SDK in FIPS140-2 mode. This method have to be called before using any of the underlying functions.
+void CryptoSDK::InitFIPSMode() {
+    gcry_error_t err;
+    if ((err = gcry_control(GCRYCTL_FORCE_FIPS_MODE))) {
+        throw runtime_error("Failed to initialize GCRYCTL_FORCE_FIPS_MODE with: " + to_string(err));
+    }
+
+    Init();
 }
