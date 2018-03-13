@@ -4,7 +4,7 @@ import { ErrorHandler, grpc, ServiceRunner, topology, topologyPeers, logger } fr
 
 import PublicApiService from "./service";
 
-const { NODE_NAME, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
+const { NODE_NAME, LOGZIO_API_KEY, LOG_LEVEL, VALIDATE_SUBSCRIPTION } = process.env;
 
 ErrorHandler.setup();
 
@@ -25,6 +25,10 @@ if (!NODE_NAME) {
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
-const nodeConfig = { nodeName: NODE_NAME };
+const validateSubscription = VALIDATE_SUBSCRIPTION === "true";
+const nodeConfig = {
+  nodeName: NODE_NAME,
+  validateSubscription
+};
 
 ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);
