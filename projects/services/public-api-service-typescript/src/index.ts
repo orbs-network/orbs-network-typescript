@@ -4,11 +4,12 @@ import { ErrorHandler, grpc, ServiceRunner, topology, topologyPeers, logger } fr
 
 import PublicApiService from "./service";
 
-const { NODE_NAME, LOGZIO_API_KEY } = process.env;
+const { NODE_NAME, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
 
 ErrorHandler.setup();
 
 logger.configure({
+  level: LOG_LEVEL,
   file: {
     fileName: path.join(__dirname, "../../../../logs/public-api.log")
   },
