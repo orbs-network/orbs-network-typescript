@@ -8,6 +8,7 @@ import { PublicApi } from "orbs-core-library";
 
 class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
   validateSubscription(): boolean {
+    // TODO: disable so we could process transactions
     return true;
   }
 }
