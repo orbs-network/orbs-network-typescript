@@ -27,7 +27,7 @@ Address::Address(const vector<uint8_t> &publicKey) : publicKey_(publicKey) {
     // Initialize version to its current default.
     version_ = Address::VERSION;
 
-    // Calculate the account ID by calculating the RIPEMD160 hash of the SHA256 of the public address.
+    // Calculate the account ID by calculating the RIPEMD160 hash of the SHA256 of the public key.
     vector<uint8_t> sha256;
     SHA256::Hash(publicKey_, sha256);
     RIPEMD160::Hash(sha256, accountId_);
