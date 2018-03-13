@@ -35,21 +35,18 @@ export default class TextMessageSmartContract extends BaseSmartContract {
   }
 
   private async getMessages(account: string): Promise<Message[]> {
-    const message = await this.stateAccessor.load(this.getMessageKeyMask(account));
-    return message != undefined ? [<Message>JSON.parse(message)] : [];
+    const messages = await this.stateAccessor.load(this.getMessageKey(account));
+    return messages != undefined ? JSON.parse(messages) : [];
   }
 
   private async appendMessage(message: Message) {
-    return this.stateAccessor.store(this.getMessageKey(message), JSON.stringify(message));
+    const messages = await this.getMessages(message.recipient);
+    messages.push(message);
+
+    return this.stateAccessor.store(this.getMessageKey(message.recipient), JSON.stringify(messages));
   }
 
-  private getMessageKey(message: Message) {
-    const hash = crypto.createHash("md5").update(JSON.stringify(message)).digest("hex");
-    // TODO: add unique message haches and ask for all keys related to the recipient
-    return `${this.getMessageKeyMask(message.recipient)}`;
-  }
-
-  private getMessageKeyMask(account: string) {
+  private getMessageKey(account: string) {
     return `messages.${account}`;
   }
 }
