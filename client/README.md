@@ -90,8 +90,9 @@ DEBUG=1 ./configure.sh
 ```
 
 ## Libgcrypt
+
 Libgcrypt is a general purpose cryptographic library originally based on code from GnuPG. It provides
-functions for all cryptograhic building blocks: symmetric cipher algorithms (AES, Arcfour, Blowfish, Camellia,
+functions for all cryptographic building blocks: symmetric cipher algorithms (AES, Arcfour, Blowfish, Camellia,
 CAST5, ChaCha20 DES, GOST28147, Salsa20, SEED, Serpent, Twofish) and modes (ECB,CFB,CBC,OFB,CTR,CCM,GCM,OCB,
 POLY1305, AESWRAP), hash algorithms (MD2, MD4, MD5, GOST R 34.11, RIPE-MD160, SHA-1, SHA2-224, SHA2-256,
 SHA2-384, SHA2-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE-128, SHAKE-256, TIGER-192, Whirlpool), MACs
