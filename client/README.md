@@ -14,6 +14,32 @@ In order to implement some of the functionality, we have elected to use libgcryp
 
 Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`.
 
+## Address Scheme
+
+### Version 0
+
+1. Start with a 32-byte Ed25519 public key:
+
+    Public key: `8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65`
+
+2. Calculate the account ID by calculating the RIPEMD160 hash of the SHA256 of the public key:
+
+    SHA256 of the public key: `40784b5b15e6bb364263dbb598f262bc5c5b4c18a34806ca70be180c3d995e0d`
+
+    RIPEMD160 of the SHA256: `c13052d8208230a58ab363708c08e78f1125f488`
+
+3. Prepend the address scheme version to the account ID:
+
+    Version + Account ID: `00c13052d8208230a58ab363708c08e78f1125f488`
+
+4. Calculate the CRC32 checksum of the result:
+
+    Raw public address: `00c13052d8208230a58ab363708c08e78f1125f48850f8658b`
+
+5. Encode the raw public address to Base58:
+
+    Public address: `1JcVJcBXwqeVcC8T2nTpG2dT6xGzhdrHai`
+
 ### Algorithms
 
 #### Hashing
