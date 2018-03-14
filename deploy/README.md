@@ -22,41 +22,50 @@ export S3_BUCKET_NAME=orbs-network-config
 
 ./docker-build.sh
 
-# deploy new node
+# install packages for deployment script to work
 
-node deploy.js \
+cd deploy
+npm install
+
+# configure environment variable and secrets
+
+touch bootstrap/.env-secrets
+
+# edit bootstrap/.env and set GOSSIP_PEERS to empty string
+
+# create basic infrastructure
+
+node src/deploy.js \
     --region $REGION \
     --ssh-public-key $PUBLIC_KEY_PATH \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
-    --create-basic-infrastructure --tag-docker-image --push-docker-image --deploy-node
+    --create-basic-infrastructure
 
-# deploy parity node
+# deploy node
 
-node deploy.js \
-    --region $REGION \
-    --ssh-public-key $PUBLIC_KEY_PATH \
-    --dns-zone $DNS_ZONE \
-    --account-id $AWS_ACCOUNT_ID \
-    --network $NETWORK \
-    --s3-bucket-name $S3_BUCKET_NAME \
-    --deploy-node --parity
-
-# replace old node
-
-node deploy.js \
+node src/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
-    --remove-node --deploy-node
+    --tag-docker-image --push-docker-image --deploy-node
+
+# find out ip allocations of reserved ips (value of NodeElasticIP)
+
+aws cloudformation describe-stacks --region $REGION --stack-name basic-infrastructure-$NETWORK
+
+aws ec2 describe-addresses --region $REGION --allocation-ips eipalloc-something
+
+# update bootstrap/.env with GOSSIP_PEERS=ws://IP_ADDRESS:60001
+# keep listing this addresses as you deploy new nodes
 
 # update node configuration
 
-node deploy.js \
+node src/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -68,7 +77,7 @@ Cron pulls bootstrap configuration automatically every five minutes to recreate 
 
 # update node stack configuration
 
-node deploy.js \
+node src/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -80,6 +89,31 @@ node deploy.js \
 
 # SSH into your newly created node
 ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_ZONE
+
+# You have successfully installed new testnet!
+
+# Extras
+
+# replace old node
+
+node src/deploy.js \
+    --region $REGION \
+    --dns-zone $DNS_ZONE \
+    --account-id $AWS_ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --remove-node --deploy-node
+
+
+# deploy parity node
+
+node src/deploy.js \
+    --region $REGION \
+    --dns-zone $DNS_ZONE \
+    --account-id $AWS_ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --deploy-node --parity
 ```
 
 ## PROPOSAL: Delivery to the clients
@@ -131,3 +165,13 @@ We should open 6 AWS sub-accounts and move servers there.
 ### What's missing
 
 TODO: add policy JSON for `deploy` role. Not the scope of this PR.
+TODO: export IP addresses in plaintext
+TODO: update script interface
+
+### Prerequisites to install a new node
+
+1. git
+2. node 9
+3. docker
+4. private/public key generated with ssh-keygen
+5. aws cli (`pip install awscli`)
