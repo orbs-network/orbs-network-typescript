@@ -47,5 +47,13 @@ void CryptoSDK::InitFIPSMode() {
         throw runtime_error("Failed to send GCRYCTL_FORCE_FIPS_MODE with: " + to_string(err));
     }
 
+    if ((err = gcry_control(GCRYCTL_SET_ENFORCED_FIPS_FLAG))) {
+        throw runtime_error("Failed to send GCRYCTL_SET_ENFORCED_FIPS_FLAG with: " + to_string(err));
+    }
+
+    if ((err = gcry_control(GCRYCTL_SELFTEST))) {
+        throw runtime_error("Failed to send GCRYCTL_SELFTEST with: " + to_string(err));
+    }
+
     Init();
 }
