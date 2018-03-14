@@ -20,6 +20,13 @@ jobs:
       - run: export DOCKER_TAG=$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') && docker pull $DOCKER_IMAGE:$DOCKER_TAG && docker tag $DOCKER_IMAGE:$DOCKER_TAG orbs:$DOCKER_TAG
       - run: cd deploy && npm install && ./deploy-staging.sh
 
+  e2e-testnet:
+    machine: true
+    steps:
+      - checkout
+      - run: $(aws ecr get-login --no-include-email --region us-west-2)
+      - run: export DOCKER_TAG=$(echo $CIRCLE_BRANCH | sed -e 's/\//-/g') && docker pull $DOCKER_IMAGE:$DOCKER_TAG && docker run --rm -ti -e E2E_NO_DEPLOY=true -e E2E_PUBLIC_API_ENDPOINT=$E2E_PUBLIC_API_ENDPOINT $DOCKER_IMAGE:$DOCKER_TAG bash -c "cd e2e && ./build.sh && ./test-from-host.sh"
+
 workflows:
   version: 2
   build-deploy:
@@ -31,3 +38,9 @@ workflows:
           filters:
             branches:
               only: master
+      - e2e-testnet
+          # requires:
+          #   - deploy
+          # filters:
+          #   branches:
+          #     only: master
