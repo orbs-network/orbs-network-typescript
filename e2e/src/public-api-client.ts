@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as caller from "grpc-caller";
-import { PublicApiClient , getPathToProto } from "orbs-interfaces";
+import { PublicApiClient, getPathToProto } from "orbs-interfaces";
 
 export interface GRPCClient {
   proto: string;
