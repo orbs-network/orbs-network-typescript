@@ -10,7 +10,7 @@ ADD . /opt/orbs/client/crypto-sdk
 WORKDIR /opt/orbs/client/crypto-sdk
 
 # Make sure that /dev/random contains enough entropy to run the tests on systems without TRNG (such as CircleCI).
-RUN /usr/local/sbin/haveged -w 1024
+RUN haveged -w 1024
 
 RUN ./clean.sh
 
