@@ -9,7 +9,7 @@ interface Config {
   publicApiClient: PublicApiClient;
 }
 
-const { SLACK_VERIFICATION_TOKEN, SLACK_TOKEN, CONVERSATION_ID } = process.env;
+const { SLACK_VERIFICATION_TOKEN, SLACK_TOKEN, CONVERSATION_ID, ORBS_API_ENDPOINT } = process.env;
 
 const BOT_ADDRESS = "0000";
 const PULL_REQUEST_AWARD = 100;
@@ -17,7 +17,7 @@ const PULL_REQUEST_AWARD = 100;
 const config = {
   subscriptionKey: "00000",
   publicApiClient: initPublicApiClient({
-    endpoint: "us-east-1.global.nodes.staging.orbs-test.com:51151"
+    endpoint: ORBS_API_ENDPOINT
   })
 };
 
