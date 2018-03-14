@@ -30,7 +30,7 @@ export default class StateStorageService extends Service {
 
   @Service.RPCMethod
   public async readKeys(rpc: types.ReadKeysContext) {
-    const keys = await this.stateStorage.readKeys(rpc.req.address, rpc.req.keys);
+    const keys = await this.stateStorage.readKeys(rpc.req.contractAddress, rpc.req.keys);
     rpc.res = { values: _.fromPairs([...keys]) };
   }
 }

@@ -4,7 +4,8 @@ import "primitives/transactions.proto";
 import "call-contract.proto";
 
 message SendTransactionInput {
-  SubscriptionSignedTransaction transaction = 1;
+  Transaction transaction = 1;
+  TransactionSubscriptionAppendix transactionSubscriptionAppendix = 2;
 }
 
 message SendTransactionOutput {
