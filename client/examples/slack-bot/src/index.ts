@@ -90,8 +90,8 @@ rtm.on("message", async (message) => {
     const transferMatch = message.text.match(/transfer (\d+) to <@(\w+)>/);
 
     if (transferMatch) {
-      const to = transferMatch[1];
-      const amount = Number(transferMatch[2]);
+      const amount = Number(transferMatch[1]);
+      const to = transferMatch[2];
 
       const account = await getAccount(message.user, config);
       await account.transfer(to, amount);
