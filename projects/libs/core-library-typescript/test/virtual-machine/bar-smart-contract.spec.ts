@@ -30,7 +30,7 @@ const SENDER_ADDRESS = "1111";
 const RECIPIENT_ADDRESS = "2222";
 const adapter = new ContractStateMemCacheAccessor(CONTRACT_ADDRESS, new StateCache());
 const senderContract = new BarSmartContract(SENDER_ADDRESS, adapter);
-const recipientContract = new BarSmartContract(SENDER_ADDRESS, adapter);
+const recipientContract = new BarSmartContract(RECIPIENT_ADDRESS, adapter);
 const superuserContract = new BarSmartContract(BarSmartContract.SUPERUSER, adapter);
 
 describe("bar contract - transfer tests", () => {
@@ -40,6 +40,7 @@ describe("bar contract - transfer tests", () => {
     expect(await senderContract.getMyBalance()).to.equal(1);
     expect(await recipientContract.getMyBalance()).to.equal(1);
   });
+
   it("transfers 1 token from one account to another", async () => {
     await superuserContract.initBalance(SENDER_ADDRESS, 2);
     await superuserContract.initBalance(RECIPIENT_ADDRESS, 0);

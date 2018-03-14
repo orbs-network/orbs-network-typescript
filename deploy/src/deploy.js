@@ -158,7 +158,9 @@ const main = (options) => {
             setParameter(basicInfrastructureParams, "BucketName", options.bucketName);
         }
 
-        createStack(cloudFormation, basicInfrastructureStackName, `${__dirname}/../cloudformation/basic-infrastructure.yaml`, basicInfrastructureParams).catch((err) => {
+        const template = fs.readFileSync(`${__dirname}/../cloudformation/basic-infrastructure.yaml`).toString();
+
+        stackAction("createStack", cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams).catch((err) => {
             console.error(err);
             process.exit(1);
         });
