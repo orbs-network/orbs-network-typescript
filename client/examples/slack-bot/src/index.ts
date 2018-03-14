@@ -55,7 +55,7 @@ rtm.on("message", async (message) => {
     if (message.text === "get my balance") {
       const account = await getAccount(message.user, config);
       const userBalance = await account.getMyBalance();
-      console.log(`You now have ${userBalance} magic internet money`);
+      rtm.sendMessage(`You now have ${userBalance} magic internet money`, message.channel);
 
       return;
     }
@@ -63,7 +63,7 @@ rtm.on("message", async (message) => {
     if (message.text === "get bot balance") {
       const botAccount = await getBotAccount(config);
       const botBalance = await botAccount.getMyBalance();
-      console.log(`Bot now has ${botBalance} magic internet money`);
+      rtm.sendMessage(`Bot now has ${botBalance} magic internet money`, message.channel);
 
       return;
     }
@@ -75,14 +75,14 @@ rtm.on("message", async (message) => {
       const botBalance = await botAccount.getMyBalance();
       const amount = Number(botInitMatch[1]);
 
-      console.log(`Init bot balance with ${amount} magic internet money`);
+      rtm.sendMessage(`Init bot balance with ${amount} magic internet money`, message.channel);
 
       if (botBalance === 0) {
         await botAccount.initBalance(BOT_ADDRESS, amount);
       }
 
       const newBotBalance = await botAccount.getMyBalance();
-      console.log(`Bot now has ${newBotBalance} magic internet money`);
+      rtm.sendMessage(`Bot now has ${newBotBalance} magic internet money`, message.channel);
 
       return;
     }
@@ -97,7 +97,7 @@ rtm.on("message", async (message) => {
       await account.transfer(to, amount);
 
       const userBalance = await account.getMyBalance();
-      console.log(`You now have ${userBalance} magic internet money`);
+      rtm.sendMessage(`You now have ${userBalance} magic internet money`, message.channel);
 
       return;
     }
@@ -111,14 +111,14 @@ rtm.on("message", async (message) => {
       const account = await getAccount(message.user, config);
       const botAccount = await getBotAccount(config);
 
-      console.log(`Transfering ${PULL_REQUEST_AWARD} to ${message.user}`);
+      rtm.sendMessage(`Transfering ${PULL_REQUEST_AWARD} to ${message.user}`, message.channel);
       await botAccount.transfer(message.user, PULL_REQUEST_AWARD);
 
       const userBalance = await account.getMyBalance();
-      console.log(`You now have ${userBalance} magic internet money`);
+      rtm.sendMessage(`You now have ${userBalance} magic internet money`, message.channel);
 
       const botBalance = await botAccount.getMyBalance();
-      console.log(`Bot now has ${botBalance} magic internet money`);
+      rtm.sendMessage(`Bot now has ${botBalance} magic internet money`, message.channel);
       return;
     }
 
