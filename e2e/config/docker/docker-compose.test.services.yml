@@ -10,6 +10,8 @@ services:
     environment:
       - NUM_OF_NODES=${NUM_OF_NODES}
       - ETHEREUM_CONTRACT_ADDRESS=${SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS}
+    ports:
+      - ${DEBUG_PORT}:9229
     networks:
       node-network:
         ipv4_address: ${PRIVATE_NETWORK}.15

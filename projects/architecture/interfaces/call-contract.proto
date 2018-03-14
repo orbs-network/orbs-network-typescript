@@ -1,8 +1,10 @@
 syntax = "proto3";
 
+import "./primitives/addresses.proto";
+
 message CallContractInput {
-  string sender = 1;
-  string contractAddress = 2;
+  UniversalAddress sender = 1;
+  ContractAddress contractAddress = 2;
   string payload = 3;
 }
 

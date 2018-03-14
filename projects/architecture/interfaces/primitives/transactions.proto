@@ -17,7 +17,7 @@ message TransactionHeader {
 
 message TransactionBody {
   ContractAddress contractAddress = 1;
-  bytes payload = 2;
+  string payload = 2;
 }
 
 message TransactionLifespan {

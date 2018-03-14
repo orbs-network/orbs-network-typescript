@@ -6,16 +6,16 @@ import * as _ from "lodash";
 
 class StubStorageClient implements types.StateStorageClient {
   keyMap: { [id: string]: string };
-  contractAddress: string;
+  contractAddress: types.ContractAddress;
 
-  constructor(opts: { contractAddress: string, keyMap: { [id: string]: string } }) {
+  constructor(opts: { contractAddress: types.ContractAddress, keyMap: { [id: string]: string } }) {
     this.contractAddress = opts.contractAddress;
     this.keyMap = opts.keyMap;
   }
 
   readKeys(input: types.ReadKeysInput): types.ReadKeysOutput {
-    if (input.address != this.contractAddress) {
-      throw `state storage supports only a single contract ${this.contractAddress} != ${input.address}`;
+    if (input.contractAddress.address != this.contractAddress.address) {
+      throw `state storage supports only a single contract ${this.contractAddress} != ${input.contractAddress}`;
     }
     return { values: _.pick(this.keyMap, input.keys) };
   }
@@ -23,14 +23,20 @@ class StubStorageClient implements types.StateStorageClient {
 
 function aTransaction(builder: { from: string, to: string, amount: number }): types.Transaction {
   return {
-    version: 1,
-    sender: builder.from,
-    contractAddress: "foobar",
-    payload: JSON.stringify({
-      method: "transfer",
-      args: [builder.to, builder.amount]
-    }),
-    signature: ""
+    header: {
+      version: 1,
+      sender: {id: new Buffer(builder.from), networkId: 0, scheme: 0, checksum: 0},
+      lifespan: {refBlockHash: new Buffer(""), blocksToLive: 10},
+      sequenceNumber: 0
+    },
+    body: {
+      contractAddress: {address: "foobar"},
+      payload: JSON.stringify({
+        method: "transfer",
+        args: [builder.to, builder.amount]
+      }),
+    },
+    signature: new Buffer("")
   };
 }
 
@@ -40,7 +46,7 @@ describe("test virtual machine", () => {
 
   beforeEach(() => {
     stateStorage = new StubStorageClient({
-      contractAddress: "foobar",
+      contractAddress: {address: "foobar" },
       keyMap: { "balances.account1": "10", "balances.account2": "0" }
     });
     virtualMachine = new VirtualMachine(stateStorage);
@@ -56,7 +62,7 @@ describe("test virtual machine", () => {
     });
     stateDiff.should.have.lengthOf(3);
     for (const item of stateDiff) {
-      item.should.have.property("contractAddress", "foobar");
+      item.should.have.property("contractAddress").eql({address: "foobar"});
     }
     stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
     stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
@@ -75,7 +81,7 @@ describe("test virtual machine", () => {
     });
     stateDiff.should.have.lengthOf(3);
     for (const item of stateDiff) {
-      item.should.have.property("contractAddress", "foobar");
+      item.should.have.property("contractAddress").eql({address: "foobar"});
     }
     stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
     stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
