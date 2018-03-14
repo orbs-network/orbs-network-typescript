@@ -18,4 +18,4 @@ gtest_add_tests(TARGET crypto-test TEST_LIST crypto-test-targets)
 gtest_add_tests(TARGET crypto-test EXTRA_ARGS --fips TEST_LIST crypto-test-targets TEST_SUFFIX .fips)
 
 # Set each target to timeout if not finished within 10 sec.
-set_tests_properties(${crypto-test-targets} PROPERTIES TIMEOUT 30)
+set_tests_properties(${crypto-test-targets} PROPERTIES TIMEOUT 10)
