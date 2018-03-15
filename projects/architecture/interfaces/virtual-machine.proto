@@ -15,6 +15,7 @@ message ProcessTransactionSetInput {
 message ProcessTransactionSetOutput {
   repeated Transaction processedTransactions = 1;
   repeated ModifiedStateKey stateDiff = 2;
+  repeated Transaction rejectedTransactions = 3;
 }
 
 message CallContractInput {
