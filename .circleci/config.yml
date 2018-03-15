@@ -46,9 +46,9 @@ workflows:
           filters:
             branches:
               only: master
-      - e2e-testnet
-          # requires:
-          #   - deploy
-          # filters:
-          #   branches:
-          #     only: master
+      - e2e-testnet:
+          requires:
+            - deploy
+          filters:
+            branches:
+              only: master
