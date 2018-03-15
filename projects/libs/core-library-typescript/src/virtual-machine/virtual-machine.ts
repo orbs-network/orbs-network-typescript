@@ -40,6 +40,10 @@ export class VirtualMachine {
 
     const stateDiff = stateCache.getModifiedKeys().map(({ key, value}) => ({contractAddress: key.contractAddress, key: key.key, value }));
 
+    if (rejectedTransactions.length > 0) {
+      logger.error(`Virtual machine has rejected ${rejectedTransactions.length} transactions`);
+    }
+
     return {
       stateDiff,
       processedTransactions,

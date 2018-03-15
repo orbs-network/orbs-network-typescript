@@ -23,6 +23,10 @@ export class TransactionPool {
   }
 
   public clearPendingTransactions(transactions: types.Transaction[]) {
+    if (transactions.length > 0) {
+      logger.info(`Transaction pool is clearing ${transactions.length} pending transactions`);
+    }
+
     for (const transaction of transactions) {
       this.broadcastClearTransactionToOtherNodes(transaction);
       this.clearPendingTransaction(transaction);
