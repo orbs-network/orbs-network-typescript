@@ -1,7 +1,10 @@
 #!/bin/bash -e
 
-yarn link orbs-interfaces
-yarn link orbs-core-library
+pushd ../crypto-sdk/
+pwd
+./configure.sh
+./build.sh
+popd
 
 yarn install
 
