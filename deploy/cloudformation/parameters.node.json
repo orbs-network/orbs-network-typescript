@@ -4,13 +4,9 @@
         "ParameterValue": "orbs-network-staging-key"
     },
     {
-        "ParameterKey": "CreateWithASG",
-        "ParameterValue": "true"
-    },
-    {
-        "ParameterKey": "ORBSInstanceType",
+        "ParameterKey": "InstanceType",
         "ParameterValue": "t2.small"
-    },    
+    },
     {
         "ParameterKey": "SecurityIngressFromPort",
         "ParameterValue": "22"

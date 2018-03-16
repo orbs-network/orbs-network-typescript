@@ -1,6 +1,6 @@
 import { delay } from "bluebird";
 
-import { Transaction, PublicApiClient } from "./public-api-client";
+import { PublicApiClient, Transaction } from "orbs-interfaces";
 
 type OrbsHardCodedContractMethodArgs = [string | number] | any[];
 
