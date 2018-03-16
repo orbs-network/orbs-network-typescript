@@ -9,6 +9,7 @@
 #include "crc32.h"
 #include "ripemd160.h"
 #include "sha256.h"
+#include "utils.h"
 
 using namespace std;
 using namespace Orbs;
@@ -20,6 +21,14 @@ const uint32_t Address::CHECKSUM_SIZE = 4;
 const uint32_t Address::ADDRESS_LENGTH = 34;
 
 Address::Address(const vector<uint8_t> &publicKey) : publicKey_(publicKey) {
+    Init();
+}
+
+Address::Address(const string &publicKey) : publicKey_(Utils::Hex2Vec(publicKey)) {
+    Init();
+}
+
+void Address::Init() {
     if (publicKey_.size() != Address::PUBLIC_KEY_SIZE) {
         throw invalid_argument("Invalid public key length: " + to_string(publicKey_.size()));
     }

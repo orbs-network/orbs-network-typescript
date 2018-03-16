@@ -14,6 +14,7 @@ public:
     static const uint32_t ADDRESS_LENGTH;
 
     Address(const std::vector<uint8_t> &publicKey);
+    Address(const std::string &publicKey);
     virtual ~Address();
 
     const std::vector<uint8_t> &GetPublicKey() const;
@@ -24,6 +25,9 @@ public:
     const std::string ToString() const;
 
     static bool IsValid(const std::string &address);
+
+private:
+    void Init();
 
 private:
     std::vector<uint8_t> publicKey_;
