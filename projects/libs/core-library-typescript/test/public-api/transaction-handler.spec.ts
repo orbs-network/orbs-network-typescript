@@ -18,8 +18,7 @@ const handler = new TransactionHandler(transactionPool, subscriptionManager, con
 function aTransactionWithSubscription(builder: { subscriptionKey: string }): types.SendTransactionInput {
 
   const transactionSubscriptionAppendix: types.TransactionSubscriptionAppendix = {
-    subscriptionKey: builder.subscriptionKey,
-    subscriptionSignature: new Buffer("")
+    subscriptionKey: builder.subscriptionKey
   };
 
   const senderAddress: types.UniversalAddress = {
@@ -33,14 +32,12 @@ function aTransactionWithSubscription(builder: { subscriptionKey: string }): typ
       header: {
         version: 0,
         sender: senderAddress,
-        lifespan: {refBlockHash: new Buffer(""), blocksToLive: 1000},
         sequenceNumber: 0
       },
       body: {
         contractAddress: {address: "contractAddress"},
         payload: Math.random().toString(),
-      },
-      signature: new Buffer("")
+      }
   };
 
   return { transaction, transactionSubscriptionAppendix};

@@ -26,7 +26,6 @@ function aTransaction(builder: { from: string, to: string, amount: number }): ty
     header: {
       version: 1,
       sender: {id: new Buffer(builder.from), networkId: 0, scheme: 0, checksum: 0},
-      lifespan: {refBlockHash: new Buffer(""), blocksToLive: 10},
       sequenceNumber: 0
     },
     body: {
@@ -36,7 +35,6 @@ function aTransaction(builder: { from: string, to: string, amount: number }): ty
         args: [builder.to, builder.amount]
       }),
     },
-    signature: new Buffer("")
   };
 }
 
