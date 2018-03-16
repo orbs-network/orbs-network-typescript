@@ -4,17 +4,19 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 
 import SidehainConnectorService from "./service";
 
-const { NODE_NAME, ETHEREUM_NODE_HTTP_ADDRESS, LOGZIO_API_KEY } = process.env;
+const { NODE_NAME, ETHEREUM_NODE_HTTP_ADDRESS, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
 
 ErrorHandler.setup();
 
 logger.configure({
+  level: LOG_LEVEL,
   file: {
     fileName: path.join(__dirname, "../../../../logs/sidechain-connector.log")
   },
   logzio: {
     apiKey: LOGZIO_API_KEY
   },
+  console: true
 });
 
 if (!NODE_NAME) {

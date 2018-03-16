@@ -4,20 +4,8 @@
         "ParameterValue": "orbs-network-staging-key"
     },
     {
-        "ParameterKey": "CreateWithASG",
-        "ParameterValue": "true"
-    },
-    {
-        "ParameterKey": "ORBSInstanceType",
+        "ParameterKey": "InstanceType",
         "ParameterValue": "c5.xlarge"
-    },
-    {
-        "ParameterKey": "IamRoleInstanceProfile",
-        "ParameterValue": "orbs-network"
-    },
-    {
-        "ParameterKey": "ORBSAmiId",
-        "ParameterValue": "ami-f2d3638a"
     },
     {
         "ParameterKey": "SecurityIngressFromPort",
@@ -38,10 +26,6 @@
     {
         "ParameterKey": "SubnetCidr2",
         "ParameterValue": "10.0.1.0/24"
-    },
-    {
-        "ParameterKey": "ElasticIP",
-        "ParameterValue": "eipalloc-fe9f72c2"
     },
     {
         "ParameterKey": "DockerTag",
@@ -69,6 +53,6 @@
     },
     {
         "ParameterKey": "Bootstrap",
-        "ParameterValue": "Parity"
+        "ParameterValue": "parity"
     }
 ]

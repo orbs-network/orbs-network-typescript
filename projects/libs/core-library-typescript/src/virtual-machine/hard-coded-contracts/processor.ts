@@ -23,6 +23,7 @@ export default class HardCodedSmartContractProcessor {
 
     // TODO: register it only in a testing environment via configuration
     this.registerContract("foobar-smart-contract", "foobar");
+    this.registerContract("text-message-smart-contract", "text-message");
   }
 
   private registerContract(moduleName: string, toAddress: string) {

@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "NodeEnv",
+        "ParameterValue": "staging"
+    },
+    {
+        "ParameterKey": "DNSZone",
+        "ParameterValue": "orbs-test.com"
+    }
+]
