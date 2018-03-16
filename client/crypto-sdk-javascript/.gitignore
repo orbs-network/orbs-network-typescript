@@ -43,3 +43,6 @@ compile_commands.json
 CTestTestfile.cmake
 
 build/
+
+# Ignore built ts files
+dist/**/*
