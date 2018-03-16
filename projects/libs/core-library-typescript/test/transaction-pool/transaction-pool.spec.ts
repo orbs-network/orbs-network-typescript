@@ -20,14 +20,12 @@ function aTransaction() {
     header: {
       version: 0,
       sender: {id: new Buffer("sender"), scheme: 0, networkId: 0, checksum: 0},
-      lifespan: {refBlockHash: new Buffer(""), blocksToLive: 100},
       sequenceNumber: 0
     },
     body: {
       contractAddress: {address: "address"},
       payload: "payload"
-    },
-    signature: new Buffer("signature"),
+    }
   };
 
   return transaction;

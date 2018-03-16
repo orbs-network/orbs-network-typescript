@@ -36,14 +36,12 @@ function aDummyTransaction(addressId): types.Transaction {
       header: {
         version: 0,
         sender: senderAddress,
-        lifespan: {refBlockHash: new Buffer(""), blocksToLive: 1000},
         sequenceNumber: 0
       },
       body: {
         contractAddress: {address: "dummyContract"},
         payload: Math.random().toString(),
-      },
-      signature: new Buffer("")
+      }
   };
 }
 

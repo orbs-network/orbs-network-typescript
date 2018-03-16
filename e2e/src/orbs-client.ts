@@ -47,8 +47,7 @@ export class OrbsClientSession {
     const res = await this.orbsClient.sendTransaction({
       transaction: signedTransaction,
       transactionSubscriptionAppendix: {
-        subscriptionKey: this.subscriptionKey,
-        subscriptionSignature: new Buffer("placeholder")
+        subscriptionKey: this.subscriptionKey
       }
     });
     await delay(10000);
@@ -69,14 +68,12 @@ export class OrbsClientSession {
       header: {
         version: 0,
         sender: this.getAddress(),
-        lifespan: { refBlockHash: new Buffer("placeholder"), blocksToLive: 1000},
         sequenceNumber: 0
       },
       body: {
         contractAddress: {address: contractAddress},
         payload: payload
       },
-      signature: new Buffer("placeholder") // TODO: add a signature once implement in the network-side
     };
   }
 
