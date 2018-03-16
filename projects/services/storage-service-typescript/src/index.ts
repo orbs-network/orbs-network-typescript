@@ -5,17 +5,19 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 import BlockStorageService from "./block-storage-service";
 import StateStorageService from "./state-storage-service";
 
-const { NODE_NAME, NODE_ENV, LOGZIO_API_KEY, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = process.env;
+const { NODE_NAME, NODE_ENV, LOGZIO_API_KEY, LOG_LEVEL, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = process.env;
 
 ErrorHandler.setup();
 
 logger.configure({
+  level: LOG_LEVEL,
   file: {
     fileName: path.join(__dirname, "../../../../logs/storage.log")
   },
   logzio: {
     apiKey: LOGZIO_API_KEY
   },
+  console: true
 });
 
 if (!NODE_NAME) {

@@ -4,17 +4,19 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 
 import VirtualMachineService from "./service";
 
-const { NODE_NAME, ETHEREUM_NODE_ADDRESS, LOGZIO_API_KEY } = process.env;
+const { NODE_NAME, ETHEREUM_NODE_ADDRESS, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
 
 ErrorHandler.setup();
 
 logger.configure({
+  level: LOG_LEVEL,
   file: {
     fileName: path.join(__dirname, "../../../../logs/virtual-machine.log")
   },
   logzio: {
     apiKey: LOGZIO_API_KEY
   },
+  console: true
 });
 
 if (!NODE_NAME) {
