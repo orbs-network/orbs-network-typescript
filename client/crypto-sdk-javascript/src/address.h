@@ -16,6 +16,9 @@ private:
   ~Address();
 
   static napi_value New(napi_env env, napi_callback_info info);
+  static napi_value GetVersion(napi_env env, napi_callback_info info);
+  static napi_value GetAccountId(napi_env env, napi_callback_info info);
+  static napi_value GetChecksum(napi_env env, napi_callback_info info);
   static napi_value ToString(napi_env env, napi_callback_info info);
 
 private:
