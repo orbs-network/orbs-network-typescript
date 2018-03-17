@@ -4,6 +4,7 @@ import { createHash } from "crypto";
 
 export namespace BlockUtils {
   export function calculateBlockHash(blockComponents: {header: types.BlockHeader, body: types.BlockBody}): Buffer {
+    // TODO: this is just a placeholder. Replace with the real algorithm once specified
     const hash = createHash("sha256");
 
     hash.update(JSON.stringify(blockComponents.header));

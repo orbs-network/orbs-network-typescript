@@ -38,7 +38,7 @@ export class StateStorage {
   private async waitForBlockState(timeout = 5000) {
     const { block } = await this.blockStorage.getLastBlock({});
     while (timeout > 0) {
-        if (block.header.height <= this.lastBlockHeight) {
+      if (block.header.height <= this.lastBlockHeight) {
         return;
       }
       await delay(200);

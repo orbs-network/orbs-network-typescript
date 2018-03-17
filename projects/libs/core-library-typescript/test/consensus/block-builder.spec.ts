@@ -1,4 +1,4 @@
-import { types,  } from "../../src/common-library/types";
+import { types } from "../../src/common-library/types";
 import * as chai from "chai";
 import { expect } from "chai";
 import * as sinonChai from "sinon-chai";
