@@ -18,7 +18,7 @@ async function init(): Promise<{blockStorage: BlockStorage, blockStorageSync: Bl
   return { blockStorage, blockStorageSync };
 }
 
-function generateNextNullBlock(lastBlock: types.Block): types.Block {
+function generateEmptyBlock(lastBlock: types.Block): types.Block {
   return BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, lastBlock);
 }
 
@@ -26,7 +26,7 @@ async function generateBlocks(blockStorage: BlockStorage, numOfBlocks: number) {
   const blocks = [];
   let lastBlock = await blockStorage.getLastBlock();
   for (let i = 0; i < numOfBlocks; i++) {
-    lastBlock = generateNextNullBlock(lastBlock);
+    lastBlock = generateEmptyBlock(lastBlock);
     blocks.push(lastBlock);
   }
   return blocks;
@@ -56,7 +56,7 @@ describe("Block storage sync", () => {
 
       const lastBlock = await blockStorage.getLastBlock();
 
-      blockStorageSync.onReceiveBlock(await generateNextNullBlock(lastBlock));
+      blockStorageSync.onReceiveBlock(await generateEmptyBlock(lastBlock));
 
       blockStorageSync.getQueueSize().should.be.eql(1);
     });

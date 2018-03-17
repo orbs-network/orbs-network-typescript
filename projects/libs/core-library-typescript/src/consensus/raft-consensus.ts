@@ -7,8 +7,6 @@ import BlockBuilder from "./block-builder";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
-import { build } from "protobufjs";
-import { SSL_OP_CRYPTOPRO_TLSEXT_BUG } from "constants";
 import { JsonBuffer } from "../common-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
