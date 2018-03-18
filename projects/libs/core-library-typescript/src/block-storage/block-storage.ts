@@ -15,17 +15,10 @@ export class BlockStorage {
   }
 
   public async generateGenesisBlock(): Promise<types.Block> {
-    const header: types.BlockHeader = {
-      version: 0,
-      prevBlockHash: new Buffer(""),
-      height: 0
-    };
-    const body: types.BlockBody = {
+    return BlockUtils.buildNextBlock({
       transactions: [],
       stateDiff: []
-    };
-
-    return BlockUtils.buildBlock({header, body});
+    });
   }
 
   public async load(): Promise<void> {
@@ -101,8 +94,9 @@ export class BlockStorage {
       throw new Error(`Invalid block height of block: ${JSON.stringify(block)}!`);
     }
 
-    if (!block.header.prevBlockHash.equals(this.lastBlock.hash)) {
-      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block)}! Should have been ${JSON.stringify(this.lastBlock.hash)}`);
+    const lastBlockHash = BlockUtils.calculateBlockHash(this.lastBlock);
+    if (!block.header.prevBlockHash.equals(lastBlockHash)) {
+      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block)}! Should have been ${JSON.stringify(lastBlockHash)}`);
     }
   }
 

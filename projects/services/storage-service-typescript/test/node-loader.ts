@@ -8,18 +8,8 @@ import { generateServiceIPCClient } from "./service-ipc-client";
 import FakeGossipClient from "./fake-gossip-client";
 import BlockStorageService from "../src/block-storage-service";
 
-function generateNullBlock(prevBlock: types.Block): types.Block {
-  return BlockUtils.buildBlock({
-    header: {
-      version: 0,
-      height: prevBlock.header.height + 1,
-      prevBlockHash: prevBlock.hash
-    },
-    body: {
-      transactions: [],
-      stateDiff: []
-    }
-  });
+function generateEmptyBlock(prevBlock: types.Block): types.Block {
+  return BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, prevBlock);
 }
 
 export class NodeLoader {
@@ -55,7 +45,7 @@ export class NodeLoader {
     console.log(block);
 
     for (let i = 0; i < numOfBlocks; i++) {
-      block = generateNullBlock(block);
+      block = generateEmptyBlock(block);
       await client.addBlock({ block });
     }
   }
