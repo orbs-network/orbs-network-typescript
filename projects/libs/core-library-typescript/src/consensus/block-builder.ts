@@ -23,7 +23,7 @@ export default class BlockBuilder {
     }
 
     if (processedTransactions.length == 0) {
-      throw "None of the transactions processed successfully. not building a new block";
+      throw "None of the transactions processed successfully. Not building a new block";
     }
 
     const block: types.Block = {

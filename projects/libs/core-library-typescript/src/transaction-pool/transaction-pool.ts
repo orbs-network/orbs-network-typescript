@@ -40,18 +40,18 @@ export class TransactionPool {
       logger.info(`Transaction pool received message from ${fromAddress} to clear transaction ${JSON.stringify(message.transaction)}`);
       this.clearPendingTransaction(message.transaction);
     } else {
-      throw `Unsupported message type ${messageType}`;
+      throw new Error(`Unsupported message type ${messageType}`);
     }
   }
 
   private async storePendingTransaction(transaction: types.Transaction) {
     const txHash = this.calculateTransactionHash(transaction);
     if (this.pendingTransactions.has(txHash)) {
-      throw `transaction with hash ${txHash} already exists in the pool`;
+      throw new Error(`Transaction with hash ${txHash} already exists in the pool`);
     }
     this.pendingTransactions.set(txHash, transaction);
 
-    logger.debug(`added a new transaction ${JSON.stringify(transaction)} to the pool`);
+    logger.debug(`Added a new transaction ${JSON.stringify(transaction)} to the pool`);
   }
 
   private async clearPendingTransaction(transaction: types.Transaction) {

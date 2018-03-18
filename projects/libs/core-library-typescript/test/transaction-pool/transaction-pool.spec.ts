@@ -12,9 +12,6 @@ chai.use(sinonChai);
 
 const gossip = stubInterface<types.GossipClient>();
 
-const transactionPool = new TransactionPool(gossip);
-
-
 function aTransaction() {
   const transaction: types.Transaction = {
     version: 0,
@@ -28,13 +25,26 @@ function aTransaction() {
 }
 
 describe("new broadcast transaction", () => {
+  let transactionPool;
+
+  beforeEach(() => {
+    transactionPool = new TransactionPool(gossip);
+  });
+
   it("is added to the transaction pool", async () => {
     const tx = aTransaction();
     await transactionPool.addNewPendingTransaction(tx);
+
     const { transactions } = await transactionPool.getAllPendingTransactions();
+
     transactions.should.eql([tx]);
     expect(gossip.broadcastMessage).to.have.been.called;
   });
 
-  xit("two identical transaction are processed only once");
+  it("two identical transaction are processed only once", async () => {
+    const tx = aTransaction();
+    await transactionPool.addNewPendingTransaction(tx);
+
+    expect(transactionPool.addNewPendingTransaction(tx)).to.eventually.be.rejectedWith("Transaction with hash 4dadf2569cefcb0b30c5e02bbf2ab226b0a2f564c6d14f488688e3468254ec43 already exists in the pool");
+  });
 });

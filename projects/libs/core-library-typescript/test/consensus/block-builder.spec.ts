@@ -65,7 +65,7 @@ const processTransactionSetOutputWithEmptyTransactions: types.ProcessTransaction
 };
 
 
-describe.only("a block", () => {
+describe("a block", () => {
   let transactionPool;
   let virtualMachine;
   let blockBuilder;
@@ -118,6 +118,6 @@ describe.only("a block", () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithEmptyTransactions);
 
-    expect(blockBuilder.buildNextBlock(5)).to.eventually.be.rejectedWith("None of the transactions processed successfully. not building a new block").and.notify(done);
+    expect(blockBuilder.buildNextBlock(5)).to.eventually.be.rejectedWith("None of the transactions processed successfully. Not building a new block").and.notify(done);
   });
 });
