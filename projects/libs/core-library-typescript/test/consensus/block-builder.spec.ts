@@ -5,6 +5,7 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
+import { TransactionPoolClient, VirtualMachineClient } from "orbs-interfaces";
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -66,9 +67,9 @@ const processTransactionSetOutputWithEmptyTransactions: types.ProcessTransaction
 
 
 describe("a block", () => {
-  let transactionPool;
-  let virtualMachine;
-  let blockBuilder;
+  let transactionPool: TransactionPoolClient;
+  let virtualMachine: VirtualMachineClient;
+  let blockBuilder: BlockBuilder;
 
   beforeEach(() => {
     transactionPool = stubInterface<types.TransactionPoolClient>();
