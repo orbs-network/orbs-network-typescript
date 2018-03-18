@@ -13,25 +13,7 @@ async function main() {
       return;
     }
 
-    let dir;
-    switch (project.type) {
-      case 'static':
-        dir = '';
-        break;
-
-      case 'library':
-        dir = 'libs';
-        break;
-
-      case 'service':
-        dir = 'services';
-        break;
-
-      default:
-        throw new Error(`Unsupported project type: ${project.type}`);
-    }
-
-    const projectPath = path.resolve(__dirname, '../../projects/', dir, projectName);
+    const projectPath = path.resolve(__dirname, '../../', project.path);
 
     console.log(`* Building ${projectName}\n`.green);
     shell.cd(projectPath);
