@@ -1,4 +1,4 @@
-export function generateServiceIPCClient<T>(service: any): T {
+export function generateFakeServiceIPCClient<T>(service: any): T {
   const client = {};
 
   for (const propertyName of Object.getOwnPropertyNames(Object.getPrototypeOf(service))) {

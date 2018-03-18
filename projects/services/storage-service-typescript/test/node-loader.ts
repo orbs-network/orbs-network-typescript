@@ -2,10 +2,7 @@ import { tmpdir } from "os";
 import * as path from "path";
 import * as fs from "fs-extra";
 
-import { types } from "orbs-core-library";
-import { generateServiceIPCClient } from "./service-ipc-client";
-
-import FakeGossipClient from "./fake-gossip-client";
+import { types, FakeGossipClient, generateFakeServiceIPCClient } from "orbs-core-library";
 import BlockStorageService from "../src/block-storage-service";
 
 function generateBlock(prevBlockId: number): types.Block {
@@ -40,7 +37,7 @@ export class NodeLoader {
   }
 
   getBlockStorageClient(): types.BlockStorageClient {
-    return generateServiceIPCClient(this.blockStorageService);
+    return generateFakeServiceIPCClient(this.blockStorageService);
   }
 
   addNodeToGossip(node: NodeLoader) {
