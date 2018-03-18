@@ -23,7 +23,7 @@ function aTransaction() {
   return transaction;
 }
 
-describe.only("new broadcast transaction", () => {
+describe("new broadcast transaction", () => {
   let transactionPool: TransactionPool;
   let gossip: GossipClient;
 
