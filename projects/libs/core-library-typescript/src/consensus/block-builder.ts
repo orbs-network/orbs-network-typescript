@@ -18,7 +18,9 @@ export default class BlockBuilder {
 
     const { processedTransactions, stateDiff, rejectedTransactions } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactions });
 
-    this.transactionPool.clearPendingTransactions({ transactions: rejectedTransactions });
+    if (rejectedTransactions.length > 0) {
+      this.transactionPool.clearPendingTransactions({ transactions: rejectedTransactions });
+    }
 
     if (processedTransactions.length == 0) {
       throw "None of the transactions processed successfully. not building a new block";

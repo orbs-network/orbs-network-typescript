@@ -9,9 +9,6 @@ import BlockBuilder from "../../src/consensus/block-builder";
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-const transactionPool = stubInterface<types.TransactionPoolClient>();
-const virtualMachine = stubInterface<types.VirtualMachineClient>();
-
 function randomUInt() {
   return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 }
@@ -68,15 +65,24 @@ const processTransactionSetOutputWithEmptyTransactions: types.ProcessTransaction
 };
 
 
-const blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
-
 describe.only("a block", () => {
+  let transactionPool;
+  let virtualMachine;
+  let blockBuilder;
+
+  beforeEach(() => {
+    transactionPool = stubInterface<types.TransactionPoolClient>();
+    virtualMachine = stubInterface<types.VirtualMachineClient>();
+    blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
+  });
+
   it("contains transactions from the pool", async () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
 
     const block = await blockBuilder.buildNextBlock(1);
     expect(block.transactions).to.eql(dummyTransactionSet);
+    expect(transactionPool.clearPendingTransactions).not.to.be.called;
   });
 
   it("contains a state diff", async () => {
@@ -99,10 +105,19 @@ describe.only("a block", () => {
     expect(block.stateDiff).to.eql(processTransactionSetOutputWithRejectedTransactions.stateDiff.slice(0, 2));
   });
 
+  it("calls transaction pool to clear rejected transactions from the pool", async () => {
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithRejectedTransactions);
+
+    const block = await blockBuilder.buildNextBlock(4);
+
+    expect(transactionPool.clearPendingTransactions).to.be.calledOnce;
+  });
+
   it("throws an error if none of the transactions passed", (done) => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithEmptyTransactions);
 
-    expect(blockBuilder.buildNextBlock(4)).to.eventually.be.rejectedWith("None of the transactions processed successfully. not building a new block").and.notify(done);
+    expect(blockBuilder.buildNextBlock(5)).to.eventually.be.rejectedWith("None of the transactions processed successfully. not building a new block").and.notify(done);
   });
 });
