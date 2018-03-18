@@ -47,7 +47,7 @@ describe("test virtual machine", () => {
   });
 
   it("#processTransactionSet - ordered transfers between 3 accounts", async () => {
-    const { processedTransactions, stateDiff } = await virtualMachine.processTransactionSet({
+    const { processedTransactions, stateDiff, rejectedTransactions } = await virtualMachine.processTransactionSet({
       orderedTransactions: [    // account1=10
         aTransaction({ from: "account1", to: "account2", amount: 9 }), // account1 = 1, account2 = 9
         aTransaction({ from: "account2", to: "account1", amount: 2 }), // account1 = 3, account2 = 7
@@ -65,7 +65,7 @@ describe("test virtual machine", () => {
 
 
   it("#processTransactionSet - ordered transfers between 3 accounts (with a failed transaction in between)", async () => {
-    const { processedTransactions, stateDiff } = await virtualMachine.processTransactionSet({
+    const { processedTransactions, stateDiff, rejectedTransactions } = await virtualMachine.processTransactionSet({
       orderedTransactions: [    // account1=10
         aTransaction({ from: "account1", to: "account2", amount: 9 }), // account1 = 1, account2 = 9
         aTransaction({ from: "account2", to: "account1", amount: 2 }), // account1 = 3, account2 = 7
@@ -80,5 +80,8 @@ describe("test virtual machine", () => {
     stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
     stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
     stateDiff.find(item => item.key === "balances.account3").should.have.property("value", "2");
+
+    rejectedTransactions.should.have.lengthOf(1);
+    rejectedTransactions.should.be.eql([aTransaction({ from: "account1", to: "account2", amount: 4 })]);
   });
 });
