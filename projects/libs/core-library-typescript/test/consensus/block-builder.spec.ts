@@ -48,29 +48,61 @@ function aRandomStateDiff(): types.ModifiedStateKey[] {
 const dummyTransactionSet = aDummyTransactionSet();
 
 const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
-transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
 
 const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
   processedTransactions: dummyTransactionSet,
-  stateDiff: aRandomStateDiff()
+  stateDiff: aRandomStateDiff(),
+  rejectedTransactions: []
 };
-virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
+
+const processTransactionSetOutputWithRejectedTransactions: types.ProcessTransactionSetOutput = {
+  processedTransactions: dummyTransactionSet.slice(0, 2),
+  stateDiff: aRandomStateDiff().slice(0, 2),
+  rejectedTransactions: [dummyTransactionSet[2]]
+};
+
+const processTransactionSetOutputWithEmptyTransactions: types.ProcessTransactionSetOutput = {
+  processedTransactions: [],
+  stateDiff: [],
+  rejectedTransactions: dummyTransactionSet
+};
+
 
 const blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
 
-describe("a block", () => {
-  it("is built with the transactions on transaction pool", async () => {
+describe.only("a block", () => {
+  it("contains transactions from the pool", async () => {
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
+
     const block = await blockBuilder.buildNextBlock(1);
-
     expect(block.transactions).to.eql(dummyTransactionSet);
-
   });
 
-  it("is built with the transaction on transaction pool", async () => {
+  it("contains a state diff", async () => {
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
+
     const block = await blockBuilder.buildNextBlock(2);
 
     expect(block.transactions).to.eql(dummyTransactionSet);
-
     expect(block.stateDiff).to.eql(processTransactionSetOutput.stateDiff);
+  });
+
+  it("does not contain rejected transactions", async () => {
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithRejectedTransactions);
+
+    const block = await blockBuilder.buildNextBlock(3);
+
+    expect(block.transactions).to.eql(dummyTransactionSet.slice(0, 2));
+    expect(block.stateDiff).to.eql(processTransactionSetOutputWithRejectedTransactions.stateDiff.slice(0, 2));
+  });
+
+  it("throws an error if none of the transactions passed", (done) => {
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithEmptyTransactions);
+
+    expect(blockBuilder.buildNextBlock(4)).to.eventually.be.rejectedWith("None of the transactions processed successfully. not building a new block").and.notify(done);
   });
 });

@@ -21,6 +21,8 @@ describe("Transaction pool service", async function () {
 
       const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
 
+
+
       return expect(values).to.eventually.be.eql([10, 10]);
 
     });

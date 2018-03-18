@@ -21,7 +21,7 @@ export default class BlockBuilder {
     this.transactionPool.clearPendingTransactions({ transactions: rejectedTransactions });
 
     if (processedTransactions.length == 0) {
-      throw "none of the transactions processed successfully. not building a new block";
+      throw "None of the transactions processed successfully. not building a new block";
     }
 
     const block: types.Block = {
