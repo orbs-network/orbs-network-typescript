@@ -11,8 +11,6 @@ WORKDIR /opt/orbs/client/crypto-sdk
 
 RUN ./clean.sh
 
-RUN ./configure.sh
-
 RUN ./build.sh
 
 RUN ./test.sh
