@@ -1,2 +1,3 @@
 # Ignore built ts files
 dist/**/*
+distTest/**/*
