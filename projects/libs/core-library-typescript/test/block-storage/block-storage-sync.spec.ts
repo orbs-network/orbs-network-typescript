@@ -81,6 +81,35 @@ describe("Block storage sync", () => {
       await blockStorage.getBlocks(4).should.eventually.be.empty;
     });
 
+    it("does not care about duplicate blocks", async () => {
+      const blocks = [
+        generateBlock(0),
+        generateBlock(1),
+        generateBlock(1),
+        generateBlock(2),
+        generateBlock(2),
+        generateBlock(3)
+      ];
+
+      const uniqueBlocks = [
+        blocks[0], blocks[1], blocks[3], blocks[5]
+      ];
+
+      blockStorageSync.onReceiveBlock(blocks[1]);
+      blockStorageSync.onReceiveBlock(blocks[2]);
+      blockStorageSync.onReceiveBlock(blocks[0]);
+      blockStorageSync.onReceiveBlock(blocks[3]);
+      blockStorageSync.onReceiveBlock(blocks[4]);
+      blockStorageSync.onReceiveBlock(blocks[5]);
+
+      blockStorageSync.getQueueSize().should.be.eql(6);
+      await blockStorageSync.appendBlocks();
+      blockStorageSync.getQueueSize().should.be.eql(0);
+
+      await blockStorage.getBlocks(0).should.eventually.be.eql(uniqueBlocks);
+      await blockStorage.getBlocks(4).should.eventually.be.empty;
+    });
+
     it("does not return blocks back to the queue in case something happens", async () => {
       const blocks = [
         generateBlock(0),

@@ -3,7 +3,7 @@ import * as path from "path";
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import { BlockStorage } from "./block-storage";
-import { sortBy } from "lodash";
+import { sortBy, uniqBy } from "lodash";
 
 function copyArray<T>(source: Array<T>, destination: Array<T>) {
   while (source.length > 0) {
@@ -28,7 +28,8 @@ export class BlockStorageSync {
     const data: Array<types.Block> = [];
     copyArray(this.queue, data);
 
-    const sortedBlocks = sortBy(data, (block) => block.header.id);
+    const uniqueBlocks = uniqBy(data, (block) => block.header.id);
+    const sortedBlocks = sortBy(uniqueBlocks, (block) => block.header.id);
 
     for (const block of sortedBlocks) {
       await this.blockStorage.addBlock(block);

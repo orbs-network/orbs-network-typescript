@@ -1,4 +1,4 @@
-import { types } from "../common-library";
+import { types, logger } from "../common-library";
 
 export default class BlockBuilder {
   private virtualMachine: types.VirtualMachineClient;
@@ -23,7 +23,9 @@ export default class BlockBuilder {
     }
 
     if (processedTransactions.length == 0) {
-      throw "None of the transactions processed successfully. Not building a new block";
+      throw new Error("None of the transactions processed successfully. Not building a new block");
+    } else {
+      logger.info(`Building block with id ${lastBlockId + 1} with ${processedTransactions.length} transactions`);
     }
 
     const block: types.Block = {

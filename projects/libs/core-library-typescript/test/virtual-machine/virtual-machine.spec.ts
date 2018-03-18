@@ -15,7 +15,7 @@ class StubStorageClient implements types.StateStorageClient {
 
   readKeys(input: types.ReadKeysInput): types.ReadKeysOutput {
     if (input.address != this.contractAddress) {
-      throw `state storage supports only a single contract ${this.contractAddress} != ${input.address}`;
+      throw new Error(`state storage supports only a single contract ${this.contractAddress} != ${input.address}`);
     }
     return { values: _.pick(this.keyMap, input.keys) };
   }
