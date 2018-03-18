@@ -124,7 +124,7 @@ export class RaftConsensus {
     // committed entry.
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
 
-    logger.debug(`new block to be committed ${JSON.stringify(block)}. blockHash: ${block.hash}`);
+    logger.debug(`new block to be committed ${JSON.stringify(block)}`);
     await this.blockBuilder.commitBlock(block);
 
     await this.transactionPool.clearPendingTransactions({ transactions: block.body.transactions });
