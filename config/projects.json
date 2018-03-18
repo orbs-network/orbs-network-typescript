@@ -39,8 +39,20 @@
     "type": "service",
     "path": "projects/services/virtual-machine-service-typescript"
   },
+  "crypto-sdk": {
+    "runtime": "C++",
+    "type": "library",
+    "path": "client/crypto-sdk"
+  },
+  "crypto-sdk-javascript": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/crypto-sdk-javascript"
+  },
   "order": [
     "architecture",
+    "crypto-sdk",
+    "crypto-sdk-javascript",
     "core-library-typescript",
     "gossip-service-typescript",
     "consensus-service-typescript",

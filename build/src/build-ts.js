@@ -9,7 +9,7 @@ async function main() {
   projects.order.forEach((projectName) => {
     const project = projects[projectName];
 
-    if (project.runtime !== 'typescript' && project.runtime !== 'protobuf') {
+    if (project.runtime !== 'typescript' && project.runtime !== 'C++' && project.runtime !== 'protobuf') {
       return;
     }
 
