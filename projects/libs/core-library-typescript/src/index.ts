@@ -9,3 +9,4 @@ export { SubscriptionManager } from "./subscription-manager";
 export { TransactionPool } from "./transaction-pool";
 export { VirtualMachine } from "./virtual-machine";
 export { Service, ServiceRunner, ServiceConfig } from "./base-service";
+export * from "./test-kit";
