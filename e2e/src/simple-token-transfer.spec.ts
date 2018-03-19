@@ -1,21 +1,30 @@
+import * as chai from "chai";
+import * as _ from "lodash";
+import * as crypto from "crypto";
+import { Address } from "orbs-crypto-sdk";
+
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
-import * as chai from "chai";
 import ChaiBarsPlugin from "./chai-bars-plugin";
-import * as _ from "lodash";
 
 const expect = chai.expect;
 
 chai.should();
 chai.use(ChaiBarsPlugin);
 
+const generateAddress = (): string => {
+  const publicKey = crypto.randomBytes(32).toString("hex");
+  const address = new Address(publicKey);
+
+  return address.toString();
+};
+
 const testConfig = loadDefaultTestConfig();
 
-
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
-  const senderAddress = `addr_${Math.floor(Math.random() * 100000000)}`; // TODO: replace with a proper public key
+  const senderAddress = generateAddress();
   const orbsSession = new OrbsClientSession(senderAddress, testConfig.subscriptionKey, testConfig.publicApiClient);
   const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
   const account = new FooBarAccount(senderAddress, contractAdapter);
@@ -26,7 +35,7 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 }
 
 async function aTextMessageAccount() {
-  const senderAddress = `addr_${Math.floor(Math.random() * 100000000)}`; // TODO: replace with a proper public key
+  const senderAddress = generateAddress();
   const orbsSession = new OrbsClientSession(senderAddress, testConfig.subscriptionKey, testConfig.publicApiClient);
   const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "text-message");
   const account = new TextMessageAccount(senderAddress, contractAdapter);
@@ -55,9 +64,10 @@ describe("simple token transfer", async function () {
     await account1.transfer({ to: account2.address, amountOfBars: 1 });
     await account1.should.to.have.bars(1);
     await account2.should.have.bars(1);
-
   });
+});
 
+describe("simple message", async function () {
   it("sends text messages between accounts", async function () {
     console.log("Initiating account for Alice");
     const alice = await aTextMessageAccount();
