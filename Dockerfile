@@ -8,8 +8,8 @@ ADD package.json yarn.lock .yarnrc docker/bootstrap-*.sh /opt/orbs/
 
 WORKDIR /opt/orbs
 
-RUN ./docker/bootstrap-sdk.sh
-RUN ./docker/bootstrap-server.sh
+RUN ./bootstrap-sdk.sh
+RUN ./bootstrap-server.sh
 
 RUN yarn config list && \
     yarn global add typescript@2.7.1 tslint@5.9.1 && \
