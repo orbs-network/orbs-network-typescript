@@ -97,8 +97,8 @@ bool Address::IsValid(const string &address) {
     }
 
     // Check the checksum of the version + account ID:
-    vector<uint8_t> checksum(decoded.cend() - Address::CHECKSUM_SIZE, decoded.cend());
     vector<uint8_t> data(decoded.cbegin(), decoded.cend() - Address::CHECKSUM_SIZE);
+    vector<uint8_t> checksum(decoded.cend() - Address::CHECKSUM_SIZE, decoded.cend());
     vector<uint8_t> dataChecksum;
     CRC32::Hash(data, dataChecksum);
     if (checksum != dataChecksum) {
