@@ -111,7 +111,7 @@ describe("Block storage sync", () => {
 
       blockStorageSync.getQueueSize().should.eql(5);
 
-      await blockStorageSync.appendBlocks().should.eventually.be.rejected;
+      await blockStorageSync.appendBlocks();
 
       await blockStorage.getBlocks(blocks[0].header.height - 1).should.eventually.eql(blocks.slice(0, 4));
       await blockStorage.getBlocks(blocks[4].header.height - 1).should.eventually.be.empty;

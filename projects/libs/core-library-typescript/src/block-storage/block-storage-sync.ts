@@ -36,7 +36,11 @@ export class BlockStorageSync {
     const sortedBlocks = sortBy(uniqueBlocks, (block) => block.header.height);
 
     for (const block of sortedBlocks) {
-      await this.blockStorage.addBlock(block);
+      try {
+        await this.blockStorage.addBlock(block);
+      } catch (e) {
+        logger.error(e);
+      }
     }
   }
 
