@@ -46,11 +46,12 @@ describe("new broadcast transaction", () => {
     expect(gossip.broadcastMessage).to.have.been.called;
   });
 
-  it("two identical transaction are processed only once", async () => {
+  it("two identical transaction are processed only once", (done) => {
     const tx = aTransaction();
-    await transactionPool.addNewPendingTransaction(tx);
 
-    expect(transactionPool.addNewPendingTransaction(tx)).to.eventually.be.rejectedWith("Transaction with hash 4dadf2569cefcb0b30c5e02bbf2ab226b0a2f564c6d14f488688e3468254ec43 already exists in the pool");
+    transactionPool.addNewPendingTransaction(tx).then(() => {
+      expect(transactionPool.addNewPendingTransaction(tx)).to.eventually.be.rejectedWith("Transaction with hash b6b6177e6d4ba5129247824cde34bae9e1d27ef49f89c31a8969078c41a9604d already exists in the pool").and.notify(done);
+    });
   });
 
   it("should propagate rejected transactions", async () => {
