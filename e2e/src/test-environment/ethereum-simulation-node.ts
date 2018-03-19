@@ -60,23 +60,24 @@ export default class EthereumSimulationNode implements TestComponent {
     const STUD_ORBS_TOKEN_SOLIDITY_CONTRACT = `
         pragma solidity 0.4.18;
 
-        contract stubOrbsToken  {
+        contract StubOrbsToken  {
             struct Subscription {
                 bytes32 id;
                 uint256 tokens;
             }
+
             bytes32 activeSubscriptionId;
 
             uint256 minTokensForSubscription;
 
-            function stubOrbsToken(uint256 _minTokensForSubscription, bytes32 _activeSubscriptionId) public {
+            function StubOrbsToken(uint256 _minTokensForSubscription, bytes32 _activeSubscriptionId) public {
                 minTokensForSubscription = _minTokensForSubscription;
                 activeSubscriptionId = _activeSubscriptionId;
             }
 
             function getSubscriptionData(bytes32 _id) public view returns (bytes32 id, uint256 tokens) {
                 id = _id;
-                if(id == activeSubscriptionId) {
+                if (id == activeSubscriptionId) {
                     tokens = minTokensForSubscription;
                 } else {
                     tokens = 0;
