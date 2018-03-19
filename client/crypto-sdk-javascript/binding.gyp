@@ -6,6 +6,7 @@
                 "src/address.cpp",
                 "src/crypto-sdk.cpp"
             ],
+            "cflags_cc!": ["-static", "-std=c++11", "-stdlib=libc++"],
             "include_dirs": [
                 "<(module_root_dir)/deps/"
             ],
