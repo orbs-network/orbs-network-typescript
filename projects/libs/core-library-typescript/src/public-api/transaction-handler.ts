@@ -10,18 +10,14 @@ export class TransactionHandler {
   private config: TransactionHandlerConfig;
 
   public async handle(transactionInput: types.SendTransactionInput) {
-    const { transaction, transactionAppendix } = transactionInput;
+    const { transaction, transactionSubscriptionAppendix } = transactionInput;
 
-    if (transaction.version !== 0) {
-      throw new Error(`Invalid transaction version: ${transaction.version}`);
-    }
-
-    if (transactionAppendix.version !== 0) {
-      throw new Error(`Invalid transaction appendix version: ${transactionAppendix.version}`);
+    if (transaction.header.version !== 0) {
+      throw new Error(`Invalid transaction version: ${transaction.header.version}`);
     }
 
     if (this.config.validateSubscription()) {
-      const subscriptionKey = transactionAppendix.subscriptionKey;
+      const subscriptionKey = transactionSubscriptionAppendix.subscriptionKey;
 
       const { active } = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
 

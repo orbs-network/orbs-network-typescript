@@ -19,7 +19,7 @@ describe("Block storage service", async function () {
     it("works with two nodes", async () => {
       nodes = await initNodesWithBlocks([10, 20]);
 
-      const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
+      const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockHeight())));
 
       return expect(values).to.eventually.be.eql([20, 20]);
 
@@ -28,7 +28,7 @@ describe("Block storage service", async function () {
     it("works with multiple nodes", async () => {
       nodes = await initNodesWithBlocks([10, 20, 50, 100]);
 
-      const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockId())));
+      const values = delay(2000).then(() => Promise.all(nodes.map(node => node.getLastBlockHeight())));
 
       return expect(values).to.eventually.be.eql([100, 100, 100, 100]);
     });

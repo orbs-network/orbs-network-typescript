@@ -15,23 +15,32 @@ const config = stubInterface<TransactionHandlerConfig>();
 config.validateSubscription.returns(true);
 const handler = new TransactionHandler(transactionPool, subscriptionManager, config);
 
-function aTransactionWith(builder: { subscriptionKey: string }) {
+function aTransactionWithSubscription(builder: { subscriptionKey: string }): types.SendTransactionInput {
 
-  const transactionAppendix: types.TransactionAppendix = {
-    version: 0,
-    prefetchAddresses: [],
+  const transactionSubscriptionAppendix: types.TransactionSubscriptionAppendix = {
     subscriptionKey: builder.subscriptionKey
   };
 
-  const transaction: types.Transaction = {
-    version: 0,
-    sender: "sender",
-    contractAddress: "address",
-    signature: "",
-    payload: ""
+  const senderAddress: types.UniversalAddress = {
+    id: new Buffer("sender"),
+    scheme: 0,
+    checksum: 0,
+    networkId: 0
   };
 
-  return { transactionAppendix, transaction };
+  const transaction: types.Transaction = {
+      header: {
+        version: 0,
+        sender: senderAddress,
+        sequenceNumber: 0
+      },
+      body: {
+        contractAddress: {address: "contractAddress"},
+        payload: Math.random().toString(),
+      }
+  };
+
+  return { transaction, transactionSubscriptionAppendix};
 }
 
 describe("a transaction", () => {
@@ -41,7 +50,7 @@ describe("a transaction", () => {
 
     subscriptionManager.getSubscriptionStatus.withArgs({ subscriptionKey }).returns({ active: true, expiryTimestamp: -1 });
 
-    await handler.handle(aTransactionWith({ subscriptionKey }));
+    await handler.handle(aTransactionWithSubscription({ subscriptionKey }));
 
     transactionPool.addNewPendingTransaction.should.have.been.called;
   });
@@ -49,6 +58,7 @@ describe("a transaction", () => {
   it("is rejected when it includes an invalid subscription key", async () => {
     subscriptionManager.getSubscriptionStatus.returns({ active: false, expiryTimestamp: -1 });
 
-    await handler.handle(aTransactionWith({ subscriptionKey: "some other key" })).should.be.rejected;
+    const transactionSignedWithWrongSubscriptionKey = aTransactionWithSubscription({ subscriptionKey: "some other key" });
+    await handler.handle(transactionSignedWithWrongSubscriptionKey).should.be.rejected;
   });
 });

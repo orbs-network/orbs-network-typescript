@@ -7,7 +7,7 @@ import "primitives/blocks.proto";
 service BlockStorage {
   rpc AddBlock (AddBlockInput) returns (AddBlockOutput);
   rpc GetBlocks (GetBlocksInput) returns (GetBlocksOutput);
-  rpc GetLastBlockId (GetLastBlockIdInput) returns (GetLastBlockIdOutput);
+  rpc GetLastBlock (GetLastBlockInput) returns (GetLastBlockOutput);
   rpc HasNewBlocks (HasNewBlocksInput) returns (HasNewBlocksOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }
@@ -20,22 +20,22 @@ message AddBlockOutput {
 }
 
 message GetBlocksInput {
-  uint32 lastBlockId = 1;
+  uint32 lastBlockHeight = 1;
 }
 
 message GetBlocksOutput {
   repeated Block blocks = 1;
 }
 
-message GetLastBlockIdInput {
+message GetLastBlockInput {
 }
 
-message GetLastBlockIdOutput {
-  uint32 blockId = 1;
+message GetLastBlockOutput {
+  Block block = 1;
 }
 
 message HasNewBlocksInput {
-  uint32 blockId = 1;
+  uint32 blockHeight = 1;
 }
 
 message HasNewBlocksOutput {

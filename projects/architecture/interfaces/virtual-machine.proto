@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "primitives/transactions.proto";
 import "primitives/blocks.proto";
+import "call-contract.proto";
 
 service VirtualMachine {
   rpc CallContract (CallContractInput) returns (CallContractOutput);
@@ -15,14 +16,4 @@ message ProcessTransactionSetInput {
 message ProcessTransactionSetOutput {
   repeated Transaction processedTransactions = 1;
   repeated ModifiedStateKey stateDiff = 2;
-}
-
-message CallContractInput {
-  string sender = 1;
-  string contractAddress = 2;
-  string payload = 3;
-}
-
-message CallContractOutput {
-  string resultJson = 1;
 }

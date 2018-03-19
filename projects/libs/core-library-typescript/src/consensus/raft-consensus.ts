@@ -7,6 +7,7 @@ import BlockBuilder from "./block-builder";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
+import { JsonBuffer } from "../common-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
@@ -68,28 +69,24 @@ export interface RaftConsensusConfig {
 
 
 export class RaftConsensus {
-  private blockStorage: types.BlockStorageClient;
-  private blockBuilder: BlockBuilder;
   private transactionPool: types.TransactionPoolClient;
+  private blockBuilder: BlockBuilder;
 
   private connector: RPCConnector;
   private node: any;
-  private lastBlockId: number;
-  private readyForBlockAppend = false;
-  private pollIntervalMs = 500;
-  private pollInterval: NodeJS.Timer;
 
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
     blockStorage: types.BlockStorageClient,
     transactionPool: types.TransactionPoolClient,
-    blockBuilder: BlockBuilder
+    virtualMachine: types.VirtualMachineClient
   ) {
-    this.blockStorage = blockStorage;
     this.connector = new RPCConnector(config.nodeName, gossip);
-    this.blockBuilder = blockBuilder;
     this.transactionPool = transactionPool;
+    this.blockBuilder = new BlockBuilder({
+      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block)
+    });
 
     this.node = gaggle({
       id: config.nodeName,
@@ -125,60 +122,25 @@ export class RaftConsensus {
 
     // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
     // committed entry.
-    const block: types.Block = msg.block;
-    logger.debug("New block to be committed ${JSON.stringify(block)}");
-    await this.blockStorage.addBlock({
-      block: block
-    });
-    this.lastBlockId = block.header.id;
+    const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
 
-    await this.transactionPool.clearPendingTransactions({ transactions: block.transactions });
+    logger.debug(`new block to be committed ${JSON.stringify(block)}`);
+    await this.blockBuilder.commitBlock(block);
+
+    await this.transactionPool.clearPendingTransactions({ transactions: block.body.transactions });
 
     if (this.node.isLeader()) {
-      this.readyForBlockAppend = true;
+      this.blockBuilder.start();
     }
   }
 
   private async onLeaderElected() {
     if (this.node.isLeader()) {
-      this.readyForBlockAppend = true;
+      this.blockBuilder.start();
       logger.info(`Node ${this.node.id} was elected as a new leader!`);
     } else {
-      this.readyForBlockAppend = false;
+      this.blockBuilder.stop();
     }
-  }
-
-  private pollForPendingTransactions() {
-    this.pollInterval = setInterval(async () => {
-      try {
-        if (this.readyForBlockAppend) {
-          await this.appendNextBlock();
-        }
-      } catch (err) {
-        logger.error("newBlockAppendTick error: " + err);
-      }
-    }, this.pollIntervalMs);
-  }
-
-  private async appendNextBlock() {
-    const lastBlockId = await this.getLastBlockId();
-    const block = await this.blockBuilder.buildNextBlock(lastBlockId);
-
-    const appendMessage: types.ConsensusMessage = {block};
-
-    this.node.append(appendMessage);
-
-    logger.debug(`Appended new block ${JSON.stringify(block)}`);
-
-    this.readyForBlockAppend = false;
-  }
-
-  private async getLastBlockId() {
-    if (this.lastBlockId == undefined) {
-      const { blockId } = await this.blockStorage.getLastBlockId({});
-      this.lastBlockId = blockId;
-    }
-    return this.lastBlockId;
   }
 
   async onMessageReceived(fromAddress: string, messageType: string, message: any) {
@@ -189,13 +151,17 @@ export class RaftConsensus {
     }
   }
 
+  private onNewBlockBuild(block: types.Block) {
+    const appendMessage: types.ConsensusMessage = { block };
+
+    this.node.append(appendMessage);
+  }
+
   async initialize() {
-    this.pollForPendingTransactions();
+    return this.blockBuilder.initialize();
   }
 
   async shutdown() {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
-    }
+    return this.blockBuilder.shutdown();
   }
 }
