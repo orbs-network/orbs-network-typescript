@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import bind from "bind-decorator";
 
-import { types, logger } from "orbs-core-library";
+import { types, logger, JsonBuffer } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";
 import { TransactionPool } from "orbs-core-library";
@@ -42,6 +42,7 @@ export default class TransactionPoolService extends Service {
   @Service.RPCMethod
   public async getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext) {
     rpc.res = this.transactionPool.getAllPendingTransactions();
+    logger.debug(`getAllPendingTransactions() . returns ${JSON.stringify(rpc.res)}`);
   }
 
   @Service.RPCMethod
@@ -52,7 +53,7 @@ export default class TransactionPoolService extends Service {
 
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    const obj: any = JSON.parse(rpc.req.buffer.toString("utf8"));
+    const obj: any = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
     await this.transactionPool.gossipMessageReceived(rpc.req.fromAddress, rpc.req.messageType, obj);
   }
 }

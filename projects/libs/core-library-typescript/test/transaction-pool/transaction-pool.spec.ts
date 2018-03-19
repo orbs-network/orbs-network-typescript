@@ -13,11 +13,15 @@ chai.use(sinonChai);
 
 function aTransaction() {
   const transaction: types.Transaction = {
-    version: 0,
-    sender: "sender",
-    contractAddress: "address",
-    signature: "signature",
-    payload: "payload"
+    header: {
+      version: 0,
+      sender: {id: new Buffer("sender"), scheme: 0, networkId: 0, checksum: 0},
+      sequenceNumber: 0
+    },
+    body: {
+      contractAddress: {address: "address"},
+      payload: "payload"
+    }
   };
 
   return transaction;

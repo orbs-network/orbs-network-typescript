@@ -21,6 +21,10 @@ export class BlockStorageSync {
   }
 
   public onReceiveBlock(block: types.Block) {
+    if (!block) {
+      throw new Error("Tried to push empty block into the queue!");
+    }
+
     this.queue.push(block);
   }
 
@@ -28,8 +32,8 @@ export class BlockStorageSync {
     const data: Array<types.Block> = [];
     copyArray(this.queue, data);
 
-    const uniqueBlocks = uniqBy(data, (block) => block.header.id);
-    const sortedBlocks = sortBy(uniqueBlocks, (block) => block.header.id);
+    const uniqueBlocks = uniqBy(data, (block) => block.header.height);
+    const sortedBlocks = sortBy(uniqueBlocks, (block) => block.header.height);
 
     for (const block of sortedBlocks) {
       await this.blockStorage.addBlock(block);

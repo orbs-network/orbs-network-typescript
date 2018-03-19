@@ -23,9 +23,9 @@ export class VirtualMachine {
       const transactionScopeStateCache = stateCache.fork();
       try {
         await this.processor.processTransaction({
-          sender: transaction.sender,
-          contractAddress: transaction.contractAddress,
-          payload: transaction.payload
+          sender: transaction.header.sender,
+          payload: transaction.body.payload,
+          contractAddress: transaction.body.contractAddress,
         }, transactionScopeStateCache);
 
       } catch (err) {

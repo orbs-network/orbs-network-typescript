@@ -5,12 +5,13 @@ import { StateCache } from "../../src/virtual-machine/state-cache";
 import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-state-accessor";
 import BarSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/foobar-smart-contract";
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
+import { types } from "../../src";
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {
   lastBlockId: number;
   stateCache: StateCache;
 
-  constructor(contractAddress: string, stateCache: StateCache) {
+  constructor(contractAddress: types.ContractAddress, stateCache: StateCache) {
     super(contractAddress);
 
     this.stateCache = stateCache;
@@ -25,7 +26,7 @@ export default class ContractStateMemCacheAccessor extends BaseContractStateAcce
   }
 }
 
-const CONTRACT_ADDRESS = "barbar";
+const CONTRACT_ADDRESS = {address: "barbar"};
 const SENDER_ADDRESS = "1111";
 const RECIPIENT_ADDRESS = "2222";
 const adapter = new ContractStateMemCacheAccessor(CONTRACT_ADDRESS, new StateCache());

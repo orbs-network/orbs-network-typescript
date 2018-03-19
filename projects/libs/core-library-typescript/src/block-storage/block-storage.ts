@@ -1,21 +1,10 @@
 import * as path from "path";
 
-import { logger } from "../common-library/logger";
-import { types } from "../common-library/types";
-
 import { LevelDBDriver } from "./leveldb-driver";
+import { BlockUtils , logger, types, JsonBuffer } from "../common-library";
 
 export class BlockStorage {
-  public static readonly LAST_BLOCK_ID_KEY: string = "last";
-  public static readonly GENESIS_BLOCK: types.Block = {
-    header: {
-      version: 0,
-      id: 0,
-      prevBlockId: -1
-    },
-    transactions: [],
-    stateDiff: []
-  };
+  public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
   private lastBlock: types.Block;
   private db: LevelDBDriver;
@@ -25,27 +14,37 @@ export class BlockStorage {
     this.db = new LevelDBDriver(dbPath);
   }
 
+  public async generateGenesisBlock(): Promise<types.Block> {
+    return BlockUtils.buildNextBlock({
+      transactions: [],
+      stateDiff: []
+    });
+  }
+
   public async load(): Promise<void> {
     // Get the ID of the last block and use it to get actual block.
-    let lastBlockId;
+    let lastBlockHeight;
     try {
-      lastBlockId = await this.db.get<number>(BlockStorage.LAST_BLOCK_ID_KEY);
+      lastBlockHeight = await this.db.get<number>(BlockStorage.LAST_BLOCK_HEIGHT_KEY);
     } catch (e) {
       if (e.notFound) {
-        logger.warn("Couldn't get last block ID. Restarting from the genesis block...");
+        logger.warn("Couldn't get last block height. Restarting from the genesis block...");
 
-        lastBlockId = BlockStorage.GENESIS_BLOCK.header.id;
+        const genesisBlock = await this.generateGenesisBlock();
 
-        await this.db.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, lastBlockId);
-        await this.putBlock(BlockStorage.GENESIS_BLOCK);
+        await this.db.put<number>(BlockStorage.LAST_BLOCK_HEIGHT_KEY, genesisBlock.header.height);
+
+        await this.putBlock(genesisBlock);
+
+        lastBlockHeight = genesisBlock.header.height;
       } else {
         throw e;
       }
     }
 
-    logger.info(`Got last block ID: ${lastBlockId}`);
+    logger.info(`Got last block height: ${lastBlockHeight}`);
 
-    this.lastBlock = await this.getBlock(lastBlockId);
+    this.lastBlock = await this.getBlock(lastBlockHeight);
   }
 
   public async shutdown() {
@@ -59,35 +58,31 @@ export class BlockStorage {
   public async addBlock(block: types.Block) {
     this.verifyNewBlock(block);
 
-    await this.db.put<number>(BlockStorage.LAST_BLOCK_ID_KEY, block.header.id);
+    await this.db.put<number>(BlockStorage.LAST_BLOCK_HEIGHT_KEY, block.header.height);
     await this.putBlock(block);
 
     this.lastBlock = block;
 
-    logger.info(`Added new block with block ID: ${block.header.id}`);
+    logger.info(`Added new block with block height: ${block.header.height}`);
   }
 
   // Returns an array of blocks, starting from a specific block ID and up to the last block.
-  public async getBlocks(fromLastBlockId: number): Promise<types.Block[]> {
+  public async getBlocks(fromLastBlockHeight: number): Promise<types.Block[]> {
     const blocks: types.Block[] = [];
 
-    if (fromLastBlockId == this.lastBlock.header.id) {
-      return blocks;
-    }
-
-    for (let i = fromLastBlockId; i < this.lastBlock.header.id; ++i) {
+    for (let i = fromLastBlockHeight; i < this.lastBlock.header.height; ++i) {
       blocks.push(await this.getBlock(i + 1));
     }
 
     return blocks;
   }
 
-  public async getLastBlockId(): Promise<number> {
-    return this.lastBlock.header.id;
+  public async getLastBlock(): Promise<types.Block> {
+    return this.lastBlock;
   }
 
-  public async hasNewBlocks(fromLastBlockId: number): Promise<boolean> {
-    return await this.getLastBlockId() > fromLastBlockId;
+  public async hasNewBlocks(fromLastBlockHeight: number): Promise<boolean> {
+    return (await this.getLastBlock()).header.height > fromLastBlockHeight;
   }
 
   private verifyNewBlock(block: types.Block) {
@@ -95,20 +90,21 @@ export class BlockStorage {
       throw new Error(`Invalid block version: ${block.header.version}!`);
     }
 
-    if (block.header.id !== this.lastBlock.header.id + 1) {
-      throw new Error(`Invalid block ID of block: ${JSON.stringify(block)}!`);
+    if (block.header.height !== this.lastBlock.header.height + 1) {
+      throw new Error(`Invalid block height of block: ${JSON.stringify(block)}!`);
     }
 
-    if (block.header.prevBlockId !== this.lastBlock.header.id) {
-      throw new Error(`Invalid prev block ID of block: ${JSON.stringify(block)}! Should have been ${this.lastBlock.header.id}`);
+    const lastBlockHash = BlockUtils.calculateBlockHash(this.lastBlock);
+    if (!block.header.prevBlockHash.equals(lastBlockHash)) {
+      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block)}! Should have been ${JSON.stringify(lastBlockHash)}`);
     }
   }
 
-  public async getBlock(id: number): Promise<types.Block> {
-    return JSON.parse(await this.db.get<string>(id.toString()));
+  public async getBlock(height: number): Promise<types.Block> {
+    return JsonBuffer.parseJsonWithBuffers(await this.db.get<string>(height.toString()));
   }
 
   private async putBlock(block: types.Block): Promise<void> {
-    await this.db.put<string>(block.header.id.toString(), JSON.stringify(block));
+    await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
   }
 }

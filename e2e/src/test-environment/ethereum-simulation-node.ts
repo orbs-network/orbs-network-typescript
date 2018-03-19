@@ -48,7 +48,7 @@ export default class EthereumSimulationNode implements TestComponent {
      }
 
      public getPublicAddress(connectFromHost = false) {
-         const address = connectFromHost ? "localhost" : this.config.publicIp;
+         const address = connectFromHost ? "127.0.0.1" : this.config.publicIp;
          return `http://${address}:8545`;
      }
 

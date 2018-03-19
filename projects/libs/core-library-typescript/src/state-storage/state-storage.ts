@@ -5,64 +5,67 @@ import { types } from "../common-library/types";
 
 import { InMemoryKVStore } from "./kvstore";
 
+import { delay } from "bluebird";
+
 export class StateStorage {
   private blockStorage: types.BlockStorageClient;
 
   private kvstore = new InMemoryKVStore();
-  private lastBlockId: number = 0;
+  private lastBlockHeight: number;
+  private pollInterval: NodeJS.Timer;
 
   public constructor(blockStorage: types.BlockStorageClient) {
     this.blockStorage = blockStorage;
   }
 
-  public async poll(): Promise<void> {
-    this.pollBlockStorage();
+  public poll() {
+    this.pollInterval = setInterval(() => this.pollBlockStorageCallback(), 200);
   }
 
-  public async readKeys(contractAddress: string, keys: string[]) {
-    await this.waitForBlockState();
+  public stopPolling() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = undefined;
+    }
+  }
 
+  public async readKeys(contractAddress: types.ContractAddress, keys: string[]) {
+    await this.waitForBlockState();
 
     return await this.kvstore.getMany(contractAddress, keys);
   }
 
   private async waitForBlockState(timeout = 5000) {
-    const { blockId } = await this.blockStorage.getLastBlockId({});
-
-    return new Promise((resolve, reject) => {
-      if (blockId > this.lastBlockId) {
-        if (timeout < 200) {
-          reject(new Error(`Timeout in attempt to read block state (${blockId} != ${this.lastBlockId})`));
-        } else {
-          setTimeout(() => this.waitForBlockState(timeout - 200), 200);
-        }
+    const { block } = await this.blockStorage.getLastBlock({});
+    while (timeout > 0) {
+      if (block.header.height <= this.lastBlockHeight) {
+        return;
       }
-
-      resolve();
-    });
+      await delay(200);
+      timeout -= 200;
+    }
+    throw new Error(`Timeout in attempt to read block state (${block.header.height} != ${this.lastBlockHeight})`);
   }
 
-  private async pollBlockStorage() {
-    const { blocks } = await this.blockStorage.getBlocks({ lastBlockId: this.lastBlockId });
+  private async pollBlockStorageCallback() {
+    const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
 
     // Assuming an ordered list of blocks.
     for (const block of blocks) {
       await this.syncNextBlock(block);
     }
-
-    setTimeout(() => this.pollBlockStorage(), 200);
   }
 
   private async syncNextBlock(block: types.Block) {
-    if (block.header.prevBlockId == this.lastBlockId) {
-      logger.debug("Processing block:", block.header.id);
+    if ((this.lastBlockHeight == undefined) || (block.header.height == this.lastBlockHeight + 1)) {
+      logger.debug("Processing block:", block.header.height);
 
-      for (const { contractAddress, key, value} of block.stateDiff) {
+      for (const { contractAddress, key, value} of block.body.stateDiff) {
         this.kvstore.set(contractAddress, key, value);
       }
-      this.lastBlockId = block.header.id;
+      this.lastBlockHeight = block.header.height;
     } else {
-      throw new Error(`Unexpected block ID: ${block.header.id}. Out of sync?`);
+      throw new Error(`Unexpected block Height: ${block.header.height}. Expected ${ this.lastBlockHeight + 1 }, Out of sync?`);
     }
   }
 }

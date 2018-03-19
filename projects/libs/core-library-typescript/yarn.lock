@@ -95,9 +95,9 @@
   version "9.4.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.5.tgz#d2a90c634208173d1b1a0a6ba9f1df3de62edcf5"
 
-"@types/node@^8.5.5":
-  version "8.9.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.3.tgz#47d00392c5834dd5a095346d72df7ff8995f7365"
+"@types/node@^8.9.4":
+  version "8.9.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.9.5.tgz#162b864bc70be077e6db212b322754917929e976"
 
 "@types/sinon-chai@^2.7.29":
   version "2.7.29"
@@ -2981,7 +2981,11 @@ lolex@^2.2.0, lolex@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/lolex/-/lolex-2.3.2.tgz#85f9450425103bf9e7a60668ea25dc43274ca807"
 
-long@^3.2.0, long@~3:
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
+
+long@~3:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/long/-/long-3.2.0.tgz#d821b7138ca1cb581c172990ef14db200b5c474b"
 
@@ -3747,9 +3751,9 @@ protobufjs@^5.0.0:
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protobufjs@^6.8.4:
-  version "6.8.4"
-  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.4.tgz#183f90d1c4aca5f6b34a79eaedd0d89ad21f603b"
+protobufjs@^6.8.6:
+  version "6.8.6"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.6.tgz#ce3cf4fff9625b62966c455fc4c15e4331a11ca2"
   dependencies:
     "@protobufjs/aspromise" "^1.1.2"
     "@protobufjs/base64" "^1.1.2"
@@ -3762,8 +3766,8 @@ protobufjs@^6.8.4:
     "@protobufjs/pool" "^1.1.0"
     "@protobufjs/utf8" "^1.1.0"
     "@types/long" "^3.0.32"
-    "@types/node" "^8.5.5"
-    long "^3.2.0"
+    "@types/node" "^8.9.4"
+    long "^4.0.0"
 
 proxy-addr@~2.0.2:
   version "2.0.2"

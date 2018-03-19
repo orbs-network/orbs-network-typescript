@@ -20,7 +20,7 @@ export class ERCBillingContractProxy {
     this.contractAddress = contractAddress;
   }
 
-  public async getSubscription(subscriptionId: string): Promise<Subscription> {
+  public async getSubscription(subscriptionKey: string): Promise<Subscription> {
     const res = await this.sidechainConnectorClient.callEthereumContract({
       contractAddress: this.contractAddress,
       functionInterface: {
@@ -36,7 +36,7 @@ export class ERCBillingContractProxy {
           "type": "uint256"
         }]
       },
-      parameters: [subscriptionId],
+      parameters: [subscriptionKey],
     });
     const { id, tokens } = JSON.parse(res.resultJson);
     return { id, tokens: new BigNumber(tokens) };
