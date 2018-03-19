@@ -34,7 +34,6 @@ workflows:
   build:
     jobs:
       - build-server
-      - build-sdk
       - deploy:
           requires:
             - build-server
