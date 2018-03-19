@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-mkdir -p deps/
-ln -sf $(realpath ../crypto-sdk) deps/crypto-sdk
+rm -rf deps && mkdir -p deps
+ln -s "$(pwd)/../crypto-sdk" deps/crypto-sdk
 
 yarn install
 
