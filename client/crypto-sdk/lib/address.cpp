@@ -63,7 +63,7 @@ const vector<uint8_t> &Address::GetChecksum() const {
 }
 
 const string Address::ToString() const {
-    // Concatenate the version, the accound ID, and the checksum together.
+    // Concatenate the version, the account ID, and the checksum together.
     vector<uint8_t> rawAddress;
     rawAddress.push_back(version_);
     rawAddress.insert(rawAddress.end(), accountId_.cbegin(), accountId_.cend());
