@@ -9,6 +9,8 @@ ExternalProject_Add(libgpg-error
   CONFIGURE_COMMAND <SOURCE_DIR>/configure
     --host=${TARGET_ARCH}
     --prefix=${TARGET_DIR}
+    --with-pic
+    --enable-static
     --disable-shared
     --disable-nls
     --disable-languages
