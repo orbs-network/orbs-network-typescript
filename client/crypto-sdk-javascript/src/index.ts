@@ -1,5 +1,5 @@
 
-const CryptoSdk = require("bindings")("cryptosdk");
+const CryptoSDK = require("bindings")("cryptosdk");
 
 export interface Address {
   version: number;
@@ -11,4 +11,4 @@ export interface Address {
 
 export const Address: {
   new(param: string): Address
-} = CryptoSdk.Address;
+} = CryptoSDK.Address;
