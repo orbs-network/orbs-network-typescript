@@ -20,6 +20,7 @@ Addresssing in the Orbs platform are based on a univerdal signature and addressi
 Every public address in Orbs platform has the form of {network_id, address_scheme, address}. *network_id* is a 1-byte field that determines that network type. *address_scheme* is a 1-byte that determines the signature scheme and the address format.
 
 **network_id encoding**
+
 | Value (hex) | Network     | Base58 encoding |
 |:-----------:|:-----------:|:---------------:|
 | 14          | Main net    | M               |
