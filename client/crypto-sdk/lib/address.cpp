@@ -15,7 +15,7 @@ using namespace Orbs;
 
 const uint8_t Address::VERSION = 0;
 const uint32_t Address::PUBLIC_KEY_SIZE = 32;
-const uint32_t VERSION_FIELD_SIZE = 1;
+const uint32_t Address::VERSION_FIELD_SIZE = 1;
 const uint32_t Address::ACCOUNT_ID_SIZE = 20;
 const uint32_t Address::CHECKSUM_SIZE = 4;
 const uint32_t Address::ADDRESS_LENGTH = 34;
