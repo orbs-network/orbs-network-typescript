@@ -4,20 +4,13 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run: ./.circleci/setup-rngd.sh
       - run: ./docker-build.sh
       - run: ./docker-test.sh
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
       - run: docker push ${DOCKER_IMAGE}
       - store_artifacts:
           path: logs
-
-  build-sdk:
-    machine: true
-    steps:
-      - run: sudo apt-get update && sudo apt-get install rng-tools
-      - run: sudo rngd -o /dev/random -r /dev/urandom
-      - checkout
-      - run: cd client/crypto-sdk && ./docker-build.sh
 
   deploy:
     machine: true
