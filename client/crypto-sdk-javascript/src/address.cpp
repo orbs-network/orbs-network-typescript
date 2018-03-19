@@ -2,7 +2,7 @@
 
 #include <assert.h>
 
-#include "../../crypto-sdk/lib/utils.h"
+#include "crypto-sdk/lib/utils.h"
 
 #include "address.h"
 
