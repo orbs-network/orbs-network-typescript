@@ -85,15 +85,17 @@ export default class BlockBuilder {
     return this.lastBlock;
   }
 
-  private async appendNextBlock() {
+  public async appendNextBlock(): Promise<types.Block> {
     const lastBlock = await this.getOrFetchLastBlock();
     const block = await this.buildBlockFromPendingTransactions(lastBlock);
 
     this.onNewBlockBuild(block);
 
-    logger.debug(`appended new block ${JSON.stringify(block)}`);
+    logger.debug(`Appended new block ${JSON.stringify(block)}`);
 
     this.readyForBlockAppend = false;
+
+    return block;
   }
 
 

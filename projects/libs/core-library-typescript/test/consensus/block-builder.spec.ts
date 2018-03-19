@@ -66,18 +66,19 @@ function aDummyStateDiff() {
 }
 
 const dummyTransactionSet = aDummyTransactionSet();
+const dummyStateDiff = aDummyStateDiff();
 
 const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
 
 const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
   processedTransactions: dummyTransactionSet,
-  stateDiff: aDummyStateDiff(),
+  stateDiff: dummyStateDiff,
   rejectedTransactions: []
 };
 
 const processTransactionSetOutputWithRejectedTransactions: types.ProcessTransactionSetOutput = {
   processedTransactions: dummyTransactionSet.slice(0, 2),
-  stateDiff: aDummyStateDiff().slice(0, 2),
+  stateDiff: dummyStateDiff.slice(0, 2),
   rejectedTransactions: [dummyTransactionSet[2]]
 };
 
@@ -88,7 +89,7 @@ const processTransactionSetOutputWithEmptyTransactions: types.ProcessTransaction
 };
 
 
-describe.skip("a block", () => {
+describe("a block", () => {
   let transactionPool: TransactionPoolClient;
   let virtualMachine: VirtualMachineClient;
   let blockBuilder: BlockBuilder;
@@ -111,8 +112,9 @@ describe.skip("a block", () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
 
-    const block = await blockBuilder.buildNextBlock(1);
-    expect(block.transactions).to.eql(dummyTransactionSet);
+    const block = await blockBuilder.appendNextBlock();
+
+    expect(block.body.transactions).to.eql(dummyTransactionSet);
     expect(transactionPool.clearPendingTransactions).not.to.be.called;
   });
 
@@ -120,27 +122,27 @@ describe.skip("a block", () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
 
-    const block = await blockBuilder.buildNextBlock(2);
+    const block = await blockBuilder.appendNextBlock();
 
-    expect(block.transactions).to.eql(dummyTransactionSet);
-    expect(block.stateDiff).to.eql(processTransactionSetOutput.stateDiff);
+    expect(block.body.transactions).to.eql(dummyTransactionSet);
+    expect(block.body.stateDiff).to.eql(processTransactionSetOutput.stateDiff);
   });
 
   it("does not contain rejected transactions", async () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithRejectedTransactions);
 
-    const block = await blockBuilder.buildNextBlock(3);
+    const block = await blockBuilder.appendNextBlock();
 
-    expect(block.transactions).to.eql(dummyTransactionSet.slice(0, 2));
-    expect(block.stateDiff).to.eql(processTransactionSetOutputWithRejectedTransactions.stateDiff.slice(0, 2));
+    expect(block.body.transactions).to.eql(dummyTransactionSet.slice(0, 2));
+    expect(block.body.stateDiff).to.eql(processTransactionSetOutputWithRejectedTransactions.stateDiff.slice(0, 2));
   });
 
   it("calls transaction pool to clear rejected transactions from the pool", async () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithRejectedTransactions);
 
-    const block = await blockBuilder.buildNextBlock(4);
+    const block = await blockBuilder.appendNextBlock();
 
     expect(transactionPool.clearPendingTransactions).to.be.calledOnce;
   });
@@ -149,12 +151,10 @@ describe.skip("a block", () => {
     transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
     virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithEmptyTransactions);
 
-    expect(blockBuilder.buildNextBlock(5)).to.eventually.be.rejectedWith("None of the transactions processed successfully. Not building a new block").and.notify(done);
+    expect(blockBuilder.buildBlockFromPendingTransactions(5)).to.eventually.be.rejectedWith("None of the transactions processed successfully. Not building a new block").and.notify(done);
   });
 
   describe("block builder polling", () => {
-    let newBlockBuildCallback;
-
     beforeEach(async () => {
       await blockBuilder.initialize();
     });
