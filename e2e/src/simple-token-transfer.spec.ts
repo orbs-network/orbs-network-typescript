@@ -73,8 +73,8 @@ describe("simple token transfer", async function () {
       bob.sendMessage(alice.address, "is anybody in here?")
     ]);
 
-    const [ bobMessages, aliceMessages ] = await Promise.all([bob.getMyMessages(), alice.getMyMessages()]);
-    const [ bobMessage1, bobMessage2 ] = _.sortBy(bobMessages, "timestamp");
+    const [bobMessages, aliceMessages] = await Promise.all([bob.getMyMessages(), alice.getMyMessages()]);
+    const [bobMessage1, bobMessage2] = _.sortBy(bobMessages, "timestamp");
 
     expect(bobMessages.length).to.equal(2);
     expect(bobMessage1.message).to.equal("hello");
