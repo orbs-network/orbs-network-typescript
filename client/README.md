@@ -15,30 +15,60 @@ In order to implement some of the functionality, we have elected to use libgcryp
 Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`.
 
 ## Address Scheme
+Addresssing in the Orbs platform are based on a univerdal signature and addressing scheme. This method allows applications and users to use a range of addressing schemes side by side, specifying the type of the address next to the address itself.
 
-### Version 0
+Every public address in Orbs platform has the form of {network_id, address_scheme, address}. *network_id* is a 1-byte field that determines that network type. *address_scheme* is a 1-byte that determines the signature scheme and the address format.
+
+**network_id encoding**
+| Value (hex) | Network     | Base58 encoding |
+|:-----------:|:-----------:|:---------------:|
+| 14          | Main net    | M               |
+| 1A          | Test net    | T               |
+
+**address_scheme** encoding:
+
+| Value (hex) | Address Scheme | Base58 encoding |
+|:-----------:|:---------------|:---------------:|
+| 00          | Rev1           | 1               |
+
+### Address Scheme `00`
 
 1. Start with a 32-byte Ed25519 public key:
 
     Public key: `8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65`
 
-2. Calculate the account ID by calculating the RIPEMD160 hash of the SHA256 of the public key:
+2. Set the 3-byte Virtual Chain ID:
+    
+    virtual_chain_id: `640ed3`
+    Note: The virtual_chain_id MSB value should be > `06` in order to obtain a BASE58 encoded address with a leading non-zero value.
+    
+3. Calculate the account_id by calculating the RIPEMD160 hash of the SHA256 of the public key:
 
     SHA256 of the public key: `40784b5b15e6bb364263dbb598f262bc5c5b4c18a34806ca70be180c3d995e0d`
 
     RIPEMD160 of the SHA256: `c13052d8208230a58ab363708c08e78f1125f488`
 
-3. Prepend the address scheme version to the account ID:
+3. Prepend the network_id, address_scheme and Virtual Chain ID to the account_id:
 
-    Version + Account ID: `00c13052d8208230a58ab363708c08e78f1125f488`
+    network_id + address_scheme + virtual_chain_id + account_id: `1400640ed3c13052d8208230a58ab363708c08e78f1125f488`
 
 4. Calculate the CRC32 checksum of the result:
 
-    Raw public address: `00c13052d8208230a58ab363708c08e78f1125f48850f8658b`
-
+    Checksum: `61f04bfc`
+    Raw public address: `1400640ed3c13052d8208230a58ab363708c08e78f1125f48861f04bfc`
+  
 5. Encode the raw public address to Base58:
+    
+    Each of the fllowing address parts is encoded seperatly:
+    
+    a. network_id: `M` 
+    
+    b. address_scheme: `1` 
+    
+    c. virtual_chain_id + address_id + Checksum: `EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1` 
+    
+    Public address: `M1EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1`
 
-    Public address: `1JcVJcBXwqeVcC8T2nTpG2dT6xGzhdrHai`
 
 ### Algorithms
 
