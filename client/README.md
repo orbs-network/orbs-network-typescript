@@ -14,6 +14,65 @@ In order to implement some of the functionality, we have elected to use libgcryp
 
 Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`.
 
+## Address Scheme
+
+Addressing in the Orbs platform are based on a universal signature and addressing scheme. This method allows applications and users to use a range of addressing schemes side by side, specifying the type of the address next to the address itself.
+
+Every public address in Orbs platform has the form of {Network ID, Address Scheme, Address}. *Network ID* is a 1-byte field that determines that network type. *Address Scheme* is a 1-byte that determines the signature scheme and the address format.
+
+### Network ID Encoding
+
+| Value (hex) | Network  | Base58 encoding |
+| :---------: | :------: | :-------------: |
+| 14          | Main net | M               |
+| 1A          | Test net | T               |
+
+### Address Scheme Encoding
+
+| Value (hex) | Address Scheme | Base58 encoding |
+| :---------: | :------------- | :-------------: |
+| 00          | Rev1           | 1               |
+
+### Address Scheme: 0
+
+1. Start with a 32-byte Ed25519 public key:
+
+    Public key: `8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65`
+
+2. Set the 3-byte Virtual Chain ID:
+
+    Virtual Chain ID: `640ed3`
+
+    Note: The Virtual Chain ID MSB value should be > `06` in order to obtain a BASE58 encoded address with a leading non-zero value.
+
+3. Calculate the Account ID by calculating the RIPEMD160 hash of the SHA256 of the public key:
+
+    SHA256 of the public key: `40784b5b15e6bb364263dbb598f262bc5c5b4c18a34806ca70be180c3d995e0d`
+
+    RIPEMD160 of the SHA256: `c13052d8208230a58ab363708c08e78f1125f488`
+
+4. Prepend the Network ID, Address Scheme and Virtual Chain ID to the Account ID:
+
+    Network ID + Address Scheme + Virtual Chain ID + Account ID: `1400640ed3c13052d8208230a58ab363708c08e78f1125f488`
+
+5. Calculate the CRC32 checksum of the result:
+
+    Checksum: `61f04bfc`
+
+    Raw public address: `1400640ed3c13052d8208230a58ab363708c08e78f1125f48861f04bfc`
+
+6. Encode the raw public address to Base58:
+
+    Each of the fllowing address parts is encoded seperatly:
+
+    a. Network ID: `M`
+
+    b. Address Scheme: `1`
+
+    c. Virtual Chain ID + Account ID + Checksum: `EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1`
+
+    Public address: `M1EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1`
+
 ### Algorithms
 
 #### Hashing
@@ -90,8 +149,9 @@ DEBUG=1 ./configure.sh
 ```
 
 ## Libgcrypt
+
 Libgcrypt is a general purpose cryptographic library originally based on code from GnuPG. It provides
-functions for all cryptograhic building blocks: symmetric cipher algorithms (AES, Arcfour, Blowfish, Camellia,
+functions for all cryptographic building blocks: symmetric cipher algorithms (AES, Arcfour, Blowfish, Camellia,
 CAST5, ChaCha20 DES, GOST28147, Salsa20, SEED, Serpent, Twofish) and modes (ECB,CFB,CBC,OFB,CTR,CCM,GCM,OCB,
 POLY1305, AESWRAP), hash algorithms (MD2, MD4, MD5, GOST R 34.11, RIPE-MD160, SHA-1, SHA2-224, SHA2-256,
 SHA2-384, SHA2-512, SHA3-224, SHA3-256, SHA3-384, SHA3-512, SHAKE-128, SHAKE-256, TIGER-192, Whirlpool), MACs

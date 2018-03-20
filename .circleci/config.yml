@@ -14,6 +14,8 @@ jobs:
   build-sdk:
     machine: true
     steps:
+      - run: sudo apt-get update && sudo apt-get install rng-tools
+      - run: sudo rngd -o /dev/random -r /dev/urandom
       - checkout
       - run: cd client/crypto-sdk && ./docker-build.sh
 
