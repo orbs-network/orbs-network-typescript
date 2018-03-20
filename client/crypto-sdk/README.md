@@ -43,7 +43,7 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
     Virtual Chain ID: `640ed3`
 
-    Note: The Virtual Chain ID MSB value should be > `06` in order to obtain a BASE58 encoded address with a leading non-zero value.
+    Note: The Virtual Chain ID MSB value should be > `07` in order to obtain a BASE58 encoded address with a leading non-zero value.
 
 3. Calculate the Account ID by calculating the RIPEMD160 hash of the SHA256 of the public key:
 
