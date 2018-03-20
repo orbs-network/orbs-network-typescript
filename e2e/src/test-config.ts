@@ -9,7 +9,7 @@ interface TestConfig {
   testEnvironment?: TestEnvironment;
   publicApiClient?: PublicApiClient;
   subscriptionKey?: string;
-  perpetualTest: {
+  stressTest: {
     accounts: number
   };
 }
@@ -17,8 +17,8 @@ interface TestConfig {
 export function loadDefaultTestConfig(): TestConfig {
   const config: TestConfig = {
     subscriptionKey: "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe",
-    perpetualTest: {
-      accounts: Number(nconf.get("E2E_ACCOUNTS_TOTAL")) || 2
+    stressTest: {
+      accounts: Number(nconf.get("E2E_ACCOUNTS_TOTAL")) || 4
     }
   };
 

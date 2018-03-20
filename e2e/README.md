@@ -17,7 +17,7 @@ The test case is a transfer of 1 bar token from one account to another.
 ### The Test Environment
 
 * `Orbs nodes` - run as separated dockers and connected through an `orbs-network` docker network.
-* `Ganache server` - simulates an Ethereum node. Used for supporting the subscription validation of processed transactions. This simulation node is loaded with a stub Orbs Subscription contract that is pre-registered with a single Orbs Subscription Key, which all transactions are signed with. 
+* `Ganache server` - simulates an Ethereum node. Used for supporting the subscription validation of processed transactions. This simulation node is loaded with a stub Orbs Subscription contract that is pre-registered with a single Orbs Subscription Key, which all transactions are signed with.
 
 The test script connects to a Public API Service of one of the nodes through a `public-network` docker network.
 
@@ -47,3 +47,9 @@ The following parameters (passed as environment variables) are supported:
 - CONNECT_FROM_HOST - Set to *true* if you run it directly from the docker host. Otherwise, if run from inside a docker, set to *false*.
 - E2E_NO_DEPLOY - Set to *true* if you wish to run the e2e test on a pre-deployed environment.
 - E2E_PUBLIC_API_ENDPOINT - The address of the node Public API to connect to (Ignored if E2E_NO_DEPLOY = false).
+
+### Stress test
+
+Can run with `yarn run stress-test` or `TEST=stress-test ./run-from-host.sh`. Takes a parameter `E2E_ACCOUNTS_TOTAL` (default: `10`).
+
+This number of accounts will be initialized and then transfers between them will be initiated in certain order: from N to N+1 and in case of N+1 to 0.

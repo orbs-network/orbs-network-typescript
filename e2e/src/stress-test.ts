@@ -47,12 +47,12 @@ describe("test multiple transactions", async function () {
     const seed = new Date().getTime();
     console.log(`Seed: ${seed}`);
 
-    const accounts = await createAccounts({ seed: seed, numberOfAccounts: testConfig.perpetualTest.accounts * 2 });
+    const accounts = await createAccounts({ seed: seed, numberOfAccounts: testConfig.stressTest.accounts });
 
     await Promise.all(accounts.map((account, num) => account.should.have.bars(10 + num)));
 
     await Promise.all(accounts.map((account, num) => {
-      const isLast = num + 1 === testConfig.perpetualTest.accounts * 2;
+      const isLast = num + 1 === testConfig.stressTest.accounts;
       const recipient = accounts[isLast ? 0 : num + 1];
       const amount = num + 1;
 
@@ -64,7 +64,7 @@ describe("test multiple transactions", async function () {
     await Promise.all(accounts.map(async (account, num) => {
       console.log(`Account ${account.address} has balance ${await account.getBalance()}`);
       const isFirst = num === 0;
-      const amount = 10 + (isFirst ? testConfig.perpetualTest.accounts * 2 : num) - 1;
+      const amount = 10 + (isFirst ? testConfig.stressTest.accounts : num) - 1;
 
       return account.should.to.have.bars(amount);
     }));
