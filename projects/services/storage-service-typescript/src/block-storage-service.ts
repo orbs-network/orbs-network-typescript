@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import * as path from "path";
 
-import { logger, types } from "orbs-core-library";
+import { logger, types, JsonBuffer } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 
@@ -45,7 +45,7 @@ export default class BlockStorageService extends Service {
 
   @Service.RPCMethod
   public async hasNewBlocks(rpc: types.HasNewBlocksContext) {
-    return this.blockStorage.hasNewBlocks(rpc.req.blockId);
+    return this.blockStorage.hasNewBlocks(rpc.req.blockHeight);
   }
 
   @Service.RPCMethod
@@ -62,13 +62,13 @@ export default class BlockStorageService extends Service {
   }
 
   @Service.RPCMethod
-  public async getLastBlockId(rpc: types.GetLastBlockIdContext) {
-    rpc.res = { blockId: await this.blockStorage.getLastBlockId() };
+  public async getLastBlock(rpc: types.GetLastBlockContext) {
+    rpc.res = { block: await this.blockStorage.getLastBlock() };
   }
 
   @Service.RPCMethod
   public async getBlocks(rpc: types.GetBlocksContext) {
-    rpc.res = { blocks: await this.blockStorage.getBlocks(rpc.req.lastBlockId) };
+    rpc.res = { blocks: await this.blockStorage.getBlocks(rpc.req.lastBlockHeight) };
   }
 
   async pollForNewBlocks() {
@@ -77,14 +77,14 @@ export default class BlockStorageService extends Service {
 
     await this.sync.appendBlocks();
 
-    const blockId = await this.blockStorage.getLastBlockId();
+    const block = await this.blockStorage.getLastBlock();
 
-    logger.debug(`Block storage ${this.config.nodeName} is polling for new blocks`, { lastBlockId: blockId });
+    logger.debug(`Block storage ${this.config.nodeName} is polling for new blocks`, { lastBlockHeight: block.header.height });
 
     this.gossip.broadcastMessage({
       broadcastGroup: "blockStorage",
       messageType: "HasNewBlocksMessage",
-      buffer: new Buffer(JSON.stringify({ blockId })),
+      buffer: new Buffer(JSON.stringify({ blockHeight: block.header.height })),
       immediate: true
     });
   }
@@ -92,7 +92,7 @@ export default class BlockStorageService extends Service {
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const { messageType, fromAddress } = rpc.req;
-    const payload = JSON.parse(rpc.req.buffer.toString("utf8"));
+    const payload = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
 
     switch (messageType) {
       case "HasNewBlocksMessage":
@@ -116,7 +116,7 @@ export default class BlockStorageService extends Service {
       return;
     }
 
-    const hasNewBlocks = await this.blockStorage.hasNewBlocks(payload.blockId);
+    const hasNewBlocks = await this.blockStorage.hasNewBlocks(payload.blockHeight);
 
     this.gossip.unicastMessage({
       recipient: fromAddress,
@@ -142,13 +142,13 @@ export default class BlockStorageService extends Service {
       this.sync.on(fromAddress);
       logger.info(`Block storage ${this.config.nodeName} starts to sync with node`, { peer: fromAddress });
 
-      const blockId = await this.blockStorage.getLastBlockId();
+      const blockHeight = (await this.blockStorage.getLastBlock()).header.height;
 
       this.gossip.unicastMessage({
         recipient: this.sync.getNode(),
         broadcastGroup: "blockStorage",
         messageType: "SendNewBlocks",
-        buffer: new Buffer(JSON.stringify({ blockId })),
+        buffer: new Buffer(JSON.stringify({ blockHeight })),
         immediate: true,
       });
     }
@@ -157,7 +157,7 @@ export default class BlockStorageService extends Service {
   async onSendNewBlocks(fromAddress: string, payload: any) {
     logger.info(`Block storage ${this.config.nodeName} received request for new blocks from ${fromAddress}`);
 
-    const blocks = await this.blockStorage.getBlocks(payload.blockId);
+    const blocks = await this.blockStorage.getBlocks(payload.blockHeight);
 
     blocks.forEach(async (block) => {
       this.gossip.unicastMessage({

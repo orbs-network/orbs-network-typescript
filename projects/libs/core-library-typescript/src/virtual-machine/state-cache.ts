@@ -1,7 +1,8 @@
 import { cloneDeep } from "lodash";
+import { types } from "..";
 
 export interface StateCacheKey {
-  contractAddress: string;
+  contractAddress: types.ContractAddress;
   key: string;
 }
 
@@ -38,11 +39,12 @@ export class StateCache {
 
   private encodeMapKey(key: StateCacheKey) {
     // TODO: not sure this approach guarantees uniqueness of the key. insecure!
-    return [key.contractAddress, key.key].join("|");
+    return [key.contractAddress.address, key.key].join("|");
   }
 
   private decodeMapKey(encodedKey: string): StateCacheKey {
-    const [contractAddress, key] = encodedKey.split("|");
+    const [address, key] = encodedKey.split("|");
+    const contractAddress: types.ContractAddress = { address };
     return { contractAddress, key };
   }
 

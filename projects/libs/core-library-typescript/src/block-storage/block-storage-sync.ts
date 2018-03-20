@@ -28,7 +28,7 @@ export class BlockStorageSync {
     const data: Array<types.Block> = [];
     copyArray(this.queue, data);
 
-    const sortedBlocks = sortBy(data, (block) => block.header.id);
+    const sortedBlocks = sortBy(data, (block) => block.header.height);
 
     for (const block of sortedBlocks) {
       await this.blockStorage.addBlock(block);

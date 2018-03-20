@@ -16,6 +16,7 @@ using namespace Orbs;
 
 const uint8_t Address::VERSION = 0;
 const uint32_t Address::PUBLIC_KEY_SIZE = 32;
+const uint32_t Address::VERSION_FIELD_SIZE = 1;
 const uint32_t Address::ACCOUNT_ID_SIZE = 20;
 const uint32_t Address::CHECKSUM_SIZE = 4;
 const uint32_t Address::ADDRESS_LENGTH = 34;
@@ -72,7 +73,7 @@ const vector<uint8_t> &Address::GetChecksum() const {
 }
 
 const string Address::ToString() const {
-    // Concatenate the version, the accound ID, and the checksum together.
+    // Concatenate the version, the account ID, and the checksum together.
     vector<uint8_t> rawAddress;
     rawAddress.push_back(version_);
     rawAddress.insert(rawAddress.end(), accountId_.cbegin(), accountId_.cend());
@@ -95,7 +96,7 @@ bool Address::IsValid(const string &address) {
     }
 
     // Version (1) + Account ID (20) + Checksum (4)
-    if (decoded.size() != 1 + Address::ACCOUNT_ID_SIZE + Address::CHECKSUM_SIZE) {
+    if (decoded.size() != VERSION_FIELD_SIZE + Address::ACCOUNT_ID_SIZE + Address::CHECKSUM_SIZE) {
         return false;
     }
 
@@ -106,8 +107,8 @@ bool Address::IsValid(const string &address) {
     }
 
     // Check the checksum of the version + account ID:
-    vector<uint8_t> checksum(decoded.cend() - Address::CHECKSUM_SIZE, decoded.cend());
     vector<uint8_t> data(decoded.cbegin(), decoded.cend() - Address::CHECKSUM_SIZE);
+    vector<uint8_t> checksum(decoded.cend() - Address::CHECKSUM_SIZE, decoded.cend());
     vector<uint8_t> dataChecksum;
     CRC32::Hash(data, dataChecksum);
     if (checksum != dataChecksum) {

@@ -10,6 +10,7 @@ class Address {
 public:
     static const uint8_t VERSION;
     static const uint32_t PUBLIC_KEY_SIZE;
+    static const uint32_t VERSION_FIELD_SIZE;
     static const uint32_t ACCOUNT_ID_SIZE;
     static const uint32_t CHECKSUM_SIZE;
     static const uint32_t ADDRESS_LENGTH;
