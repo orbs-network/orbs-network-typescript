@@ -45,14 +45,15 @@ async function aTextMessageAccount() {
 
 describe("simple token transfer", async function () {
   this.timeout(800000);
-  before(async function () {
+
+  before(async () => {
     if (testConfig.testEnvironment) {
       console.log("starting test environment...");
       await testConfig.testEnvironment.start();
     }
   });
 
-  it("transfers 1 bar token from one account to another", async function () {
+  it("transfers 1 bar token from one account to another", async () => {
     console.log("initing account1 with 2 bars");
     const account1 = await aFooBarAccountWith({ amountOfBars: 2 });
     await account1.should.have.bars(2);
@@ -68,7 +69,16 @@ describe("simple token transfer", async function () {
 });
 
 describe("simple message", async function () {
-  it("sends text messages between accounts", async function () {
+  this.timeout(800000);
+
+  before(async () => {
+    if (testConfig.testEnvironment) {
+      console.log("starting test environment...");
+      await testConfig.testEnvironment.start();
+    }
+  });
+
+  it("sends text messages between accounts", async () => {
     console.log("Initiating account for Alice");
     const alice = await aTextMessageAccount();
 
@@ -94,7 +104,7 @@ describe("simple message", async function () {
     expect(aliceMessages[0].message).to.equal("is anybody in here?");
   });
 
-  after(async function () {
+  after(async () => {
     if (testConfig.testEnvironment) {
       await testConfig.testEnvironment.stop();
     }
