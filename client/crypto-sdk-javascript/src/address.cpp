@@ -108,7 +108,7 @@ napi_value Address::GetVersion(napi_env env, napi_callback_info info) {
     assert(status == napi_ok);
 
     napi_value version;
-    status = napi_create_double(env, obj->address_.GetVersion(), &version);
+    status = napi_create_uint32(env, obj->address_.GetVersion(), &version);
     assert(status == napi_ok);
 
     return version;
