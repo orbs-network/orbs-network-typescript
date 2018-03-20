@@ -102,7 +102,7 @@ const vector<uint8_t> Base58::Decode(const string &data) {
         // Decode base58 character
         const size_t ch = BASE58_CHARACTERS.find_first_of(c);
         if (ch == string::npos) {
-            throw runtime_error("Invalid character: " + to_string(c));
+            throw logic_error("Invalid character: " + to_string(c));
         }
 
         // Apply "b256 = b256 * 58 + ch".
@@ -127,7 +127,7 @@ const vector<uint8_t> Base58::Decode(const string &data) {
 
     // Copy result into output vector.
     vector<uint8_t> res;
-    res.reserve(zeroes + (b256.end() - it));
+    res.reserve(zeroes + distance(it, b256.end()));
     res.assign(zeroes, 0x00);
     while (it != b256.end()) {
         res.push_back(*(it++));
