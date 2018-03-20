@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "orbs-crypto-sdk",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "https://github.com/orbs-network/orbs-network.git",
   "author": "Orbs Team",
   "license": "MIT",
