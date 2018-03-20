@@ -12,5 +12,8 @@ export interface Address {
 }
 
 export const Address: {
+  readonly MAIN_NETWORK_ID: string;
+  readonly TEST_NETWORK_ID: string;
+
   new(publicKey: string, virtualChainId: string, networkId: string): Address
 } = CryptoSDK.Address;
