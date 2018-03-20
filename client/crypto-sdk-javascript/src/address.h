@@ -21,6 +21,9 @@ private:
   static napi_value GetVirtualChainId(napi_env env, napi_callback_info info);
   static napi_value GetAccountId(napi_env env, napi_callback_info info);
   static napi_value GetChecksum(napi_env env, napi_callback_info info);
+
+  static napi_value GetMainNetworkId(napi_env env, napi_callback_info info);
+  static napi_value GetTestNetworkId(napi_env env, napi_callback_info info);
   static napi_value ToString(napi_env env, napi_callback_info info);
 
 private:
