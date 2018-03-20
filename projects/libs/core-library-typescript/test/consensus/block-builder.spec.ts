@@ -1,76 +1,109 @@
 import { types } from "../../src/common-library/types";
 import * as chai from "chai";
 import { expect } from "chai";
-import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
+import { BlockUtils } from "../../src/common-library";
+import * as sinon from "sinon";
 
-chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
-const transactionPool = stubInterface<types.TransactionPoolClient>();
-const virtualMachine = stubInterface<types.VirtualMachineClient>();
 
-function randomUInt() {
-  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+function aGenesisBlock(): types.Block {
+  return BlockUtils.buildBlock({
+    header: {
+      version: 0,
+      prevBlockHash: new Buffer(""),
+      height: 0
+    },
+    body: {
+      transactions: [],
+      stateDiff: []
+    }
+  });
 }
 
-function aRandomTransaction(): types.Transaction {
-    return {
+function aDummyTransaction(addressId): types.Transaction {
+  const senderAddress: types.UniversalAddress = {
+    id: new Buffer(addressId),
+    scheme: 0,
+    checksum: 0,
+    networkId: 0
+  };
+
+  return {
+      header: {
         version: 0,
-        sender: randomUInt().toString(16),
-        contractAddress:  randomUInt().toString(16),
+        sender: senderAddress,
+        sequenceNumber: 0
+      },
+      body: {
+        contractAddress: {address: "dummyContract"},
         payload: Math.random().toString(),
-        signature: ""
-    };
+      }
+  };
 }
 
 function aDummyTransactionSet(numberOfTransactions = 3) {
   const transactions = [];
-  for (let i = 0; i < numberOfTransactions; i++); {
-    transactions.push(aRandomTransaction);
+  for (let i = 0; i < numberOfTransactions; i++) {
+    transactions.push(aDummyTransaction(`address${i}`));
   }
 
   return transactions;
 }
 
-function aRandomStateDiff(): types.ModifiedStateKey[] {
+function aDummyStateDiff() {
   return [
     {
-      contractAddress: randomUInt().toString(16),
-      key: `key-${randomUInt()}`,
-      value: randomUInt().toString(),
+      contractAddress: {address: "dummyContract"},
+      key: "dummyKey",
+      value: "dummyValue",
     }
   ];
 }
 
-const dummyTransactionSet = aDummyTransactionSet();
-
-const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
-transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-
-const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
-  processedTransactions: dummyTransactionSet,
-  stateDiff: aRandomStateDiff()
-};
-virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
-
-const blockBuilder = new BlockBuilder({ virtualMachine, transactionPool });
 
 describe("a block", () => {
-  it("is built with the transactions on transaction pool", async () => {
-    const block = await blockBuilder.buildNextBlock(1);
+  let blockBuilder: BlockBuilder;
+  const newBlockBuildCallback = sinon.spy();
+  const dummyTransactionSet = aDummyTransactionSet();
+  const dummyStateDiff = aDummyStateDiff();
 
-    expect(block.transactions).to.eql(dummyTransactionSet);
+  before(async () => {
 
+    const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
+    const transactionPool = stubInterface<types.TransactionPoolClient>();
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+
+    const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
+      processedTransactions: dummyTransactionSet,
+      stateDiff: dummyStateDiff
+    };
+    const virtualMachine = stubInterface<types.VirtualMachineClient>();
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
+
+    const blockStorage = stubInterface<types.BlockStorageClient>();
+    blockStorage.getLastBlock.returns({block: aGenesisBlock()});
+
+    blockBuilder = new BlockBuilder({ virtualMachine, transactionPool, blockStorage, newBlockBuildCallback, pollIntervalMs: 10});
+
+    await blockBuilder.initialize();
   });
 
-  it("is built with the transaction on transaction pool", async () => {
-    const block = await blockBuilder.buildNextBlock(2);
+  it("is built from pending transactions shortly after started", (done) => {
+    blockBuilder.start();
 
-    expect(block.transactions).to.eql(dummyTransactionSet);
+    setTimeout(() => {
+      expect(newBlockBuildCallback).to.have.been.calledWith(sinon.match.has("body",
+      sinon.match.has("transactions", dummyTransactionSet).and(sinon.match.has("stateDiff", dummyStateDiff))));
+      done();
+      blockBuilder.stop();
+    }, 100);
+  });
 
-    expect(block.stateDiff).to.eql(processTransactionSetOutput.stateDiff);
+  after(async () => {
+    blockBuilder.shutdown();
   });
 });

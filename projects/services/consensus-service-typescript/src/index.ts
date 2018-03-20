@@ -17,6 +17,7 @@ logger.configure({
   console: true
 });
 
+
 const nodeTopology = topology();
 
 consensusServer(nodeTopology)

@@ -90,4 +90,3 @@ TEST(Hash, computes_string_SHA256_of_string) {
     SHA256::Hash("אורבס", res);
     EXPECT_STREQ(res.c_str(), "b484a030e6ea715b5adb74301a7f4674d144af61f08f776c69cf16c28a86b34b");
 }
-

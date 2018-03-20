@@ -7,16 +7,7 @@ service Consensus {
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }
 
-
 message ConsensusMessage {
   Block block = 1;
 }
 
-message SendTransactionInput {
-  Transaction transaction = 1;
-  TransactionAppendix transactionAppendix = 2;
-}
-
-message SendTransactionOutput {
-  // empty
-}

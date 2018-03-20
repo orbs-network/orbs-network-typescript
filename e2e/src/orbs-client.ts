@@ -1,6 +1,6 @@
 import { delay } from "bluebird";
 
-import { PublicApiClient, Transaction } from "orbs-interfaces";
+import { PublicApiClient, Transaction, UniversalAddress } from "orbs-interfaces";
 
 type OrbsHardCodedContractMethodArgs = [string | number] | any[];
 
@@ -46,9 +46,7 @@ export class OrbsClientSession {
 
     const res = await this.orbsClient.sendTransaction({
       transaction: signedTransaction,
-      transactionAppendix: {
-        version: 0,
-        prefetchAddresses: [],
+      transactionSubscriptionAppendix: {
         subscriptionKey: this.subscriptionKey
       }
     });
@@ -57,9 +55,9 @@ export class OrbsClientSession {
   }
 
   async call(contractAddress: string, payload: string) {
-    const { resultJson } = await this.orbsClient.call({
+    const { resultJson } = await this.orbsClient.callContract({
       sender: this.getAddress(),
-      contractAddress: contractAddress,
+      contractAddress: {address: contractAddress},
       payload: payload
     });
     return JSON.parse(resultJson);
@@ -67,15 +65,19 @@ export class OrbsClientSession {
 
   public generateTransaction(contractAddress: string, payload: string): Transaction {
     return {
-      version: 0,
-      sender: this.senderAddress,
-      contractAddress: contractAddress,
-      payload: payload,
-      signature: "" // TODO: add a signature once implement in the network-side
+      header: {
+        version: 0,
+        sender: this.getAddress(),
+        sequenceNumber: 0
+      },
+      body: {
+        contractAddress: {address: contractAddress},
+        payload: payload
+      },
     };
   }
 
-  public getAddress() {
-    return this.senderAddress;
+  public getAddress(): UniversalAddress {
+    return {id: new Buffer(this.senderAddress), scheme: 0, networkId: 0, checksum: 0};
   }
 }
