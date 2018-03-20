@@ -2,22 +2,14 @@ import { tmpdir } from "os";
 import * as path from "path";
 import * as fs from "fs-extra";
 
-import { types } from "orbs-core-library";
+import { types, BlockUtils } from "orbs-core-library";
 import { generateServiceIPCClient } from "./service-ipc-client";
 
 import FakeGossipClient from "./fake-gossip-client";
 import BlockStorageService from "../src/block-storage-service";
 
-function generateBlock(prevBlockId: number): types.Block {
-  return {
-    header: {
-      version: 0,
-      id: prevBlockId + 1,
-      prevBlockId: prevBlockId
-    },
-    transactions: [{ version: 0, contractAddress: "0", sender: "", signature: "", payload: "{}" }],
-    stateDiff: []
-  };
+function generateEmptyBlock(prevBlock: types.Block): types.Block {
+  return BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, prevBlock);
 }
 
 export class NodeLoader {
@@ -47,9 +39,13 @@ export class NodeLoader {
     this.fakeGossipClient.addNode(node.name, { blockStorage: node.getBlockStorageClient() });
   }
 
-  async loadWithBlocks(blocks: types.Block[]) {
-    for (const block of blocks) {
-      const client = this.getBlockStorageClient();
+  async loadWithNullBlocks(numOfBlocks: number) {
+    const client = this.getBlockStorageClient();
+    let { block } = await client.getLastBlock({});
+    console.log(block);
+
+    for (let i = 0; i < numOfBlocks; i++) {
+      block = generateEmptyBlock(block);
       await client.addBlock({ block });
     }
   }
@@ -72,9 +68,9 @@ export class NodeLoader {
     });
   }
 
-  async getLastBlockId() {
-    const res = await this.getBlockStorageClient().getLastBlockId({});
-    return res.blockId;
+  async getLastBlockHeight() {
+    const res = await this.getBlockStorageClient().getLastBlock({});
+    return res.block.header.height;
   }
 }
 
@@ -83,17 +79,12 @@ export async function initNodesWithBlocks(numOfBlocksPerNode: number[]): Promise
 
   const nodes: NodeLoader[] = [];
 
-  const blocks = [];
-
-  for (let i = 0; i < Math.max(...numOfBlocksPerNode); i++) {
-    blocks.push(generateBlock(i));
-  }
 
   // Instantiate node.
   for (let nodeIndex = 0; nodeIndex < numOfNodes; nodeIndex++) {
     const node = new NodeLoader(`node${nodeIndex}`);
     await node.initialize();
-    await node.loadWithBlocks(blocks.slice(0, numOfBlocksPerNode[nodeIndex]));
+    await node.loadWithNullBlocks(numOfBlocksPerNode[nodeIndex]);
     nodes.push(node);
   }
 

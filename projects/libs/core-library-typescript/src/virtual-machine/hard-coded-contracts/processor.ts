@@ -9,9 +9,9 @@ import {
 import BaseSmartContract from "./base-smart-contact";
 
 export interface CallRequest {
-  sender: string;
+  sender: types.UniversalAddress;
   payload: string;
-  contractAddress: string;
+  contractAddress: types.ContractAddress;
 }
 
 export default class HardCodedSmartContractProcessor {
@@ -53,11 +53,11 @@ export default class HardCodedSmartContractProcessor {
   }
 
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
-    const Contract = this.contractAddresses.get(request.contractAddress);
+    const Contract = this.contractAddresses.get(request.contractAddress.address);
     if (Contract == undefined) {
       throw new Error(`contract with address ${request.contractAddress} not registered`);
     }
-    const contract = new Contract.default(request.sender, stateAdapter);
+    const contract = new Contract.default(request.sender.id, stateAdapter);
 
     const { method, args } = JSON.parse(request.payload);
 

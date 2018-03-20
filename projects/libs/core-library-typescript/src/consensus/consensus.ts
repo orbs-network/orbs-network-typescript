@@ -4,7 +4,6 @@ import { types } from "../common-library/types";
 import { Gossip } from "../gossip";
 
 import { RaftConsensusConfig, RaftConsensus } from "./raft-consensus";
-import BlockBuilder from "./block-builder";
 
 export class Consensus {
   private raftConsensus: RaftConsensus;
@@ -13,8 +12,7 @@ export class Consensus {
     config: RaftConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
-    this.raftConsensus = new RaftConsensus(
-      config, gossip, blockStorage, transactionPool, new BlockBuilder({ virtualMachine, transactionPool }));
+    this.raftConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
   }
 
   async initialize() {

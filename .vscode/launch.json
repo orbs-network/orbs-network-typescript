@@ -1,0 +1,80 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "e2e node1",
+            "port": 9229,
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/orbs",
+            "protocol": "inspector",
+            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "e2e node2",
+            "port": 9230,
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/orbs",
+            "protocol": "inspector",
+            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "e2e node3",
+            "port": 9231,
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/orbs",
+            "protocol": "inspector",
+            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "e2e node4",
+            "port": 9232,
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/orbs",
+            "protocol": "inspector",
+            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "e2e node5",
+            "port": 9233,
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/orbs",
+            "protocol": "inspector",
+            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "e2e node6",
+            "port": 9234,
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/orbs",
+            "protocol": "inspector",
+            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "E2E All Nodes",
+            "configurations": ["e2e node1", "e2e node2", "e2e node3", "e2e node4", "e2e node5", "e2e node6"]
+        }
+    ]
+}
