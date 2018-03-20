@@ -81,6 +81,13 @@
             "outFiles": [
                 "${workspaceFolder}/projects/**/*.js"
             ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "crypto-sdk tests",
+            "program": "${workspaceRoot}/client/crypto-sdk/build/test/crypto-test",
+            "cwd": "${workspaceRoot}/"
         }
     ],
     "compounds": [
