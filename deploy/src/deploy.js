@@ -46,30 +46,30 @@ const CF_STACK_STATUS = [
     "CREATE_COMPLETE"
 ];
 
-const getStacks = (cloudFormation) => new Promise((resolve, reject) => {
+const getStacks = (cloudFormation, region) => new Promise((resolve, reject) => {
     cloudFormation.listStacks({ StackStatusFilter: CF_STACK_STATUS }, (err, data) => {
         if (err) return reject(err);
 
         const stacks = data.StackSummaries;
 
-        console.log(`Found ${stacks.length} stack${stacks.length > 1 ? "s" : ""}: ${_.map(stacks, "StackName").join(", ")}`);
+        console.log(`Found ${stacks.length} stack${stacks.length > 1 ? "s" : ""} in ${region}: ${_.map(stacks, "StackName").join(", ")}`);
         resolve(stacks);
     });
 });
 
 // confition is a function that returns true or false
-const waitForStacks = (cloudFormation, condition) => new Promise((resolve, reject) => {
+const waitForStacks = (cloudFormation, region, condition) => new Promise((resolve, reject) => {
     const start = new Date().getTime();
 
     const interval = setInterval(() => {
-        console.log("Waiting for CloudFormation to meet the condition...");
+        console.log(`Waiting for CloudFormation to meet the condition in ${region}...`);
 
         // Reject after 5 minutes
         if ((new Date().getTime() - start) / 1000 > 60 * 5) {
             reject("Timed out");
         }
 
-        getStacks(cloudFormation).then(stacks => {
+        getStacks(cloudFormation, region).then(stacks => {
             if (condition(stacks)) {
                 clearInterval(interval);
                 resolve();
@@ -127,7 +127,9 @@ const removeStack = (cloudFormation, stackName) => new Promise((resolve, reject)
     });
 });
 
-const main = (options) => {
+const execute = (options) => {
+    console.log(`Deploying to ${options.region}`);
+
     const cloudFormation = new AWS.CloudFormation({ region: options.region });
 
     const keyName = `orbs-network-${options.NODE_ENV}-key`;
@@ -143,7 +145,7 @@ const main = (options) => {
     const basicInfrastructureStackName = `basic-infrastructure-${options.network}`;
 
     if (options.createBasicInfrastructure) {
-        console.log(`Creating basic infrastructure...`);
+        console.log(`Creating basic infrastructure in ${options.region}...`);
 
         const basicInfrastructureParams = [{
             "ParameterKey": "NodeEnv",
@@ -166,7 +168,7 @@ const main = (options) => {
         });
     }
 
-    waitForStacks(cloudFormation, (stacks) => {
+    return waitForStacks(cloudFormation, options.region, (stacks) => {
         return _.isObject(_.find(stacks, (s) => s.StackName === basicInfrastructureStackName && s.StackStatus === "CREATE_COMPLETE"));
     }).then(() => {
         if (options.tagDockerImage) {
@@ -174,14 +176,14 @@ const main = (options) => {
         }
 
         if (options.pushDockerImage) {
-            console.log(`Pushing docker image...`);
+            console.log(`Pushing docker image to ${options.region}...`);
             pushDockerImage(options);
         }
 
         const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
 
         if (options.deployNode || options.updateNode || options.updateConfiguration) {
-            console.log(`Uploading bootstrap files...`);
+            console.log(`Uploading bootstrap files to ${options.region}...`);
             uploadBootstrap(options);
         }
 
@@ -191,19 +193,18 @@ const main = (options) => {
                 removeStack(cloudFormation, stackName);
             }
 
-            waitForStacks(cloudFormation, (stacks) => {
-                console.log(stacks);
+            return waitForStacks(cloudFormation, options.region, (stacks) => {
                 const nodeStack = _.find(stacks, {StackName: stackName});
 
                 const check = options.updateNode ? _.isObject : _.isEmpty;
                 return check(nodeStack);
             }).then(() => {
                 if (options.deployNode) {
-                    console.log(`Deploying new node...`);
+                    console.log(`Deploying new node to ${options.region}...`);
                 }
 
                 if (options.updateNode) {
-                    console.log(`Updating node...`);
+                    console.log(`Updating node in ${options.region}...`);
                 }
 
                 const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
@@ -228,34 +229,48 @@ const main = (options) => {
                 });
 
                 const action = options.updateNode ? "updateStack" : "createStack";
-                stackAction(action, cloudFormation, stackName, template, standaloneParams);
+                return stackAction(action, cloudFormation, stackName, template, standaloneParams).then(() => {
+                    const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
 
-                const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
-
-                console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
+                    console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
+                });
             });
         }
     });
 };
 
-main({
-    region: config.get("region"),
-    network: config.get("network"),
-    accoundId: config.get("account-id"),
-    NODE_ENV: config.get("network") == "mainnet" ? "production" : "staging",
-    dnsZone: config.get("dns-zone"),
-    sshPublicKey: config.get("ssh-public-key"),
-    createBasicInfrastructure: config.get("create-basic-infrastructure"),
-    bucketName: config.get("s3-bucket-name"),
-    pushDockerImage: config.get("push-docker-image"),
-    tagDockerImage: config.get("tag-docker-image"),
-    numOfNodes: config.get("nodes"),
-    dockerTag: config.get("docker-tag"),
-    deployNode: config.get("deploy-node"),
-    removeNode: config.get("remove-node"),
-    updateNode: config.get("update-node"),
-    updateConfiguration: config.get("update-configuration"),
-    parity: config.get("parity"),
-    sshCidr: config.get("ssh-cidr"),
-    peersCidr: config.get("peers-cidr")
-});
+const main = () => {
+    const nodeConfig = {
+        network: config.get("network"),
+        accoundId: config.get("account-id"),
+        NODE_ENV: config.get("network") == "mainnet" ? "production" : "staging",
+        dnsZone: config.get("dns-zone"),
+        sshPublicKey: config.get("ssh-public-key"),
+        createBasicInfrastructure: config.get("create-basic-infrastructure"),
+        bucketName: config.get("s3-bucket-name"),
+        pushDockerImage: config.get("push-docker-image"),
+        tagDockerImage: config.get("tag-docker-image"),
+        numOfNodes: config.get("nodes"),
+        dockerTag: config.get("docker-tag"),
+        deployNode: config.get("deploy-node"),
+        removeNode: config.get("remove-node"),
+        updateNode: config.get("update-node"),
+        updateConfiguration: config.get("update-configuration"),
+        parity: config.get("parity"),
+        sshCidr: config.get("ssh-cidr"),
+        peersCidr: config.get("peers-cidr")
+    };
+
+    const regions = config.get("region").split(',');
+    const step = config.get("step") || 3;
+
+    const someRegionsList = _.chunk(regions, step);
+
+    return _.reduce(someRegionsList, (prevDeployment, someRegions) => {
+        return prevDeployment.then(() => {
+            return Promise.all(someRegions.map(region => execute(_.extend(nodeConfig, { region }))));
+        });
+    }, Promise.resolve()).catch(() => process.exit(1));
+};
+
+main();
