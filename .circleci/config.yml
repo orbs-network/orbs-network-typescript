@@ -47,10 +47,10 @@ workflows:
             - build-server
           filters:
             branches:
-              only: master
+              only: bugfix/sidechain-connector
       - e2e-testnet:
           requires:
             - deploy
           filters:
             branches:
-              only: master
+              only: bugfix/sidechain-connector
