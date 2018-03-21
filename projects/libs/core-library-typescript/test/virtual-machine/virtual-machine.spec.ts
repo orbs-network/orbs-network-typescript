@@ -27,20 +27,24 @@ class StubStorageClient implements types.StateStorageClient {
   }
 }
 
-function aTransaction(builder: { from: string, to: string, amount: number }, contractAddress: string = "foobar"): types.Transaction {
-  return {
+function aTransactionEntry(builder: { from: string, to: string, amount: number }): types.TransactionEntry {
+  const transaction: types.Transaction = {
     header: {
       version: 1,
       sender: {id: new Buffer(builder.from), networkId: 0, scheme: 0, checksum: 0},
-      sequenceNumber: 0
+      timestamp: Date.now().toString()
     },
     body: {
-      contractAddress: {address: contractAddress},
+      contractAddress: {address: "foobar"},
       payload: JSON.stringify({
         method: "transfer",
         args: [builder.to, builder.amount]
       }),
     },
+  };
+  return {
+    transaction,
+    txHash: new Buffer("TBD") // TODO: calculate unique hash
   };
 }
 
@@ -74,11 +78,11 @@ describe("test virtual machine", () => {
   });
 
   it("#processTransactionSet - ordered transfers between 3 accounts", async () => {
-    const { processedTransactions, stateDiff, rejectedTransactions } = await virtualMachine.processTransactionSet({
+    const { transactionReceipts, stateDiff } = await virtualMachine.processTransactionSet({
       orderedTransactions: [    // account1=10
-        aTransaction({ from: "account1", to: "account2", amount: 9 }), // account1 = 1, account2 = 9
-        aTransaction({ from: "account2", to: "account1", amount: 2 }), // account1 = 3, account2 = 7
-        aTransaction({ from: "account1", to: "account3", amount: 2 })  // account1 = 1, account2 = 7, account3 = 2
+        aTransactionEntry({ from: "account1", to: "account2", amount: 9 }), // account1 = 1, account2 = 9
+        aTransactionEntry({ from: "account2", to: "account1", amount: 2 }), // account1 = 3, account2 = 7
+        aTransactionEntry({ from: "account1", to: "account3", amount: 2 })  // account1 = 1, account2 = 7, account3 = 2
       ]
     });
 
@@ -93,17 +97,20 @@ describe("test virtual machine", () => {
 
 
   it("#processTransactionSet - ordered transfers between 3 accounts (with a failed transaction in between)", async () => {
-    const { processedTransactions, stateDiff, rejectedTransactions } = await virtualMachine.processTransactionSet({
+    const { transactionReceipts, stateDiff } = await virtualMachine.processTransactionSet({
       orderedTransactions: [    // account1=10
-        aTransaction({ from: "account1", to: "account2", amount: 9 }), // account1 = 1, account2 = 9
-        aTransaction({ from: "account2", to: "account1", amount: 2 }), // account1 = 3, account2 = 7
-        aTransaction({ from: "account1", to: "account2", amount: 4 }), // account1 = 3, account2 = 7
-        aTransaction({ from: "account1", to: "account3", amount: 2 })  // account1 = 1, account2 = 7, account3 = 2
+        aTransactionEntry({ from: "account1", to: "account2", amount: 9 }), // account1 = 1, account2 = 9
+        aTransactionEntry({ from: "account2", to: "account1", amount: 2 }), // account1 = 3, account2 = 7
+        aTransactionEntry({ from: "account1", to: "account2", amount: 4 }), // account1 = 3, account2 = 7
+        aTransactionEntry({ from: "account1", to: "account3", amount: 2 })  // account1 = 1, account2 = 7, account3 = 2
       ]
     });
-
-    expect(rejectedTransactions).to
-      .have.lengthOf(1)
-      .and.eql([aTransaction({ from: "account1", to: "account2", amount: 4 })]);
+    stateDiff.should.have.lengthOf(3);
+    for (const item of stateDiff) {
+      item.should.have.property("contractAddress").eql({address: "foobar"});
+    }
+    stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
+    stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
+    stateDiff.find(item => item.key === "balances.account3").should.have.property("value", "2");
   });
 });

@@ -20,6 +20,7 @@ function aGenesisBlock(): types.Block {
     },
     body: {
       transactions: [],
+      transactionReceipts: [],
       stateDiff: []
     }
   });
@@ -37,7 +38,7 @@ function aDummyTransaction(addressId): types.Transaction {
       header: {
         version: 0,
         sender: senderAddress,
-        sequenceNumber: 0
+        timestamp: Date.now()
       },
       body: {
         contractAddress: {address: "dummyContract"},
@@ -46,16 +47,18 @@ function aDummyTransaction(addressId): types.Transaction {
   };
 }
 
-function aDummyTransactionSet(numberOfTransactions = 3) {
-  const transactions = [];
+function aDummyTransactionSet(numberOfTransactions = 3): types.Transaction[] {
+  const transactions: types.Transaction[] = [];
   for (let i = 0; i < numberOfTransactions; i++) {
-    transactions.push(aDummyTransaction(`address${i}`));
+    const transaction = aDummyTransaction(`address${i}`);
+    const txHash = new Buffer(`dummyHash${i}`);
+    transactions.push(transaction);
   }
 
   return transactions;
 }
 
-function aDummyStateDiff() {
+function aDummyStateDiff(): types.ModifiedStateKey[] {
   return [
     {
       contractAddress: {address: "dummyContract"},
@@ -65,93 +68,37 @@ function aDummyStateDiff() {
   ];
 }
 
-const dummyTransactionSet = aDummyTransactionSet();
-const dummyStateDiff = aDummyStateDiff();
-
-const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactions: dummyTransactionSet };
-
-const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
-  processedTransactions: dummyTransactionSet,
-  stateDiff: dummyStateDiff,
-  rejectedTransactions: []
-};
-
-const processTransactionSetOutputWithRejectedTransactions: types.ProcessTransactionSetOutput = {
-  processedTransactions: dummyTransactionSet.slice(0, 2),
-  stateDiff: dummyStateDiff.slice(0, 2),
-  rejectedTransactions: [dummyTransactionSet[2]]
-};
-
-const processTransactionSetOutputWithEmptyTransactions: types.ProcessTransactionSetOutput = {
-  processedTransactions: [],
-  stateDiff: [],
-  rejectedTransactions: dummyTransactionSet
-};
-
 
 describe("a block", () => {
-  let transactionPool: TransactionPoolClient;
-  let virtualMachine: VirtualMachineClient;
   let blockBuilder: BlockBuilder;
-  let blockStorage: BlockStorageClient;
   let newBlockBuildCallback;
 
-  beforeEach(async () => {
-    transactionPool = stubInterface<types.TransactionPoolClient>();
-    virtualMachine = stubInterface<types.VirtualMachineClient>();
+  const dummyTransactionSet = aDummyTransactionSet();
+  const dummyStateDiff = aDummyStateDiff();
+  const dummyTransactionReceipts = [{ txHash: new Buffer("dummyhash"), success: true }];
 
-    blockStorage = stubInterface<types.BlockStorageClient>();
+  beforeEach(async () => {
+    const blockStorage: BlockStorageClient = stubInterface<types.BlockStorageClient>();
     blockStorage.getLastBlock.returns({block: aGenesisBlock()});
 
     newBlockBuildCallback = sinon.spy();
 
+    const transactionEntries: types.TransactionEntry[] = dummyTransactionSet.map(transaction => ({ transaction, txHash: new Buffer("dummyHash")}));
+    const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactionEntries };
+    const transactionPool = stubInterface<types.TransactionPoolClient>();
+    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+
+
+    const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
+      stateDiff: dummyStateDiff,
+      transactionReceipts: dummyTransactionReceipts
+    };
+
+    const virtualMachine = stubInterface<types.VirtualMachineClient>();
+    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
+
     blockBuilder = new BlockBuilder({ virtualMachine, transactionPool, blockStorage, newBlockBuildCallback, pollIntervalMs: 10});
-  });
 
-  it("contains transactions from the pool", async () => {
-    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
-
-    const block = await blockBuilder.appendNextBlock();
-
-    expect(block.body.transactions).to.eql(dummyTransactionSet);
-    expect(transactionPool.clearPendingTransactions).not.to.be.called;
-  });
-
-  it("contains a state diff", async () => {
-    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
-
-    const block = await blockBuilder.appendNextBlock();
-
-    expect(block.body.transactions).to.eql(dummyTransactionSet);
-    expect(block.body.stateDiff).to.eql(processTransactionSetOutput.stateDiff);
-  });
-
-  it("does not contain rejected transactions", async () => {
-    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-    virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithRejectedTransactions);
-
-    const block = await blockBuilder.appendNextBlock();
-
-    expect(block.body.transactions).to.eql(dummyTransactionSet.slice(0, 2));
-    expect(block.body.stateDiff).to.eql(processTransactionSetOutputWithRejectedTransactions.stateDiff.slice(0, 2));
-  });
-
-  it("calls transaction pool to clear rejected transactions from the pool", async () => {
-    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-    virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithRejectedTransactions);
-
-    const block = await blockBuilder.appendNextBlock();
-
-    expect(transactionPool.clearPendingTransactions).to.be.calledOnce;
-  });
-
-  it("throws an error if none of the transactions passed", (done) => {
-    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-    virtualMachine.processTransactionSet.returns(processTransactionSetOutputWithEmptyTransactions);
-
-    expect(blockBuilder.buildBlockFromPendingTransactions(5)).to.eventually.be.rejectedWith("None of the transactions processed successfully. Not building a new block").and.notify(done);
   });
 
   describe("block builder polling", () => {
@@ -160,16 +107,20 @@ describe("a block", () => {
     });
 
     it("is built from pending transactions shortly after started", (done) => {
-      transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
-      virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
-
       blockBuilder.start();
 
       setTimeout(() => {
-        expect(newBlockBuildCallback).to.have.been.calledWith(sinon.match.has("body",
-        sinon.match.has("transactions", dummyTransactionSet).and(sinon.match.has("stateDiff", dummyStateDiff))));
-        done();
-        blockBuilder.stop();
+        try {
+          const bodyMatch = sinon.match.has("transactions", dummyTransactionSet)
+          .and(sinon.match.has("stateDiff", dummyStateDiff))
+          .and(sinon.match.has("transactionReceipts"));
+          expect(newBlockBuildCallback).to.have.been.calledWith(sinon.match.has("body", bodyMatch));
+          done();
+        } catch (e) {
+          done(e);
+        } finally {
+          blockBuilder.stop();
+        }
       }, 100);
     });
 

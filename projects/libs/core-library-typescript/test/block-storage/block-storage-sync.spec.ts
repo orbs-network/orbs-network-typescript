@@ -19,7 +19,7 @@ async function init(): Promise<{blockStorage: BlockStorage, blockStorageSync: Bl
 }
 
 function generateEmptyBlock(lastBlock: types.Block): types.Block {
-  return BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, lastBlock);
+  return BlockUtils.buildNextBlock({transactions: [], transactionReceipts: [], stateDiff: []}, lastBlock);
 }
 
 async function generateBlocks(blockStorage: BlockStorage, numOfBlocks: number) {

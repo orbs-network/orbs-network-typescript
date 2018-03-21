@@ -17,6 +17,7 @@ export class BlockStorage {
   public async generateGenesisBlock(): Promise<types.Block> {
     return BlockUtils.buildNextBlock({
       transactions: [],
+      transactionReceipts: [],
       stateDiff: []
     });
   }

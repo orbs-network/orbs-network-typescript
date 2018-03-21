@@ -15,9 +15,10 @@ async function initBlockStorage(): Promise<BlockStorage> {
   return blockStorage;
 }
 
-function generateValidNextBlock(lastBlock: types.Block): types.Block {
+function generateEmptyBlock(lastBlock: types.Block): types.Block {
   return BlockUtils.buildNextBlock({
     transactions: [],
+    transactionReceipts: [],
     stateDiff: []
   }, lastBlock);
 }
@@ -49,7 +50,7 @@ describe("Block storage", () => {
 
   describe("#getBlock", () => {
     it("returns a block", async () => {
-      const exampleBlock: types.Block = generateValidNextBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
 
       await blockStorage.addBlock(exampleBlock);
       const block = await blockStorage.getBlock(1);
@@ -59,7 +60,7 @@ describe("Block storage", () => {
 
   describe("#addBlock", () => {
     it("adds a new block", async () => {
-      const exampleBlock: types.Block = generateValidNextBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
 
       await blockStorage.addBlock(exampleBlock);
       const block = await blockStorage.getLastBlock();
@@ -68,7 +69,7 @@ describe("Block storage", () => {
     });
 
     xit("checks previous block hash", async () => {
-      const exampleBlock: types.Block = generateValidNextBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
       exampleBlock.header.prevBlockHash = Buffer.concat([exampleBlock.header.prevBlockHash, new Buffer("noise")]);
 
       const result = blockStorage.addBlock(exampleBlock);
@@ -77,7 +78,7 @@ describe("Block storage", () => {
     });
 
     it("checks block height", async () => {
-      const exampleBlock: types.Block = generateValidNextBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
       exampleBlock.header.height += 1;
 
       const result = blockStorage.addBlock(exampleBlock);
@@ -89,7 +90,7 @@ describe("Block storage", () => {
 
   describe("#hasNewBlocks", () => {
     it("returns appropriate values", async () => {
-      const exampleBlock: types.Block = generateValidNextBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
 
       await blockStorage.addBlock(exampleBlock);
 
@@ -100,7 +101,7 @@ describe("Block storage", () => {
 
   describe("#getBlocks", () => {
     it("returns array of blocks starting from blockNumber", async () => {
-      const exampleBlock: types.Block = generateValidNextBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
 
       await blockStorage.addBlock(exampleBlock);
 
