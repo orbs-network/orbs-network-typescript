@@ -31,6 +31,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: consensus
+      ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
     networks:
@@ -47,6 +48,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: public-api
+      VALIDATE_SUBSCRIPTION: 'true'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
     networks:
@@ -72,6 +74,22 @@ services:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
     working_dir: /opt/orbs/projects/services/virtual-machine-service-typescript/
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/virtual-machine.js
+    env_file:
+      - .env
+      - .env-secrets
+    environment:
+      SERVICE_NAME: virtual-machine
+    volumes:
+      - /opt/orbs/logs:/opt/orbs/logs
+    networks:
+      default:
+
+  sidechain-connector:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    working_dir: /opt/orbs/projects/services/sidechain-connector-service-typescript/
+    environment:
+      ETHEREUM_NODE_HTTP_ADDRESS: http://ethereum.services.orbs-test.com:8545
+    command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/sidechain-connector.js
     env_file:
       - .env
       - .env-secrets
