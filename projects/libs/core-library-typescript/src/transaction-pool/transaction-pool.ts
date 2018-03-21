@@ -44,6 +44,10 @@ export class TransactionPool {
     }
   }
 
+  public getPendingTransactionQueueSize(): number {
+    return this.pendingTransactions.size;
+  }
+
   private async storePendingTransaction(transaction: types.Transaction) {
     const txHash = this.calculateTransactionHash(transaction);
     if (this.pendingTransactions.has(txHash)) {

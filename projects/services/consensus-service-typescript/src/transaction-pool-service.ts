@@ -17,9 +17,16 @@ export default class TransactionPoolService extends Service {
   }
 
   async initialize() {
+    this.startPoolSizeMonitor();
+  }
+
+  async shutdown() {
+    clearInterval(this.pollInterval);
+  }
+
+  private startPoolSizeMonitor() {
     this.pollInterval = setInterval(() => {
-      const { transactions } = this.transactionPool.getAllPendingTransactions();
-      const size = transactions.length;
+      const size = this.transactionPool.getPendingTransactionQueueSize();
 
       if (size === 0) {
         logger.debug(`Transaction pool has no pending transactions`);
@@ -27,10 +34,6 @@ export default class TransactionPoolService extends Service {
         logger.debug(`Transaction pool has ${size} pending transactions`);
       }
     }, this.pollIntervalMs);
-  }
-
-  async shutdown() {
-    clearInterval(this.pollInterval);
   }
 
   @Service.RPCMethod
