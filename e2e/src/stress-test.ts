@@ -8,7 +8,6 @@ import * as _ from "lodash";
 
 const expect = chai.expect;
 
-chai.should();
 chai.use(ChaiBarsPlugin);
 
 const testConfig = loadDefaultTestConfig();
@@ -49,7 +48,7 @@ describe("test multiple transactions", async function () {
 
     const accounts = await createAccounts({ seed: seed, numberOfAccounts: testConfig.stressTest.accounts });
 
-    await Promise.all(accounts.map((account, num) => account.should.have.bars(10 + num)));
+    await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(10 + num)));
 
     await Promise.all(accounts.map((account, num) => {
       const isLast = num + 1 === testConfig.stressTest.accounts;
@@ -66,7 +65,7 @@ describe("test multiple transactions", async function () {
       const isFirst = num === 0;
       const amount = 10 + (isFirst ? testConfig.stressTest.accounts : num) - 1;
 
-      return account.should.to.have.bars(amount);
+      return expect(account).to.have.bars(amount);
     }));
   });
 
