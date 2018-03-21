@@ -4,4 +4,4 @@ parity:
     - /mnt/data:/root/.local/share/io.parity.ethereum/
   ports:
     - 8545:8545
-  command: --no-secretstore --jsonrpc-interface all --no-ui --no-ipc --no-ws --no-ancient-blocks --chain ${ETHERIUM_CHAIN}
+  command: --no-secretstore --jsonrpc-interface all --no-ui --no-ipc --no-ws --no-ancient-blocks --chain ${ETHEREUM_CHAIN}
