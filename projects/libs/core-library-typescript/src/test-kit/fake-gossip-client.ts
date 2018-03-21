@@ -1,7 +1,7 @@
 
-import { types } from "orbs-core-library";
+import { types } from "../common-library/types";
 
-export default class FakeGossipClient implements types.GossipClient {
+export class FakeGossipClient implements types.GossipClient {
   nodes = new Map<string, types.ClientMap>();
   nodeName: string;
 

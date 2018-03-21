@@ -3,7 +3,7 @@ import * as path from "path";
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import { BlockStorage } from "./block-storage";
-import { sortBy } from "lodash";
+import { sortBy, uniqBy } from "lodash";
 
 function copyArray<T>(source: Array<T>, destination: Array<T>) {
   while (source.length > 0) {
@@ -21,6 +21,10 @@ export class BlockStorageSync {
   }
 
   public onReceiveBlock(block: types.Block) {
+    if (!block) {
+      throw new Error("Tried to push empty block into the queue!");
+    }
+
     this.queue.push(block);
   }
 
@@ -28,10 +32,15 @@ export class BlockStorageSync {
     const data: Array<types.Block> = [];
     copyArray(this.queue, data);
 
-    const sortedBlocks = sortBy(data, (block) => block.header.height);
+    const uniqueBlocks = uniqBy(data, (block) => block.header.height);
+    const sortedBlocks = sortBy(uniqueBlocks, (block) => block.header.height);
 
     for (const block of sortedBlocks) {
-      await this.blockStorage.addBlock(block);
+      try {
+        await this.blockStorage.addBlock(block);
+      } catch (e) {
+        logger.error(e);
+      }
     }
   }
 

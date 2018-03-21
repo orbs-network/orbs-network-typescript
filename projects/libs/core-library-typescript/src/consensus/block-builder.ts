@@ -41,13 +41,19 @@ export default class BlockBuilder {
     const { transactions } = await this.transactionPool.getAllPendingTransactions({});
 
     if (transactions.length == 0) {
-        throw "transaction pool is empty";
+        throw new Error("Transaction pool is empty");
     }
 
-    const { processedTransactions, stateDiff } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactions });
+    const { processedTransactions, stateDiff, rejectedTransactions } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactions });
+
+    if (rejectedTransactions.length > 0) {
+      this.transactionPool.clearPendingTransactions({ transactions: rejectedTransactions });
+    }
 
     if (processedTransactions.length == 0) {
-        throw new Error("Transaction pool is empty");
+      throw new Error("None of the transactions processed successfully. Not building a new block");
+    } else {
+      logger.info(`Building new block with ${processedTransactions.length} transactions`);
     }
 
     return BlockUtils.buildNextBlock({
@@ -79,15 +85,17 @@ export default class BlockBuilder {
     return this.lastBlock;
   }
 
-  private async appendNextBlock() {
+  public async appendNextBlock(): Promise<types.Block> {
     const lastBlock = await this.getOrFetchLastBlock();
     const block = await this.buildBlockFromPendingTransactions(lastBlock);
 
     this.onNewBlockBuild(block);
 
-    logger.debug(`appended new block ${JSON.stringify(block)}`);
+    logger.debug(`Appended new block ${JSON.stringify(block)}`);
 
     this.readyForBlockAppend = false;
+
+    return block;
   }
 
 

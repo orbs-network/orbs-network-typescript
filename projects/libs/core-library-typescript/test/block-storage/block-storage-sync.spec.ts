@@ -79,6 +79,24 @@ describe("Block storage sync", () => {
       await blockStorage.getBlocks(4).should.eventually.be.empty;
     });
 
+    it("does not care about duplicate blocks", async () => {
+      const blocks = await generateBlocks(blockStorage, 4);
+
+      blockStorageSync.onReceiveBlock(blocks[1]);
+      blockStorageSync.onReceiveBlock(blocks[2]);
+      blockStorageSync.onReceiveBlock(blocks[0]);
+      blockStorageSync.onReceiveBlock(blocks[3]);
+      blockStorageSync.onReceiveBlock(blocks[3]);
+      blockStorageSync.onReceiveBlock(blocks[2]);
+
+      blockStorageSync.getQueueSize().should.be.eql(6);
+      await blockStorageSync.appendBlocks();
+      blockStorageSync.getQueueSize().should.be.eql(0);
+
+      await blockStorage.getBlocks(0).should.eventually.be.eql(blocks);
+      await blockStorage.getBlocks(4).should.eventually.be.empty;
+    });
+
     it("does not return blocks back to the queue in case something happens", async () => {
       const blocks = await generateBlocks(blockStorage, 6);
       // removing a block from the array to make it non-continuous
@@ -93,7 +111,7 @@ describe("Block storage sync", () => {
 
       blockStorageSync.getQueueSize().should.eql(5);
 
-      await blockStorageSync.appendBlocks().should.eventually.be.rejected;
+      await blockStorageSync.appendBlocks();
 
       await blockStorage.getBlocks(blocks[0].header.height - 1).should.eventually.eql(blocks.slice(0, 4));
       await blockStorage.getBlocks(blocks[4].header.height - 1).should.eventually.be.empty;

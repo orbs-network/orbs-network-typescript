@@ -50,13 +50,16 @@ export default class BlockStorageService extends Service {
 
   @Service.RPCMethod
   public async addBlock(rpc: types.AddBlockContext) {
-    if (this.isSyncing()) {
-      const message = `Block storage ${this.config.nodeName} can't add new blocks while syncing`;
-      logger.error(message);
-      throw new Error(message);
-    }
+    const block = rpc.req.block;
 
-    await this.blockStorage.addBlock(rpc.req.block);
+    if (this.isSyncing()) {
+      logger.info(`Block storage ${this.config.nodeName} is adding new block with height ${block.header.height} while syncing`);
+
+      this.sync.onReceiveBlock(rpc.req.block);
+      await this.sync.appendBlocks();
+    } else {
+      await this.blockStorage.addBlock(rpc.req.block);
+    }
 
     rpc.res = {};
   }

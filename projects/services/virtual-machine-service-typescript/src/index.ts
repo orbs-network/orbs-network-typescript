@@ -4,7 +4,7 @@ import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } fr
 
 import VirtualMachineService from "./service";
 
-const { NODE_NAME, ETHEREUM_NODE_ADDRESS, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
+const { NODE_NAME, ETHEREUM_NODE_HTTP_ADDRESS, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
 
 ErrorHandler.setup();
 
@@ -25,7 +25,7 @@ if (!NODE_NAME) {
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
-const nodeConfig = { nodeName: NODE_NAME, ethereumNodeHttpAddress: ETHEREUM_NODE_ADDRESS };
+const nodeConfig = { nodeName: NODE_NAME, ethereumNodeHttpAddress: ETHEREUM_NODE_HTTP_ADDRESS };
 
 const main = async () => {
   await ServiceRunner.run(grpc.virtualMachineServer, new VirtualMachineService(peers.stateStorage, nodeConfig), nodeTopology.endpoint);
