@@ -9,11 +9,17 @@ interface TestConfig {
   testEnvironment?: TestEnvironment;
   publicApiClient?: PublicApiClient;
   subscriptionKey?: string;
+  stressTest: {
+    accounts: number
+  };
 }
 
 export function loadDefaultTestConfig(): TestConfig {
   const config: TestConfig = {
-    subscriptionKey: "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe"
+    subscriptionKey: "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe",
+    stressTest: {
+      accounts: Number(nconf.get("E2E_ACCOUNTS_TOTAL")) || 4
+    }
   };
 
   if (nconf.get("E2E_NO_DEPLOY")) {
