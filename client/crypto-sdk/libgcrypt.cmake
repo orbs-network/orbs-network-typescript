@@ -13,8 +13,9 @@ ExternalProject_Add(libgcrypt
     --host=${TARGET_ARCH}
     --prefix=${TARGET_DIR}
     --with-gpg-error-prefix=${BINARY_DIR}/src
-    --enable-static
+    --with-pic
     --disable-shared
+    --enable-static
     --disable-asm
   BUILD_COMMAND make
   TEST_COMMAND make check

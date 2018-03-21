@@ -7,7 +7,7 @@ using namespace std;
 using namespace testing;
 using namespace Orbs;
 
-TEST(Address, creates_from_public_key) {
+TEST(Address, creates_from_binary_public_key) {
     vector<uint8_t> publicKey;
 
     uint8_t rawData[] = "\x8d\x41\xd0\x55\xd0\x04\x59\xbe\x37\xf7\x49\xda\x2c\xaf\x87\xbd\x4c\xed\x6f\xaf\xa3\x35\xb1\xf2\x14\x2e\x0f\x44\x50\x1b\x2c\x65";
@@ -21,6 +21,20 @@ TEST(Address, creates_from_public_key) {
     uint8_t rawData2[] = "\x7a\x46\x34\x87\xbb\x0e\xb5\x84\xda\xbc\xcd\x52\x39\x85\x06\xb4\xa2\xdd\x43\x25\x03\xcc\x6b\x7b\x58\x2f\x87\x83\x2a\xd1\x04\xe6";
     publicKey = vector<uint8_t>(rawData2, rawData2 + sizeof(rawData2) - 1);
     Address a2(publicKey);
+
+    EXPECT_EQ(a2.GetVersion(), 0);
+    EXPECT_THAT(a2.GetAccountId(), ElementsAreArray("\x44\x06\x8a\xcc\x1b\x9f\xfc\x07\x26\x94\xb6\x84\xfc\x11\xff\x22\x9a\xff\x0b\x28", Address::ACCOUNT_ID_SIZE));
+    EXPECT_THAT(a2.GetChecksum(), ElementsAreArray("\x1f\xe5\x41\x34", Address::CHECKSUM_SIZE));
+}
+
+TEST(Address, creates_from_string_public_key) {
+    Address a1("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65");
+
+    EXPECT_EQ(a1.GetVersion(), 0);
+    EXPECT_THAT(a1.GetAccountId(), ElementsAreArray("\xc1\x30\x52\xd8\x20\x82\x30\xa5\x8a\xb3\x63\x70\x8c\x08\xe7\x8f\x11\x25\xf4\x88", Address::ACCOUNT_ID_SIZE));
+    EXPECT_THAT(a1.GetChecksum(), ElementsAreArray("\x50\xf8\x65\x8b", Address::CHECKSUM_SIZE));
+
+    Address a2("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6");
 
     EXPECT_EQ(a2.GetVersion(), 0);
     EXPECT_THAT(a2.GetAccountId(), ElementsAreArray("\x44\x06\x8a\xcc\x1b\x9f\xfc\x07\x26\x94\xb6\x84\xfc\x11\xff\x22\x9a\xff\x0b\x28", Address::ACCOUNT_ID_SIZE));

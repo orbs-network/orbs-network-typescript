@@ -15,4 +15,4 @@ docker run -ti --rm --privileged  \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $ROOT_DIR/logs:/opt/orbs/logs \
 $DOCKER_IMAGE:$DOCKER_TAG  \
-bash -c 'apt-get update && apt-get install -y python-pip python-dev && pip install docker-compose && (curl -fsSL get.docker.com | bash) && cd e2e && ./build.sh && yarn test'
+bash -c 'apt-get update && apt-get install -y python-pip && pip install docker-compose && (curl -fsSL get.docker.com | bash) && cd e2e && ./build.sh && yarn test'
