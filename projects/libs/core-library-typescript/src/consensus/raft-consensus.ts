@@ -124,10 +124,15 @@ export class RaftConsensus {
     // committed entry.
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
 
-    logger.debug(`new block to be committed ${JSON.stringify(block)}`);
-    await this.blockBuilder.commitBlock(block);
+    try {
+      logger.debug(`New block to be committed ${JSON.stringify(block)}`);
+      await this.blockBuilder.commitBlock(block);
 
-    await this.transactionPool.clearPendingTransactions({ transactions: block.body.transactions });
+      await this.transactionPool.clearPendingTransactions({ transactions: block.body.transactions });
+    } catch (e) {
+      logger.error(`Consensus could not commit a block to block storage: ${JSON.stringify(block)}`);
+      logger.error(e);
+    }
 
     if (this.node.isLeader()) {
       this.blockBuilder.start();

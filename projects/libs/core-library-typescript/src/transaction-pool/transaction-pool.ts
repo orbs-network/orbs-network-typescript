@@ -23,28 +23,44 @@ export class TransactionPool {
   }
 
   public clearPendingTransactions(transactions: types.Transaction[]) {
+    if (transactions.length > 0) {
+      logger.info(`Transaction pool is clearing ${transactions.length} pending transactions`);
+    }
+
     for (const transaction of transactions) {
-      const txHash = this.calculateTransactionHash(transaction);
-      this.pendingTransactions.delete(txHash);
+      this.broadcastClearTransactionToOtherNodes(transaction);
+      this.clearPendingTransaction(transaction);
     }
   }
 
   public async gossipMessageReceived(fromAddress: string, messageType: string, message: types.GossipMessageReceivedData) {
     if (messageType == "newTransaction") {
       this.storePendingTransaction(message.transaction);
+    } else if (messageType == "clearPendingTransaction") {
+      logger.info(`Transaction pool received message from ${fromAddress} to clear transaction ${JSON.stringify(message.transaction)}`);
+      this.clearPendingTransaction(message.transaction);
     } else {
-      throw `Unsupported message type ${messageType}`;
+      throw new Error(`Unsupported message type ${messageType}`);
     }
+  }
+
+  public getPendingTransactionQueueSize(): number {
+    return this.pendingTransactions.size;
   }
 
   private async storePendingTransaction(transaction: types.Transaction) {
     const txHash = this.calculateTransactionHash(transaction);
     if (this.pendingTransactions.has(txHash)) {
-      throw `transaction with hash ${txHash} already exists in the pool`;
+      throw new Error(`Transaction with hash ${txHash} already exists in the pool`);
     }
     this.pendingTransactions.set(txHash, transaction);
 
-    logger.debug(`added a new transaction ${JSON.stringify(transaction)} to the pool`);
+    logger.debug(`Added a new transaction ${JSON.stringify(transaction)} to the pool`);
+  }
+
+  private async clearPendingTransaction(transaction: types.Transaction) {
+    const txHash = this.calculateTransactionHash(transaction);
+    this.pendingTransactions.delete(txHash);
   }
 
   private calculateTransactionHash(transaction: types.Transaction) {
@@ -53,12 +69,19 @@ export class TransactionPool {
     return hash.digest("hex");
   }
 
-
-
   private async broadcastTransactionToOtherNodes(transaction: types.Transaction) {
     await this.gossip.broadcastMessage({
       broadcastGroup: "transactionPool",
       messageType: "newTransaction",
+      buffer: new Buffer(JSON.stringify({transaction})),
+      immediate: true
+    });
+  }
+
+  private async broadcastClearTransactionToOtherNodes(transaction: types.Transaction) {
+    await this.gossip.broadcastMessage({
+      broadcastGroup: "transactionPool",
+      messageType: "clearPendingTransaction",
       buffer: new Buffer(JSON.stringify({transaction})),
       immediate: true
     });
