@@ -111,6 +111,8 @@ rtm.on("message", async (message) => {
       const to = match[2];
 
       const receiver = await getAccount(to, config);
+      rtm.sendMessage(`Transfering ${amount} from ${mention(client.address)} to ${mention(receiver.address)}`, message.channel);
+
       await client.transfer(to.address, amount);
 
       const [ clientBalance, receiverBalance ] = await Promise.all([client.getMyBalance(), receiver.getMyBalance()]);
