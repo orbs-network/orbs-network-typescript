@@ -34,6 +34,23 @@ async function getBotAccount(config: Config) {
   return botAccount;
 }
 
+async function matchInput(message: any, condition: RegExp,
+  callback: (clientAccount: FooBarAccount, botAccount: FooBarAccount, match: any) => void) {
+    const matches = message.text.match(condition);
+
+    if (matches) {
+      const [clientAccount, botAccount] = await Promise.all([
+        getAccount(message.user, config), getBotAccount(config)
+      ]);
+
+      callback(clientAccount, botAccount, matches);
+    }
+}
+
+function mention(user: string) {
+  return `<@${user}>`;
+}
+
 const rtm = new RTMClient(SLACK_TOKEN, { autoReconnect: true, useRtmConnect: true });
 rtm.start({});
 
@@ -52,76 +69,46 @@ rtm.on("message", async (message) => {
   console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
 
   try {
-    if (message.text === "get my balance") {
-      const account = await getAccount(message.user, config);
-      const userBalance = await account.getMyBalance();
-      rtm.sendMessage(`You now have ${userBalance} magic internet money`, message.channel);
+    matchInput(message, /^get my balance$/i, async (client, bot, match) => {
+      const clientBalance = await client.getMyBalance();
+      rtm.sendMessage(`${mention(client.address)} has ${clientBalance} magic internet money`, message.channel);
+    });
 
-      return;
-    }
-
-    if (message.text === "get bot balance") {
-      const botAccount = await getBotAccount(config);
-      const botBalance = await botAccount.getMyBalance();
+    matchInput(message, /^get bot balance$/i, async (client, bot, match) => {
+      const botBalance = await bot.getMyBalance();
       rtm.sendMessage(`Bot now has ${botBalance} magic internet money`, message.channel);
+    });
 
-      return;
-    }
+    matchInput(message, /^good bot gets (\d+)$/i, async (client, bot, match) => {
+      const amount = Number(match[1]);
+      rtm.sendMessage(`Set bot balance to ${amount} magic internet money`, message.channel);
 
-    const botInitMatch = message.text.match(/good bot gets (\d+)/);
+      await bot.initBalance(BOT_ADDRESS, amount);
 
-    if (botInitMatch) {
-      const botAccount = await getBotAccount(config);
-      const botBalance = await botAccount.getMyBalance();
-      const amount = Number(botInitMatch[1]);
+      const balance = await bot.getMyBalance();
+      rtm.sendMessage(`Bot now has ${balance} magic internet money`, message.channel);
+    });
 
-      rtm.sendMessage(`Init bot balance with ${amount} magic internet money`, message.channel);
+    matchInput(message, /I opened a pull request/i, async (client, bot, match) => {
+      rtm.sendMessage(`Transfering ${PULL_REQUEST_AWARD} to ${mention(message.user)}`, message.channel);
+      await bot.transfer(client.address, PULL_REQUEST_AWARD);
 
-      if (botBalance === 0) {
-        await botAccount.initBalance(BOT_ADDRESS, amount);
-      }
-
-      const newBotBalance = await botAccount.getMyBalance();
-      rtm.sendMessage(`Bot now has ${newBotBalance} magic internet money`, message.channel);
-
-      return;
-    }
-
-    const transferMatch = message.text.match(/transfer (\d+) to <@(\w+)>/);
-
-    if (transferMatch) {
-      const amount = Number(transferMatch[1]);
-      const to = transferMatch[2];
-
-      const account = await getAccount(message.user, config);
-      await account.transfer(to, amount);
-
-      const userBalance = await account.getMyBalance();
-      rtm.sendMessage(`You now have ${userBalance} magic internet money`, message.channel);
-
-      return;
-    }
-
-    const freeMoneyMatch = message.text.match(/I opened a pull request/);
-
-    if (freeMoneyMatch) {
-      const to = freeMoneyMatch[1];
-      const amount = Number(freeMoneyMatch[2]);
-
-      const account = await getAccount(message.user, config);
-      const botAccount = await getBotAccount(config);
-
-      rtm.sendMessage(`Transfering ${PULL_REQUEST_AWARD} to ${message.user}`, message.channel);
-      await botAccount.transfer(message.user, PULL_REQUEST_AWARD);
-
-      const userBalance = await account.getMyBalance();
-      rtm.sendMessage(`You now have ${userBalance} magic internet money`, message.channel);
-
-      const botBalance = await botAccount.getMyBalance();
+      const [ clientBalance, botBalance ] = await Promise.all([client.getMyBalance(), bot.getMyBalance()]);
+      rtm.sendMessage(`${mention(client.address)} has ${clientBalance} magic internet money`, message.channel);
       rtm.sendMessage(`Bot now has ${botBalance} magic internet money`, message.channel);
-      return;
-    }
+    });
 
+    matchInput(message, /transfer (\d+) to <@(\w+)>/, async (client, bot, match) => {
+      const amount = Number(match[1]);
+      const to = match[2];
+
+      const receiver = await getAccount(to, config);
+      await client.transfer(to.address, amount);
+
+      const [ clientBalance, receiverBalance ] = await Promise.all([client.getMyBalance(), receiver.getMyBalance()]);
+      rtm.sendMessage(`${mention(client.address)} now has ${clientBalance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(receiver.address)} now has ${receiverBalance} magic internet money`, message.channel);
+    });
   } catch (e) {
     console.log(`Error occurred: ${e}`);
   }
