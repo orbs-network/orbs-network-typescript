@@ -14,7 +14,7 @@ const uint32_t ED25519Key::PUBLIC_KEY_SIZE = 32;
 static const string ED25519_GENKEY =
     "(genkey"
         "(ecc"
-            "(curve ֿEd25519)"
+            "(curve Ed25519)"
             "(flags param eddsa)"
         ")"
     ")";
