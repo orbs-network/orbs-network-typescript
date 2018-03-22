@@ -57,3 +57,8 @@ void CryptoSDK::InitFIPSMode() {
 
     Init();
 }
+
+// Checks if the SDK is running in FIPS mode.
+bool CryptoSDK::isFIPSMode() {
+    return gcry_fips_mode_active();
+}

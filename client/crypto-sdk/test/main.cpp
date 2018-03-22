@@ -25,9 +25,13 @@ int main(int argc, char **argv) {
     if (!InFipsMode(argc, argv)) {
         cerr << "Initializing CryptoSDK in normal mode..." << endl;
         CryptoSDK::Init();
+
+        EXPECT_FALSE(CryptoSDK::isFIPSMode());
     } else {
         cerr << "Initializing CryptoSDK in FIPS 140-2 mode..." << endl;
         CryptoSDK::InitFIPSMode();
+
+        EXPECT_TRUE(CryptoSDK::isFIPSMode());
     }
 
     InitGoogleTest(&argc, argv);
