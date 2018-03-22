@@ -28,13 +28,14 @@ void Address::Destructor(napi_env env, void *nativeObject, void * /*finalize_hin
 napi_value Address::Init(napi_env env, napi_value exports) {
     napi_status status;
     napi_property_descriptor properties[] = {
-        { "MAIN_NETWORK_ID", 0, 0, GetMainNetworkId, NULL, 0, napi_static, 0 },
-        { "TEST_NETWORK_ID", 0, 0, GetTestNetworkId, NULL, 0, napi_static, 0 },
-        { "networkId", 0, 0, GetNetworkId, NULL, 0, napi_default, 0 },
-        { "version", 0, 0, GetVersion, NULL, 0, napi_default, 0 },
-        { "virtualChainId", 0, 0, GetVirtualChainId, NULL, 0, napi_default, 0 },
-        { "accountId", 0, 0, GetAccountId, NULL, 0, napi_default, 0 },
-        { "checksum", 0, 0, GetChecksum, NULL, 0, napi_default, 0 },
+        { "MAIN_NETWORK_ID", 0, 0, GetMainNetworkId, nullptr, 0, napi_static, 0 },
+        { "TEST_NETWORK_ID", 0, 0, GetTestNetworkId, nullptr, 0, napi_static, 0 },
+        { "publicKey", 0, 0, GetPublicKey, nullptr, 0, napi_default, 0 },
+        { "networkId", 0, 0, GetNetworkId, nullptr, 0, napi_default, 0 },
+        { "version", 0, 0, GetVersion, nullptr, 0, napi_default, 0 },
+        { "virtualChainId", 0, 0, GetVirtualChainId, nullptr, 0, napi_default, 0 },
+        { "accountId", 0, 0, GetAccountId, nullptr, 0, napi_default, 0 },
+        { "checksum", 0, 0, GetChecksum, nullptr, 0, napi_default, 0 },
         DECLARE_NAPI_METHOD("toString", ToString),
     };
 
@@ -112,6 +113,24 @@ napi_value Address::New(napi_env env, napi_callback_info info) {
     assert(status == napi_ok);
 
     return instance;
+}
+
+napi_value Address::GetPublicKey(napi_env env, napi_callback_info info) {
+    napi_status status;
+
+    napi_value jsthis;
+    status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+    assert(status == napi_ok);
+
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
+    assert(status == napi_ok);
+
+    const string str(Orbs::Utils::Vec2Hex(obj->address_.GetPublicKey()));
+    napi_value res;
+    status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+
+    return res;
 }
 
 napi_value Address::GetNetworkId(napi_env env, napi_callback_info info) {
