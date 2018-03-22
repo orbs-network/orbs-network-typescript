@@ -12,8 +12,8 @@ public:
     static const uint32_t PUBLIC_KEY_SIZE;
 
     // Generates new public key pair using the ED25519 curve.
-    ED25519Key();
-    ED25519Key(const std::vector<uint8_t> &publicKey);
+    explicit ED25519Key();
+    explicit ED25519Key(const std::vector<uint8_t> &publicKey);
     virtual ~ED25519Key();
 
     // Exports the public key.

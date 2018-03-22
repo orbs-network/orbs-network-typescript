@@ -3,12 +3,14 @@
         {
             "target_name": "cryptosdk",
             "sources": [
+                "src/ed25519key.cpp",
                 "src/address.cpp",
                 "src/crypto-sdk.cpp"
             ],
             "cflags_cc!": ["-static", "-std=c++11", "-stdlib=libc++"],
             "include_dirs": [
-                "<(module_root_dir)/deps/"
+                "<(module_root_dir)/deps/",
+                "<(module_root_dir)/deps/crypto-sdk/build/lib/libgcrypt-prefix/src/libgcrypt-build/src/"
             ],
             "libraries": [
                 "<(module_root_dir)/deps/crypto-sdk/build/lib/libcrypto.a",

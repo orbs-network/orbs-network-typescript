@@ -23,10 +23,10 @@ public:
     static const uint32_t CHECKSUM_SIZE;
     static const uint32_t ADDRESS_LENGTH;
 
-    Address(const std::vector<uint8_t> &publicKey, const std::vector<uint8_t> &virtualChainId, uint8_t networkId);
-    Address(const std::string &publicKey, const std::string &virtualChainId, const std::string &networkId);
+    explicit Address(const std::vector<uint8_t> &publicKey, const std::vector<uint8_t> &virtualChainId, uint8_t networkId);
+    explicit Address(const std::string &publicKey, const std::string &virtualChainId, const std::string &networkId);
 
-    Address(const ED25519Key &key, const std::vector<uint8_t> &virtualChainId, uint8_t networkId);
+    explicit Address(const ED25519Key &key, const std::vector<uint8_t> &virtualChainId, uint8_t networkId);
 
     virtual ~Address();
 
