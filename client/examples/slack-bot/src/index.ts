@@ -7,9 +7,16 @@ import { RTMClient } from "@slack/client";
 interface Config {
   subscriptionKey: string;
   publicApiClient: PublicApiClient;
+  timeout: number;
 }
 
-const { SLACK_VERIFICATION_TOKEN, SLACK_TOKEN, CONVERSATION_ID, ORBS_API_ENDPOINT } = process.env;
+const {
+  SLACK_VERIFICATION_TOKEN,
+  SLACK_TOKEN,
+  CONVERSATION_ID,
+  ORBS_API_ENDPOINT,
+  TRANSACTION_TIMEOUT
+} = process.env;
 
 const BOT_ADDRESS = "0000";
 const PULL_REQUEST_AWARD = 100;
@@ -18,11 +25,12 @@ const config = {
   subscriptionKey: "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe",
   publicApiClient: initPublicApiClient({
     endpoint: ORBS_API_ENDPOINT
-  })
+  }),
+  timeout: Number(TRANSACTION_TIMEOUT) || 2000
 };
 
 async function getAccount(senderAddress: string, config: Config): Promise<FooBarAccount> {
-  const orbsSession = new OrbsClientSession(senderAddress, config.subscriptionKey, config.publicApiClient);
+  const orbsSession = new OrbsClientSession(senderAddress, config.subscriptionKey, config.publicApiClient, config.timeout);
   const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
   const account = new FooBarAccount(senderAddress, contractAdapter);
 

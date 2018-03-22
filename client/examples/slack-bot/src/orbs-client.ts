@@ -34,11 +34,13 @@ export class OrbsClientSession {
   orbsClient: PublicApiClient;
   subscriptionKey: string;
   senderAddress: string;
+  timeout: number;
 
-  constructor(senderAddress: string, subscriptionKey: string, orbsClient: PublicApiClient) {
+  constructor(senderAddress: string, subscriptionKey: string, orbsClient: PublicApiClient, timeout: number) {
     this.senderAddress = senderAddress;
     this.orbsClient = orbsClient;
     this.subscriptionKey = subscriptionKey;
+    this.timeout = timeout;
   }
 
   async sendTransaction(contractAddress: string, payload: string) {
@@ -50,7 +52,7 @@ export class OrbsClientSession {
         subscriptionKey: this.subscriptionKey
       }
     });
-    await delay(10000);
+    await delay(this.timeout);
     return res;
   }
 
