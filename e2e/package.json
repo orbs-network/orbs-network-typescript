@@ -23,11 +23,11 @@
     "ganache-core": "^2.0.2",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "nconf": "^0.10.0",
+    "orbs-crypto-sdk": "file:../client/crypto-sdk-javascript",
+    "orbs-interfaces": "file:../projects/architecture",
     "solc": "0.4.18",
     "underscore": "^1.8.3",
-    "web3": "1.0.0-beta.29",
-    "orbs-crypto-sdk": "file:../client/crypto-sdk-javascript",
-    "orbs-interfaces": "file:../projects/architecture"
+    "web3": "1.0.0-beta.29"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
