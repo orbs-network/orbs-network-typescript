@@ -1,7 +1,7 @@
 #include "ed25519key.h"
 
+#include <stdexcept>
 #include <string>
-#include <sstream>
 
 #include "crypto.h"
 #include "utils.h"
