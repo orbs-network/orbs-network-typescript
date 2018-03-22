@@ -37,7 +37,7 @@ ED25519Key::ED25519Key() : key_(nullptr) {
     gcry_sexp_t parms = nullptr;
 
     try {
-        gcry_error_t err = gcry_sexp_build(&parms, NULL, ED25519_GENKEY.c_str());
+        gcry_error_t err = gcry_sexp_build(&parms, nullptr, ED25519_GENKEY.c_str());
         if (err) {
             throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
         }
@@ -67,7 +67,7 @@ ED25519Key::ED25519Key(const vector<uint8_t> &publicKey) : key_(nullptr) {
         throw invalid_argument("Invalid public key length: " + to_string(publicKey.size()));
     }
 
-    gcry_error_t err = gcry_sexp_build(&key_, NULL, ED25519_IMPORT_PUBLIC_KEY.c_str(), publicKey.size(), &publicKey[0]);
+    gcry_error_t err = gcry_sexp_build(&key_, nullptr, ED25519_IMPORT_PUBLIC_KEY.c_str(), publicKey.size(), &publicKey[0]);
     if (err) {
         throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
     }
