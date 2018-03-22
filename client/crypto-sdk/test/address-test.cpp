@@ -1,13 +1,15 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../lib/crypto.h"
 #include "../lib/address.h"
+#include "../lib/ed25519key.h"
 
 using namespace std;
 using namespace testing;
 using namespace Orbs;
 
-TEST(Address, creates_from_binary_arguments) {
+TEST(Address, creates_from_binary_public_key) {
     vector<uint8_t> publicKey;
     vector<uint8_t> virtualChainId;
 
@@ -60,7 +62,69 @@ TEST(Address, creates_from_binary_arguments) {
     EXPECT_THAT(a4.GetChecksum(), ElementsAreArray("\xd9\x71\xf7\x00", Address::CHECKSUM_SIZE));
 }
 
-TEST(Address, creates_from_string_arguments) {
+TEST(Address, creates_from_ed25519_key) {
+    if (CryptoSDK::isFIPSMode()) {
+        EXPECT_THROW(ED25519Key key, runtime_error);
+        return;
+    }
+
+    vector<uint8_t> publicKey;
+    vector<uint8_t> virtualChainId;
+
+    uint8_t rawPublicKey[] = "\x8d\x41\xd0\x55\xd0\x04\x59\xbe\x37\xf7\x49\xda\x2c\xaf\x87\xbd\x4c\xed\x6f\xaf\xa3\x35\xb1\xf2\x14\x2e\x0f\x44\x50\x1b\x2c\x65";
+    uint8_t rawVirtualChainId[] = "\x64\x0e\xd3";
+    publicKey = vector<uint8_t>(rawPublicKey, rawPublicKey + sizeof(rawPublicKey) - 1);
+    ED25519Key key1(publicKey);
+    virtualChainId = vector<uint8_t>(rawVirtualChainId, rawVirtualChainId + sizeof(rawVirtualChainId) - 1);
+    Address a1(key1, virtualChainId, Address::MAIN_NETWORK_ID);
+
+    EXPECT_EQ(a1.GetVersion(), 0);
+    EXPECT_EQ(a1.GetNetworkId(), Address::MAIN_NETWORK_ID);
+    EXPECT_THAT(a1.GetVirtualChainId(), ElementsAreArray("\x64\x0e\xd3", Address::VIRTUAL_CHAIN_ID_SIZE));
+    EXPECT_THAT(a1.GetAccountId(), ElementsAreArray("\xc1\x30\x52\xd8\x20\x82\x30\xa5\x8a\xb3\x63\x70\x8c\x08\xe7\x8f\x11\x25\xf4\x88", Address::ACCOUNT_ID_SIZE));
+    EXPECT_THAT(a1.GetChecksum(), ElementsAreArray("\x61\xf0\x4b\xfc", Address::CHECKSUM_SIZE));
+
+    uint8_t rawPublicKey2[] = "\x8d\x41\xd0\x55\xd0\x04\x59\xbe\x37\xf7\x49\xda\x2c\xaf\x87\xbd\x4c\xed\x6f\xaf\xa3\x35\xb1\xf2\x14\x2e\x0f\x44\x50\x1b\x2c\x65";
+    uint8_t rawVirtualChainId2[] = "\x64\x0e\xd3";
+    publicKey = vector<uint8_t>(rawPublicKey2, rawPublicKey2 + sizeof(rawPublicKey2) - 1);
+    ED25519Key key2(publicKey);
+    virtualChainId = vector<uint8_t>(rawVirtualChainId2, rawVirtualChainId2 + sizeof(rawVirtualChainId2) - 1);
+    Address a2(key2, virtualChainId, Address::TEST_NETWORK_ID);
+
+    EXPECT_EQ(a2.GetVersion(), 0);
+    EXPECT_EQ(a2.GetNetworkId(), Address::TEST_NETWORK_ID);
+    EXPECT_THAT(a2.GetVirtualChainId(), ElementsAreArray("\x64\x0e\xd3", Address::VIRTUAL_CHAIN_ID_SIZE));
+    EXPECT_THAT(a2.GetAccountId(), ElementsAreArray("\xc1\x30\x52\xd8\x20\x82\x30\xa5\x8a\xb3\x63\x70\x8c\x08\xe7\x8f\x11\x25\xf4\x88", Address::ACCOUNT_ID_SIZE));
+    EXPECT_THAT(a2.GetChecksum(), ElementsAreArray("\x26\x20\xb4\xed", Address::CHECKSUM_SIZE));
+
+    uint8_t rawPublicKey3[] = "\x7a\x46\x34\x87\xbb\x0e\xb5\x84\xda\xbc\xcd\x52\x39\x85\x06\xb4\xa2\xdd\x43\x25\x03\xcc\x6b\x7b\x58\x2f\x87\x83\x2a\xd1\x04\xe6";
+    uint8_t rawVirtualChainId3[] = "\x90\x12\xca";
+    publicKey = vector<uint8_t>(rawPublicKey3, rawPublicKey3 + sizeof(rawPublicKey3) - 1);
+    ED25519Key key3(publicKey);
+    virtualChainId = vector<uint8_t>(rawVirtualChainId3, rawVirtualChainId3 + sizeof(rawVirtualChainId3) - 1);
+    Address a3(key3, virtualChainId, Address::MAIN_NETWORK_ID);
+
+    EXPECT_EQ(a3.GetVersion(), 0);
+    EXPECT_EQ(a3.GetNetworkId(), Address::MAIN_NETWORK_ID);
+    EXPECT_THAT(a3.GetVirtualChainId(), ElementsAreArray("\x90\x12\xca", Address::VIRTUAL_CHAIN_ID_SIZE));
+    EXPECT_THAT(a3.GetAccountId(), ElementsAreArray("\x44\x06\x8a\xcc\x1b\x9f\xfc\x07\x26\x94\xb6\x84\xfc\x11\xff\x22\x9a\xff\x0b\x28", Address::ACCOUNT_ID_SIZE));
+    EXPECT_THAT(a3.GetChecksum(), ElementsAreArray("\x9e\xa1\x08\x11", Address::CHECKSUM_SIZE));
+
+    uint8_t rawPublicKey4[] = "\x7a\x46\x34\x87\xbb\x0e\xb5\x84\xda\xbc\xcd\x52\x39\x85\x06\xb4\xa2\xdd\x43\x25\x03\xcc\x6b\x7b\x58\x2f\x87\x83\x2a\xd1\x04\xe6";
+    uint8_t rawVirtualChainId4[] = "\x90\x12\xca";
+    publicKey = vector<uint8_t>(rawPublicKey4, rawPublicKey4 + sizeof(rawPublicKey4) - 1);
+    ED25519Key key4(publicKey);
+    virtualChainId = vector<uint8_t>(rawVirtualChainId4, rawVirtualChainId4 + sizeof(rawVirtualChainId4) - 1);
+    Address a4(key4, virtualChainId, Address::TEST_NETWORK_ID);
+
+    EXPECT_EQ(a4.GetVersion(), 0);
+    EXPECT_EQ(a4.GetNetworkId(), Address::TEST_NETWORK_ID);
+    EXPECT_THAT(a4.GetVirtualChainId(), ElementsAreArray("\x90\x12\xca", Address::VIRTUAL_CHAIN_ID_SIZE));
+    EXPECT_THAT(a4.GetAccountId(), ElementsAreArray("\x44\x06\x8a\xcc\x1b\x9f\xfc\x07\x26\x94\xb6\x84\xfc\x11\xff\x22\x9a\xff\x0b\x28", Address::ACCOUNT_ID_SIZE));
+    EXPECT_THAT(a4.GetChecksum(), ElementsAreArray("\xd9\x71\xf7\x00", Address::CHECKSUM_SIZE));
+}
+
+TEST(Address, creates_from_string_public_key) {
     Address a1("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65", "640ed3", "M");
 
     EXPECT_EQ(a1.GetVersion(), 0);

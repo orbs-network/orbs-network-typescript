@@ -30,6 +30,7 @@ const uint32_t Address::ADDRESS_LENGTH = 39;
 
 Address::Address(const vector<uint8_t> &publicKey, const vector<uint8_t> &virtualChainId, uint8_t networkId) :
     publicKey_(publicKey), virtualChainId_(virtualChainId), networkId_(networkId) {
+
     Init();
 }
 
@@ -42,6 +43,12 @@ Address::Address(const string &publicKey, const string &virtualChainId, const st
     }
 
     networkId_ = decodedNetworkId[0];
+
+    Init();
+}
+
+Address::Address(const ED25519Key &key, const vector<uint8_t> &virtualChainId, uint8_t networkId) :
+    publicKey_(key.GetPublicKey()), virtualChainId_(virtualChainId), networkId_(networkId) {
 
     Init();
 }
