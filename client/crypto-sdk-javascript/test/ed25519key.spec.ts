@@ -2,7 +2,7 @@ import { expect } from "chai";
 
 import { ED25519Key } from "../src/index";
 
-describe("a ed25519 key", () => {
+describe("an ed25519 key", () => {
   it("is properly initialized by a public key", async () => {
     const publicKey = "8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65";
     const key1 = new ED25519Key(publicKey);
