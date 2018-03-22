@@ -9,6 +9,7 @@ describe("an address", () => {
     const networkId = Address.MAIN_NETWORK_ID;
     const address = new Address(publicKey, virtualChainId, networkId);
 
+    expect(address.publicKey).to.equal(publicKey);
     expect(address.networkId).to.equal(Address.MAIN_NETWORK_ID);
     expect(address.version).to.equal(0);
     expect(address.virtualChainId).to.equal("640ed3");
@@ -21,6 +22,7 @@ describe("an address", () => {
     const networkId2 = Address.TEST_NETWORK_ID;
     const address2 = new Address(publicKey2, virtualChainId2, networkId2);
 
+    expect(address2.publicKey).to.equal(publicKey2);
     expect(address2.networkId).to.equal(Address.TEST_NETWORK_ID);
     expect(address2.version).to.equal(0);
     expect(address2.virtualChainId).to.equal("9012ca");
