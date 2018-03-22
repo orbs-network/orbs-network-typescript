@@ -145,7 +145,7 @@ TEST(Address, throws_on_invalid_arguments_on_creation) {
     EXPECT_THROW(Address a1(publicKey, virtualChainId, Address::MAIN_NETWORK_ID), invalid_argument);
 
     // Public key is too short.
-    uint8_t rawPublicKey2[] = "\x12\33";
+    uint8_t rawPublicKey2[] = "\x12\x33";
     uint8_t rawVirtualChainId2[] = "\x64\x0e\xd3";
     publicKey = vector<uint8_t>(rawPublicKey2, rawPublicKey2 + sizeof(rawPublicKey2) - 1);
     virtualChainId = vector<uint8_t>(rawVirtualChainId2, rawVirtualChainId2 + sizeof(rawVirtualChainId2) - 1);
