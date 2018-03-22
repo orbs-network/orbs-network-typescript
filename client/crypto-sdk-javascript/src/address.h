@@ -12,7 +12,7 @@ public:
   static void Destructor(napi_env env, void *nativeObject, void *finalizeHint);
 
 private:
-  explicit Address(const std::string &publicAddress, const std::string &virtualChainId, const std::string &networkId);
+  explicit Address(const std::string &publicKey, const std::string &virtualChainId, const std::string &networkId);
   ~Address();
 
   static napi_value New(napi_env env, napi_callback_info info);
