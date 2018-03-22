@@ -64,6 +64,7 @@
     "public-api-service-typescript",
     "sidechain-connector-service-typescript",
     "storage-service-typescript",
-    "virtual-machine-service-typescript"
+    "virtual-machine-service-typescript",
+    "example-slack-bot"
   ]
 }
