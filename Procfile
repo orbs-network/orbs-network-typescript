@@ -1,1 +1,1 @@
-bot-worker: node client/examples/slack-bot/dist/index.js
+web: node client/examples/slack-bot/dist/index.js
