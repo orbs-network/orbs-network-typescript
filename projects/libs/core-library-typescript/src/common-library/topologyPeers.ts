@@ -33,7 +33,7 @@ export function topologyPeers(topologyPeers: any[]): types.ClientMap {
         break;
       }
       default: {
-        throw `Undefined peer service: ${peer.service}`;
+        throw new Error(`Undefined peer service: ${peer.service}`);
       }
     }
   }

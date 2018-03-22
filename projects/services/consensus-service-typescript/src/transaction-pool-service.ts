@@ -8,6 +8,8 @@ import { TransactionPool } from "orbs-core-library";
 
 export default class TransactionPoolService extends Service {
   private transactionPool: TransactionPool;
+  private pollInterval: NodeJS.Timer;
+  private pollIntervalMs = 2000;
 
   public constructor(transactionPool: TransactionPool, serviceConfig: ServiceConfig) {
     super(serviceConfig);
@@ -15,10 +17,23 @@ export default class TransactionPoolService extends Service {
   }
 
   async initialize() {
+    this.startPoolSizeMonitor();
   }
 
   async shutdown() {
+    clearInterval(this.pollInterval);
+  }
 
+  private startPoolSizeMonitor() {
+    this.pollInterval = setInterval(() => {
+      const size = this.transactionPool.getPendingTransactionQueueSize();
+
+      if (size === 0) {
+        logger.debug(`Transaction pool has no pending transactions`);
+      } else {
+        logger.debug(`Transaction pool has ${size} pending transactions`);
+      }
+    }, this.pollIntervalMs);
   }
 
   @Service.RPCMethod

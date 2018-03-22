@@ -3,6 +3,7 @@ import { types, logger } from "../common-library";
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
 import { stat } from "fs";
+import { Transaction } from "orbs-interfaces";
 
 export class VirtualMachine {
   private stateStorage: types.StateStorageClient;
@@ -15,7 +16,8 @@ export class VirtualMachine {
 
   public async processTransactionSet(input: types.ProcessTransactionSetInput): Promise<types.ProcessTransactionSetOutput> {
     const stateCache = new StateCache();
-    const processedTransactions = [];
+    const processedTransactions: Transaction[] = [];
+    const rejectedTransactions: Transaction[] = [];
 
     for (const transaction of input.orderedTransactions) {
       const transactionScopeStateCache = stateCache.fork();
@@ -28,6 +30,7 @@ export class VirtualMachine {
 
       } catch (err) {
         logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
+        rejectedTransactions.push(transaction);
         continue;
       }
 
@@ -37,9 +40,14 @@ export class VirtualMachine {
 
     const stateDiff = stateCache.getModifiedKeys().map(({ key, value}) => ({contractAddress: key.contractAddress, key: key.key, value }));
 
+    if (rejectedTransactions.length > 0) {
+      logger.error(`Virtual machine has rejected ${rejectedTransactions.length} transactions`);
+    }
+
     return {
       stateDiff,
-      processedTransactions
+      processedTransactions,
+      rejectedTransactions
     };
   }
 

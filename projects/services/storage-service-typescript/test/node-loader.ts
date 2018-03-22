@@ -2,10 +2,7 @@ import { tmpdir } from "os";
 import * as path from "path";
 import * as fs from "fs-extra";
 
-import { types, BlockUtils } from "orbs-core-library";
-import { generateServiceIPCClient } from "./service-ipc-client";
-
-import FakeGossipClient from "./fake-gossip-client";
+import { types, BlockUtils, FakeGossipClient, generateServiceIPCClient } from "orbs-core-library";
 import BlockStorageService from "../src/block-storage-service";
 
 function generateEmptyBlock(prevBlock: types.Block): types.Block {
