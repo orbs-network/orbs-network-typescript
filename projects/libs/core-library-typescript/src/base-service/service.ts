@@ -57,4 +57,19 @@ export abstract class Service {
 
     logger.info(`${this.config.nodeName} (${this.name}): service shut down`);
   }
+
+  public static initLogger(fileName: string) {
+    const { LOGZIO_API_KEY, LOG_LEVEL } = process.env;
+
+    logger.configure({
+      level: LOG_LEVEL,
+      file: {
+        fileName
+      },
+      logzio: {
+        apiKey: LOGZIO_API_KEY
+      },
+      console: true
+    });
+  }
 }

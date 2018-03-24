@@ -1,23 +1,14 @@
 import * as path from "path";
 
-import { ErrorHandler, grpc, ServiceRunner, topology, topologyPeers, logger } from "orbs-core-library";
+import { ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers, logger } from "orbs-core-library";
 
 import PublicApiService from "./service";
 
-const { NODE_NAME, LOGZIO_API_KEY, LOG_LEVEL, VALIDATE_SUBSCRIPTION } = process.env;
+const { NODE_NAME, VALIDATE_SUBSCRIPTION } = process.env;
 
 ErrorHandler.setup();
 
-logger.configure({
-  level: LOG_LEVEL,
-  file: {
-    fileName: path.join(__dirname, "../../../../logs/public-api.log")
-  },
-  logzio: {
-    apiKey: LOGZIO_API_KEY
-  },
-  console: true
-});
+Service.initLogger(path.join(__dirname, "../../../../logs/public-api.log"));
 
 if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");

@@ -1,22 +1,12 @@
 import * as path from "path";
-import { logger, ErrorHandler, topology } from "orbs-core-library";
-import consensusServer from "./consensus-server";
 
-const { LOGZIO_API_KEY, LOG_LEVEL } = process.env;
+import { logger, ErrorHandler, topology, Service } from "orbs-core-library";
+
+import consensusServer from "./consensus-server";
 
 ErrorHandler.setup();
 
-logger.configure({
-  level: LOG_LEVEL,
-  file: {
-    fileName: path.join(__dirname, "../../../../logs/consensus.log")
-  },
-  logzio: {
-    apiKey: LOGZIO_API_KEY
-  },
-  console: true
-});
-
+Service.initLogger(path.join(__dirname, "../../../../logs/consensus.log"));
 
 const nodeTopology = topology();
 
