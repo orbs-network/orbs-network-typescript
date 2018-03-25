@@ -1,5 +1,8 @@
 FROM node:9-slim
 
+ARG CI
+ENV CI=$CI
+
 VOLUME [ "/opt/orbs/logs", "/opt/orbs/db" ]
 
 # TODO: move to later stage, use cache for ts compiler & top level software

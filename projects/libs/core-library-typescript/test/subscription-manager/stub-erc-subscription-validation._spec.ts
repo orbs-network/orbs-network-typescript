@@ -7,7 +7,7 @@ import { delay } from "bluebird";
 import { grpc, } from "../../src/common-library/grpc";
 import { types } from "../../src/common-library/types";
 import { logger } from "../../src/common-library/logger";
-import { ErrorHandler } from "../../src/common-library/ErrorHandler";
+import { ErrorHandler } from "../../src/common-library/error-handler";
 
 import { EthereumSimulationNode } from "../../testkit/subscription-manager/ethereum-simulation-node";
 
