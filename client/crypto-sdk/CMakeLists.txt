@@ -12,6 +12,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set debug library postfix" FORCE)
 
+set(CI $ENV{CI})
+
 project(crypto-sdk)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
