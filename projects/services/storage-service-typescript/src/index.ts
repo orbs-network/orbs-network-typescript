@@ -29,6 +29,6 @@ const blockStorageConfig = {
 const stateStorageConfig = { nodeName: NODE_NAME };
 
 ServiceRunner.runMulti(grpc.storageServiceServer, [
-  new BlockStorageService(peers.gossip, blockStorageConfig),
+  new BlockStorageService(peers.gossip, peers.transactionPool, blockStorageConfig),
   new StateStorageService(peers.blockStorage, stateStorageConfig)
 ], nodeTopology.endpoint);

@@ -7,12 +7,14 @@ import * as fsExtra from "fs-extra";
 import { types, BlockUtils } from "../../src/common-library";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockStorageSync } from "../../src/block-storage/block-storage-sync";
+import { stubInterface } from "ts-sinon";
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
 
 async function init(): Promise<{blockStorage: BlockStorage, blockStorageSync: BlockStorageSync}> {
   fsExtra.removeSync(LEVELDB_PATH);
-  const blockStorage = new BlockStorage(LEVELDB_PATH);
+  const transactionPool = stubInterface<types.TransactionPoolClient>();
+  const blockStorage = new BlockStorage(LEVELDB_PATH, transactionPool);
   await blockStorage.load();
   const blockStorageSync = new BlockStorageSync(blockStorage);
   return { blockStorage, blockStorageSync };

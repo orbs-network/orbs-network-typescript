@@ -1,16 +1,18 @@
-import * as chai from "chai";
+import { expect } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
+import { stubInterface } from "ts-sinon";
 import * as fsExtra from "fs-extra";
 
 import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockUtils } from "../../src/common-library";
 
+
 const LEVELDB_PATH = "/tmp/leveldb-test";
 
-async function initBlockStorage(): Promise<BlockStorage> {
-  const blockStorage = new BlockStorage(LEVELDB_PATH);
+async function initBlockStorage(transactionPool: types.TransactionPoolClient): Promise<BlockStorage> {
+  const blockStorage = new BlockStorage(LEVELDB_PATH, transactionPool);
   await blockStorage.load();
   return blockStorage;
 }
@@ -26,13 +28,15 @@ function generateEmptyBlock(lastBlock: types.Block): types.Block {
 describe("Block storage", () => {
   let blockStorage: BlockStorage;
   let lastBlock: types.Block;
+  let transactionPool: types.TransactionPoolClient;
 
 
   beforeEach(async () => {
     try {
       fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
-    blockStorage = await initBlockStorage();
+    transactionPool = stubInterface<types.TransactionPoolClient>();
+    blockStorage = await initBlockStorage(transactionPool);
     lastBlock = await blockStorage.getLastBlock();
   });
 
@@ -43,8 +47,8 @@ describe("Block storage", () => {
 
   describe("has genesis block", () => {
     it("on initialization", async () => {
-      lastBlock.should.not.be.undefined;
-      lastBlock.header.height.should.be.eql(0);
+      expect(lastBlock).to.not.be.undefined;
+      expect(lastBlock.header.height).to.be.eql(0);
     });
   });
 
@@ -54,7 +58,7 @@ describe("Block storage", () => {
 
       await blockStorage.addBlock(exampleBlock);
       const block = await blockStorage.getBlock(1);
-      block.should.be.eql(exampleBlock);
+      expect(block).to.be.eql(exampleBlock);
     });
   });
 
@@ -64,8 +68,8 @@ describe("Block storage", () => {
 
       await blockStorage.addBlock(exampleBlock);
       const block = await blockStorage.getLastBlock();
-      block.should.not.be.undefined;
-      block.header.height.should.be.eql(1);
+      expect(block).to.not.be.undefined;
+      expect(block.header.height).to.be.eql(1);
     });
 
     xit("checks previous block hash", async () => {
@@ -74,7 +78,7 @@ describe("Block storage", () => {
 
       const result = blockStorage.addBlock(exampleBlock);
       // do not remove return
-      await result.should.eventually.be.rejectedWith(Error);
+      await expect(result).to.eventually.be.rejectedWith(Error);
     });
 
     it("checks block height", async () => {
@@ -82,7 +86,14 @@ describe("Block storage", () => {
       exampleBlock.header.height += 1;
 
       const result = blockStorage.addBlock(exampleBlock);
-      await result.should.eventually.be.rejectedWith(Error);
+      await expect(result).to.eventually.be.rejectedWith(Error);
+    });
+
+    it("reports transactions back to pool", async () => {
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+
+      await blockStorage.addBlock(exampleBlock);
+      await expect(transactionPool.markCommittedTransactions).to.have.been.calledOnce;
     });
 
     xit("verifies block hash");
@@ -94,8 +105,8 @@ describe("Block storage", () => {
 
       await blockStorage.addBlock(exampleBlock);
 
-      await blockStorage.hasNewBlocks(0).should.eventually.be.true;
-      await blockStorage.hasNewBlocks(1000).should.eventually.be.false;
+      await expect(blockStorage.hasNewBlocks(0)).to.eventually.be.true;
+      await expect(blockStorage.hasNewBlocks(1000)).to.eventually.be.false;
     });
   });
 
@@ -105,7 +116,7 @@ describe("Block storage", () => {
 
       await blockStorage.addBlock(exampleBlock);
 
-      await blockStorage.getBlocks(lastBlock.header.height).should.eventually.be.eql([exampleBlock]);
+      await expect(blockStorage.getBlocks(lastBlock.header.height)).to.eventually.be.eql([exampleBlock]);
     });
   });
 });

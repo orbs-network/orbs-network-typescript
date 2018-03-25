@@ -1,7 +1,7 @@
 import { tmpdir } from "os";
 import * as path from "path";
 import * as fs from "fs-extra";
-
+import { stubInterface } from "ts-sinon";
 import { types, BlockUtils, FakeGossipClient, generateServiceIPCClient } from "orbs-core-library";
 import BlockStorageService from "../src/block-storage-service";
 
@@ -21,7 +21,7 @@ export class NodeLoader {
 
     this.fakeGossipClient = new FakeGossipClient(nodeName);
 
-    this.blockStorageService = new BlockStorageService(this.fakeGossipClient, {
+    this.blockStorageService = new BlockStorageService(this.fakeGossipClient, stubInterface<types.TransactionPoolClient>(), {
       nodeName,
       pollInterval: 100,
       dbPath: this.levelDbPath
