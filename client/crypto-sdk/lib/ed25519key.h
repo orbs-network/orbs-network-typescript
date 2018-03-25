@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <vector>
 
-#include <gcrypt.h>
-
 namespace Orbs {
+
+typedef void *key_t;
 
 class ED25519Key {
 public:
@@ -19,15 +19,15 @@ public:
     // Exports the public key.
     virtual const std::vector<uint8_t> GetPublicKey() const;
 
-    // Disable copy constructor, in order to prevent gcry_sexp_t dereferencing.
+    // Disable copy constructor, in order to prevent key_t dereferencing.
     ED25519Key(const ED25519Key &other) = delete;
 
 private:
     // Verifies public key pair and throws on error.
-    static void VerifyKeyPair(gcry_sexp_t key);
+    static void VerifyKeyPair(key_t key);
 
 private:
-    gcry_sexp_t key_;
+    key_t key_;
 };
 
 }

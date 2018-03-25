@@ -3,11 +3,17 @@
 #include <stdexcept>
 #include <string>
 
+#include <gcrypt.h>
+
 #include "crypto.h"
 #include "utils.h"
 
 using namespace std;
 using namespace Orbs;
+
+struct key {
+    gcry_sexp_t key;
+};
 
 const uint32_t ED25519Key::PUBLIC_KEY_SIZE = 32;
 
@@ -34,6 +40,8 @@ ED25519Key::ED25519Key() : key_(nullptr) {
         throw runtime_error("ED25519Key is currently not suppored in FIPS mode!");
     }
 
+    key_ = new gcry_sexp_t();
+
     gcry_sexp_t parms = nullptr;
 
     try {
@@ -42,7 +50,7 @@ ED25519Key::ED25519Key() : key_(nullptr) {
             throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
         }
 
-        err = gcry_pk_genkey(&key_, parms);
+        err = gcry_pk_genkey(static_cast<gcry_sexp_t *>(key_), parms);
         if (err) {
             throw runtime_error("gcry_pk_genkey failed with: " + string(gcry_strerror(err)));
         }
@@ -67,33 +75,42 @@ ED25519Key::ED25519Key(const vector<uint8_t> &publicKey) : key_(nullptr) {
         throw invalid_argument("Invalid public key length: " + to_string(publicKey.size()));
     }
 
-    gcry_error_t err = gcry_sexp_build(&key_, nullptr, ED25519_IMPORT_PUBLIC_KEY.c_str(), publicKey.size(), &publicKey[0]);
+    key_ = new gcry_sexp_t();
+    gcry_error_t err = gcry_sexp_build(static_cast<gcry_sexp_t *>(key_), nullptr, ED25519_IMPORT_PUBLIC_KEY.c_str(), publicKey.size(), &publicKey[0]);
     if (err) {
         throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
     }
 }
 
 ED25519Key::~ED25519Key() {
-    gcry_sexp_release(key_);
+    if (key_ != nullptr) {
+        gcry_sexp_t *gkey = static_cast<gcry_sexp_t *>(key_);
+        gcry_sexp_release(*gkey);
+
+        delete gkey;
+    }
+
     key_ = nullptr;
 }
 
 // Verifies public key pair and throws on error.
-void ED25519Key::VerifyKeyPair(gcry_sexp_t key) {
-    if (key == nullptr) {
+void ED25519Key::VerifyKeyPair(key_t key) {
+    if (key == nullptr || static_cast<void *>(key) == nullptr) {
         throw invalid_argument("Invalid key!");
     }
+
+    gcry_sexp_t gkey = *static_cast<gcry_sexp_t *>(key);
 
     gcry_sexp_t publicKey = nullptr;
     gcry_sexp_t secretKey = nullptr;
 
     try {
-        publicKey = gcry_sexp_find_token(key, "public-key", 0);
+        publicKey = gcry_sexp_find_token(gkey, "public-key", 0);
         if (!publicKey) {
             throw invalid_argument("Public part is missing!");
         }
 
-        secretKey = gcry_sexp_find_token(key, "private-key", 0);
+        secretKey = gcry_sexp_find_token(gkey, "private-key", 0);
         if (!secretKey) {
             throw invalid_argument("Private part is missing!");
         }
@@ -104,7 +121,7 @@ void ED25519Key::VerifyKeyPair(gcry_sexp_t key) {
         }
 
         // Check that gcry_pk_testkey also works on the entire S-expression.
-        err = gcry_pk_testkey(key);
+        err = gcry_pk_testkey(gkey);
         if (err) {
             throw invalid_argument("gcry_pk_testkey failed on the entire key with: " + string(gcry_strerror(err)));
         }
@@ -126,7 +143,8 @@ const vector<uint8_t> ED25519Key::GetPublicKey() const {
     gcry_sexp_t qPoint = nullptr;
 
     try {
-        publicKey = gcry_sexp_find_token(key_, "public-key", 0);
+        gcry_sexp_t gkey = *static_cast<gcry_sexp_t *>(key_);
+        publicKey = gcry_sexp_find_token(gkey, "public-key", 0);
         if (!publicKey) {
             throw runtime_error("gcry_sexp_find_token failed to find \"public-key\"!");
         }
