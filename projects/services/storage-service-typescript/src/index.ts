@@ -1,24 +1,15 @@
 import * as path from "path";
 
-import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
+import { logger, ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
 
 import BlockStorageService from "./block-storage-service";
 import StateStorageService from "./state-storage-service";
 
-const { NODE_NAME, NODE_ENV, LOGZIO_API_KEY, LOG_LEVEL, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = process.env;
+const { NODE_NAME, NODE_ENV, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = process.env;
 
 ErrorHandler.setup();
 
-logger.configure({
-  level: LOG_LEVEL,
-  file: {
-    fileName: path.join(__dirname, "../../../../logs/storage.log")
-  },
-  logzio: {
-    apiKey: LOGZIO_API_KEY
-  },
-  console: true
-});
+Service.initLogger(path.join(__dirname, "../../../../logs/storage.log"));
 
 if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");
