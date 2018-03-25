@@ -13,8 +13,6 @@
 		14706BEE2067CCA5008C6154 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14706BED2067CCA5008C6154 /* Assets.xcassets */; };
 		14706BF12067CCA5008C6154 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14706BEF2067CCA5008C6154 /* LaunchScreen.storyboard */; };
 		14706BF42067CCA5008C6154 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 14706BF32067CCA5008C6154 /* main.m */; };
-		14706BFE2067CCA5008C6154 /* ios_sample_appTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 14706BFD2067CCA5008C6154 /* ios_sample_appTests.m */; };
-		14706C092067CCA5008C6154 /* ios_sample_appUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 14706C082067CCA5008C6154 /* ios_sample_appUITests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,11 +44,7 @@
 		14706BF22067CCA5008C6154 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		14706BF32067CCA5008C6154 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		14706BF92067CCA5008C6154 /* ios-sample-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-sample-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		14706BFD2067CCA5008C6154 /* ios_sample_appTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ios_sample_appTests.m; sourceTree = "<group>"; };
-		14706BFF2067CCA5008C6154 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		14706C042067CCA5008C6154 /* ios-sample-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-sample-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		14706C082067CCA5008C6154 /* ios_sample_appUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ios_sample_appUITests.m; sourceTree = "<group>"; };
-		14706C0A2067CCA5008C6154 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,8 +76,6 @@
 			isa = PBXGroup;
 			children = (
 				14706BE32067CCA5008C6154 /* ios-sample-app */,
-				14706BFC2067CCA5008C6154 /* ios-sample-appTests */,
-				14706C072067CCA5008C6154 /* ios-sample-appUITests */,
 				14706BE22067CCA5008C6154 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,24 +104,6 @@
 				14706BF32067CCA5008C6154 /* main.m */,
 			);
 			path = "ios-sample-app";
-			sourceTree = "<group>";
-		};
-		14706BFC2067CCA5008C6154 /* ios-sample-appTests */ = {
-			isa = PBXGroup;
-			children = (
-				14706BFD2067CCA5008C6154 /* ios_sample_appTests.m */,
-				14706BFF2067CCA5008C6154 /* Info.plist */,
-			);
-			path = "ios-sample-appTests";
-			sourceTree = "<group>";
-		};
-		14706C072067CCA5008C6154 /* ios-sample-appUITests */ = {
-			isa = PBXGroup;
-			children = (
-				14706C082067CCA5008C6154 /* ios_sample_appUITests.m */,
-				14706C0A2067CCA5008C6154 /* Info.plist */,
-			);
-			path = "ios-sample-appUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -275,7 +249,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14706BFE2067CCA5008C6154 /* ios_sample_appTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,7 +256,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14706C092067CCA5008C6154 /* ios_sample_appUITests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
