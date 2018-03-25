@@ -1,7 +1,7 @@
 {
   "name": "orbs-typescript-sdk",
   "version": "0.1.0",
-  "description": "Orbs Typescript SDK",
+  "description": "Orbs Magic Money Bot",
   "repository": {
     "type": "git",
     "url": "https://github.com/orbs-network/orbs-network.git"
