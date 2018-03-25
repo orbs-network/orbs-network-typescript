@@ -11,7 +11,7 @@ docker run -ti --rm --privileged  \
 --network=public-network --ip 172.2.2.15 \
 -e PREEXISTING_PUBLIC_SUBNET=172.2.2 -e CONNECT_FROM_HOST=false \
 -e DOCKER_IMAGE -e DOCKER_TAG \
--e TEST=${TEST} \
+-e TEST \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $ROOT_DIR/logs:/opt/orbs/logs \
 $DOCKER_IMAGE:$DOCKER_TAG  \
