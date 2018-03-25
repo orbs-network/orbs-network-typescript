@@ -1,7 +1,7 @@
 import { defaults } from "lodash";
 
 import { grpcServer, types, topologyPeers, logger } from "orbs-core-library";
-import { Consensus, SubscriptionManager, TransactionPool } from "orbs-core-library";
+import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool } from "orbs-core-library";
 
 import ConsensusService from "./consensus-service";
 import SubscriptionManagerService from "./subscription-manager-service";
@@ -43,6 +43,11 @@ function makeSubscriptionManager(peers: types.ClientMap) {
   return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
 }
 
+function makePendingTransactionPool(peers: types.ClientMap) {
+  const committedTransactionPool = new CommittedTransactionPool();
+  return new PendingTransactionPool(peers.gossip, committedTransactionPool);
+}
+
 export default function(nodeTopology: any) {
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);
@@ -50,5 +55,5 @@ export default function(nodeTopology: any) {
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers), nodeConfig))
     .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers), nodeConfig))
-    .withService("TransactionPool", new TransactionPoolService(new TransactionPool(peers.gossip), nodeConfig));
+    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers), nodeConfig));
 }

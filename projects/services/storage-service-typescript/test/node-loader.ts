@@ -6,7 +6,7 @@ import { types, BlockUtils, FakeGossipClient, generateServiceIPCClient } from "o
 import BlockStorageService from "../src/block-storage-service";
 
 function generateEmptyBlock(prevBlock: types.Block): types.Block {
-  return BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, prevBlock);
+  return BlockUtils.buildNextBlock({transactions: [], stateDiff: [], transactionReceipts: []}, prevBlock);
 }
 
 export class NodeLoader {

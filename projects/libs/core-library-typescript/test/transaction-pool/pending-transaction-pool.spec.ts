@@ -52,7 +52,7 @@ describe("Transaction Pool", () => {
     gossip = stubInterface<types.GossipClient>();
     const committedTransactionPool = stubInterface<CommittedTransactionPool>();
     committedTransactionPool.hasTransactionWithId.returns(false);
-    transactionPool = new PendingTransactionPool(gossip, committedTransactionPool);
+    transactionPool = new PendingTransactionPool(gossip, committedTransactionPool, { transactionLifespanMs: 30000, cleanupIntervalMs: 1000 });
   });
 
   it("new broadcast transaction is added to the pool", async () => {
@@ -77,7 +77,7 @@ describe("Transaction Pool", () => {
     await expect(transactionPool.addNewPendingTransaction(tx)).to.be.rejected;
   });
 
-  describe("expired transaction is properly cleared from the pool", () => {
+  describe("expired transaction is properly cleared from the pool when calling clearExpiredTransactions()", () => {
     let clock: sinon.SinonFakeTimers;
 
     before(() => {
@@ -96,6 +96,38 @@ describe("Transaction Pool", () => {
       const tx2 = aValidTransaction();
       await transactionPool.addNewPendingTransaction(tx2);
       transactionPool.clearExpiredTransactions();
+
+      const pendingTransactions = transactionPool.getAllPendingTransactions();
+      expect(pendingTransactions).to.have.lengthOf(1);
+      expect(pendingTransactions[0]).to.have.property("transaction", tx2);
+    });
+  });
+
+  describe("expired transaction is properly cleared from the pool by the cleanup timer", () => {
+    let clock: sinon.SinonFakeTimers;
+
+    before(() => {
+      clock = sinon.useFakeTimers(Date.now());
+    });
+
+    after(() => {
+      clock.restore();
+    });
+
+    it("", async () => {
+      const tx1 = aValidTransaction();
+      await transactionPool.addNewPendingTransaction(tx1);
+      console.log("transactionPool.transactionLifespanMs", transactionPool.transactionLifespanMs);
+      clock.tick(transactionPool.transactionLifespanMs + 1);
+
+      const tx2 = aValidTransaction();
+      await transactionPool.addNewPendingTransaction(tx2);
+      transactionPool.startCleanupTimer();
+
+      // this should be smaller than the transaction lifespan to work. Otherwise both transactions will expire
+      clock.tick(transactionPool.cleanupIntervalMs + 1);
+
+      transactionPool.stopCleanupTimer();
 
       const pendingTransactions = transactionPool.getAllPendingTransactions();
       expect(pendingTransactions).to.have.lengthOf(1);

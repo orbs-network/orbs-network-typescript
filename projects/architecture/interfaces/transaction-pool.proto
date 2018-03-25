@@ -6,11 +6,16 @@ import "primitives/gossip-listener.proto";
 service TransactionPool {
   rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
   rpc GetAllPendingTransactions (GetAllPendingTransactionsInput) returns (GetAllPendingTransactionsOutput);
-  rpc ClearPendingTransactions (ClearPendingTransactionsInput) returns (ClearPendingTransactionsOutput);
+  rpc MarkCommittedTransactions (MarkCommittedTransactionsInput) returns (MarkCommittedTransactionsOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
 }
 
-message GossipMessageReceivedData {
+message CommittedTransactionEntry {
+  bytes txHash = 1;
+  int32 timestamp = 2;
+}
+
+message NewTransactionBroadcastMessage {
   Transaction transaction = 1;
 }
 
@@ -26,12 +31,12 @@ message GetAllPendingTransactionsInput {
 }
 
 message GetAllPendingTransactionsOutput {
-  repeated Transaction transactions = 1;
+  repeated TransactionEntry transactionEntries = 1;
 }
 
-message ClearPendingTransactionsInput {
-  repeated Transaction transactions = 1;
+message MarkCommittedTransactionsInput {
+  repeated CommittedTransactionEntry transactionEntries  = 1;
 }
 
-message ClearPendingTransactionsOutput {
+message MarkCommittedTransactionsOutput {
 }

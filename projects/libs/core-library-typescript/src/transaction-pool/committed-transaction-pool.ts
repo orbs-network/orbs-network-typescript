@@ -1,33 +1,31 @@
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import { createHash } from "crypto";
-import { isExpired } from "./transaction-utils";
+import BaseTransactionPool from "./base-transaction-pool";
 
-export class CommittedTransactionPool {
+export class CommittedTransactionPool extends BaseTransactionPool {
   private committedTransactions = new Map<string, number>();
-  private gossip: types.GossipClient;
-
-  constructor(gossip: types.GossipClient) {
-    this.gossip = gossip;
-  }
 
   public hasTransactionWithId(txid: string): boolean {
     return this.committedTransactions.has(txid);
   }
 
-  public clearExpiredTransactions() {
+  public clearExpiredTransactions(): number {
+    let count = 0;
     for (const [txid, timestamp] of this.committedTransactions.entries()) {
-      if (isExpired(timestamp)) {
+      if (this.isExpired(timestamp)) {
         this.committedTransactions.delete(txid);
+        count++;
       }
     }
+    return count;
   }
 
   public addCommittedTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
     for (const { txHash, timestamp } of transactionEntries) {
       const txid = txHash.toString("hex");
 
-      if (isExpired(timestamp)) {
+      if (this.isExpired(timestamp)) {
         continue;
       }
 
