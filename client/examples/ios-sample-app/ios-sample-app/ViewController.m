@@ -17,5 +17,8 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (IBAction)onGenerateAddressButtonClick:(id)sender {
+    [self.addressTextField setText:@"Hello World!"];
+}
 
 @end
