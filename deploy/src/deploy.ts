@@ -241,7 +241,7 @@ export async function execute(options: any) {
     setParameter(standaloneParams, "KeyName", keyName);
     setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
 
-    if (options.nodes) {
+    if (options.numOfNodes) {
       setParameter(standaloneParams, "NumOfNodes", options.numOfNodes);
     }
 
