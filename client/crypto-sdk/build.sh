@@ -4,11 +4,12 @@ mkdir -p build
 cd build
 
 if [ -n "${DEBUG}" ] ; then
-    echo "Building bebug version..."
-    cmake .. -DCMAKE_BUILD_TYPE=Debug
+    BUILD_TYPE=Debug
 else
-    echo "Building release version..."
-    cmake .. -DCMAKE_BUILD_TYPE=Release
+    BUILD_TYPE=Release
 fi
+
+echo "Building ${BUILD_TYPE} version..."
+cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
 
 make
