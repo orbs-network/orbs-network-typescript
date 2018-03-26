@@ -225,7 +225,7 @@ napi_value Address::GetChecksum(napi_env env, napi_callback_info info) {
     return res;
 }
 
-napi_value Address::GetMainNetworkId(napi_env env, napi_callback_info info) {
+static napi_value GetNetworkId(napi_env env, napi_callback_info info, uint8_t networkId) {
     napi_status status;
 
     napi_value jsthis;
@@ -233,7 +233,7 @@ napi_value Address::GetMainNetworkId(napi_env env, napi_callback_info info) {
     assert(status == napi_ok);
 
     vector<uint8_t> data;
-    data.push_back(Orbs::Address::MAIN_NETWORK_ID);
+    data.push_back(networkId);
     const string str(Orbs::Base58::Encode(data));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
@@ -241,20 +241,12 @@ napi_value Address::GetMainNetworkId(napi_env env, napi_callback_info info) {
     return res;
 }
 
+napi_value Address::GetMainNetworkId(napi_env env, napi_callback_info info) {
+    return GetNetworkId(env, info,Orbs::Address::MAIN_NETWORK_ID);
+}
+
 napi_value Address::GetTestNetworkId(napi_env env, napi_callback_info info) {
-    napi_status status;
-
-    napi_value jsthis;
-    status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
-    assert(status == napi_ok);
-
-    vector<uint8_t> data;
-    data.push_back(Orbs::Address::TEST_NETWORK_ID);
-    const string str(Orbs::Base58::Encode(data));
-    napi_value res;
-    status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
-
-    return res;
+    return GetNetworkId(env, info,Orbs::Address::TEST_NETWORK_ID);
 }
 
 napi_value Address::ToString(napi_env env, napi_callback_info info) {
