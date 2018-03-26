@@ -1,5 +1,5 @@
 export * from "./logger";
-export * from "./errorHandler";
+export * from "./error-handler";
 export * from "./grpc";
 export * from "./topology";
 export * from "./topologyPeers";

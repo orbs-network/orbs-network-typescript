@@ -1,23 +1,14 @@
 import * as path from "path";
 
-import { logger, ErrorHandler, grpc, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
+import { logger, ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
 
 import VirtualMachineService from "./service";
 
-const { NODE_NAME, ETHEREUM_NODE_HTTP_ADDRESS, LOGZIO_API_KEY, LOG_LEVEL } = process.env;
+const { NODE_NAME, ETHEREUM_NODE_HTTP_ADDRESS } = process.env;
 
 ErrorHandler.setup();
 
-logger.configure({
-  level: LOG_LEVEL,
-  file: {
-    fileName: path.join(__dirname, "../../../../logs/virtual-machine.log")
-  },
-  logzio: {
-    apiKey: LOGZIO_API_KEY
-  },
-  console: true
-});
+Service.initLogger(path.join(__dirname, "../../../../logs/virtual-machine.log"));
 
 if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");
