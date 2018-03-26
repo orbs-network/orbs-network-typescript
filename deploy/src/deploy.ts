@@ -88,7 +88,7 @@ function uploadBootstrap(options: any) {
 }
 
 function getDockerImageName(options: any) {
-  return `${options.accoundId}.dkr.ecr.${options.region}.amazonaws.com/orbs-network-${options.NODE_ENV}-${options.region}`;
+  return `${options.accountId}.dkr.ecr.${options.region}.amazonaws.com/orbs-network-${options.NODE_ENV}-${options.region}`;
 }
 
 function getDefaultDockerImageTag() {
@@ -265,7 +265,7 @@ export async function execute(options: any) {
 export function getBaseConfig() {
   const nodeConfig = {
     network: config.get("network"),
-    accoundId: config.get("account-id"),
+    accountId: config.get("account-id"),
     NODE_ENV: config.get("network") == "mainnet" ? "production" : "staging",
     dnsZone: config.get("dns-zone"),
     sshPublicKey: config.get("ssh-public-key"),
