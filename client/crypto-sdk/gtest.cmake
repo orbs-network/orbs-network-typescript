@@ -1,5 +1,3 @@
-find_package(Threads REQUIRED)
-
 set(GTEST_VERSION release-1.8.0)
 
 include(ExternalProject)

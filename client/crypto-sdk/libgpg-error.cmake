@@ -1,5 +1,3 @@
-find_package(Threads REQUIRED)
-
 set(LIBGPG_ERROR_VERSION 1.27)
 
 if(CI)

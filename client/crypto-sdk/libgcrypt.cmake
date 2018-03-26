@@ -1,5 +1,3 @@
-find_package(Threads REQUIRED)
-
 set(LIBGCRYPT_VERSION 1.8.2)
 
 ExternalProject_Get_Property(libgpg-error BINARY_DIR)
