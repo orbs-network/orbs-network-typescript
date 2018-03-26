@@ -58,7 +58,7 @@ node src/deploy.js \
 
 aws cloudformation describe-stacks --region $REGION --stack-name basic-infrastructure-$NETWORK
 
-aws ec2 describe-addresses --region $REGION --allocation-ips eipalloc-something
+aws ec2 describe-addresses --region $REGION --allocation-ids eipalloc-something
 
 # update bootstrap/.env with GOSSIP_PEERS=ws://IP_ADDRESS:60001
 # keep listing this addresses as you deploy new nodes
