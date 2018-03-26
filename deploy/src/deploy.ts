@@ -6,13 +6,13 @@ const shell = require("shelljs");
 const fs = require("fs");
 const nconf = require("nconf");
 
-const { REGION, NETWORK, DNS_ZONE, ACCOUNT_ID } = process.env;
+const { REGION, NETWORK, DNS_ZONE } = process.env;
 
 const argsConfig = {
   parseValues: true
 };
 
-const config = nconf.env(argsConfig).argv(argsConfig);
+export const config = nconf.env(argsConfig).argv(argsConfig);
 
 function setParameter(params: any, key: string, value: string | number) {
   const param = _.find(params, (p: any) => p.ParameterKey === key);
@@ -84,7 +84,7 @@ function waitForStacks(cloudFormation: any, region: any, condition: any) {
 
 function uploadBootstrap(options: any) {
   const { s3Path, localPath } = options.parity ? { s3Path: "parity", localPath: "parity" } : { s3Path: "v1", localPath: "bootstrap" };
-  shell.exec(`aws s3 sync ${__dirname}/../${localPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
+  shell.exec(`${getAWSCredentialsAsEnvVars(options)} aws s3 sync ${__dirname}/../${localPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
 }
 
 function getDockerImageName(options: any) {
@@ -98,7 +98,7 @@ function getDefaultDockerImageTag() {
 function pushDockerImage(options: any) {
   const dockerImage = getDockerImageName(options);
 
-  shell.exec(`$(aws ecr get-login --no-include-email --region ${options.region})`);
+  shell.exec(`$(${getAWSCredentialsAsEnvVars(options)} aws ecr get-login --no-include-email --region ${options.region})`);
   shell.exec(`docker push ${dockerImage}`);
 }
 
@@ -133,15 +133,31 @@ function removeStack(cloudFormation: any, stackName: string) {
   });
 }
 
-async function execute(options: any) {
+function getAWSCredentialsAsEnvVars(options: any) {
+  if (!options.credentials) {
+    return "";
+  }
+
+  return `export AWS_SECRET_ACCESS_KEY=${options.credentials.secretAccessKey} AWS_ACCESS_KEY_ID=${options.credentials.accessKeyId} &&`;
+}
+
+export async function execute(options: any) {
   console.log(`Deploying to ${options.region}`);
 
-  const cloudFormation = new AWS.CloudFormation({ region: options.region });
+
+  const cfParams: any = { region: options.region };
+  if (options.credentials) {
+    cfParams.accessKeyId = options.credentials.accessKeyId;
+    cfParams.secretAccessKey = options.credentials.secretAccessKey;
+  }
+
+  const cloudFormation = new AWS.CloudFormation(cfParams);
 
   const keyName = `orbs-network-${options.NODE_ENV}-key`;
 
   if (options.sshPublicKey) {
-    shell.exec(`aws ec2 import-key-pair \
+    shell.exec(`${getAWSCredentialsAsEnvVars(options)} \
+    aws ec2 import-key-pair \
             --key-name ${keyName} \
             --public-key-material "$(cat ${options.sshPublicKey})" \
             --region ${options.region}
@@ -246,7 +262,7 @@ async function execute(options: any) {
   }
 }
 
-async function main() {
+export function getBaseConfig() {
   const nodeConfig = {
     network: config.get("network"),
     accoundId: config.get("account-id"),
@@ -265,9 +281,14 @@ async function main() {
     updateConfiguration: config.get("update-configuration"),
     parity: config.get("parity"),
     sshCidr: config.get("ssh-cidr"),
-    peersCidr: config.get("peers-cidr")
+    peersCidr: config.get("peers-cidr"),
   };
 
+  return nodeConfig;
+}
+
+async function main() {
+  const nodeConfig = getBaseConfig();
   const regions = config.get("region").split(",");
   const step = config.get("step") || 3;
 
@@ -285,4 +306,6 @@ async function main() {
   }
 }
 
-main();
+if (!module.parent) {
+  main();
+}
