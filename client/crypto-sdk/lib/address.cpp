@@ -26,6 +26,8 @@ const uint32_t Address::VIRTUAL_CHAIN_ID_SIZE = 3;
 const uint8_t Address::VIRTUAL_CHAIN_ID_MSB = 0x08;
 const uint32_t Address::ACCOUNT_ID_SIZE = 20;
 const uint32_t Address::CHECKSUM_SIZE = 4;
+
+// Network ID [1] + Version [1] + BASE58 of (Virtual Chain ID + Account ID + Checksum) [37].
 const uint32_t Address::ADDRESS_LENGTH = 39;
 
 Address::Address(const vector<uint8_t> &publicKey, const vector<uint8_t> &virtualChainId, uint8_t networkId) :
