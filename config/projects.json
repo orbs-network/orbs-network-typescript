@@ -49,6 +49,11 @@
     "type": "library",
     "path": "client/crypto-sdk-javascript"
   },
+  "example-slack-bot": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/examples/slack-bot"
+  },
   "order": [
     "architecture",
     "crypto-sdk",
@@ -59,6 +64,7 @@
     "public-api-service-typescript",
     "sidechain-connector-service-typescript",
     "storage-service-typescript",
-    "virtual-machine-service-typescript"
+    "virtual-machine-service-typescript",
+    "example-slack-bot"
   ]
 }
