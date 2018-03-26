@@ -114,15 +114,13 @@ function tagDockerImage(options: any) {
 
 function stackAction(action: string, cloudFormation: any, stackName: string, templateBody: string, parameters: any) {
   return new Promise((resolve, reject) => {
-    return new Promise((resolve, reject) => {
-      cloudFormation[action]({
-        StackName: stackName,
-        Parameters: parameters,
-        TemplateBody: templateBody,
-        Capabilities: ["CAPABILITY_NAMED_IAM"]
-      }, (err: Error, data: any) => {
-        err ? reject(err) : resolve(data);
-      });
+    cloudFormation[action]({
+      StackName: stackName,
+      Parameters: parameters,
+      TemplateBody: templateBody,
+      Capabilities: ["CAPABILITY_NAMED_IAM"]
+    }, (err: Error, data: any) => {
+      err ? reject(err) : resolve(data);
     });
   });
 }
@@ -202,6 +200,11 @@ async function execute(options: any) {
     await waitForStacks(cloudFormation, options.region, (stacks: any) => {
       const nodeStack = _.find(stacks, { StackName: stackName });
 
+      // TODO: fix never-ending update loop if node does not exit
+      if (options.updateNode && !_.isObject(nodeStack)) {
+        throw new Error(`Can't update if stack ${stackName} does not exist!`);
+      }
+
       const check = options.updateNode ? _.isObject : _.isEmpty;
       return check(nodeStack);
     });
@@ -236,11 +239,10 @@ async function execute(options: any) {
     });
 
     const action = options.updateNode ? "updateStack" : "createStack";
-    return stackAction(action, cloudFormation, stackName, template, standaloneParams).then(() => {
-      const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
+    await stackAction(action, cloudFormation, stackName, template, standaloneParams);
 
-      console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
-    });
+    const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
+    console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
   }
 }
 
@@ -272,10 +274,15 @@ async function main() {
   const someRegionsList = _.chunk(regions, step);
 
   console.log(nodeConfig);
+  console.log(someRegionsList);
 
   for (const someRegions of someRegionsList) {
-    await Promise.all(someRegions.map((region: string) => execute(_.extend({}, nodeConfig, { region }))));
+    try {
+      await Promise.all(someRegions.map((region: string) => execute(_.extend({}, nodeConfig, { region }))));
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
-main().then(console.log);
+main();
