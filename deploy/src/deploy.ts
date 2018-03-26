@@ -108,8 +108,8 @@ function tagDockerImage(options: any) {
   const dockerImage = getDockerImageName(options);
   const dockerTag = options.dockerTag || defaultTag;
 
-  console.log(`docker tag ${defaultImage}:${defaultTag} ${dockerImage}:${dockerTag}`);
-  shell.exec(`docker tag ${defaultImage}:${defaultTag} ${dockerImage}:${dockerTag}`);
+  console.log(`docker tag ${defaultImage}:${dockerTag} ${dockerImage}:${dockerTag}`);
+  shell.exec(`docker tag ${defaultImage}:${dockerTag} ${dockerImage}:${dockerTag}`);
 }
 
 function stackAction(action: string, cloudFormation: any, stackName: string, templateBody: string, parameters: any) {
@@ -135,7 +135,7 @@ function removeStack(cloudFormation: any, stackName: string) {
   });
 }
 
-function execute(options: any) {
+async function execute(options: any) {
   console.log(`Deploying to ${options.region}`);
 
   const cloudFormation = new AWS.CloudFormation({ region: options.region });
@@ -170,84 +170,81 @@ function execute(options: any) {
 
     const template = fs.readFileSync(`${__dirname}/../cloudformation/basic-infrastructure.yaml`).toString();
 
-    stackAction("createStack", cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams).catch((err: Error) => {
-      console.error(err);
-      process.exit(1);
-    });
+    await stackAction("createStack", cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams);
   }
 
-  return waitForStacks(cloudFormation, options.region, (stacks: any) => {
+  await waitForStacks(cloudFormation, options.region, (stacks: any) => {
     return _.isObject(_.find(stacks, (s: any) => s.StackName === basicInfrastructureStackName && s.StackStatus === "CREATE_COMPLETE"));
-  }).then(() => {
-    if (options.tagDockerImage) {
-      tagDockerImage(options);
-    }
-
-    if (options.pushDockerImage) {
-      console.log(`Pushing docker image to ${options.region}...`);
-      pushDockerImage(options);
-    }
-
-    const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
-
-    if (options.deployNode || options.updateNode || options.updateConfiguration) {
-      console.log(`Uploading bootstrap files to ${options.region}...`);
-      uploadBootstrap(options);
-    }
-
-    if (options.deployNode || options.updateNode) {
-      if (options.removeNode) {
-        console.log(`Removing old node...`);
-        removeStack(cloudFormation, stackName);
-      }
-
-      return waitForStacks(cloudFormation, options.region, (stacks: any) => {
-        const nodeStack = _.find(stacks, { StackName: stackName });
-
-        const check = options.updateNode ? _.isObject : _.isEmpty;
-        return check(nodeStack);
-      }).then(() => {
-        if (options.deployNode) {
-          console.log(`Deploying new node to ${options.region}...`);
-        }
-
-        if (options.updateNode) {
-          console.log(`Updating node in ${options.region}...`);
-        }
-
-        const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
-
-        const standaloneParams = JSON.parse(fs.readFileSync(`${__dirname}/../cloudformation/${paramsFileName}`).toString());
-
-        setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
-        setParameter(standaloneParams, "KeyName", keyName);
-        setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
-
-        if (options.nodes) {
-          setParameter(standaloneParams, "NumOfNodes", options.numOfNodes);
-        }
-
-        const sshCidr = (options.sshCidr || "0.0.0.0/0").split(",");
-        const peersCidr = (options.peersCidr || "0.0.0.0/0").split(",");
-
-        // TODO: move to Kubernetes, this is getting ridiculous
-        _.templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
-        const template = _.template(fs.readFileSync(`${__dirname}/../cloudformation/node.yaml`).toString())({
-          sshCidr, peersCidr
-        });
-
-        const action = options.updateNode ? "updateStack" : "createStack";
-        return stackAction(action, cloudFormation, stackName, template, standaloneParams).then(() => {
-          const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
-
-          console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
-        });
-      });
-    }
   });
+
+  if (options.tagDockerImage) {
+    tagDockerImage(options);
+  }
+
+  if (options.pushDockerImage) {
+    console.log(`Pushing docker image to ${options.region}...`);
+    pushDockerImage(options);
+  }
+
+  const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
+
+  if (options.deployNode || options.updateNode || options.updateConfiguration) {
+    console.log(`Uploading bootstrap files to ${options.region}...`);
+    uploadBootstrap(options);
+  }
+
+  if (options.removeNode) {
+    console.log(`Removing old node...`);
+    await removeStack(cloudFormation, stackName);
+  }
+
+  if (options.deployNode || options.updateNode) {
+    await waitForStacks(cloudFormation, options.region, (stacks: any) => {
+      const nodeStack = _.find(stacks, { StackName: stackName });
+
+      const check = options.updateNode ? _.isObject : _.isEmpty;
+      return check(nodeStack);
+    });
+
+    if (options.deployNode) {
+      console.log(`Deploying new node to ${options.region}...`);
+    }
+
+    if (options.updateNode) {
+      console.log(`Updating node in ${options.region}...`);
+    }
+
+    const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
+
+    const standaloneParams = JSON.parse(fs.readFileSync(`${__dirname}/../cloudformation/${paramsFileName}`).toString());
+
+    setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
+    setParameter(standaloneParams, "KeyName", keyName);
+    setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
+
+    if (options.nodes) {
+      setParameter(standaloneParams, "NumOfNodes", options.numOfNodes);
+    }
+
+    const sshCidr = (options.sshCidr || "0.0.0.0/0").split(",");
+    const peersCidr = (options.peersCidr || "0.0.0.0/0").split(",");
+
+    // TODO: move to Kubernetes, this is getting ridiculous
+    _.templateSettings.interpolate = /<%=([\s\S]+?)%>/g;
+    const template = _.template(fs.readFileSync(`${__dirname}/../cloudformation/node.yaml`).toString())({
+      sshCidr, peersCidr
+    });
+
+    const action = options.updateNode ? "updateStack" : "createStack";
+    return stackAction(action, cloudFormation, stackName, template, standaloneParams).then(() => {
+      const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
+
+      console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
+    });
+  }
 }
 
-function main() {
+async function main() {
   const nodeConfig = {
     network: config.get("network"),
     accoundId: config.get("account-id"),
@@ -274,9 +271,11 @@ function main() {
 
   const someRegionsList = _.chunk(regions, step);
 
-  return _.reduce(someRegionsList, (prevDeployment: Promise<any>, someRegions: string[]) => {
-    return prevDeployment.then(() => {
-      return Promise.all(someRegions.map(region => execute(_.extend(nodeConfig, { region }))));
-    });
-  }, Promise.resolve()).catch(() => process.exit(1));
+  console.log(nodeConfig);
+
+  for (const someRegions of someRegionsList) {
+    await Promise.all(someRegions.map((region: string) => execute(_.extend({}, nodeConfig, { region }))));
+  }
 }
+
+main().then(console.log);
