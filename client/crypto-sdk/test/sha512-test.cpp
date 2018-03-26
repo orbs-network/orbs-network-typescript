@@ -90,4 +90,3 @@ TEST(Hash, computes_string_SHA512_of_string) {
     SHA512::Hash("אורבס", res);
     EXPECT_STREQ(res.c_str(), "bda6d47b7433df147caaabfb0e99959094d6189082c2e41a5500fd8e6ffaec9ef0015598103c7f02dcf5a27ff18b46d0f6b28783eef14b66895be1b9d5c818b7");
 }
-

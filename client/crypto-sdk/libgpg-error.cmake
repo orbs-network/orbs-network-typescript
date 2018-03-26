@@ -2,6 +2,12 @@ find_package(Threads REQUIRED)
 
 set(LIBGPG_ERROR_VERSION 1.27)
 
+if(CI)
+  set(LIBGPG_ERROR_TEST_COMMAND make check)
+else()
+  message("Skipping libgpg-error tests...")
+endif()
+
 include(ExternalProject)
 ExternalProject_Add(libgpg-error
   URL "https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-${LIBGPG_ERROR_VERSION}.tar.bz2"
@@ -9,11 +15,13 @@ ExternalProject_Add(libgpg-error
   CONFIGURE_COMMAND <SOURCE_DIR>/configure
     --host=${TARGET_ARCH}
     --prefix=${TARGET_DIR}
+    --with-pic
+    --enable-static
     --disable-shared
     --disable-nls
     --disable-languages
   BUILD_COMMAND make
-  TEST_COMMAND make check
+  TEST_COMMAND ${LIBGPG_ERROR_TEST_COMMAND}
   UPDATE_COMMAND ""
   INSTALL_COMMAND ""
   LOG_DOWNLOAD ON

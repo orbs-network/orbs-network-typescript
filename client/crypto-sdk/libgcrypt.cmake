@@ -4,6 +4,12 @@ set(LIBGCRYPT_VERSION 1.8.2)
 
 ExternalProject_Get_Property(libgpg-error BINARY_DIR)
 
+if(CI)
+  set(LIBGCRYPT_TEST_COMMAND make check)
+else()
+  message("Skipping libgcrypt tests...")
+endif()
+
 include(ExternalProject)
 ExternalProject_Add(libgcrypt
   DEPENDS libgpg-error
@@ -13,11 +19,12 @@ ExternalProject_Add(libgcrypt
     --host=${TARGET_ARCH}
     --prefix=${TARGET_DIR}
     --with-gpg-error-prefix=${BINARY_DIR}/src
-    --enable-static
+    --with-pic
     --disable-shared
+    --enable-static
     --disable-asm
   BUILD_COMMAND make
-  TEST_COMMAND make check
+  TEST_COMMAND ${LIBGCRYPT_TEST_COMMAND}
   UPDATE_COMMAND ""
   INSTALL_COMMAND ""
   LOG_DOWNLOAD ON

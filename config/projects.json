@@ -1,38 +1,58 @@
 {
   "architecture": {
     "runtime": "protobuf",
-    "type": "static"
+    "type": "static",
+    "path": "projects/architecture"
   },
   "core-library-typescript": {
     "runtime": "typescript",
-    "type": "library"
+    "type": "library",
+    "path": "projects/libs/core-library-typescript"
   },
   "gossip-service-typescript": {
     "runtime": "typescript",
-    "type": "service"
+    "type": "service",
+    "path": "projects/services/gossip-service-typescript"
   },
   "consensus-service-typescript": {
     "runtime": "typescript",
-    "type": "service"
+    "type": "service",
+    "path": "projects/services/consensus-service-typescript"
   },
   "public-api-service-typescript": {
     "runtime": "typescript",
-    "type": "service"
+    "type": "service",
+    "path": "projects/services/public-api-service-typescript"
   },
   "sidechain-connector-service-typescript": {
     "runtime": "typescript",
-    "type": "service"
+    "type": "service",
+    "path": "projects/services/sidechain-connector-service-typescript"
   },
   "storage-service-typescript": {
     "runtime": "typescript",
-    "type": "service"
+    "type": "service",
+    "path": "projects/services/storage-service-typescript"
   },
   "virtual-machine-service-typescript": {
     "runtime": "typescript",
-    "type": "service"
+    "type": "service",
+    "path": "projects/services/virtual-machine-service-typescript"
+  },
+  "crypto-sdk": {
+    "runtime": "C++",
+    "type": "library",
+    "path": "client/crypto-sdk"
+  },
+  "crypto-sdk-javascript": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/crypto-sdk-javascript"
   },
   "order": [
     "architecture",
+    "crypto-sdk",
+    "crypto-sdk-javascript",
     "core-library-typescript",
     "gossip-service-typescript",
     "consensus-service-typescript",

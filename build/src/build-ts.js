@@ -5,37 +5,22 @@ const shell = require('shelljs');
 const projects = require('../../config/projects.json');
 require('colors');
 
+const RUNTIMES = ['typescript', 'protobuf', 'C++'];
+
 async function main() {
   projects.order.forEach((projectName) => {
     const project = projects[projectName];
 
-    if (project.runtime !== 'typescript' && project.runtime !== 'protobuf') {
+    if (RUNTIMES.indexOf(project.runtime) === -1) {
       return;
     }
 
-    let dir;
-    switch (project.type) {
-      case 'static':
-        dir = '';
-        break;
-
-      case 'library':
-        dir = 'libs';
-        break;
-
-      case 'service':
-        dir = 'services';
-        break;
-
-      default:
-        throw new Error(`Unsupported project type: ${project.type}`);
-    }
-
-    const projectPath = path.resolve(__dirname, '../../projects/', dir, projectName);
+    const projectPath = path.resolve(__dirname, '../../', project.path);
 
     console.log(`* Building ${projectName}\n`.green);
     shell.cd(projectPath);
-    const shellStringOutput = shell.exec('./build.sh');
+
+    const shellStringOutput = shell.exec(project.runtime !== 'C++' ? './build.sh' : './rebuild.sh');
     if (shellStringOutput.code !== 0) {
       throw new Error(`Error ${shellStringOutput.code} in ${projectPath}\n`.red);
     }
