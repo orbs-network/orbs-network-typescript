@@ -10,4 +10,20 @@ export default abstract class BaseSmartContract {
     this.sender = sender;
     this.stateAccessor = stateAccessor;
   }
+
+  validationError(message: string) {
+    return new ValidationError(message);
+  }
+}
+
+export class ValidationError implements Error {
+  name: string;
+  message: string;
+  stack?: string;
+  expected = true;
+
+  constructor(message: string) {
+    this.message = message;
+  }
+
 }
