@@ -125,9 +125,25 @@ function stackAction(action: string, cloudFormation: any, stackName: string, tem
   });
 }
 
+function describeStack(cloudFormation: any, stackName: string) {
+  return new Promise((resolve, reject) => {
+    cloudFormation.describeStacks({ StackName: stackName }, (err: Error, data: any) => {
+      err ? reject(err) : resolve(data);
+    });
+  });
+}
+
 function removeStack(cloudFormation: any, stackName: string) {
   return new Promise((resolve, reject) => {
     cloudFormation.deleteStack({ StackName: stackName }, (err: Error, data: any) => {
+      err ? reject(err) : resolve(data);
+    });
+  });
+}
+
+function getElasticIp(ec2: any, allocationIds: string[]) {
+  return new Promise((resolve, reject) => {
+    ec2.describeAddresses({ AllocationIds: allocationIds }, (err: Error, data: any) => {
       err ? reject(err) : resolve(data);
     });
   });
@@ -145,13 +161,14 @@ export async function execute(options: any) {
   console.log(`Deploying to ${options.region}`);
 
 
-  const cfParams: any = { region: options.region };
+  const awsParams: any = { region: options.region };
   if (options.credentials) {
-    cfParams.accessKeyId = options.credentials.accessKeyId;
-    cfParams.secretAccessKey = options.credentials.secretAccessKey;
+    awsParams.accessKeyId = options.credentials.accessKeyId;
+    awsParams.secretAccessKey = options.credentials.secretAccessKey;
   }
 
-  const cloudFormation = new AWS.CloudFormation(cfParams);
+  const cloudFormation = new AWS.CloudFormation(awsParams);
+  const ec2 = new AWS.EC2(awsParams);
 
   const keyName = `orbs-network-${options.NODE_ENV}-key`;
 
@@ -210,6 +227,21 @@ export async function execute(options: any) {
   if (options.removeNode) {
     console.log(`Removing old node...`);
     await removeStack(cloudFormation, stackName);
+  }
+
+  if (options.listResources) {
+    const stackDescription: any = await describeStack(cloudFormation, basicInfrastructureStackName);
+    const outputs = stackDescription.Stacks[0].Outputs;
+
+    console.log(`Stack ${basicInfrastructureStackName} in ${options.region} exports`);
+    console.log(outputs);
+
+    // TODO: output EthereumNodeIp
+    const nodeIpAllocation = _.find(outputs, { OutputKey: "NodeElasticIP" }).OutputValue;
+    const nodeIp = (<any> await getElasticIp(ec2, [ nodeIpAllocation ])).Addresses[0].PublicIp;
+
+    console.log(".env configuration");
+    console.log(`GOSSIP_PEERS=ws://${nodeIp}:60001`);
   }
 
   if (options.deployNode || options.updateNode) {
@@ -274,6 +306,7 @@ export function getBaseConfig() {
     removeNode: config.get("remove-node"),
     updateNode: config.get("update-node"),
     updateConfiguration: config.get("update-configuration"),
+    listResources: config.get("list-resources"),
     parity: config.get("parity"),
     sshCidr: config.get("ssh-cidr"),
     peersCidr: config.get("peers-cidr"),
@@ -288,9 +321,6 @@ async function main() {
   const step = config.get("step") || 3;
 
   const someRegionsList = _.chunk(regions, step);
-
-  console.log(nodeConfig);
-  console.log(someRegionsList);
 
   for (const someRegions of someRegionsList) {
     try {

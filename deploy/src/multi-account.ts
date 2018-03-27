@@ -27,8 +27,6 @@ async function main() {
       bucketName
     });
 
-    console.log(regionalConfig);
-
     await execute(regionalConfig);
   }
 }
