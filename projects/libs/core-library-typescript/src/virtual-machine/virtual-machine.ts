@@ -29,9 +29,13 @@ export class VirtualMachine {
         }, transactionScopeStateCache);
 
       } catch (err) {
-        logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
-        rejectedTransactions.push(transaction);
-        continue;
+        if (!err.expected) {
+          throw err;
+        } else {
+          logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
+          rejectedTransactions.push(transaction);
+          continue;
+        }
       }
 
       stateCache.merge(transactionScopeStateCache.getModifiedKeys());
