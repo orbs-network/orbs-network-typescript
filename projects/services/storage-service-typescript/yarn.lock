@@ -2952,9 +2952,9 @@ ts-node@^4.0.2:
     v8flags "^3.0.0"
     yn "^2.0.0"
 
-ts-sinon@^1.0.12:
+"ts-sinon@https://github.com/orbs-network/ts-sinon":
   version "1.0.12"
-  resolved "https://registry.yarnpkg.com/ts-sinon/-/ts-sinon-1.0.12.tgz#8e963124f6f03c6315c9a092e37714c477014de2"
+  resolved "https://github.com/orbs-network/ts-sinon#2cb805b8ff9896a5c22a64506df9223f93a13cb8"
   dependencies:
     "@types/sinon" "^4.1.2"
     sinon "^4.1.3"
