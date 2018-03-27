@@ -241,10 +241,6 @@ export async function execute(options: any) {
     setParameter(standaloneParams, "KeyName", keyName);
     setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
 
-    if (options.numOfNodes) {
-      setParameter(standaloneParams, "NumOfNodes", options.numOfNodes);
-    }
-
     const sshCidr = (options.sshCidr || "0.0.0.0/0").split(",");
     const peersCidr = (options.peersCidr || "0.0.0.0/0").split(",");
 
@@ -273,7 +269,6 @@ export function getBaseConfig() {
     bucketName: config.get("s3-bucket-name"),
     pushDockerImage: config.get("push-docker-image"),
     tagDockerImage: config.get("tag-docker-image"),
-    numOfNodes: config.get("nodes"),
     dockerTag: config.get("docker-tag"),
     deployNode: config.get("deploy-node"),
     removeNode: config.get("remove-node"),
