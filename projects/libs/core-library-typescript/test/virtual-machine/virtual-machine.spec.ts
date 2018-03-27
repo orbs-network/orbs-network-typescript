@@ -3,6 +3,10 @@ import * as chai from "chai";
 import { VirtualMachine } from "../../src/virtual-machine";
 import { types } from "../../src/common-library";
 import * as _ from "lodash";
+import * as cap from "chai-as-promised";
+
+chai.should();
+chai.use(cap);
 
 class StubStorageClient implements types.StateStorageClient {
   keyMap: { [id: string]: string };
@@ -21,7 +25,7 @@ class StubStorageClient implements types.StateStorageClient {
   }
 }
 
-function aTransaction(builder: { from: string, to: string, amount: number }): types.Transaction {
+function aTransaction(builder: { from: string, to: string, amount: number }, contractAddress: string = "foobar"): types.Transaction {
   return {
     header: {
       version: 1,
@@ -29,7 +33,7 @@ function aTransaction(builder: { from: string, to: string, amount: number }): ty
       sequenceNumber: 0
     },
     body: {
-      contractAddress: {address: "foobar"},
+      contractAddress: {address: contractAddress},
       payload: JSON.stringify({
         method: "transfer",
         args: [builder.to, builder.amount]
@@ -48,6 +52,23 @@ describe("test virtual machine", () => {
       keyMap: { "balances.account1": "10", "balances.account2": "0" }
     });
     virtualMachine = new VirtualMachine(stateStorage);
+  });
+
+  it("rejects a transaction with a non-positive amount", async () => {
+    const transaction = aTransaction({ from: "account1", to: "account2", amount: 0 });
+
+    const { processedTransactions, stateDiff, rejectedTransactions } = await virtualMachine.processTransactionSet({
+      orderedTransactions: [transaction]
+    });
+
+    rejectedTransactions.should.have.lengthOf(1);
+    rejectedTransactions.should.contain(transaction);
+  });
+
+  it("explodes on an unexpected error", async () => {
+    const transaction = aTransaction({ from: "foo", to: "bar", amount: 0 }, "zagzag");
+
+    return chai.expect(virtualMachine.processTransactionSet({ orderedTransactions: [transaction] })).to.be.rejected;
   });
 
   it("#processTransactionSet - ordered transfers between 3 accounts", async () => {
