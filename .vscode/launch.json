@@ -13,7 +13,9 @@
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/opt/orbs",
             "protocol": "inspector",
-            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+            "outFiles": [
+                "${workspaceFolder}/projects/**/*.js"
+            ]
         },
         {
             "type": "node",
@@ -24,7 +26,9 @@
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/opt/orbs",
             "protocol": "inspector",
-            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+            "outFiles": [
+                "${workspaceFolder}/projects/**/*.js"
+            ]
         },
         {
             "type": "node",
@@ -35,7 +39,9 @@
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/opt/orbs",
             "protocol": "inspector",
-            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+            "outFiles": [
+                "${workspaceFolder}/projects/**/*.js"
+            ]
         },
         {
             "type": "node",
@@ -46,7 +52,9 @@
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/opt/orbs",
             "protocol": "inspector",
-            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+            "outFiles": [
+                "${workspaceFolder}/projects/**/*.js"
+            ]
         },
         {
             "type": "node",
@@ -57,7 +65,9 @@
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/opt/orbs",
             "protocol": "inspector",
-            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+            "outFiles": [
+                "${workspaceFolder}/projects/**/*.js"
+            ]
         },
         {
             "type": "node",
@@ -68,13 +78,29 @@
             "localRoot": "${workspaceFolder}",
             "remoteRoot": "/opt/orbs",
             "protocol": "inspector",
-            "outFiles": [ "${workspaceFolder}/projects/**/*.js" ]
+            "outFiles": [
+                "${workspaceFolder}/projects/**/*.js"
+            ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "crypto-sdk tests",
+            "program": "${workspaceRoot}/client/crypto-sdk/build/test/crypto-test",
+            "cwd": "${workspaceRoot}/"
         }
     ],
     "compounds": [
         {
             "name": "E2E All Nodes",
-            "configurations": ["e2e node1", "e2e node2", "e2e node3", "e2e node4", "e2e node5", "e2e node6"]
+            "configurations": [
+                "e2e node1",
+                "e2e node2",
+                "e2e node3",
+                "e2e node4",
+                "e2e node5",
+                "e2e node6"
+            ]
         }
     ]
 }

@@ -14,9 +14,10 @@ const expect = chai.expect;
 chai.should();
 chai.use(ChaiBarsPlugin);
 
+const VIRTUAL_CHAIN_ID = "640ed3";
 const generateAddress = (): string => {
   const publicKey = crypto.randomBytes(32).toString("hex");
-  const address = new Address(publicKey);
+  const address = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
 
   return address.toString();
 };
