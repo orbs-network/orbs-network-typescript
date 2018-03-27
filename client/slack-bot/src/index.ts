@@ -1,6 +1,6 @@
 import { PublicApiClient } from "orbs-interfaces";
 import { initPublicApiClient } from "./public-api-client";
-import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
+import { OrbsClientSession, OrbsHardCodedContractAdapter, generateAddress } from "./orbs-client";
 import { FooBarAccount } from "./foobar-account";
 import { RTMClient } from "@slack/client";
 
@@ -28,37 +28,38 @@ const config = {
   timeout: Number(TRANSACTION_TIMEOUT) || 2000
 };
 
-async function getAccount(senderAddress: string, config: Config): Promise<FooBarAccount> {
-  const orbsSession = new OrbsClientSession(senderAddress, config.subscriptionKey, config.publicApiClient, config.timeout);
+async function getAccount(username: string, config: Config): Promise<FooBarAccount> {
+  const address = generateAddress(username);
+  const orbsSession = new OrbsClientSession(address, config.subscriptionKey, config.publicApiClient, config.timeout);
   const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
-  const account = new FooBarAccount(senderAddress, contractAdapter);
+  const account = new FooBarAccount(username, address, contractAdapter);
 
   return Promise.resolve(account);
 }
 
-async function matchInput(message: any, condition: RegExp, botAddress: string,
+async function matchInput(message: any, condition: RegExp, botUsername: string,
   callback: (clientAccount: FooBarAccount, botAccount: FooBarAccount, match: any) => void) {
     const matches = message.text.match(condition);
 
     if (matches) {
       const [clientAccount, botAccount] = await Promise.all([
-        getAccount(message.user, config), getAccount(botAddress, config)
+        getAccount(message.user, config), getAccount(botUsername, config)
       ]);
 
       callback(clientAccount, botAccount, matches);
     }
 }
 
-function mention(user: string) {
-  return `<@${user}>`;
+function mention(client: FooBarAccount) {
+  return `<@${client.username}> ${client.address}`;
 }
 
 const rtm = new RTMClient(SLACK_TOKEN, { autoReconnect: true, useRtmConnect: true });
 rtm.start({});
 
 rtm.on("message", async (message) => {
-  const BOT_ADDRESS = rtm.activeUserId;
-  console.log(`Connected as bot with id ${BOT_ADDRESS}`);
+  const BOT_USER_ID = rtm.activeUserId;
+  console.log(`Connected as bot with id ${BOT_USER_ID}`);
 
   // For structure of `event`, see https://api.slack.com/events/message
 
@@ -74,47 +75,52 @@ rtm.on("message", async (message) => {
   console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
 
   try {
-    matchInput(message, /^get my balance$/i, BOT_ADDRESS, async (client, bot, match) => {
+    matchInput(message, /^get my address$/i, BOT_USER_ID, async (client, bot, match) => {
       const clientBalance = await client.getMyBalance();
-      rtm.sendMessage(`${mention(client.address)} has ${clientBalance} magic internet money`, message.channel);
+      rtm.sendMessage(mention(client), message.channel);
     });
 
-    matchInput(message, /^get bot balance$/i, BOT_ADDRESS, async (client, bot, match) => {
+    matchInput(message, /^get my balance$/i, BOT_USER_ID, async (client, bot, match) => {
+      const clientBalance = await client.getMyBalance();
+      rtm.sendMessage(`${mention(client)} has ${clientBalance} magic internet money`, message.channel);
+    });
+
+    matchInput(message, /^get bot balance$/i, BOT_USER_ID, async (client, bot, match) => {
       const botBalance = await bot.getMyBalance();
-      rtm.sendMessage(`Bot now has ${botBalance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(bot)} now has ${botBalance} magic internet money`, message.channel);
     });
 
-    matchInput(message, /^good bot gets (\d+)$/i, BOT_ADDRESS, async (client, bot, match) => {
+    matchInput(message, /^good bot gets (\d+)$/i, BOT_USER_ID, async (client, bot, match) => {
       const amount = Number(match[1]);
-      rtm.sendMessage(`Set bot balance to ${amount} magic internet money`, message.channel);
+      rtm.sendMessage(`Set ${mention(bot)} balance to ${amount} magic internet money`, message.channel);
 
-      await bot.initBalance(BOT_ADDRESS, amount);
+      await bot.initBalance(bot.address, amount);
 
       const balance = await bot.getMyBalance();
-      rtm.sendMessage(`Bot now has ${balance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(bot)} now has ${balance} magic internet money`, message.channel);
     });
 
-    matchInput(message, /I opened a pull request/i, BOT_ADDRESS, async (client, bot, match) => {
-      rtm.sendMessage(`Transfering ${PULL_REQUEST_AWARD} to ${mention(message.user)}`, message.channel);
+    matchInput(message, /I opened a pull request/i, BOT_USER_ID, async (client, bot, match) => {
+      rtm.sendMessage(`Transfering ${PULL_REQUEST_AWARD} to ${mention(client)}`, message.channel);
       await bot.transfer(client.address, PULL_REQUEST_AWARD);
 
       const [ clientBalance, botBalance ] = await Promise.all([client.getMyBalance(), bot.getMyBalance()]);
-      rtm.sendMessage(`${mention(client.address)} has ${clientBalance} magic internet money`, message.channel);
-      rtm.sendMessage(`Bot now has ${botBalance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(client)} has ${clientBalance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(bot)} now has ${botBalance} magic internet money`, message.channel);
     });
 
-    matchInput(message, /transfer (\d+) to <@(\w+)>/, BOT_ADDRESS, async (client, bot, match) => {
+    matchInput(message, /[transfer|send] (\d+) to <@(\w+)>/, BOT_USER_ID, async (client, bot, match) => {
       const amount = Number(match[1]);
       const to = match[2];
 
       const receiver = await getAccount(to, config);
-      rtm.sendMessage(`Transfering ${amount} from ${mention(client.address)} to ${mention(receiver.address)}`, message.channel);
+      rtm.sendMessage(`Transfering ${amount} from ${mention(client)} to ${mention(receiver)}`, message.channel);
 
       await client.transfer(receiver.address, amount);
 
       const [ clientBalance, receiverBalance ] = await Promise.all([client.getMyBalance(), receiver.getMyBalance()]);
-      rtm.sendMessage(`${mention(client.address)} now has ${clientBalance} magic internet money`, message.channel);
-      rtm.sendMessage(`${mention(receiver.address)} now has ${receiverBalance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(client)} now has ${clientBalance} magic internet money`, message.channel);
+      rtm.sendMessage(`${mention(receiver)} now has ${receiverBalance} magic internet money`, message.channel);
     });
   } catch (e) {
     console.log(`Error occurred: ${e}`);
