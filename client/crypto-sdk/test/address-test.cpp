@@ -9,7 +9,7 @@ using namespace std;
 using namespace testing;
 using namespace Orbs;
 
-TEST(Address, creates_from_binary_public_key) {
+TEST(Address, creates_from_binary_arguments) {
     vector<uint8_t> publicKey;
     vector<uint8_t> virtualChainId;
 
