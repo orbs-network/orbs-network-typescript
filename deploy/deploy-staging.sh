@@ -8,7 +8,7 @@ export REGIONS=${REGIONS-us-east-1,eu-central-1,ap-northeast-1,ap-northeast-2,ap
 export DOCKER_TAG=${DOCKER_TAG-master}
 export DEPLOY_STEP=${DEPLOY_STEP-2}
 
-yarn build-ts
+npm run build-ts
 
 node dist/deploy.js \
     --region $REGIONS \
