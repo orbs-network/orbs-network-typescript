@@ -175,3 +175,12 @@ TODO: update script interface
 3. docker
 4. private/public key generated with ssh-keygen
 5. aws cli (`pip install awscli`)
+
+AWS services **required** for node deployment to work:
+
+1. S3
+2. ECR
+3. EC2
+4. CloudFormation
+
+Route53 is **optional** unless you want to use DNS zone that points to your node.
