@@ -6,3 +6,5 @@ ln -s "$(pwd)/../crypto-sdk" deps/crypto-sdk
 yarn install
 
 yarn run build
+
+yarn link
