@@ -8,6 +8,7 @@ import { initPublicApiClient } from "../public-api-client";
 
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
 const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
+const TEST_SMART_CONTRACTS = [{address: "foobar", filename: "foobar-smart-contract"}, {address: "text-message", filename: "text-message-smart-contract"}];
 
 export interface OrbsNodeConfig {
   nodeName: string;
@@ -75,6 +76,7 @@ export class OrbsNode implements TestComponent {
             SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
             SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
             SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS: this.config.ethereumSubscriptionContractAddress,
+            VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD: TEST_SMART_CONTRACTS,
             DEBUG_PORT: this.config.debugPort
           }
         }

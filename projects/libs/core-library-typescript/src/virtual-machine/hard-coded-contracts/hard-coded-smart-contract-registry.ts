@@ -1,18 +1,18 @@
 import * as path from "path";
 
-export type Contracts = [{ address: string; filename: string; }];
+export type Contracts = { address: string; filename: string; }[];
 
 export interface HardCodedSmartContractRegistryConfig {
-  contracts(): Contracts;
-  registryRoot(): string;
+  contracts: Contracts;
+  registryRoot?: string;
 }
 
 export class HardCodedSmartContractRegistry {
   loadedContracts = new Map<string, any>();
 
-  constructor(config?: HardCodedSmartContractRegistryConfig) {
-    const contractsToLoad =  config ? config.contracts() : [{address: "foobar", filename: "foobar-smart-contract"}, {address: "text-message", filename: "text-message-smart-contract"}];
-    const root = config ? config.registryRoot() : path.resolve(__dirname, "registry");
+  constructor(config: HardCodedSmartContractRegistryConfig) {
+    const contractsToLoad =  config.contracts || [];
+    const root = config.registryRoot || path.resolve(__dirname, "registry");
     contractsToLoad.forEach(contract => this.registerContract(contract.address, contract.filename, root));
   }
 

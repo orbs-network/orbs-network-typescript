@@ -5,6 +5,8 @@ import { types } from "../../src/common-library";
 import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import * as cs from "chai-subset";
+import * as path from "path";
+import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-coded-contracts/processor";
 
 chai.use(cap);
 chai.use(cs);
@@ -53,7 +55,14 @@ describe("test virtual machine", () => {
       contractAddress: {address: "foobar" },
       keyMap: { "balances.account1": "10", "balances.account2": "0" }
     });
-    virtualMachine = new VirtualMachine(stateStorage);
+
+    const contractRegistryConfig = {
+      contracts: [
+        {address: "foobar", filename: "foobar-smart-contract"}
+      ]
+    };
+
+    virtualMachine = new VirtualMachine(contractRegistryConfig, stateStorage);
   });
 
   it("rejects a transaction with a non-positive amount", async () => {

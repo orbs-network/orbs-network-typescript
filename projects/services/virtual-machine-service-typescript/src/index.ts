@@ -3,8 +3,9 @@ import * as path from "path";
 import { logger, ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
 
 import VirtualMachineService from "./service";
+import { VirtualMachine } from "orbs-core-library";
 
-const { NODE_NAME, ETHEREUM_NODE_HTTP_ADDRESS } = process.env;
+const { NODE_NAME, SMART_CONTRACTS_TO_LOAD } = process.env;
 
 ErrorHandler.setup();
 
@@ -16,10 +17,12 @@ if (!NODE_NAME) {
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
-const nodeConfig = { nodeName: NODE_NAME, ethereumNodeHttpAddress: ETHEREUM_NODE_HTTP_ADDRESS };
+const nodeConfig = { nodeName: NODE_NAME};
 
-const main = async () => {
-  await ServiceRunner.run(grpc.virtualMachineServer, new VirtualMachineService(peers.stateStorage, nodeConfig), nodeTopology.endpoint);
+const contractRegistryConfig = {
+  contracts: JSON.parse(SMART_CONTRACTS_TO_LOAD)
 };
 
-ServiceRunner.run(grpc.virtualMachineServer, new VirtualMachineService(peers.stateStorage, nodeConfig), nodeTopology.endpoint);
+const virtualMachine = new VirtualMachine(contractRegistryConfig, peers.stateStorage);
+
+ServiceRunner.run(grpc.virtualMachineServer, new VirtualMachineService(virtualMachine, nodeConfig), nodeTopology.endpoint);
