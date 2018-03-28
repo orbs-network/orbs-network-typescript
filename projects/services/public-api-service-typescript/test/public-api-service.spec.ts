@@ -37,7 +37,7 @@ describe("Public API Service - Component Test", async function () {
 
   const endpoint = `127.0.0.1:${await getPort()}`;
 
-  before(async () => {
+  beforeEach(async () => {
     virtualMachine = stubInterface<types.VirtualMachineClient>();
     transactionPool = stubInterface<types.TransactionPoolClient>();
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
@@ -46,7 +46,8 @@ describe("Public API Service - Component Test", async function () {
       nodeName: "tester"
     });
     server = await ServiceRunner.run(grpc.publicApiServer, service, endpoint);
-  })
+  });
+
   it("sent transaction propagates properly to the transaction pool", async () => {
     const client = grpc.publicApiClient({ endpoint });
 
@@ -60,7 +61,7 @@ describe("Public API Service - Component Test", async function () {
     });
   });
 
-  after(async () => {
+  afterEach(async () => {
     ServiceRunner.stop(server);
-  })
+  });
 });
