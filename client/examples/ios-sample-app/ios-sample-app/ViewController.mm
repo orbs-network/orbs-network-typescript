@@ -7,8 +7,9 @@
 using namespace std;
 using namespace Orbs;
 
-static const string VIRTUAL_CHAIN_ID("640ed3");
-static const string TEST_NETWORK_ID("T");
+static NSString *VIRTUAL_CHAIN_ID(@"640ed3");
+static NSString *MAIN_NETWORK_ID(@"M");
+static NSString *TEST_NETWORK_ID(@"T");
 
 @interface ViewController ()
 
@@ -23,17 +24,61 @@ static const string TEST_NETWORK_ID("T");
     // Do any additional setup after loading the view, typically from a nib.
 }
 
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)onGenerateAddressButtonClick:(id)sender {
+- (NSString *)generateAddress:(NSString *)networkId {
+    const string virtualChainId([VIRTUAL_CHAIN_ID cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    const string network([networkId cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    
     ED25519Key key;
-    Address address(Utils::Vec2Hex(key.GetPublicKey()), VIRTUAL_CHAIN_ID, TEST_NETWORK_ID);
-    NSString *publicAddress = [NSString stringWithCString:address.ToString().c_str() encoding:[NSString defaultCStringEncoding]];
+    Address address(Utils::Vec2Hex(key.GetPublicKey()), virtualChainId, network);
+    return [NSString stringWithCString:address.ToString().c_str() encoding:[NSString defaultCStringEncoding]];
+}
+
+- (IBAction)onGenerateAddressButtonClicked:(id)sender {
+    NSString *networkId;
+    
+    switch (_networkIdControl.selectedSegmentIndex) {
+        // Testnet
+        case 0: {
+            networkId = TEST_NETWORK_ID;
+            break;
+        }
+            
+        // Mainnet
+        case 1: {
+            networkId = MAIN_NETWORK_ID;
+            break;
+        }
+    }
+    
+    NSString *publicAddress = [self generateAddress:networkId];
     [self.addressTextField setText:publicAddress];
+}
+
+- (IBAction)onNetworkIdChanged:(id)sender {
+    [self.addressTextField setText:@""];
+    
+    UISegmentedControl *segmentedControl = (UISegmentedControl *)sender;
+    
+    switch (segmentedControl.selectedSegmentIndex) {
+        // Testnet
+        case 0: {
+            NSString *publicAddress = [self generateAddress:TEST_NETWORK_ID];
+            [self.addressTextField setText:publicAddress];
+            break;
+        }
+            
+        // Mainnet
+        case 1: {
+            NSString *publicAddress = [self generateAddress:MAIN_NETWORK_ID];
+            [self.addressTextField setText:publicAddress];
+            break;
+        }
+    }
 }
 
 @end
