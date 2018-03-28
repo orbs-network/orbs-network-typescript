@@ -23,4 +23,4 @@ else
 fi
 
 # Extract the package
-tar xvzf ${LIBGCRYPT_PACKAGE_FILENAME}
+tar -jxvf ${LIBGCRYPT_PACKAGE_FILENAME}

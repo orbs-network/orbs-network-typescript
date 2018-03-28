@@ -23,4 +23,4 @@ else
 fi
 
 # Extract the package
-tar xvzf ${LIBGPG_ERROR_PACKAGE_FILENAME}
+tar -jxvf ${LIBGPG_ERROR_PACKAGE_FILENAME}
