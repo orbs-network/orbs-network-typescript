@@ -1,6 +1,7 @@
 #include "crypto.h"
 
 #include <gcrypt.h>
+
 #include <stdexcept>
 #include <string>
 
