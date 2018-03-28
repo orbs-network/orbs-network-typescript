@@ -4,6 +4,7 @@ import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
 import { stat } from "fs";
 import { Transaction } from "orbs-interfaces";
+import { HardCodedSmartContractRegistry } from "./hard-coded-contracts/hard-coded-smart-contract-registry";
 
 export class VirtualMachine {
   private stateStorage: types.StateStorageClient;
@@ -11,7 +12,7 @@ export class VirtualMachine {
 
   public constructor(stateStorage: types.StateStorageClient) {
     this.stateStorage = stateStorage;
-    this.processor = new HardCodedSmartContractProcessor(this.stateStorage);
+    this.processor = new HardCodedSmartContractProcessor(this.stateStorage, new HardCodedSmartContractRegistry());
   }
 
   public async processTransactionSet(input: types.ProcessTransactionSetInput): Promise<types.ProcessTransactionSetOutput> {
