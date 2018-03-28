@@ -1,5 +1,6 @@
 #import "ViewController.h"
 
+#import "../../../crypto-sdk/lib/crypto.h"
 #import "../../../crypto-sdk/lib/address.h"
 #import "../../../crypto-sdk/lib/utils.h"
 
@@ -16,6 +17,8 @@ static const string TEST_NETWORK_ID("T");
 @implementation ViewController
 
 - (void)viewDidLoad {
+    CryptoSDK::Init();
+    
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 }
