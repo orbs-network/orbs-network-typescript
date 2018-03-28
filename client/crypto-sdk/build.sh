@@ -18,17 +18,33 @@ fi
 
 pushd build
 
+if [ -z ${PLATFORM+x} ] ;  then
+    PLATFORM=$(uname -s)
+fi
+
 if [ -n "${DEBUG}" ] ; then
     BUILD_TYPE=Debug
 else
     BUILD_TYPE=Release
 fi
 
-echo "Building ${BUILD_TYPE} version..."
-cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+echo "Building ${BUILD_TYPE} version for ${PLATFORM}..."
 
-make
+case ${PLATFORM} in
+    IOS)
+        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE="toolchains/ios.cmake" -DIOS_PLATFORM="iPhoneSimulator"
+        make
 
-popd
+        popd
 
-./test.sh
+        ;;
+    *)
+        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+        make
+
+        popd
+
+        ./test.sh
+
+        ;;
+esac
