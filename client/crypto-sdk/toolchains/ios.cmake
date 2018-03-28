@@ -38,48 +38,6 @@ set(IOS True)
 # Required as of cmake 2.8.10
 set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "Force unset of the deployment target for iOS" FORCE)
 
-# Determine the cmake host system version so we know where to find the iOS SDKs
-find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin)
-if(CMAKE_UNAME)
-  exec_program(uname ARGS -r OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION)
-  string (REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\1" DARWIN_MAJOR_VERSION "${CMAKE_HOST_SYSTEM_VERSION}")
-endif(CMAKE_UNAME)
-
-# All iOS/Darwin specific settings - some may be redundant
-set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
-set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
-set(CMAKE_SHARED_MODULE_PREFIX "lib")
-set(CMAKE_SHARED_MODULE_SUFFIX ".so")
-set(CMAKE_MODULE_EXISTS 1)
-set(CMAKE_DL_LIBS "")
-
-set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
-set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
-set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
-set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
-
-# Hidden visibilty is required for cxx on iOS
-set(CMAKE_C_FLAGS_INIT "-isysroot ${CMAKE_OSX_SYSROOT} -miphoneos-version-min=6.0")
-set(CMAKE_CXX_FLAGS_INIT "-stdlib=libc++ -fvisibility=hidden -fvisibility-inlines-hidden -isysroot ${CMAKE_OSX_SYSROOT} -miphoneos-version-min=6.0")
-
-set(CMAKE_C_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
-set(CMAKE_CXX_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
-
-set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)
-set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-dynamiclib -headerpad_max_install_names")
-set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS "-bundle -headerpad_max_install_names")
-set(CMAKE_SHARED_MODULE_LOADER_C_FLAG "-Wl,-bundle_loader,")
-set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
-
-# hack: if a new cmake (which uses CMAKE_INSTALL_NAME_TOOL) runs on an old build tree
-# (where install_name_tool was hardcoded) and where CMAKE_INSTALL_NAME_TOOL isn't in the cache
-# and still cmake didn't fail in CMakeFindBinUtils.cmake (because it isn't rerun)
-# hardcode CMAKE_INSTALL_NAME_TOOL here to install_name_tool, so it behaves as it did before, Alex
-if(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
-  find_program(CMAKE_INSTALL_NAME_TOOL install_name_tool)
-endif(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
-
 # Setup iOS platform unless specified manually with IOS_PLATFORM
 if(NOT DEFINED IOS_PLATFORM)
   set(IOS_PLATFORM "iPhoneOS")
@@ -107,6 +65,58 @@ elseif(${IOS_PLATFORM} STREQUAL "iPhoneSimulator")
 else (${IOS_PLATFORM} STREQUAL "iPhoneOS")
   message (FATAL_ERROR "Unsupported IOS_PLATFORM value selected. Please choose iPhoneOS or iPhoneSimulator")
 endif(${IOS_PLATFORM} STREQUAL "iPhoneOS")
+
+# Set the architecture for iOS
+# NOTE: Currently both ARCHS_STANDARD_32_BIT and ARCHS_UNIVERSAL_IPHONE_OS set armv7 only, so set both manually
+if(${IOS_PLATFORM} STREQUAL "iPhoneOS")
+  set(IOS_ARCH armv7)
+else()
+  set(IOS_ARCH x86_64)
+endif()
+
+set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE string "Build architecture for iOS")
+
+# Determine the cmake host system version so we know where to find the iOS SDKs
+find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin)
+if(CMAKE_UNAME)
+  exec_program(uname ARGS -r OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION)
+  string (REGEX REPLACE "^([0-9]+)\\.([0-9]+).*$" "\\1" DARWIN_MAJOR_VERSION "${CMAKE_HOST_SYSTEM_VERSION}")
+endif(CMAKE_UNAME)
+
+# All iOS/Darwin specific settings - some may be redundant
+set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
+set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
+set(CMAKE_SHARED_MODULE_PREFIX "lib")
+set(CMAKE_SHARED_MODULE_SUFFIX ".so")
+set(CMAKE_MODULE_EXISTS 1)
+set(CMAKE_DL_LIBS "")
+
+set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
+set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
+set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
+set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
+
+# Hidden visibilty is required for cxx on iOS
+set(CMAKE_C_FLAGS_INIT "-arch ${IOS_ARCH} -isysroot ${CMAKE_OSX_SYSROOT} -miphoneos-version-min=6.0")
+set(CMAKE_CXX_FLAGS_INIT "-arch ${IOS_ARCH} -stdlib=libc++ -fvisibility=hidden -fvisibility-inlines-hidden -isysroot ${CMAKE_OSX_SYSROOT} -miphoneos-version-min=6.0")
+
+set(CMAKE_C_LINK_FLAGS "-arch ${IOS_ARCH} -Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
+set(CMAKE_CXX_LINK_FLAGS "-arch ${IOS_ARCH} -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
+
+set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)
+set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-dynamiclib -headerpad_max_install_names")
+set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS "-bundle -headerpad_max_install_names")
+set(CMAKE_SHARED_MODULE_LOADER_C_FLAG "-Wl,-bundle_loader,")
+set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
+
+# hack: if a new cmake (which uses CMAKE_INSTALL_NAME_TOOL) runs on an old build tree
+# (where install_name_tool was hardcoded) and where CMAKE_INSTALL_NAME_TOOL isn't in the cache
+# and still cmake didn't fail in CMakeFindBinUtils.cmake (because it isn't rerun)
+# hardcode CMAKE_INSTALL_NAME_TOOL here to install_name_tool, so it behaves as it did before, Alex
+if(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
+  find_program(CMAKE_INSTALL_NAME_TOOL install_name_tool)
+endif(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
 # Setup iOS developer location unless specified manually with CMAKE_IOS_DEVELOPER_ROOT
 # Note Xcode 4.3 changed the installation location, choose the most recent one available
@@ -138,16 +148,6 @@ set(CMAKE_OSX_SYSROOT ${CMAKE_IOS_SDK_ROOT} CACHE PATH "Sysroot used for iOS sup
 set(CMAKE_C_COMPILER "/Applications/Xcode.app/Contents/Developer/usr/bin/gcc")
 set(CMAKE_CXX_COMPILER "/Applications/Xcode.app/Contents/Developer/usr/bin/g++")
 set(CMAKE_AR ar CACHE FILEPATH "" FORCE)
-
-# Set the architecture for iOS
-# NOTE: Currently both ARCHS_STANDARD_32_BIT and ARCHS_UNIVERSAL_IPHONE_OS set armv7 only, so set both manually
-if(${IOS_PLATFORM} STREQUAL "iPhoneOS")
-  set(IOS_ARCH armv7)
-else()
-  set(IOS_ARCH i386)
-endif()
-
-set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE string "Build architecture for iOS")
 
 # Set the find root to the iOS developer roots and to user defined paths
 set(CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_IOS_SDK_ROOT} ${CMAKE_PREFIX_PATH} CACHE string "iOS find search path root")
