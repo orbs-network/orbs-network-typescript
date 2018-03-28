@@ -305,6 +305,14 @@ Resources:
           FromPort: 51151
           ToPort: 51151
           CidrIp: !Ref PublicAPICidrIp
+        - IpProtocol: tcp
+          FromPort: 8545
+          ToPort: 8545
+          CidrIp:
+            Fn::Join:
+              - "/"
+              - - Fn::ImportValue: !Join ["-", ["orbs-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
+                - "32"
   InstanceLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:

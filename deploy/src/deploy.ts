@@ -149,8 +149,12 @@ function getAWSCredentialsAsEnvVars(options: any) {
   return `export AWS_SECRET_ACCESS_KEY=${options.credentials.secretAccessKey} AWS_ACCESS_KEY_ID=${options.credentials.accessKeyId} &&`;
 }
 
-async function createOrUpdateBasicInfrastructure(cloudFormation: any, options: any): Promise<string> {
-  const basicInfrastructureStackName = `basic-infrastructure-${options.network}`;
+function getBasicInfrastructureStackName(options: any) {
+  return `basic-infrastructure-${options.network}`;
+}
+
+async function createOrUpdateBasicInfrastructure(cloudFormation: any, options: any) {
+  const basicInfrastructureStackName = getBasicInfrastructureStackName(options);
 
   if (options.createBasicInfrastructure || options.updateBasicInfrastructure) {
     console.log(`Creating basic infrastructure in ${options.region}...`);
@@ -171,108 +175,35 @@ async function createOrUpdateBasicInfrastructure(cloudFormation: any, options: a
     const template = fs.readFileSync(`${__dirname}/../cloudformation/basic-infrastructure.yaml`).toString();
 
     const action = options.createBasicInfrastructure ? "createStack" : "updateStack";
-    await stackAction(action, cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams);
+    return stackAction(action, cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams);
   }
-
-  return basicInfrastructureStackName;
 }
 
-export async function execute(options: any) {
-  console.log(`Deploying to ${options.region}`);
+async function listResources(cloudFormation: any, options: any) {
+  const basicInfrastructureStackName = getBasicInfrastructureStackName(options);
+  const stackDescription: any = await describeStack(cloudFormation, basicInfrastructureStackName);
+  const outputs = stackDescription.Stacks[0].Outputs;
 
+  console.log(`Stack ${basicInfrastructureStackName} in ${options.region} exports`);
+  console.log(outputs);
 
-  const awsParams: any = { region: options.region };
-  if (options.credentials) {
-    awsParams.accessKeyId = options.credentials.accessKeyId;
-    awsParams.secretAccessKey = options.credentials.secretAccessKey;
-  }
+  const nodeIp = _.find(outputs, { OutputKey: "NodeElasticIPValue" }).OutputValue;
+  const ethereumNodeIp = _.find(outputs, { OutputKey: "EthereumNodeElasticIPValue" }).OutputValue;
 
-  const cloudFormation = new AWS.CloudFormation(awsParams);
-  const ec2 = new AWS.EC2(awsParams);
+  console.log(".env configuration");
+  console.log(`GOSSIP_PEERS=ws://${nodeIp}:60001`);
 
-  // TODO: get rid of hardcoded key name
-  const keyName = `orbs-network-${options.NODE_ENV}-key`;
+  console.log("Local Ethereum configuration (do !not! put into .env file)");
+  console.log(`ETHEREUM_NODE_HTTP_ADDRESS=http://${ethereumNodeIp}:8545`);
+}
 
-  if (options.sshPublicKey) {
-    shell.exec(`${getAWSCredentialsAsEnvVars(options)} \
-    aws ec2 import-key-pair \
-            --key-name ${keyName} \
-            --public-key-material "$(cat ${options.sshPublicKey})" \
-            --region ${options.region}
-            `);
-  }
-
-  const basicInfrastructureStackName = await createOrUpdateBasicInfrastructure(cloudFormation, options);
-
-  await waitForStacks(cloudFormation, options.region, (stacks: any) => {
-    return _.isObject(_.find(stacks, (s: any) => s.StackName === basicInfrastructureStackName && s.StackStatus === "CREATE_COMPLETE"));
-  });
-
-  if (options.tagDockerImage) {
-    tagDockerImage(options);
-  }
-
-  if (options.pushDockerImage) {
-    console.log(`Pushing docker image to ${options.region}...`);
-    pushDockerImage(options);
-  }
-
-  const stackName = `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
-
-  if (options.deployNode || options.updateNode || options.updateConfiguration) {
-    console.log(`Uploading bootstrap files to ${options.region}...`);
-    uploadBootstrap(options);
-  }
-
-  if (options.removeNode) {
-    console.log(`Removing old node...`);
-    await removeStack(cloudFormation, stackName);
-  }
-
-  if (options.listResources) {
-    const stackDescription: any = await describeStack(cloudFormation, basicInfrastructureStackName);
-    const outputs = stackDescription.Stacks[0].Outputs;
-
-    console.log(`Stack ${basicInfrastructureStackName} in ${options.region} exports`);
-    console.log(outputs);
-
-    const nodeIp = _.find(outputs, { OutputKey: "NodeElasticIPValue" }).OutputValue;
-    const ethereumNodeIp = _.find(outputs, { OutputKey: "EthereumNodeElasticIPValue" }).OutputValue;
-
-    console.log(".env configuration");
-    console.log(`GOSSIP_PEERS=ws://${nodeIp}:60001`);
-
-    console.log("Local Ethereum configuration (do !not! put into .env file)");
-    console.log(`ETHEREUM_NODE_HTTP_ADDRESS=http://${ethereumNodeIp}:8545`);
-  }
-
-  if (options.deployNode || options.updateNode) {
-    await waitForStacks(cloudFormation, options.region, (stacks: any) => {
-      const nodeStack = _.find(stacks, { StackName: stackName });
-
-      // TODO: fix never-ending update loop if node does not exit
-      if (options.updateNode && !_.isObject(nodeStack)) {
-        throw new Error(`Can't update if stack ${stackName} does not exist!`);
-      }
-
-      const check = options.updateNode ? _.isObject : _.isEmpty;
-      return check(nodeStack);
-    });
-
-    if (options.deployNode) {
-      console.log(`Deploying new node to ${options.region}...`);
-    }
-
-    if (options.updateNode) {
-      console.log(`Updating node in ${options.region}...`);
-    }
-
-    const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
+async function createOrUpdateNode(cloudFormation: any, options: any) {
+  const paramsFileName = options.parity ? "parameters.parity.json" : "parameters.node.json";
 
     const standaloneParams = JSON.parse(fs.readFileSync(`${__dirname}/../cloudformation/${paramsFileName}`).toString());
 
     setParameter(standaloneParams, "NodeEnv", options.NODE_ENV);
-    setParameter(standaloneParams, "KeyName", keyName);
+    setParameter(standaloneParams, "KeyName", getPublicKeyName(options));
     setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
 
     if (options.EthereumElasticIP) {
@@ -289,11 +220,94 @@ export async function execute(options: any) {
     });
 
     const action = options.updateNode ? "updateStack" : "createStack";
-    await stackAction(action, cloudFormation, stackName, template, standaloneParams);
+    await stackAction(action, cloudFormation, getNodeStackName(options), template, standaloneParams);
 
     // TODO: fix ssh command if dnsZone is absent
     const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
     console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
+}
+
+  // TODO: get rid of hardcoded key name
+function getPublicKeyName(options: any): string {
+  return `orbs-network-${options.NODE_ENV}-key`;
+}
+
+function importPublicKey(options: any) {
+  shell.exec(`${getAWSCredentialsAsEnvVars(options)} \
+  aws ec2 import-key-pair \
+          --key-name ${getPublicKeyName(options)} \
+          --public-key-material "$(cat ${options.sshPublicKey})" \
+          --region ${options.region}
+          `);
+}
+
+function getNodeStackName(options: any) {
+  return `${options.parity ? "ethereum" : "orbs"}-network-${options.network}`;
+}
+
+export async function execute(options: any) {
+  console.log(`Deploying to ${options.region}`);
+
+  const awsParams: any = { region: options.region };
+  if (options.credentials) {
+    awsParams.accessKeyId = options.credentials.accessKeyId;
+    awsParams.secretAccessKey = options.credentials.secretAccessKey;
+  }
+
+  const cloudFormation = new AWS.CloudFormation(awsParams);
+  const ec2 = new AWS.EC2(awsParams);
+
+  if (options.sshPublicKey) {
+    importPublicKey(options);
+  }
+
+  await createOrUpdateBasicInfrastructure(cloudFormation, options);
+
+  await waitForStacks(cloudFormation, options.region, (stacks: any) => {
+    return _.isObject(_.find(stacks, (s: any) => s.StackName === getBasicInfrastructureStackName(options) && s.StackStatus === "CREATE_COMPLETE"));
+  });
+
+  if (options.tagDockerImage) {
+    tagDockerImage(options);
+  }
+
+  if (options.pushDockerImage) {
+    console.log(`Pushing docker image to ${options.region}...`);
+    pushDockerImage(options);
+  }
+
+  const stackName = getNodeStackName(options);
+
+  if (options.deployNode || options.updateNode || options.updateConfiguration) {
+    console.log(`Uploading bootstrap files to ${options.region}...`);
+    uploadBootstrap(options);
+  }
+
+  if (options.removeNode) {
+    console.log(`Removing old node...`);
+    await removeStack(cloudFormation, stackName);
+  }
+
+  if (options.listResources) {
+    await listResources(cloudFormation, options);
+  }
+
+  if (options.deployNode || options.updateNode) {
+    await waitForStacks(cloudFormation, options.region, (stacks: any) => {
+      const nodeStack = _.find(stacks, { StackName: stackName });
+
+      // TODO: fix never-ending update loop if node does not exit
+      if (options.updateNode && !_.isObject(nodeStack)) {
+        throw new Error(`Can't update if stack ${stackName} does not exist!`);
+      }
+
+      const check = options.updateNode ? _.isObject : _.isEmpty;
+      return check(nodeStack);
+    });
+
+    console.log(`${options.deployNode ? "Deploying" : "Updating"} node ${getNodeStackName(options)} in ${options.region}...`);
+
+    await createOrUpdateNode(cloudFormation, options);
   }
 }
 
