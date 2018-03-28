@@ -1,6 +1,7 @@
 import { delay } from "bluebird";
-
 import { PublicApiClient, Transaction, UniversalAddress } from "orbs-interfaces";
+import { Address } from "orbs-crypto-sdk";
+import * as crypto from "crypto";
 
 type OrbsHardCodedContractMethodArgs = [string | number] | any[];
 
@@ -82,4 +83,13 @@ export class OrbsClientSession {
   public getAddress(): UniversalAddress {
     return {id: new Buffer(this.senderAddress), scheme: 0, networkId: 0, checksum: 0};
   }
+}
+
+export const VIRTUAL_CHAIN_ID = "640ed3";
+
+export function generateAddress(username: string): string {
+  const publicKey = crypto.createHash("sha256").update(username).digest("hex");
+  const address = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+
+  return address.toString();
 }

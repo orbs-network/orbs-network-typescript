@@ -52,7 +52,7 @@
   "example-slack-bot": {
     "runtime": "typescript",
     "type": "library",
-    "path": "client/examples/slack-bot"
+    "path": "client/slack-bot"
   },
   "order": [
     "architecture",
