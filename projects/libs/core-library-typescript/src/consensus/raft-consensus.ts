@@ -124,12 +124,12 @@ export class RaftConsensus {
     // committed entry.
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
 
-    logger.debug(`new block to be committed ${JSON.stringify(block)}`);
+    logger.debug(`New block to be committed ${JSON.stringify(block)}`);
 
     try {
       await this.blockBuilder.commitBlock(block);
     } catch (err) {
-      logger.error(`failed to commit block with height ${block.header.height}`);
+      logger.error(`Failed to commit block with height ${block.header.height}`);
     }
 
     if (this.node.isLeader()) {
