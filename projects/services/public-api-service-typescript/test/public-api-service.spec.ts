@@ -20,7 +20,7 @@ const transaction: types.Transaction = {
   header: {
     version: 0,
     sender: senderAddress,
-    timestamp: Date.now().toString()
+    sequenceNumber: 0
   },
   body: {
     contractAddress: {address: "contractAddress"},
