@@ -32,12 +32,10 @@ export class VirtualMachine {
           throw err;
         } else {
           logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
-          rejectedTransactions.push(transaction);
           continue;
         }
-        logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
       } finally {
-        const transactionReceipt: types.TransactionReceipt = { txHash, success };
+        const transactionReceipt: types.TransactionReceipt = { txHash, success};
         transactionReceipts.push(transactionReceipt);
       }
     }

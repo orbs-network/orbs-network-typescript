@@ -27,7 +27,7 @@ class StubStorageClient implements types.StateStorageClient {
   }
 }
 
-function aTransactionEntry(builder: { from: string, to: string, amount: number }): types.TransactionEntry {
+function aTransactionEntry(builder: { from: string, to: string, amount: number }, contractAddress?: string): types.TransactionEntry {
   const transaction: types.Transaction = {
     header: {
       version: 1,
@@ -35,7 +35,7 @@ function aTransactionEntry(builder: { from: string, to: string, amount: number }
       timestamp: Date.now().toString()
     },
     body: {
-      contractAddress: {address: "foobar"},
+      contractAddress: {address: contractAddress || "foobar"},
       payload: JSON.stringify({
         method: "transfer",
         args: [builder.to, builder.amount]
@@ -61,18 +61,17 @@ describe("test virtual machine", () => {
   });
 
   it("rejects a transaction with a non-positive amount", async () => {
-    const transaction = aTransaction({ from: "account1", to: "account2", amount: 0 });
+    const transaction = aTransactionEntry({ from: "account1", to: "account2", amount: 0 });
 
-    const { processedTransactions, stateDiff, rejectedTransactions } = await virtualMachine.processTransactionSet({
+    const { transactionReceipts, stateDiff } = await virtualMachine.processTransactionSet({
       orderedTransactions: [transaction]
     });
-
-    expect(rejectedTransactions).to.have.lengthOf(1);
-    expect(rejectedTransactions).to.contain(transaction);
+    expect(transactionReceipts).to.have.lengthOf(1);
+    expect(transactionReceipts[0].success).to.be.false;
   });
 
   it("explodes on an unexpected error", async () => {
-    const transaction = aTransaction({ from: "foo", to: "bar", amount: 0 }, "zagzag");
+    const transaction = aTransactionEntry({ from: "foo", to: "bar", amount: 0 }, "zagzag");
 
     return chai.expect(virtualMachine.processTransactionSet({ orderedTransactions: [transaction] })).to.be.rejected;
   });
