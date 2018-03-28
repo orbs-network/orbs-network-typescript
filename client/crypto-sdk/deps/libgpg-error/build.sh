@@ -19,8 +19,8 @@ cd ${LIBGPG_ERROR_PACKAGE}
 
 case ${PLATFORM} in
     IOS)
-        IOS64_PREFIX="$PREFIX/tmp/ios64"
-        SIMULATOR64_PREFIX="$PREFIX/tmp/simulator64"
+        IOS64_PREFIX="$PREFIX/ios/ios64"
+        SIMULATOR64_PREFIX="$PREFIX/ios/simulator64"
 
         mkdir -p ${IOS64_PREFIX} ${SIMULATOR64_PREFIX}
 
@@ -79,10 +79,9 @@ case ${PLATFORM} in
             "${SIMULATOR64_PREFIX}/lib/libgpg-error.a" \
             "${IOS64_PREFIX}/lib/libgpg-error.a" \
             -output "${PREFIX}/lib/libgpg-error.a"
-        mv -f -- "${IOS64_PREFIX}/include" "$PREFIX/"
+        cp -f -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
 
         # Cleanup
-        rm -rf -- "${PREFIX}/tmp"
         make distclean > /dev/null
 
         ;;
