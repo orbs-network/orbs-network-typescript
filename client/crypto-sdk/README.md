@@ -12,7 +12,7 @@ In order to implement some of the functionality, we have elected to use libgcryp
 
 ### Build System
 
-Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`.
+Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`).
 
 ## Address Scheme
 
@@ -132,6 +132,19 @@ DEBUG=1 ./build.sh
 
 ```bash
 ./clean.sh
+```
+
+### Building for iOS
+
+The following iOS builds are currently supported:
+
+1. iPhone Simulator 64bit.
+2. iOS 64bit.
+
+> In order to build for iOS, you'd need to provide the `PLATFORM=IOS` environment variable. Please note that you'd need to have both *Xcode* and *iPhone Simulator* installed.
+
+```bash
+PLATFORM=IOS ./build.sh
 ```
 
 ## Test
