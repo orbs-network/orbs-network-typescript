@@ -68,7 +68,7 @@ export class OrbsClientSession {
       header: {
         version: 0,
         sender: this.getAddress(),
-        timestamp: timestamp == undefined ? Date.now() : timestamp
+        timestamp: (timestamp == undefined ? Date.now() : timestamp).toString()
       },
       body: {
         contractAddress: {address: contractAddress},
