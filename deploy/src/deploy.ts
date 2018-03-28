@@ -141,20 +141,40 @@ function removeStack(cloudFormation: any, stackName: string) {
   });
 }
 
-function getElasticIp(ec2: any, allocationIds: string[]) {
-  return new Promise((resolve, reject) => {
-    ec2.describeAddresses({ AllocationIds: allocationIds }, (err: Error, data: any) => {
-      err ? reject(err) : resolve(data);
-    });
-  });
-}
-
 function getAWSCredentialsAsEnvVars(options: any) {
   if (!options.credentials) {
     return "";
   }
 
   return `export AWS_SECRET_ACCESS_KEY=${options.credentials.secretAccessKey} AWS_ACCESS_KEY_ID=${options.credentials.accessKeyId} &&`;
+}
+
+async function createOrUpdateBasicInfrastructure(cloudFormation: any, options: any): Promise<string> {
+  const basicInfrastructureStackName = `basic-infrastructure-${options.network}`;
+
+  if (options.createBasicInfrastructure || options.updateBasicInfrastructure) {
+    console.log(`Creating basic infrastructure in ${options.region}...`);
+
+    const basicInfrastructureParams = [{
+      "ParameterKey": "NodeEnv",
+      "ParameterValue": options.NODE_ENV
+    }];
+
+    if (options.dnsZone) {
+      setParameter(basicInfrastructureParams, "DNSZone", options.dnsZone);
+    }
+
+    if (options.bucketName) {
+      setParameter(basicInfrastructureParams, "BucketName", options.bucketName);
+    }
+
+    const template = fs.readFileSync(`${__dirname}/../cloudformation/basic-infrastructure.yaml`).toString();
+
+    const action = options.createBasicInfrastructure ? "createStack" : "updateStack";
+    await stackAction(action, cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams);
+  }
+
+  return basicInfrastructureStackName;
 }
 
 export async function execute(options: any) {
@@ -182,28 +202,7 @@ export async function execute(options: any) {
             `);
   }
 
-  const basicInfrastructureStackName = `basic-infrastructure-${options.network}`;
-
-  if (options.createBasicInfrastructure) {
-    console.log(`Creating basic infrastructure in ${options.region}...`);
-
-    const basicInfrastructureParams = [{
-      "ParameterKey": "NodeEnv",
-      "ParameterValue": options.NODE_ENV
-    }];
-
-    if (options.dnsZone) {
-      setParameter(basicInfrastructureParams, "DNSZone", options.dnsZone);
-    }
-
-    if (options.bucketName) {
-      setParameter(basicInfrastructureParams, "BucketName", options.bucketName);
-    }
-
-    const template = fs.readFileSync(`${__dirname}/../cloudformation/basic-infrastructure.yaml`).toString();
-
-    await stackAction("createStack", cloudFormation, basicInfrastructureStackName, template, basicInfrastructureParams);
-  }
+  const basicInfrastructureStackName = await createOrUpdateBasicInfrastructure(cloudFormation, options);
 
   await waitForStacks(cloudFormation, options.region, (stacks: any) => {
     return _.isObject(_.find(stacks, (s: any) => s.StackName === basicInfrastructureStackName && s.StackStatus === "CREATE_COMPLETE"));
@@ -237,9 +236,8 @@ export async function execute(options: any) {
     console.log(`Stack ${basicInfrastructureStackName} in ${options.region} exports`);
     console.log(outputs);
 
-    const nodeIpAllocation = _.find(outputs, { OutputKey: "NodeElasticIP" }).OutputValue;
-    const ethereumNodeIpAllocation = _.find(outputs, { OutputKey: "EthereumNodeElasticIP" }).OutputValue;
-    const [ nodeIp, ethereumNodeIp ] = _.map((<any> await getElasticIp(ec2, [ nodeIpAllocation, ethereumNodeIpAllocation ])).Addresses, "PublicIp");
+    const nodeIp = _.find(outputs, { OutputKey: "NodeElasticIPValue" }).OutputValue;
+    const ethereumNodeIp = _.find(outputs, { OutputKey: "EthereumNodeElasticIPValue" }).OutputValue;
 
     console.log(".env configuration");
     console.log(`GOSSIP_PEERS=ws://${nodeIp}:60001`);
@@ -307,6 +305,7 @@ export function getBaseConfig() {
     dnsZone: config.get("dns-zone"),
     sshPublicKey: config.get("ssh-public-key"),
     createBasicInfrastructure: config.get("create-basic-infrastructure"),
+    updateBasicInfrastructure: config.get("update-basic-infrastructure"),
     bucketName: config.get("s3-bucket-name"),
     pushDockerImage: config.get("push-docker-image"),
     tagDockerImage: config.get("tag-docker-image"),
