@@ -28,7 +28,7 @@ const transaction: types.Transaction = {
   }
 };
 
-describe("Public API Service - Ou", async function () {
+describe("Public API Service - Component Test", async function () {
   let service: PublicApiService;
   let server: GRPCRuntime;
   let virtualMachine: types.VirtualMachineClient;
