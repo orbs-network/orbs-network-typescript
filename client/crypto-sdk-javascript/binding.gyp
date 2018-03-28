@@ -10,12 +10,12 @@
             "cflags_cc!": ["-static", "-std=c++11", "-stdlib=libc++"],
             "include_dirs": [
                 "<(module_root_dir)/deps/",
-                "<(module_root_dir)/deps/crypto-sdk/build/lib/libgcrypt-prefix/src/libgcrypt-build/src/"
+                "<(module_root_dir)/deps/crypto-sdk/build/libgcrypt/include/"
             ],
             "libraries": [
-                "<(module_root_dir)/deps/crypto-sdk/build/lib/libcrypto.a",
-                "<(module_root_dir)/deps/crypto-sdk/build/lib/libgcrypt-prefix/src/libgcrypt-build/src/.libs/libgcrypt.a",
-                "<(module_root_dir)/deps/crypto-sdk/build/lib/libgpg-error-prefix/src/libgpg-error-build/src/.libs/libgpg-error.a"
+                "<(module_root_dir)/deps/crypto-sdk/build/libgpg-error/lib/libgpg-error.a",
+                "<(module_root_dir)/deps/crypto-sdk/build/libgcrypt/lib/libgcrypt.a",
+                "<(module_root_dir)/deps/crypto-sdk/build/lib/libcrypto.a"
             ]
         }
     ]
