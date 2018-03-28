@@ -48,7 +48,7 @@ export default class HardCodedSmartContractProcessor {
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
     const Contract = this.registry.getContract(request.contractAddress.address);
     if (Contract == undefined) {
-      throw new Error(`contract with address ${request.contractAddress} not registered`);
+      throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
     }
     const contract = new Contract.default(request.sender.id, stateAdapter);
 

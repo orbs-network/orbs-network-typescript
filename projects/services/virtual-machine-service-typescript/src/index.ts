@@ -15,12 +15,21 @@ if (!NODE_NAME) {
   throw new Error("NODE_NAME can't be empty!");
 }
 
+function parseContractList() {
+  try {
+    return JSON.parse(SMART_CONTRACTS_TO_LOAD);
+  } catch (err) {
+    logger.error(`bad contract list from env: ${SMART_CONTRACTS_TO_LOAD} of type ${typeof SMART_CONTRACTS_TO_LOAD}`);
+    return [];
+  }
+}
+
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 const nodeConfig = { nodeName: NODE_NAME};
 
 const contractRegistryConfig = {
-  contracts: JSON.parse(SMART_CONTRACTS_TO_LOAD)
+  contracts: parseContractList()
 };
 
 const virtualMachine = new VirtualMachine(contractRegistryConfig, peers.stateStorage);

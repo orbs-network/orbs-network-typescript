@@ -76,7 +76,7 @@ export class OrbsNode implements TestComponent {
             SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
             SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
             SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS: this.config.ethereumSubscriptionContractAddress,
-            VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD: TEST_SMART_CONTRACTS,
+            VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD: JSON.stringify(TEST_SMART_CONTRACTS),
             DEBUG_PORT: this.config.debugPort
           }
         }
