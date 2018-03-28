@@ -169,7 +169,6 @@ We should open 6 AWS sub-accounts and move servers there.
 
 TODO: add policy JSON for `deploy` role. Not the scope of this PR.
 TODO: update script interface
-TODO: import Etherium node ip during deployment
 
 ### Prerequisites to install a new node
 

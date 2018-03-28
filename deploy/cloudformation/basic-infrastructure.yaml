@@ -175,6 +175,11 @@ Outputs:
     Export:
       Name: !Join ["-", ["ethereum-node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
 
+  EthereumNodeElasticIPValue:
+    Value: !GetAtt EthereumNodeElasticIP.AllocationId
+    Export:
+      Name: !Join ["-", ["ethereum-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
+
   NodeDomainName:
     Condition: HasDNSZone
     Value: !Ref NodeDomainName

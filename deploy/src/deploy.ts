@@ -170,6 +170,7 @@ export async function execute(options: any) {
   const cloudFormation = new AWS.CloudFormation(awsParams);
   const ec2 = new AWS.EC2(awsParams);
 
+  // TODO: get rid of hardcoded key name
   const keyName = `orbs-network-${options.NODE_ENV}-key`;
 
   if (options.sshPublicKey) {
@@ -236,12 +237,15 @@ export async function execute(options: any) {
     console.log(`Stack ${basicInfrastructureStackName} in ${options.region} exports`);
     console.log(outputs);
 
-    // TODO: output EthereumNodeIp
     const nodeIpAllocation = _.find(outputs, { OutputKey: "NodeElasticIP" }).OutputValue;
-    const nodeIp = (<any> await getElasticIp(ec2, [ nodeIpAllocation ])).Addresses[0].PublicIp;
+    const ethereumNodeIpAllocation = _.find(outputs, { OutputKey: "EthereumNodeElasticIP" }).OutputValue;
+    const [ nodeIp, ethereumNodeIp ] = _.map((<any> await getElasticIp(ec2, [ nodeIpAllocation, ethereumNodeIpAllocation ])).Addresses, "PublicIp");
 
     console.log(".env configuration");
     console.log(`GOSSIP_PEERS=ws://${nodeIp}:60001`);
+
+    console.log("Local Ethereum configuration (do !not! put into .env file)");
+    console.log(`ETHEREUM_NODE_HTTP_ADDRESS=http://${ethereumNodeIp}:8545`);
   }
 
   if (options.deployNode || options.updateNode) {
@@ -273,6 +277,10 @@ export async function execute(options: any) {
     setParameter(standaloneParams, "KeyName", keyName);
     setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
 
+    if (options.EthereumElasticIP) {
+      setParameter(standaloneParams, "EthereumElasticIP", options.ethereumNodeIp);
+    }
+
     const sshCidr = (options.sshCidr || "0.0.0.0/0").split(",");
     const peersCidr = (options.peersCidr || "0.0.0.0/0").split(",");
 
@@ -285,6 +293,7 @@ export async function execute(options: any) {
     const action = options.updateNode ? "updateStack" : "createStack";
     await stackAction(action, cloudFormation, stackName, template, standaloneParams);
 
+    // TODO: fix ssh command if dnsZone is absent
     const hostname = options.parity ? `ethereum.${options.region}.global.services` : `${options.region}.global.nodes`;
     console.log(`ssh -o StrictHostKeyChecking=no ec2-user@${hostname}.${options.NODE_ENV}.${options.dnsZone}`);
   }
@@ -307,6 +316,7 @@ export function getBaseConfig() {
     updateNode: config.get("update-node"),
     updateConfiguration: config.get("update-configuration"),
     listResources: config.get("list-resources"),
+    ethereumNodeIp: config.get("ethereum-node-ip"),
     parity: config.get("parity"),
     sshCidr: config.get("ssh-cidr"),
     peersCidr: config.get("peers-cidr"),
