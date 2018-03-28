@@ -79,7 +79,7 @@ case ${PLATFORM} in
             "${SIMULATOR64_PREFIX}/lib/libgpg-error.a" \
             "${IOS64_PREFIX}/lib/libgpg-error.a" \
             -output "${PREFIX}/lib/libgpg-error.a"
-        cp -f -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
+        cp -rf -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
 
         # Cleanup
         make distclean > /dev/null
