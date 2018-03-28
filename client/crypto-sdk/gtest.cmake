@@ -10,6 +10,7 @@ ExternalProject_Add(googletest
   LOG_UPDATE ON
   LOG_CONFIGURE ON
   LOG_BUILD ON
+  LOG_TEST ON
   LOG_INSTALL ON
 )
 
