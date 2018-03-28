@@ -38,6 +38,6 @@ export default abstract class BaseTransactionPool {
   }
 
   protected isTransactionExpired(transaction: types.Transaction): boolean {
-    return this.isExpired(transaction.header.timestamp);
+    return this.isExpired(parseInt(transaction.header.timestamp));
   }
 }

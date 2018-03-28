@@ -38,7 +38,7 @@ function aDummyTransaction(addressId): types.Transaction {
       header: {
         version: 0,
         sender: senderAddress,
-        timestamp: Date.now()
+        timestamp: Date.now().toString()
       },
       body: {
         contractAddress: {address: "dummyContract"},

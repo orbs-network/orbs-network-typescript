@@ -17,7 +17,7 @@ function aValidTransaction() {
     header: {
       version: 0,
       sender: {id: new Buffer("sender"), scheme: 0, networkId: 0, checksum: 0},
-      timestamp: Date.now()
+      timestamp: Date.now().toString()
     },
     body: {
       contractAddress: {address: "address"},
@@ -33,7 +33,7 @@ function anExpiredTransaction() {
     header: {
       version: 0,
       sender: {id: new Buffer("sender"), scheme: 0, networkId: 0, checksum: 0},
-      timestamp: Date.now() - 60 * 1000 * 10 // of 10 minutes ago
+      timestamp: (Date.now() - 60 * 1000 * 10).toString() // of 10 minutes ago
     },
     body: {
       contractAddress: {address: "address"},

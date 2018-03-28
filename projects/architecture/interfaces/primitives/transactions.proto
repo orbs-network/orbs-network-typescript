@@ -10,7 +10,7 @@ message Transaction {
 message TransactionHeader {
   uint32 version = 1;
   UniversalAddress sender = 2;
-  uint32 timestamp = 3;
+  uint64 timestamp = 3;
 }
 
 message TransactionBody {
