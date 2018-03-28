@@ -5,12 +5,20 @@ file(GLOB CRYPTO_SDK_TEST_SRC
   "*.cpp"
 )
 
-add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
-add_dependencies(crypto-test googletest libgcrypt)
+set(LIBGPG_ERROR_DIR ${CMAKE_BINARY_DIR}/libgpg-error)
+set(LIBGPG_ERROR_LIBRARY ${LIBGPG_ERROR_DIR}/lib/libgpg-error.a)
 
-ExternalProject_Get_Property(libgcrypt BINARY_DIR)
-set(LIBGCRYPT_LIBRARY ${BINARY_DIR}/src/.libs/libgcrypt.a)
-target_link_libraries(crypto-test LINK_PUBLIC crypto ${GTEST_LIBRARY} ${GMOCK_LIBRARY} ${LIBGCRYPT_LIBRARY} gpg-error)
+set(LIBGCRYPT_DIR ${CMAKE_BINARY_DIR}/libgcrypt)
+set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/lib/libgcrypt.a)
+
+add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
+
+target_link_libraries(crypto-test LINK_PUBLIC crypto
+  ${GTEST_LIBRARY}
+  ${GMOCK_LIBRARY}
+  ${LIBGCRYPT_LIBRARY}
+  ${LIBGPG_ERROR_LIBRARY}
+)
 
 # Tell ctest about my tests.
 include(GoogleTest)
