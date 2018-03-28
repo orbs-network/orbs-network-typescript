@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14296700206BB1B800F3FEC2 /* libgpg-error.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 142966FF206BB1B800F3FEC2 /* libgpg-error.a */; };
 		14706BE62067CCA5008C6154 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 14706BE52067CCA5008C6154 /* AppDelegate.mm */; };
 		14706BE92067CCA5008C6154 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 14706BE82067CCA5008C6154 /* ViewController.mm */; };
 		14706BEC2067CCA5008C6154 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14706BEA2067CCA5008C6154 /* Main.storyboard */; };
@@ -14,8 +15,7 @@
 		14706BF12067CCA5008C6154 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14706BEF2067CCA5008C6154 /* LaunchScreen.storyboard */; };
 		14706BF42067CCA5008C6154 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 14706BF32067CCA5008C6154 /* main.m */; };
 		14706C1820683CA1008C6154 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14706C1720683CA1008C6154 /* libcrypto.a */; };
-		147127432068417200D2B7C0 /* libgcrypt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 147127422068417200D2B7C0 /* libgcrypt.a */; };
-		147127452068419300D2B7C0 /* libgpg-error.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 147127442068419300D2B7C0 /* libgpg-error.a */; };
+		14D1DA27206BB24900B77A10 /* libgcrypt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14D1DA26206BB24900B77A10 /* libgcrypt.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		142966FF206BB1B800F3FEC2 /* libgpg-error.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libgpg-error.a"; path = "../../crypto-sdk/build/libgpg-error/lib/libgpg-error.a"; sourceTree = "<group>"; };
 		14706BE12067CCA5008C6154 /* ios-sample-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-sample-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14706BE42067CCA5008C6154 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		14706BE52067CCA5008C6154 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -49,8 +50,7 @@
 		14706BF92067CCA5008C6154 /* ios-sample-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-sample-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14706C042067CCA5008C6154 /* ios-sample-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-sample-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14706C1720683CA1008C6154 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../crypto-sdk/build/lib/libcrypto.a"; sourceTree = "<group>"; };
-		147127422068417200D2B7C0 /* libgcrypt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgcrypt.a; path = "../../crypto-sdk/build/lib/libgcrypt-prefix/src/libgcrypt-build/src/.libs/libgcrypt.a"; sourceTree = "<group>"; };
-		147127442068419300D2B7C0 /* libgpg-error.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libgpg-error.a"; path = "../../crypto-sdk/build/lib/libgpg-error-prefix/src/libgpg-error-build/src/.libs/libgpg-error.a"; sourceTree = "<group>"; };
+		14D1DA26206BB24900B77A10 /* libgcrypt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgcrypt.a; path = "../../crypto-sdk/build/libgcrypt/lib/libgcrypt.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,8 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				147127452068419300D2B7C0 /* libgpg-error.a in Frameworks */,
-				147127432068417200D2B7C0 /* libgcrypt.a in Frameworks */,
+				14D1DA27206BB24900B77A10 /* libgcrypt.a in Frameworks */,
+				14296700206BB1B800F3FEC2 /* libgpg-error.a in Frameworks */,
 				14706C1820683CA1008C6154 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -119,8 +119,8 @@
 		14706C1620683CA1008C6154 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				147127442068419300D2B7C0 /* libgpg-error.a */,
-				147127422068417200D2B7C0 /* libgcrypt.a */,
+				14D1DA26206BB24900B77A10 /* libgcrypt.a */,
+				142966FF206BB1B800F3FEC2 /* libgpg-error.a */,
 				14706C1720683CA1008C6154 /* libcrypto.a */,
 			);
 			name = Frameworks;
@@ -424,13 +424,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZU9RBNHA75;
-				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "ios-sample-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"../../crypto-sdk/build/lib/",
-					"../../crypto-sdk/build/lib/libgcrypt-prefix/src/libgcrypt-build/src/.libs",
-					"../../crypto-sdk/build/lib/libgpg-error-prefix/src/libgpg-error-build/src/.libs",
+					"../../crypto-sdk/build/libgpg-error/lib",
+					"../../crypto-sdk/build/libgcrypt/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "orbs.ios-sample-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -448,13 +447,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZU9RBNHA75;
-				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "ios-sample-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"../../crypto-sdk/build/lib/",
-					"../../crypto-sdk/build/lib/libgcrypt-prefix/src/libgcrypt-build/src/.libs",
-					"../../crypto-sdk/build/lib/libgpg-error-prefix/src/libgpg-error-build/src/.libs",
+					"../../crypto-sdk/build/libgpg-error/lib",
+					"../../crypto-sdk/build/libgcrypt/lib",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "orbs.ios-sample-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
