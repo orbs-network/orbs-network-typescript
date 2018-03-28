@@ -2,15 +2,19 @@
 
 mkdir -p build
 
-pushd deps/libgpg-error
-./download.sh
-./build.sh
-popd
+if [ ! -d "build/libgpg-error" ] ; then
+    pushd deps/libgpg-error
+    ./download.sh
+    ./build.sh
+    popd
+fi
 
-pushd deps/libgcrypt
-./download.sh
-./build.sh
-popd
+if [ ! -d "build/libgcrypt" ] ; then
+    pushd deps/libgcrypt
+    ./download.sh
+    ./build.sh
+    popd
+fi
 
 pushd build
 
