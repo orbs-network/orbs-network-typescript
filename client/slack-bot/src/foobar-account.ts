@@ -11,8 +11,10 @@ export interface Message {
 export class FooBarAccount {
   adapter: OrbsHardCodedContractAdapter;
   address: string;
+  username: string;
 
-  public constructor(address: string, adapter: OrbsHardCodedContractAdapter) {
+  public constructor(username: string, address: string, adapter: OrbsHardCodedContractAdapter) {
+    this.username = username;
     this.adapter = adapter;
     this.address = address;
   }

@@ -5,12 +5,12 @@ export default class FooBarSmartContract extends BaseSmartContract {
 
   public async transfer(recipient: string, amount: number) {
     if (amount === 0) {
-      throw new Error("transaction amount must be > 0");
+      throw this.validationError("transaction amount must be > 0");
     }
 
     const senderBalance: number = await this.getBalance(this.sender);
     if (senderBalance < amount) {
-      throw new Error(`balance is not sufficient ${senderBalance} < ${amount}`);
+      throw this.validationError(`balance is not sufficient ${senderBalance} < ${amount}`);
     }
 
     // TODO: no integer overflow protection
