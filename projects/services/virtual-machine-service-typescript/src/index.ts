@@ -19,7 +19,7 @@ function parseContractList() {
   try {
     return JSON.parse(SMART_CONTRACTS_TO_LOAD);
   } catch (err) {
-    logger.error(`bad contract list from env: ${SMART_CONTRACTS_TO_LOAD} of type ${typeof SMART_CONTRACTS_TO_LOAD}`);
+    logger.error(`Bad contract list from env: ${SMART_CONTRACTS_TO_LOAD} of type ${typeof SMART_CONTRACTS_TO_LOAD}. Defaulting to empty list of contracts.`);
     return [];
   }
 }
