@@ -4,15 +4,29 @@
   "description": "## Template and parameters",
   "main": "src/deploy.js",
   "scripts": {
-    "test": "ssh -t -o StrictHostKeyChecking=no ec2-user@pelmeni.nodes.orbs-test.com \"sudo docker exec -ti orbs_public-api_1 /bin/bash -c 'cd /opt/orbs/e2e && yarn test'\""
+    "test": "ssh -t -o StrictHostKeyChecking=no ec2-user@pelmeni.nodes.orbs-test.com \"sudo docker exec -ti orbs_public-api_1 /bin/bash -c 'cd /opt/orbs/e2e && yarn test'\"",
+    "build": "yarn run build-ts && yarn run tslint",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve\"",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "deploy": "node dist/deploy.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/nconf": "^0.0.37",
     "aws-sdk": "^2.192.0",
+    "csv-parse": "^2.0.4",
     "lodash": "^4.17.5",
     "nconf": "^0.10.0",
     "shelljs": "^0.8.1",
     "web3": "^1.0.0-beta.29"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.99",
+    "@types/node": "^9.4.4",
+    "tslint": "^5.9.1",
+    "typescript": "^2.7.1"
   }
 }

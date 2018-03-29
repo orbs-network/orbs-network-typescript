@@ -4,28 +4,23 @@ export NETWORK=testnet
 export AWS_ACCOUNT_ID=506367651493
 export DNS_ZONE=orbs-test.com
 export S3_BUCKET_NAME=orbs-network-config
-export REGIONS=${REGIONS-us-east-1 eu-central-1 ap-northeast-1 ap-northeast-2 ap-southeast-2 ca-central-1}
+export REGIONS=${REGIONS-us-east-1,eu-central-1,ap-northeast-1,ap-northeast-2,ap-southeast-2,ca-central-1}
+export DOCKER_TAG=${DOCKER_TAG-master}
+export DEPLOY_STEP=${DEPLOY_STEP-2}
+export ETHEREUM_NODE_IP=http://ethereum.services.orbs-test.com:8545
 
-for REGION in $REGIONS
-do
-    echo $REGION
+npm run build-ts
 
-    # node src/deploy.js \
-    #     --region $REGION \
-    #     --dns-zone $DNS_ZONE \
-    #     --account-id $AWS_ACCOUNT_ID \
-    #     --network $NETWORK \
-    #     --s3-bucket-name $S3_BUCKET_NAME \
-    #     --create-basic-infrastructure
-
-    node src/deploy.js \
-        --region $REGION \
-        --dns-zone $DNS_ZONE \
-        --account-id $AWS_ACCOUNT_ID \
-        --network $NETWORK \
-        --s3-bucket-name $S3_BUCKET_NAME \
-        --tag-docker-image \
-        --push-docker-image \
-        --remove-node \
-        --deploy-node
-done
+node dist/deploy.js \
+    --region $REGIONS \
+    --dns-zone $DNS_ZONE \
+    --account-id $AWS_ACCOUNT_ID \
+    --network $NETWORK \
+    --s3-bucket-name $S3_BUCKET_NAME \
+    --docker-tag ${DOCKER_TAG} \
+    --step $DEPLOY_STEP \
+    --ethereum-node-ip  \
+    --tag-docker-image \
+    --push-docker-image \
+    --remove-node \
+    --deploy-node
