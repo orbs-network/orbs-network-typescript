@@ -1,11 +1,12 @@
 import { types } from "../common-library/types";
 import { createHash } from "crypto";
+import * as stringify from "json-stable-stringify";
 
 export namespace TransactionUtils {
   export function calculateTransactionHash(transaction: types.Transaction): Buffer {
     const hash = createHash("sha256");
-    hash.update(JSON.stringify(transaction.header));
-    hash.update(JSON.stringify(transaction.body));
+    hash.update(stringify(transaction.header));
+    hash.update(stringify(transaction.body));
     return hash.digest();
   }
 
