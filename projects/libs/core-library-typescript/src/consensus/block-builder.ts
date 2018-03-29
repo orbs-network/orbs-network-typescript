@@ -41,7 +41,7 @@ export default class BlockBuilder {
     const { transactionEntries } = await this.transactionPool.getAllPendingTransactions({});
 
     if (transactionEntries.length == 0) {
-        throw "transaction pool is empty";
+        throw new Error("transaction pool is empty");
     }
 
     const { transactionReceipts, stateDiff } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactionEntries });
