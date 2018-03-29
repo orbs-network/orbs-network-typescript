@@ -11,6 +11,8 @@ import { stubInterface } from "ts-sinon";
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
 
+chai.use(chai.should);
+
 async function init(): Promise<{blockStorage: BlockStorage, blockStorageSync: BlockStorageSync}> {
   fsExtra.removeSync(LEVELDB_PATH);
   const transactionPool = stubInterface<types.TransactionPoolClient>();

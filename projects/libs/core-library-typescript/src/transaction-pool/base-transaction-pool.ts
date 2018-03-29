@@ -6,10 +6,10 @@ export interface TransactionPoolConfig {
 }
 
 export default abstract class BaseTransactionPool {
-  static DEFAULT_TRANSACTION_LIFESPAN_MS = 1000 * 30;
-  static DEFAULT_CLEANUP_INTERVAL = 1000 * 15;
+  static readonly DEFAULT_TRANSACTION_LIFESPAN_MS = 1000 * 30;
+  static readonly DEFAULT_CLEANUP_INTERVAL = 1000 * 15;
   public readonly transactionLifespanMs: number;
-  public readonly  cleanupIntervalMs: number;
+  public readonly cleanupIntervalMs: number;
   private cleanupTimer: NodeJS.Timer;
 
   constructor(config?: TransactionPoolConfig) {
@@ -38,6 +38,6 @@ export default abstract class BaseTransactionPool {
   }
 
   protected isTransactionExpired(transaction: types.Transaction): boolean {
-    return this.isExpired(parseInt(transaction.header.timestamp));
+    return this.isExpired(Number(transaction.header.timestamp));
   }
 }
