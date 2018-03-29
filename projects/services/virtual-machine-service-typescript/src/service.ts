@@ -9,10 +9,9 @@ import { VirtualMachine } from "orbs-core-library";
 export default class VirtualMachineService extends Service {
   private virtualMachine: VirtualMachine;
 
-  public constructor(stateStorage: types.StateStorageClient, serviceConfig: ServiceConfig) {
+  public constructor(virtualMachine: VirtualMachine, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-
-    this.virtualMachine = new VirtualMachine(stateStorage);
+    this.virtualMachine = virtualMachine;
   }
 
   async initialize() {
