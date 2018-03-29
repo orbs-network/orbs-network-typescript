@@ -48,8 +48,8 @@ case ${PLATFORM} in
             --host=x86_64-apple-darwin \
             --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
             --with-pic \
-            --disable-shared \
             --enable-static \
+            --disable-shared \
             --disable-asm \
             --disable-doc \
             --prefix="${SIMULATOR64_PREFIX}"
@@ -73,8 +73,8 @@ case ${PLATFORM} in
             --host=arm-apple-darwin \
             --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
             --with-pic \
-            --disable-shared \
             --enable-static \
+            --disable-shared \
             --disable-asm \
             --disable-doc \
             --prefix="${IOS64_PREFIX}"
@@ -103,8 +103,8 @@ case ${PLATFORM} in
         ./configure \
             --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
             --with-pic \
-            --disable-shared \
             --enable-static \
+            --disable-shared \
             --disable-asm \
             --disable-doc \
             --prefix="${PREFIX}"
