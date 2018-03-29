@@ -7,6 +7,7 @@ import {
 } from "../contract-state-accessor";
 
 import BaseSmartContract from "./base-smart-contact";
+import { HardCodedSmartContractRegistry } from "./hard-coded-smart-contract-registry";
 
 export interface CallRequest {
   sender: types.UniversalAddress;
@@ -15,21 +16,13 @@ export interface CallRequest {
 }
 
 export default class HardCodedSmartContractProcessor {
-  contractAddresses = new Map<string, any>();
   stateStorageClient: types.StateStorageClient;
 
-  constructor(stateStorageClient: types.StateStorageClient) {
+  registry: HardCodedSmartContractRegistry;
+
+  constructor(stateStorageClient: types.StateStorageClient, registry: HardCodedSmartContractRegistry) {
     this.stateStorageClient = stateStorageClient;
-
-    // TODO: register it only in a testing environment via configuration
-    this.registerContract("foobar-smart-contract", "foobar");
-    this.registerContract("text-message-smart-contract", "text-message");
-  }
-
-  private registerContract(moduleName: string, toAddress: string) {
-    // TODO: this loading method is not safe
-    const contractModule = require(`./registry/${moduleName}`);
-    this.contractAddresses.set(toAddress, contractModule);
+    this.registry = registry;
   }
 
   public async processTransaction(request: CallRequest, stateCache: StateCache) {
@@ -53,9 +46,9 @@ export default class HardCodedSmartContractProcessor {
   }
 
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
-    const Contract = this.contractAddresses.get(request.contractAddress.address);
+    const Contract = this.registry.getContract(request.contractAddress.address);
     if (Contract == undefined) {
-      throw new Error(`contract with address ${request.contractAddress} not registered`);
+      throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
     }
     const contract = new Contract.default(request.sender.id, stateAdapter);
 
