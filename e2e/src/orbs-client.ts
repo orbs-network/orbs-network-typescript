@@ -63,12 +63,12 @@ export class OrbsClientSession {
     return JSON.parse(resultJson);
   }
 
-  public generateTransaction(contractAddress: string, payload: string, timestamp?: number): Transaction {
+  public generateTransaction(contractAddress: string, payload: string, timestamp: number = Date.now()): Transaction {
     return {
       header: {
         version: 0,
         sender: this.getAddress(),
-        timestamp: (timestamp == undefined ? Date.now() : timestamp).toString()
+        timestamp: timestamp.toString()
       },
       body: {
         contractAddress: {address: contractAddress},

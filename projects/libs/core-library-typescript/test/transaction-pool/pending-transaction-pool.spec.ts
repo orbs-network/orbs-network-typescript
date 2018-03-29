@@ -7,7 +7,6 @@ import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 import { PendingTransactionPool, CommittedTransactionPool } from "../../src/transaction-pool";
 
-chai.should();
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
@@ -80,11 +79,11 @@ describe("Transaction Pool", () => {
   describe("expired transaction is properly cleared from the pool when calling clearExpiredTransactions()", () => {
     let clock: sinon.SinonFakeTimers;
 
-    before(() => {
+    beforeEach(() => {
       clock = sinon.useFakeTimers(Date.now());
     });
 
-    after(() => {
+    afterEach(() => {
       clock.restore();
     });
 
@@ -106,11 +105,11 @@ describe("Transaction Pool", () => {
   describe("expired transaction is properly cleared from the pool by the cleanup timer", () => {
     let clock: sinon.SinonFakeTimers;
 
-    before(() => {
+    beforeEach(() => {
       clock = sinon.useFakeTimers(Date.now());
     });
 
-    after(() => {
+    afterEach(() => {
       clock.restore();
     });
 

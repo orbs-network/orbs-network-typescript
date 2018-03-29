@@ -24,13 +24,12 @@ export class CommittedTransactionPool extends BaseTransactionPool {
   public addCommittedTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
     for (const { txHash, timestamp } of transactionEntries) {
       const txid = txHash.toString("hex");
-      const timestampInt = parseInt(timestamp);
 
-      if (this.isExpired(timestampInt)) {
+      if (this.isExpired(Number(timestamp))) {
         continue;
       }
 
-      this.committedTransactions.set(txid, timestampInt);
+      this.committedTransactions.set(txid, Number(timestamp));
     }
   }
 }
