@@ -17,42 +17,37 @@ export class VirtualMachine {
 
   public async processTransactionSet(input: types.ProcessTransactionSetInput): Promise<types.ProcessTransactionSetOutput> {
     const stateCache = new StateCache();
-    const processedTransactions: Transaction[] = [];
-    const rejectedTransactions: Transaction[] = [];
+    const transactionReceipts: types.TransactionReceipt[] = [];
 
-    for (const transaction of input.orderedTransactions) {
+    for (const {txHash, transaction} of input.orderedTransactions) {
       const transactionScopeStateCache = stateCache.fork();
+      let success: boolean = false;
       try {
         await this.processor.processTransaction({
           sender: transaction.header.sender,
           payload: transaction.body.payload,
           contractAddress: transaction.body.contractAddress,
         }, transactionScopeStateCache);
-
+        success = true;
+        stateCache.merge(transactionScopeStateCache.getModifiedKeys());
       } catch (err) {
         if (!err.expected) {
           throw err;
         } else {
           logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
-          rejectedTransactions.push(transaction);
           continue;
         }
+      } finally {
+        const transactionReceipt: types.TransactionReceipt = { txHash, success};
+        transactionReceipts.push(transactionReceipt);
       }
-
-      stateCache.merge(transactionScopeStateCache.getModifiedKeys());
-      processedTransactions.push(transaction);
     }
 
     const stateDiff = stateCache.getModifiedKeys().map(({ key, value}) => ({contractAddress: key.contractAddress, key: key.key, value }));
 
-    if (rejectedTransactions.length > 0) {
-      logger.error(`Virtual machine has rejected ${rejectedTransactions.length} transactions`);
-    }
-
     return {
-      stateDiff,
-      processedTransactions,
-      rejectedTransactions
+      transactionReceipts,
+      stateDiff
     };
   }
 

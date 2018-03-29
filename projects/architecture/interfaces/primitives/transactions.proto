@@ -5,25 +5,18 @@ import "./addresses.proto";
 message Transaction {
   TransactionHeader header = 1;
   TransactionBody body = 2;
-  // bytes signature = 3;
 }
 
 message TransactionHeader {
   uint32 version = 1;
   UniversalAddress sender = 2;
-  // TransactionLifespan lifespan = 3;
-  uint32 sequenceNumber = 4;
+  uint64 timestamp = 3;
 }
 
 message TransactionBody {
   ContractAddress contractAddress = 1;
   string payload = 2;
 }
-
-// message TransactionLifespan {
-//   bytes refBlockHash = 1;
-//   uint32 blocksToLive = 2;
-// }
 
 message TransactionSubscriptionAppendix {
   string subscriptionKey = 1; // TODO: what's the key format?
@@ -33,4 +26,14 @@ message TransactionSubscriptionAppendix {
 message SubscriptionSignedTransaction {
   Transaction transaction = 1;
   TransactionSubscriptionAppendix transactionSubscriptionAppendix = 2;
+}
+
+message TransactionReceipt {
+  bytes txHash = 1;
+  bool success = 2; // TODO: This is just a temporary field to distinguish between successful and failed transactions
+}
+
+message TransactionEntry {
+  bytes txHash = 1;
+  Transaction transaction = 2;
 }

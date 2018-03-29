@@ -10,11 +10,10 @@ service VirtualMachine {
 }
 
 message ProcessTransactionSetInput {
-  repeated Transaction orderedTransactions = 1;
+  repeated TransactionEntry orderedTransactions = 1;
 }
 
 message ProcessTransactionSetOutput {
-  repeated Transaction processedTransactions = 1;
+  repeated TransactionReceipt transactionReceipts = 1;
   repeated ModifiedStateKey stateDiff = 2;
-  repeated Transaction rejectedTransactions = 3;
 }
