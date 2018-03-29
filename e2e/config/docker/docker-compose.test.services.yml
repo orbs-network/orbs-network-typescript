@@ -72,6 +72,8 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/virtual-machine-service-typescript/
+    environment:
+      - SMART_CONTRACTS_TO_LOAD=${VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD}
     command: node --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/virtual-machine.js
     volumes_from:
       - shared_volumes

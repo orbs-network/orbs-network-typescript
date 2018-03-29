@@ -32,7 +32,7 @@ function aTransactionWithSubscription(builder: { subscriptionKey: string }): typ
       header: {
         version: 0,
         sender: senderAddress,
-        sequenceNumber: 0
+        timestamp: Date.now().toString()
       },
       body: {
         contractAddress: {address: "contractAddress"},
