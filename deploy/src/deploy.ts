@@ -206,7 +206,7 @@ async function createOrUpdateNode(cloudFormation: any, options: any) {
     setParameter(standaloneParams, "KeyName", getPublicKeyName(options));
     setParameter(standaloneParams, "DockerTag", options.dockerTag || getDefaultDockerImageTag());
 
-    if (options.EthereumElasticIP) {
+    if (options.ethereumNodeIp) {
       setParameter(standaloneParams, "EthereumElasticIP", options.ethereumNodeIp);
     }
 
@@ -264,7 +264,7 @@ export async function execute(options: any) {
   await createOrUpdateBasicInfrastructure(cloudFormation, options);
 
   await waitForStacks(cloudFormation, options.region, (stacks: any) => {
-    return _.isObject(_.find(stacks, (s: any) => s.StackName === getBasicInfrastructureStackName(options) && s.StackStatus === "CREATE_COMPLETE"));
+    return _.isObject(_.find(stacks, (s: any) => s.StackName === getBasicInfrastructureStackName(options) && _.includes(["CREATE_COMPLETE", "UPDATE_COMPLETE"], s.StackStatus)));
   });
 
   if (options.tagDockerImage) {
