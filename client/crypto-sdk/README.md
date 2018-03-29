@@ -107,6 +107,7 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 ## Prerequisites
 
 1. [CMake](https://cmake.org)
+2. [Xcode](https://developer.apple.com/xcode/) + iPhone Simulator (64bit)
 
 ```bash
 brew install cmake
