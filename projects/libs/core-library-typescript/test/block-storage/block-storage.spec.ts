@@ -72,7 +72,7 @@ describe("Block storage", () => {
       expect(block.header.height).to.be.eql(1);
     });
 
-    xit("checks previous block hash", async () => {
+    it("checks previous block hash", async () => {
       const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
       exampleBlock.header.prevBlockHash = Buffer.concat([exampleBlock.header.prevBlockHash, new Buffer("noise")]);
 
@@ -95,8 +95,6 @@ describe("Block storage", () => {
       await blockStorage.addBlock(exampleBlock);
       await expect(transactionPool.markCommittedTransactions).to.have.been.calledOnce;
     });
-
-    xit("verifies block hash");
   });
 
   describe("#hasNewBlocks", () => {
