@@ -158,6 +158,9 @@ Parameters:
   ElasticIP:
     Type: String
     Default: ''
+  EthereumElasticIP:
+    Type: String
+    Default: ''
   DockerTag:
     Type: String
     Default: 'master'
@@ -173,9 +176,6 @@ Parameters:
   DockerImage:
     Type: String
     Default: ''
-  NumOfNodes:
-    Type: Number
-    Default: '6'
 
 Conditions:
   CreateEC2LCWithKeyPair:
@@ -201,6 +201,7 @@ Conditions:
   UseCustomAMI: !Not [!Equals [!Ref AmiId, '']]
   ImportRole: !Equals [!Ref IamRoleInstanceProfile, '']
   ImportElasticIP: !Equals [!Ref ElasticIP, '']
+  ImportEthereumElasticIP: !Equals [!Ref EthereumElasticIP, '']
   ImportNodeName: !Equals [!Ref NodeName, '']
   ImportDockerImage: !Equals [!Ref DockerImage, '']
 Resources:
@@ -304,6 +305,14 @@ Resources:
           FromPort: 51151
           ToPort: 51151
           CidrIp: !Ref PublicAPICidrIp
+        - IpProtocol: tcp
+          FromPort: 8545
+          ToPort: 8545
+          CidrIp:
+            Fn::Join:
+              - "/"
+              - - Fn::ImportValue: !Join ["-", ["orbs-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
+                - "32"
   InstanceLaunchConfiguration:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
@@ -332,7 +341,7 @@ Resources:
 
            cat > /opt/scripts/update.sh <<-EOF
            #!/bin/bash -xe
-           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} NUM_OF_NODES=${NUM_OF_NODES} ETHEREUM_NODE_HTTP_ADDRESS=${ETHEREUM_NODE_HTTP_ADDRESS}
+           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} ETHEREUM_NODE_HTTP_ADDRESS=http://${ETHEREUM_NODE_IP}:8545
            hostname ${NODE_NAME}
            aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/${BOOTSTRAP_PATH}/
            bash -x /opt/${BOOTSTRAP_PATH}/bootstrap.sh &>> /var/log/orbs-bootstrap.log
@@ -347,8 +356,10 @@ Resources:
               - ImportNodeName
               - !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
               - !Ref NodeName
-            NUM_OF_NODES: !Ref NumOfNodes
-            ETHEREUM_NODE_HTTP_ADDRESS: "http://ethereum.services.orbs-test.com:8545"
+            ETHEREUM_NODE_IP: !If
+              - ImportEthereumElasticIP
+              - Fn::ImportValue: !Join ["-", ["ethereum-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
+              - !Ref EthereumElasticIP
             DOCKER_TAG: !Ref DockerTag
             DOCKER_IMAGE: !If
               - ImportDockerImage

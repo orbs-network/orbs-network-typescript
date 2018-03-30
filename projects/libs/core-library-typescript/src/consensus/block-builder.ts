@@ -38,26 +38,17 @@ export default class BlockBuilder {
   }
 
   private async buildBlockFromPendingTransactions(lastBlock: types.Block): Promise<types.Block> {
-    const { transactions } = await this.transactionPool.getAllPendingTransactions({});
+    const { transactionEntries } = await this.transactionPool.getAllPendingTransactions({});
 
-    if (transactions.length == 0) {
-        throw new Error("Transaction pool is empty");
+    if (transactionEntries.length == 0) {
+        throw new Error("transaction pool is empty");
     }
 
-    const { processedTransactions, stateDiff, rejectedTransactions } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactions });
-
-    if (rejectedTransactions.length > 0) {
-      this.transactionPool.clearPendingTransactions({ transactions: rejectedTransactions });
-    }
-
-    if (processedTransactions.length == 0) {
-      throw new Error("None of the transactions processed successfully. Not building a new block");
-    } else {
-      logger.info(`Building new block with ${processedTransactions.length} transactions`);
-    }
+    const { transactionReceipts, stateDiff } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactionEntries });
 
     return BlockUtils.buildNextBlock({
-      transactions: processedTransactions,
+      transactions: transactionEntries.map(entry => entry.transaction),
+      transactionReceipts,
       stateDiff
     }, lastBlock);
   }

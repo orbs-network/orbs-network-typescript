@@ -59,6 +59,10 @@
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.2.tgz#f1af664769cfb50af805431c407425ed619daa21"
 
+"@types/json-stable-stringify@^1.0.32":
+  version "1.0.32"
+  resolved "https://registry.yarnpkg.com/@types/json-stable-stringify/-/json-stable-stringify-1.0.32.tgz#121f6917c4389db3923640b2e68de5fa64dda88e"
+
 "@types/lodash@^4.14.102":
   version "4.14.104"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.104.tgz#53ee2357fa2e6e68379341d92eb2ecea4b11bb80"
@@ -2018,12 +2022,14 @@ optjs@~3.2.2:
 "orbs-core-library@file:../../libs/core-library-typescript":
   version "0.1.0"
   dependencies:
+    "@types/json-stable-stringify" "^1.0.32"
     bignumber.js "^6.0.0"
     bind-decorator "^1.0.11"
     bluebird "^3.5.1"
     gaggle "git+https://github.com/lbeder/gaggle.git"
     grpc "^1.9.0"
     grpc-caller "https://github.com/electricmonk/grpc-caller"
+    json-stable-stringify "^1.0.1"
     leveldown "^3.0.0"
     levelup "^2.0.1"
     lodash "^4.17.4"
@@ -2611,7 +2617,7 @@ sinon-chai@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/sinon-chai/-/sinon-chai-3.0.0.tgz#d5cbd70fa71031edd96b528e0eed4038fcc99f29"
 
-sinon@^4.1.3:
+sinon@^4.1.3, sinon@^4.4.9:
   version "4.4.9"
   resolved "https://registry.yarnpkg.com/sinon/-/sinon-4.4.9.tgz#0792a2a5171eb0cf242edacb0eba3898b8b4297f"
   dependencies:

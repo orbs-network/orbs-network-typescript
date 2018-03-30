@@ -56,9 +56,12 @@ node src/deploy.js \
 
 # find out ip allocations of reserved ips (value of NodeElasticIP)
 
-aws cloudformation describe-stacks --region $REGION --stack-name basic-infrastructure-$NETWORK
-
-aws ec2 describe-addresses --region $REGION --allocation-ips eipalloc-something
+node src/deploy.js \
+    --region $REGION \
+    --dns-zone $DNS_ZONE \
+    --account-id $AWS_ACCOUNT_ID \
+    --network $NETWORK \
+    --list-resources
 
 # update bootstrap/.env with GOSSIP_PEERS=ws://IP_ADDRESS:60001
 # keep listing this addresses as you deploy new nodes
@@ -165,7 +168,6 @@ We should open 6 AWS sub-accounts and move servers there.
 ### What's missing
 
 TODO: add policy JSON for `deploy` role. Not the scope of this PR.
-TODO: export IP addresses in plaintext
 TODO: update script interface
 
 ### Prerequisites to install a new node
@@ -175,3 +177,12 @@ TODO: update script interface
 3. docker
 4. private/public key generated with ssh-keygen
 5. aws cli (`pip install awscli`)
+
+AWS services **required** for node deployment to work:
+
+1. S3
+2. ECR
+3. EC2
+4. CloudFormation
+
+Route53 is **optional** unless you want to use DNS zone that points to your node.
