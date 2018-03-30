@@ -7,19 +7,23 @@ import * as fsExtra from "fs-extra";
 import { types, BlockUtils } from "../../src/common-library";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockStorageSync } from "../../src/block-storage/block-storage-sync";
+import { stubInterface } from "ts-sinon";
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
 
+chai.use(chai.should);
+
 async function init(): Promise<{blockStorage: BlockStorage, blockStorageSync: BlockStorageSync}> {
   fsExtra.removeSync(LEVELDB_PATH);
-  const blockStorage = new BlockStorage(LEVELDB_PATH);
+  const transactionPool = stubInterface<types.TransactionPoolClient>();
+  const blockStorage = new BlockStorage(LEVELDB_PATH, transactionPool);
   await blockStorage.load();
   const blockStorageSync = new BlockStorageSync(blockStorage);
   return { blockStorage, blockStorageSync };
 }
 
 function generateEmptyBlock(lastBlock: types.Block): types.Block {
-  return BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, lastBlock);
+  return BlockUtils.buildNextBlock({transactions: [], transactionReceipts: [], stateDiff: []}, lastBlock);
 }
 
 async function generateBlocks(blockStorage: BlockStorage, numOfBlocks: number) {

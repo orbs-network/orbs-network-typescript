@@ -71,7 +71,7 @@ export class OrbsClientSession {
       header: {
         version: 0,
         sender: this.getAddress(),
-        sequenceNumber: 0
+        timestamp: Date.now().toString()
       },
       body: {
         contractAddress: {address: contractAddress},

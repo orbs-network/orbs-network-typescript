@@ -4,59 +4,75 @@ import bind from "bind-decorator";
 import { types, logger, JsonBuffer } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";
-import { TransactionPool } from "orbs-core-library";
+import { PendingTransactionPool, CommittedTransactionPool } from "orbs-core-library";
 
 export default class TransactionPoolService extends Service {
-  private transactionPool: TransactionPool;
-  private pollInterval: NodeJS.Timer;
-  private pollIntervalMs = 2000;
+  private pendingTransactionPool: PendingTransactionPool;
+  private committedTransactionPool: CommittedTransactionPool;
+  private monitorPollTimer: NodeJS.Timer;
+  private monitorPollIntervalMs = 2000;
 
-  public constructor(transactionPool: TransactionPool, serviceConfig: ServiceConfig) {
+  public constructor(pendingTransactionPool: PendingTransactionPool, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.transactionPool = transactionPool;
+    this.pendingTransactionPool = pendingTransactionPool;
   }
 
   async initialize() {
     this.startPoolSizeMonitor();
+    this.pendingTransactionPool.startCleanupTimer();
+    this.committedTransactionPool.startCleanupTimer();
   }
 
   async shutdown() {
-    clearInterval(this.pollInterval);
+    this.committedTransactionPool.stopCleanupTimer();
+    this.pendingTransactionPool.stopCleanupTimer();
+    this.stopPoolSizeMonitor();
   }
 
   private startPoolSizeMonitor() {
-    this.pollInterval = setInterval(() => {
-      const size = this.transactionPool.getPendingTransactionQueueSize();
+    this.monitorPollTimer = setInterval(() => {
+      const queueSize = this.pendingTransactionPool.getQueueSize();
 
-      if (size === 0) {
+      if (queueSize === 0) {
         logger.debug(`Transaction pool has no pending transactions`);
       } else {
-        logger.debug(`Transaction pool has ${size} pending transactions`);
+        logger.debug(`Transaction pool has ${queueSize} pending transactions`);
       }
-    }, this.pollIntervalMs);
+    }, this.monitorPollIntervalMs);
+  }
+
+  private stopPoolSizeMonitor() {
+    if (this.monitorPollTimer) {
+      clearInterval(this.monitorPollTimer);
+    }
+  }
+
+
+  @Service.RPCMethod
+  public async markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext) {
+    this.pendingTransactionPool.markCommittedTransactions(rpc.req.transactionEntries);
+    rpc.res = {};
   }
 
   @Service.RPCMethod
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
-     await this.transactionPool.addNewPendingTransaction(rpc.req.transaction);
+     await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
      rpc.res = {};
   }
 
   @Service.RPCMethod
   public async getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext) {
-    rpc.res = this.transactionPool.getAllPendingTransactions();
+    const transactionEntries = this.pendingTransactionPool.getAllPendingTransactions();
+    rpc.res = { transactionEntries };
     logger.debug(`getAllPendingTransactions() . returns ${JSON.stringify(rpc.res)}`);
-  }
-
-  @Service.RPCMethod
-  public async clearPendingTransactions(rpc: types.ClearPendingTransactionsContext) {
-    this.transactionPool.clearPendingTransactions(rpc.req.transactions);
-    rpc.res = {};
   }
 
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const obj: any = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
-    await this.transactionPool.gossipMessageReceived(rpc.req.fromAddress, rpc.req.messageType, obj);
+    if (rpc.req.messageType === "newTransaction") {
+      const message = <types.NewTransactionBroadcastMessage>obj;
+      await this.pendingTransactionPool.onNewBroadcastTransaction(message.transaction);
+    }
   }
 }

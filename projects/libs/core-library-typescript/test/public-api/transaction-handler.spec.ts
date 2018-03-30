@@ -5,7 +5,8 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 
-chai.should();
+const { expect } = chai;
+
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
@@ -32,7 +33,7 @@ function aTransactionWithSubscription(builder: { subscriptionKey: string }): typ
       header: {
         version: 0,
         sender: senderAddress,
-        sequenceNumber: 0
+        timestamp: Date.now().toString()
       },
       body: {
         contractAddress: {address: "contractAddress"},
@@ -52,13 +53,13 @@ describe("a transaction", () => {
 
     await handler.handle(aTransactionWithSubscription({ subscriptionKey }));
 
-    transactionPool.addNewPendingTransaction.should.have.been.called;
+    expect(transactionPool.addNewPendingTransaction).to.have.been.called;
   });
 
   it("is rejected when it includes an invalid subscription key", async () => {
     subscriptionManager.getSubscriptionStatus.returns({ active: false, expiryTimestamp: -1 });
 
     const transactionSignedWithWrongSubscriptionKey = aTransactionWithSubscription({ subscriptionKey: "some other key" });
-    await handler.handle(transactionSignedWithWrongSubscriptionKey).should.be.rejected;
+    await expect(handler.handle(transactionSignedWithWrongSubscriptionKey)).to.be.rejected;
   });
 });

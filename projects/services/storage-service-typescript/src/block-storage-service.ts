@@ -14,12 +14,14 @@ export default class BlockStorageService extends Service {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
+  private transactionPool: types.TransactionPoolClient;
   private pollForNewBlocksInterval: any;
   private pollForNewBlocksIntervalMs: number;
 
-  public constructor(gossip: types.GossipClient, serviceConfig: BlockStorageServiceConfig) {
+  public constructor(gossip: types.GossipClient, transactionPool: types.TransactionPoolClient, serviceConfig: BlockStorageServiceConfig) {
     super(serviceConfig);
     this.gossip = gossip;
+    this.transactionPool = transactionPool;
     this.pollForNewBlocksIntervalMs = serviceConfig.pollInterval;
   }
 
@@ -33,7 +35,7 @@ export default class BlockStorageService extends Service {
 
   async initBlockStorage(): Promise<void> {
     const blockStorageConfig = <BlockStorageServiceConfig>this.config;
-    this.blockStorage = new BlockStorage(blockStorageConfig.dbPath);
+    this.blockStorage = new BlockStorage(blockStorageConfig.dbPath, this.transactionPool);
     await this.blockStorage.load();
     this.sync = new BlockStorageSync(this.blockStorage);
   }

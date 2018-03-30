@@ -20,7 +20,7 @@ const transaction: types.Transaction = {
   header: {
     version: 0,
     sender: senderAddress,
-    sequenceNumber: 0
+    timestamp: Date.now().toString()
   },
   body: {
     contractAddress: {address: "contractAddress"},
@@ -34,10 +34,10 @@ describe("Public API Service - Component Test", async function () {
   let virtualMachine: types.VirtualMachineClient;
   let transactionPool: types.TransactionPoolClient;
   let subscriptionManager: types.SubscriptionManagerClient;
-
-  const endpoint = `127.0.0.1:${await getPort()}`;
+  let endpoint: string;
 
   beforeEach(async () => {
+    endpoint = `127.0.0.1:${await getPort()}`;
     virtualMachine = stubInterface<types.VirtualMachineClient>();
     transactionPool = stubInterface<types.TransactionPoolClient>();
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
