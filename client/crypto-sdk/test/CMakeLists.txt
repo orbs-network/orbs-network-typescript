@@ -14,7 +14,7 @@ set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/lib/libgcrypt.a)
 add_executable(crypto-test ${CRYPTO_SDK_TEST_SRC})
 
 target_link_libraries(crypto-test LINK_PUBLIC
-  crypto
+  cryptosdk
   ${GTEST_LIBRARY}
   ${GMOCK_LIBRARY}
   ${LIBGCRYPT_LIBRARY}

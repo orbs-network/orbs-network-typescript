@@ -3,11 +3,13 @@
 #include <cstdint>
 #include <vector>
 
+#include "exports.h"
+
 namespace Orbs {
 
 typedef void *key_t;
 
-class ED25519Key {
+class CRYPTO_EXPORT ED25519Key {
 public:
     static const uint32_t PUBLIC_KEY_SIZE;
 
