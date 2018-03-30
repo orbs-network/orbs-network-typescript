@@ -7,15 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		14296700206BB1B800F3FEC2 /* libgpg-error.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 142966FF206BB1B800F3FEC2 /* libgpg-error.a */; };
 		14706BE62067CCA5008C6154 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 14706BE52067CCA5008C6154 /* AppDelegate.mm */; };
 		14706BE92067CCA5008C6154 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 14706BE82067CCA5008C6154 /* ViewController.mm */; };
 		14706BEC2067CCA5008C6154 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14706BEA2067CCA5008C6154 /* Main.storyboard */; };
 		14706BEE2067CCA5008C6154 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14706BED2067CCA5008C6154 /* Assets.xcassets */; };
 		14706BF12067CCA5008C6154 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14706BEF2067CCA5008C6154 /* LaunchScreen.storyboard */; };
 		14706BF42067CCA5008C6154 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 14706BF32067CCA5008C6154 /* main.m */; };
-		14706C1820683CA1008C6154 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14706C1720683CA1008C6154 /* libcrypto.a */; };
-		14D1DA27206BB24900B77A10 /* libgcrypt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 14D1DA26206BB24900B77A10 /* libgcrypt.a */; };
+		14AA350D206D9AAC009F4810 /* libcryptosdk.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 14AA350C206D9AAC009F4810 /* libcryptosdk.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +34,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		142966FF206BB1B800F3FEC2 /* libgpg-error.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libgpg-error.a"; path = "../../crypto-sdk/build/libgpg-error/lib/libgpg-error.a"; sourceTree = "<group>"; };
 		14706BE12067CCA5008C6154 /* ios-sample-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-sample-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14706BE42067CCA5008C6154 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		14706BE52067CCA5008C6154 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -49,8 +46,7 @@
 		14706BF32067CCA5008C6154 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		14706BF92067CCA5008C6154 /* ios-sample-appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-sample-appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14706C042067CCA5008C6154 /* ios-sample-appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-sample-appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		14706C1720683CA1008C6154 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../crypto-sdk/build/lib/libcrypto.a"; sourceTree = "<group>"; };
-		14D1DA26206BB24900B77A10 /* libgcrypt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgcrypt.a; path = "../../crypto-sdk/build/libgcrypt/lib/libgcrypt.a"; sourceTree = "<group>"; };
+		14AA350C206D9AAC009F4810 /* libcryptosdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptosdk.dylib; path = "../../crypto-sdk/build/lib/libcryptosdk.dylib"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,9 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14D1DA27206BB24900B77A10 /* libgcrypt.a in Frameworks */,
-				14296700206BB1B800F3FEC2 /* libgpg-error.a in Frameworks */,
-				14706C1820683CA1008C6154 /* libcrypto.a in Frameworks */,
+				14AA350D206D9AAC009F4810 /* libcryptosdk.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,9 +113,7 @@
 		14706C1620683CA1008C6154 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				14D1DA26206BB24900B77A10 /* libgcrypt.a */,
-				142966FF206BB1B800F3FEC2 /* libgpg-error.a */,
-				14706C1720683CA1008C6154 /* libcrypto.a */,
+				14AA350C206D9AAC009F4810 /* libcryptosdk.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -134,6 +126,7 @@
 			buildConfigurationList = 14706C0D2067CCA5008C6154 /* Build configuration list for PBXNativeTarget "ios-sample-app" */;
 			buildPhases = (
 				14706BDD2067CCA5008C6154 /* Sources */,
+				14AA350F206D9CC0009F4810 /* ShellScript */,
 				14706BDE2067CCA5008C6154 /* Frameworks */,
 				14706BDF2067CCA5008C6154 /* Resources */,
 			);
@@ -253,6 +246,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		14AA350F206D9CC0009F4810 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "codesign -f -s \"${CODE_SIGN_IDENTITY}\" ../../crypto-sdk/build/lib/libcryptosdk.dylib";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		14706BDD2067CCA5008C6154 /* Sources */ = {
@@ -426,11 +435,7 @@
 				DEVELOPMENT_TEAM = ZU9RBNHA75;
 				INFOPLIST_FILE = "ios-sample-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"../../crypto-sdk/build/lib/",
-					"../../crypto-sdk/build/libgpg-error/lib",
-					"../../crypto-sdk/build/libgcrypt/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "../../crypto-sdk/build/lib/";
 				PRODUCT_BUNDLE_IDENTIFIER = "orbs.ios-sample-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -449,11 +454,7 @@
 				DEVELOPMENT_TEAM = ZU9RBNHA75;
 				INFOPLIST_FILE = "ios-sample-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"../../crypto-sdk/build/lib/",
-					"../../crypto-sdk/build/libgpg-error/lib",
-					"../../crypto-sdk/build/libgcrypt/lib",
-				);
+				LIBRARY_SEARCH_PATHS = "../../crypto-sdk/build/lib/";
 				PRODUCT_BUNDLE_IDENTIFIER = "orbs.ios-sample-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
