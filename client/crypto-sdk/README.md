@@ -98,8 +98,8 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
   * Source: [https://github.com/google/googletest.git](https://github.com/google/googletest.git)
   * Version: `release-1.8.0` git tag.
 * Libgpg-error (`libgpg_error`): Libgpg-error is a small library that originally defined common error values for all GnuPG components.
-  * Source: [https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2)
-  * Version: 1.27.
+  * Source: [https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.28.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.28.tar.bz2)
+  * Version: 1.28.
 * Libgcrypt (`libgcrypt`): Libgcrypt is a general purpose cryptographic library originally based on code from GnuPG.
   * Source: [https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2)
   * Version: 1.8.2.

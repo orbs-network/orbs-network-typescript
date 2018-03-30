@@ -8,7 +8,7 @@ function readlink() {
 NPROCESSORS=$(getconf NPROCESSORS_ONLN 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
 PROCESSORS=${NPROCESSORS:-3}
 
-LIBGPG_ERROR_VERSION=1.27
+LIBGPG_ERROR_VERSION=1.28
 LIBGPG_ERROR_PACKAGE="libgpg-error-${LIBGPG_ERROR_VERSION}"
 
 PREFIX="$(pwd)/../../build/libgpg-error/"
