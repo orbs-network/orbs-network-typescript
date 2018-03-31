@@ -63,7 +63,7 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 6. Encode the raw public address to Base58:
 
-    Each of the fllowing address parts is encoded seperatly:
+    Each of the following address parts is encoded separately:
 
     a. Network ID: `M`
 
