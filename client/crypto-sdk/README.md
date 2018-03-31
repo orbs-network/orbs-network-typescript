@@ -89,6 +89,10 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 * CRC32
 
+#### Public Key Cryptography
+
+* ED25519 key pair support
+
 ### External Dependencies
 
 * Google Test (`gtest`): Google Test is a unit testing library for the C++ programming language, based on the xUnit architecture.
