@@ -3,6 +3,7 @@
         {
             "target_name": "cryptosdk",
             "sources": [
+                "src/ed25519key.cpp",
                 "src/address.cpp",
                 "src/crypto-sdk.cpp"
             ],

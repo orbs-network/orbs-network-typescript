@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import * as _ from "lodash";
 import * as crypto from "crypto";
-import { Address } from "orbs-crypto-sdk";
+import { Address, ED25519Key } from "orbs-crypto-sdk";
 
 import { OrbsClientSession, OrbsHardCodedContractAdapter } from "./orbs-client";
 import { FooBarAccount } from "./foobar-contract";
@@ -16,8 +16,8 @@ chai.use(ChaiBarsPlugin);
 
 const VIRTUAL_CHAIN_ID = "640ed3";
 const generateAddress = (): string => {
-  const publicKey = crypto.randomBytes(32).toString("hex");
-  const address = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+  const key = new ED25519Key();
+  const address = new Address(key.publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
 
   return address.toString();
 };
