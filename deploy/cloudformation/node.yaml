@@ -389,6 +389,7 @@ Resources:
                   [main]
                   stack=${AWS_STACK_ID}
                   region=${AWS_REGION}
+                  interval=5
                 - AWS_REGION: !Ref "AWS::Region"
                   AWS_STACK_ID: !Ref "AWS::StackId"
               mode: "000400"
