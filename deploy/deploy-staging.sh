@@ -15,6 +15,8 @@ npm run build-ts
 
 # ssh-keygen -t rsa -b 4096 -C "orbs-global-$AWS_ACCOUNT_ID-staging-$REGION" -f temp-keys/orbs-global-$AWS_ACCOUNT_ID-staging-$REGION-secret-message-key -N ""
 
+# ssh-keygen -f temp-keys/orbs-global-506367651493-staging-ca-central-1-secret-message-key.pub -e -m pem > temp-keys/orbs-global-506367651493-staging-ca-central-1-secret-message-key.pub.pem
+
 node dist/deploy.js \
     --region $REGIONS \
     --dns-zone $DNS_ZONE \
