@@ -210,6 +210,14 @@ async function createOrUpdateNode(cloudFormation: any, options: any) {
       setParameter(standaloneParams, "EthereumElasticIP", options.ethereumNodeIp);
     }
 
+    if (options.secretBlockKey) {
+      setParameter(standaloneParams, "SecretBlockKey", fs.readFileSync(options.secretBlockKey).toString());
+    }
+
+    if (options.secretMessageKey) {
+      setParameter(standaloneParams, "SecretMessageKey", fs.readFileSync(options.secretMessageKey).toString());
+    }
+
     const sshCidr = (options.sshCidr || "0.0.0.0/0").split(",");
     const peersCidr = (options.peersCidr || "0.0.0.0/0").split(",");
 
@@ -333,6 +341,8 @@ export function getBaseConfig() {
     parity: config.get("parity"),
     sshCidr: config.get("ssh-cidr"),
     peersCidr: config.get("peers-cidr"),
+    secretBlockKey: config.get("secret-block-key"),
+    secretMessageKey: config.get("secret-message-key"),
   };
 
   return nodeConfig;

@@ -20,11 +20,17 @@ async function main() {
   const regions = config.get("region").split(",");
 
   for (const region of regions) {
+    // TODO: fix staging
+    const secretBlockKey = `${__dirname}/test-keys/orbs-global-${accountId}-staging-${region}-secret-block-key`;
+    const secretMessageKey = `${__dirname}/test-keys/orbs-global-${accountId}-staging-${region}-secret-message-key`;
+
     const regionalConfig = _.extend({}, getBaseConfig(), {
       credentials,
       accountId,
       region,
-      bucketName
+      bucketName,
+      secretBlockKey,
+      secretMessageKey
     });
 
     await execute(regionalConfig);
