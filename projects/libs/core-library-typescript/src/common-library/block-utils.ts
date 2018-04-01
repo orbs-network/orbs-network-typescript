@@ -1,15 +1,15 @@
 
 import { types, logger } from ".";
 import { createHash } from "crypto";
+import * as stringify from "json-stable-stringify";
 
 export namespace BlockUtils {
   export function calculateBlockHash(block: types.Block): Buffer {
-    // TODO: this is just a placeholder. Replace with the real algorithm once specified
     const hash = createHash("sha256");
 
-    hash.update(JSON.stringify(block.header));
+    hash.update(stringify(block.header));
 
-    hash.update(JSON.stringify(block.body));
+    hash.update(stringify(block.body));
 
     return hash.digest();
   }
