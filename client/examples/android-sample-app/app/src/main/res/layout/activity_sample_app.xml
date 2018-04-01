@@ -5,7 +5,18 @@
     android:id="@+id/activity_sample_app"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.orbs.sampleapp.">
+    tools:context="com.orbs.sampleapp.SampleApp">
+
+    <!--<ImageView-->
+    <!--android:id="@+id/logo_image"-->
+    <!--android:contentDescription="@string/logo"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_constraintBottom_toBottomOf="@+id/activity_sample_app"-->
+    <!--app:layout_constraintLeft_toLeftOf="@+id/activity_sample_app"-->
+    <!--app:layout_constraintRight_toRightOf="@+id/activity_sample_app"-->
+    <!--app:layout_constraintTop_toTopOf="@+id/activity_sample_app"-->
+    <!--/>-->
 
     <TextView
         android:id="@+id/hello_textview"
@@ -15,6 +26,21 @@
         app:layout_constraintBottom_toBottomOf="@+id/activity_sample_app"
         app:layout_constraintLeft_toLeftOf="@+id/activity_sample_app"
         app:layout_constraintRight_toRightOf="@+id/activity_sample_app"
-        app:layout_constraintTop_toTopOf="@+id/activity_sample_app" />
+        app:layout_constraintTop_toTopOf="@+id/activity_sample_app"
+        app:layout_constraintVertical_bias="0.64" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:contentDescription="@string/logo"
+        android:layout_width="285dp"
+        android:layout_height="214dp"
+        android:src="@drawable/orbs"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.111" />
+
 
 </android.support.constraint.ConstraintLayout>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Orbs Android Sample App</string>
+    <string name="logo">Logo</string>
 </resources>
