@@ -49,6 +49,11 @@
     "type": "library",
     "path": "client/crypto-sdk-javascript"
   },
+  "client-sdk-javascript": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/client-sdk-javascript"
+  },
   "example-slack-bot": {
     "runtime": "typescript",
     "type": "library",
@@ -58,6 +63,7 @@
     "architecture",
     "crypto-sdk",
     "crypto-sdk-javascript",
+    "client-sdk-javascript",
     "core-library-typescript",
     "gossip-service-typescript",
     "consensus-service-typescript",

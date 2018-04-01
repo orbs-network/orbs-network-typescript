@@ -1,10 +1,10 @@
 import { delay } from "bluebird";
 
-import { PublicApiClient, Transaction, UniversalAddress } from "orbs-interfaces";
+import { PublicApiClient, Transaction, UniversalAddress, SendTransactionInput, SendTransactionOutput } from "orbs-interfaces";
 
-type OrbsHardCodedContractMethodArgs = [string | number] | any[];
+export type OrbsContractMethodArgs = [string | number] | any[];
 
-export class OrbsHardCodedContractAdapter {
+export class OrbsContractAdapter {
   orbsSession: OrbsClientSession;
   contractAddress: string;
 
@@ -13,7 +13,7 @@ export class OrbsHardCodedContractAdapter {
     this.contractAddress = contractAddress;
   }
 
-  public async sendTransaction(methodName: string, args: OrbsHardCodedContractMethodArgs) {
+  public async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
     const payload = JSON.stringify({
       method: methodName,
       args: args
@@ -21,7 +21,7 @@ export class OrbsHardCodedContractAdapter {
     return await this.orbsSession.sendTransaction(this.contractAddress, payload);
   }
 
-  public async call(methodName: string, args: OrbsHardCodedContractMethodArgs) {
+  public async call(methodName: string, args: OrbsContractMethodArgs) {
     const payload = JSON.stringify({
       method: methodName,
       args: args
@@ -41,7 +41,7 @@ export class OrbsClientSession {
     this.subscriptionKey = subscriptionKey;
   }
 
-  async sendTransaction(contractAddress: string, payload: string) {
+  async sendTransaction(contractAddress: string, payload: string): Promise<SendTransactionOutput> {
     const signedTransaction = this.generateTransaction(contractAddress, payload);
 
     const res = await this.orbsClient.sendTransaction({
