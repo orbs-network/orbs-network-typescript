@@ -1,6 +1,6 @@
 import { TestEnvironment } from "./test-environment";
 import { PublicApiClient } from "orbs-interfaces";
-import { initPublicApiClient } from "./public-api-client";
+import { initPublicApiClient } from "orbs-client-sdk";
 import * as nconf from "nconf";
 
 nconf.env({ parseValues: true });
