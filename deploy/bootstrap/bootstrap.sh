@@ -3,8 +3,6 @@
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 aws ec2 associate-address --region $REGION --instance-id $INSTANCE_ID --allocation-id $EIP
 
-yum install -y docker
-service docker start
 $(aws ecr get-login --no-include-email --region $REGION)
 pip install docker-compose
 
