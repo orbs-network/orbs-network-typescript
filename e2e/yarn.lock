@@ -2993,7 +2993,7 @@ optjs@~3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/optjs/-/optjs-3.2.2.tgz#69a6ce89c442a44403141ad2f9b370bd5bb6f4ee"
 
-orbs-client-sdk@../client/client-sdk-javascript:
+"orbs-client-sdk@file:../client/client-sdk-javascript":
   version "0.0.1"
   dependencies:
     bluebird "^3.5.1"
