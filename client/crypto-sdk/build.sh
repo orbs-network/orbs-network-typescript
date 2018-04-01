@@ -33,18 +33,29 @@ echo "Building ${BUILD_TYPE} version for ${PLATFORM}..."
 case ${PLATFORM} in
     IOS)
         cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE="toolchains/ios.cmake" -DIOS_PLATFORM="iPhoneSimulator"
-        make
 
-        popd
+        ;;
+    ANDROID)
+        case "$(uname -s)" in
+            Darwin)
+                export ANDROID_NDK=~/Library/Android/sdk
+
+                ;;
+            *)
+                ;;
+        esac
+
+        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE="toolchains/android.cmake"
 
         ;;
     *)
         cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
-        make
-
-        popd
-
-        ./test.sh
 
         ;;
 esac
+
+make
+
+popd
+
+./test.sh
