@@ -19,7 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class HelloJni extends AppCompatActivity {
+public class SampleApp extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class HelloJni extends AppCompatActivity {
      * Trying to call this function will result in a
      * java.lang.UnsatisfiedLinkError exception !
      */
-    public native String  unimplementedStringFromJNI();
+    public native String unimplementedStringFromJNI();
 
     /* this is used to load the 'hello-jni' library on application
      * startup. The library has already been unpacked into
@@ -56,6 +56,6 @@ public class HelloJni extends AppCompatActivity {
      * installation time by the package manager.
      */
     static {
-        System.loadLibrary("hello-jni");
+        //System.loadLibrary("hello-jni");
     }
 }
