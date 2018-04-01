@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.hellojni;
+package com.orbs.sampleapp;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,19 +24,18 @@ public class SampleApp extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /* Retrieve our TextView and set its content.
-         * the text is retrieved by calling a native
-         * function.
-         */
-        setContentView(R.layout.activity_hello_jni);
+
+        // Retrieve our TextView and set its content. The text is retrieved by calling a native function.
+        setContentView(R.layout.activity_sample_app);
         TextView tv = (TextView)findViewById(R.id.hello_textview);
         tv.setText( stringFromJNI() );
     }
+
     /* A native method that is implemented by the
      * 'hello-jni' native library, which is packaged
      * with this application.
      */
-    public native String  stringFromJNI();
+    public native String stringFromJNI();
 
     /* This is another native method declaration that is *not*
      * implemented by 'hello-jni'. This is simply to show that
