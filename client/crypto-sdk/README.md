@@ -110,8 +110,20 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 ## Prerequisites
 
+### General
+
 1. [CMake](https://cmake.org)
-2. [Xcode](https://developer.apple.com/xcode/) + iPhone Simulator (64bit)
+
+### iOS
+
+1. [Xcode](https://developer.apple.com/xcode/)
+2. iPhone Simulator (64bit)
+
+### Android
+
+1. [Android Studio](https://developer.android.com/studio/index.html) (3.1 or higher)
+2. [Android SDK](https://developer.android.com/studio/intro/update.html)
+3. [Android NDK](https://developer.android.com/studio/projects/add-native-code.html#download-ndk) + CMake
 
 ```bash
 brew install cmake
