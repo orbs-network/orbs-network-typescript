@@ -176,6 +176,14 @@ Parameters:
   DockerImage:
     Type: String
     Default: ''
+  SecretMessageKey:
+    Type: String
+    NoEcho: true
+    Default: 'dummy-secret-message-key'
+  SecretBlockKey:
+    Type: String
+    NoEcho: true
+    Default: 'dummy-secret-block-key'
 
 Conditions:
   CreateEC2LCWithKeyPair:
@@ -337,40 +345,116 @@ Resources:
         Fn::Base64: !Sub
           - |
            #!/bin/bash -xe
-           mkdir -p /opt/scripts
+           yum install -y aws-cfn-bootstrap
 
-           cat > /opt/scripts/update.sh <<-EOF
-           #!/bin/bash -xe
-           export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} ETHEREUM_NODE_HTTP_ADDRESS=http://${ETHEREUM_NODE_IP}:8545
-           hostname ${NODE_NAME}
-           aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/${BOOTSTRAP_PATH}/
-           bash -x /opt/${BOOTSTRAP_PATH}/bootstrap.sh &>> /var/log/orbs-bootstrap.log
-           EOF
+           # Install the files and packages from the metadata
+           /opt/aws/bin/cfn-init -v --stack ${AWS_STACK_NAME} \
+            --resource InstanceLaunchConfiguration \
+            --configsets install_and_bootstrap \
+            --region ${AWS_REGION}
 
-           bash /opt/scripts/update.sh
-          - EIP: !If
-              - ImportElasticIP
-              - Fn::ImportValue: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
-              - !Ref ElasticIP
-            NODE_NAME: !If
-              - ImportNodeName
-              - !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
-              - !Ref NodeName
-            ETHEREUM_NODE_IP: !If
-              - ImportEthereumElasticIP
-              - Fn::ImportValue: !Join ["-", ["ethereum-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
-              - !Ref EthereumElasticIP
-            DOCKER_TAG: !Ref DockerTag
-            DOCKER_IMAGE: !If
-              - ImportDockerImage
-              - Fn::ImportValue: !Join ["-", ["orbs-repository", !Ref NodeEnv, !Ref "AWS::Region"]]
-              - !Ref DockerImage
-            NODE_ENV: !Ref NodeEnv
-            REGION: !Ref "AWS::Region"
-            BOOTSTRAP: !Ref Bootstrap
-            BOOTSTRAP_PATH: !FindInMap [ NodeNames, !Ref Bootstrap, "path" ]
-            S3_CONFIG:
-              Fn::ImportValue: !Join ["-", ["orbs-network-s3-bucket", !Ref NodeEnv, !Ref "AWS::Region"]]
+            # Signal the status from cfn-init
+            /opt/aws/bin/cfn-signal -e $? \
+              --stack ${AWS_STACK_NAME} \
+              --resource InstanceLaunchConfiguration \
+              --region ${AWS_REGION}
+          - AWS_REGION: !Ref "AWS::Region"
+            AWS_STACK_NAME: !Ref "AWS::StackName"
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          install_and_bootstrap:
+            - install
+            - provision_keys
+            - bootstrap
+        install:
+          packages:
+            yum:
+              docker: []
+          services:
+            sysvinit:
+              docker:
+                enabled: true
+                ensureRunning: true
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub
+                - |
+                  [main]
+                  stack=${AWS_STACK_ID}
+                  region=${AWS_REGION}
+                - AWS_REGION: !Ref "AWS::Region"
+                  AWS_STACK_ID: !Ref "AWS::StackId"
+              mode: "000400"
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub
+                - |
+                  [cfn-auto-reloader-hook]
+                  triggers=post.update
+                  path=Resources.InstanceLaunchConfiguration.Metadata.AWS::CloudFormation::Init
+                  action=/opt/aws/bin/cfn-init -v --stack ${AWS_STACK_NAME} --resource InstanceLaunchConfiguration --configsets install_and_bootstrap --region ${AWS_REGION}
+                  runas=root
+                - AWS_REGION: !Ref "AWS::Region"
+                  AWS_STACK_NAME: !Ref "AWS::StackId"
+        provision_keys:
+          files:
+            /opt/keys/message/secret-key:
+              content: !Ref SecretMessageKey
+              mode: "000400"
+              # TODO: change later to whatever user we use inside the container
+              owner: root
+            /opt/keys/block/secret-key:
+              content: !Ref SecretBlockKey
+              mode: "000400"
+              # TODO: change later to whatever user we use inside the container
+              owner: root
+        bootstrap:
+          commands:
+            001_run_update:
+              command: /opt/scripts/update.sh
+          files:
+            /opt/scripts/update.sh:
+              mode: "00700"
+              owner: root
+              content: !Sub
+                - |
+                  #!/bin/bash -xe
+                  export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} ETHEREUM_NODE_HTTP_ADDRESS=http://${ETHEREUM_NODE_IP}:8545
+                  hostname ${NODE_NAME}
+                  aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/${BOOTSTRAP_PATH}/
+                  bash -x /opt/${BOOTSTRAP_PATH}/bootstrap.sh &>> /var/log/orbs-bootstrap.log
+                - EIP: !If
+                    - ImportElasticIP
+                    - Fn::ImportValue: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
+                    - !Ref ElasticIP
+                  NODE_NAME: !If
+                    - ImportNodeName
+                    - !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
+                    - !Ref NodeName
+                  ETHEREUM_NODE_IP: !If
+                    - ImportEthereumElasticIP
+                    - Fn::ImportValue: !Join ["-", ["ethereum-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
+                    - !Ref EthereumElasticIP
+                  DOCKER_TAG: !Ref DockerTag
+                  DOCKER_IMAGE: !If
+                    - ImportDockerImage
+                    - Fn::ImportValue: !Join ["-", ["orbs-repository", !Ref NodeEnv, !Ref "AWS::Region"]]
+                    - !Ref DockerImage
+                  NODE_ENV: !Ref NodeEnv
+                  REGION: !Ref "AWS::Region"
+                  BOOTSTRAP: !Ref Bootstrap
+                  BOOTSTRAP_PATH: !FindInMap [ NodeNames, !Ref Bootstrap, "path" ]
+                  S3_CONFIG:
+                    Fn::ImportValue: !Join ["-", ["orbs-network-s3-bucket", !Ref NodeEnv, !Ref "AWS::Region"]]
+
   InstanceAsg:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:

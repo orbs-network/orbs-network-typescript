@@ -7,11 +7,11 @@ export ETHEREUM_CHAIN=${ETHEREUM_CHAIN-ropsten}
 export PARITY_LOCAL_PATH=/mnt/data/
 mkdir -p $PARITY_LOCAL_PATH
 
+# TODO: DO NOT FORMAT ON STACK UPDATE
 mkfs.ext3 -F /dev/xvdc
 mount /dev/xvdc $PARITY_LOCAL_PATH
 
-yum install -y docker
-service docker start
+service docker restart
 
 pip install docker-compose
 
