@@ -19,12 +19,6 @@ android {
         }
     }
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
-    }
-
     flavorDimensions 'cpuArch'
     productFlavors {
         arm7 {
