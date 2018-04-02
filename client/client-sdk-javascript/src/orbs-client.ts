@@ -1,50 +1,22 @@
 import { delay } from "bluebird";
 
-import { PublicApiClient, Transaction, UniversalAddress, SendTransactionInput, SendTransactionOutput } from "orbs-interfaces";
-
-export type OrbsContractMethodArgs = [string | number] | any[];
-
-export class OrbsContractAdapter {
-  orbsSession: OrbsClientSession;
-  contractAddress: string;
-
-  constructor(orbsSession: OrbsClientSession, contractAddress: string) {
-    this.orbsSession = orbsSession;
-    this.contractAddress = contractAddress;
-  }
-
-  public async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
-    const payload = JSON.stringify({
-      method: methodName,
-      args: args
-    });
-    return await this.orbsSession.sendTransaction(this.contractAddress, payload);
-  }
-
-  public async call(methodName: string, args: OrbsContractMethodArgs) {
-    const payload = JSON.stringify({
-      method: methodName,
-      args: args
-    });
-    return this.orbsSession.call(this.contractAddress, payload);
-  }
-}
+import { PublicApiClient, Transaction, UniversalAddress, SendTransactionOutput } from "orbs-interfaces";
 
 export class OrbsClientSession {
-  orbsClient: PublicApiClient;
+  connection: PublicApiClient;
   subscriptionKey: string;
   senderAddress: string;
 
-  constructor(senderAddress: string, subscriptionKey: string, orbsClient: PublicApiClient) {
+  constructor(senderAddress: string, subscriptionKey: string, connection: PublicApiClient) {
     this.senderAddress = senderAddress;
-    this.orbsClient = orbsClient;
+    this.connection = connection;
     this.subscriptionKey = subscriptionKey;
   }
 
   async sendTransaction(contractAddress: string, payload: string): Promise<SendTransactionOutput> {
     const signedTransaction = this.generateTransaction(contractAddress, payload);
 
-    const res = await this.orbsClient.sendTransaction({
+    const res = await this.connection.sendTransaction({
       transaction: signedTransaction,
       transactionSubscriptionAppendix: {
         subscriptionKey: this.subscriptionKey
@@ -55,7 +27,7 @@ export class OrbsClientSession {
   }
 
   async call(contractAddress: string, payload: string) {
-    const { resultJson } = await this.orbsClient.callContract({
+    const { resultJson } = await this.connection.callContract({
       sender: this.getAddress(),
       contractAddress: {address: contractAddress},
       payload: payload
