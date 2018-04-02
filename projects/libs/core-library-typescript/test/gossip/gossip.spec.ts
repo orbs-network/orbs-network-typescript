@@ -38,6 +38,7 @@ describe("Gossip", function () {
       const senderId = 0;
       const recipientId = 1;
       const buffer = new Buffer(JSON.stringify({ foo: "bar" }));
+      console.log("XX", buffer.toString());
 
       await gossips[senderId].unicastMessage(gossips[recipientId].localAddress, "consensus", "TEST_MESSAGE", buffer, true);
       await delay(1000);
@@ -53,12 +54,11 @@ describe("Gossip", function () {
       }
     });
 
-    it("#broadcast message triggers the service at all other nodes", async () => {
+    it.only("#broadcast message triggers the service at all other nodes", async () => {
       const senderId = 0;
-      const payload = { foo: "bar" };
-      const buffer = new Buffer(JSON.stringify(payload));
+      const buffer = new Buffer(JSON.stringify({ foo: "bar" }));
 
-      await gossips[senderId].broadcastMessage("consensus", "TEST_MESSAGE", payload, true);
+      await gossips[senderId].broadcastMessage("consensus", "TEST_MESSAGE", buffer, true);
       await delay(2000);
 
       for (let i = 0; i < numberOfGossips - 1; i++) {
@@ -99,10 +99,9 @@ describe("Gossip", function () {
 
     it("#broadcast signs messages", async () => {
       const senderId = 0;
-      const payload = { foo: "bar" };
-      const buffer = new Buffer(JSON.stringify(payload));
+      const buffer = new Buffer(JSON.stringify({ foo: "bar" }));
 
-      await gossips[senderId].broadcastMessage("consensus", "TEST_MESSAGE", payload, true);
+      await gossips[senderId].broadcastMessage("consensus", "TEST_MESSAGE", buffer, true);
       await delay(2000);
 
       for (let i = 0; i < numberOfGossips - 1; i++) {

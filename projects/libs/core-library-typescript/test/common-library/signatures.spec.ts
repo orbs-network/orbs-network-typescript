@@ -9,7 +9,7 @@ import * as sinon from "sinon";
 
 chai.use(sinonChai);
 
-describe.only("Signatures", () => {
+describe("Signatures", () => {
   describe("#signMessage", () => {
     it("returns a signed object", () => {
       const signatures = new Signatures({

@@ -36,7 +36,7 @@ export default class Signatures {
   }
 
   private verifyObject(object: any, signature: string, publicKey: string): boolean {
-    const payload = stringify(object);
+    const payload = _.isBuffer(object) ? object : stringify(object);
 
     const verify = crypto.createVerify(this.SIGNATURE_TYPE);
     verify.update(payload);
