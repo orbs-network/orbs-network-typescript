@@ -59,5 +59,27 @@ describe("Signatures", () => {
 
       expect(signatureVerifier.verifyMessage(message, signature, keyName)).to.be.true;
     });
+
+    it("works with buffers", () => {
+      const signatures = new Signatures({
+        message: {
+          privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
+        }
+      });
+
+      const message = Buffer.from([0, 1]);
+
+      const signature = signatures.signMessage(message);
+
+      const signatureVerifier = new Signatures({
+        message: {
+          publicKeysPath: `${__dirname}/test-public-keys`
+        }
+      });
+
+      const keyName = "public-message-key";
+
+      expect(signatureVerifier.verifyMessage(message, signature, keyName)).to.be.true;
+    });
   });
 });

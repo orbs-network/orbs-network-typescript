@@ -95,12 +95,10 @@ export class Gossip {
         return;
       }
 
-      console.log(`ObjectType "${objectType.toString()}"`);
-      console.log(`ObjectRaw "${objectRaw.toString()}"`);
-      console.log(`Signature "${signature.toString()}"`);
+      const objectAsBuffer = Buffer.from(objectRaw);
 
       if (this.signMessages) {
-        if (!this.signatures.verifyMessage(objectRaw, signature.toString("base64"), sender)) {
+        if (!this.signatures.verifyMessage(objectAsBuffer, signature.toString("base64"), sender)) {
           throw new Error(`Could not verify message from ${sender}`);
         }
       }
@@ -117,7 +115,7 @@ export class Gossip {
         fromAddress: sender,
         broadcastGroup,
         messageType: objectType,
-        buffer: Buffer.from(objectRaw)
+        buffer: objectAsBuffer
       });
     });
 
