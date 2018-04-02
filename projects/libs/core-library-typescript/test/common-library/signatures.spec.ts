@@ -4,7 +4,7 @@ import { expect } from "chai";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
-import Signatures from "../../src/common-library";
+import { Signatures } from "../../src/common-library";
 import * as sinon from "sinon";
 
 chai.use(sinonChai);

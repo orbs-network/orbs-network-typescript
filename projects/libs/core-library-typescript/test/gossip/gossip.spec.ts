@@ -6,7 +6,7 @@ import * as sinonChai from "sinon-chai";
 import { stubObject } from "ts-sinon";
 import * as chaiBytes from "chai-bytes";
 import { delay } from "bluebird";
-import Signatures from "../../src/common-library/signatures";
+import { Signatures } from "../../src/common-library/signatures";
 
 const expect = chai.expect;
 
