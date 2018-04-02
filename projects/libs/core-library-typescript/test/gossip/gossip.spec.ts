@@ -20,7 +20,7 @@ describe("Gossip", function () {
   let gossips: Gossip[];
   const numberOfGossips = 3;
 
-  describe("without signatures", () => {
+  describe.only("without signatures", () => {
     beforeEach(async () => {
       consensuses = [];
       gossips = [];
@@ -54,7 +54,7 @@ describe("Gossip", function () {
       }
     });
 
-    it.only("#broadcast message triggers the service at all other nodes", async () => {
+    it("#broadcast message triggers the service at all other nodes", async () => {
       const senderId = 0;
       const buffer = new Buffer(JSON.stringify({ foo: "bar" }));
 
