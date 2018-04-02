@@ -5,31 +5,38 @@ import { readFileSync } from "fs";
 
 const parse = require("csv-parse/lib/sync");
 
+function parseCredentials(path: string) {
+  try {
+    const csv = parse(readFileSync(path).toString(), { columns: true })[0];
+
+    const credentials = {
+      accessKeyId: csv["Access key ID"],
+      secretAccessKey: csv["Secret access key"]
+    };
+  }
+  catch (e) {
+    console.error(`WARNING: Could not find credentials, proceeding without them`);
+  }
+}
+
 async function main() {
   const credentialsPath = config.get("aws-credentials-path");
-  const csv = parse(readFileSync(credentialsPath).toString(), { columns: true })[0];
+  const credentials = parseCredentials(credentialsPath);
 
-  const credentials = {
-    accessKeyId: csv["Access key ID"],
-    secretAccessKey: csv["Secret access key"]
-  };
-
-  const accountId = credentialsPath.match(/_(\d+)_/)[1];
-  const bucketName = `orbs-network-${accountId}-config`;
+  const accountId = process.env.AWS_ACCOUNT_ID || credentialsPath.match(/_(\d+)_/)[1];
+  const bucketName = process.env.S3_BUCKET_NAME || `orbs-network-${accountId}-config`;
 
   const regions = config.get("region").split(",");
 
   for (const region of regions) {
     // TODO: fix staging
-    const secretBlockKey = `${__dirname}/test-keys/orbs-global-${accountId}-staging-${region}-secret-block-key`;
-    const secretMessageKey = `${__dirname}/test-keys/orbs-global-${accountId}-staging-${region}-secret-message-key`;
+    const secretMessageKey = `${__dirname}/../temp-keys/private-keys/message/orbs-global-${accountId}-staging-${region}`;
 
     const regionalConfig = _.extend({}, getBaseConfig(), {
       credentials,
       accountId,
       region,
       bucketName,
-      secretBlockKey,
       secretMessageKey
     });
 
