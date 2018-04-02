@@ -3,7 +3,7 @@ import { SendTransactionOutput } from "orbs-interfaces";
 
 export type OrbsContractMethodArgs = [string | number] | any[];
 
-export default class OrbsContractAdapter {
+export class OrbsContractAdapter {
   orbsSession: OrbsClientSession;
   contractAddress: string;
 
