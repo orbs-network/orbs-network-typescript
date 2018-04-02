@@ -20,7 +20,7 @@ describe("Gossip", function () {
   let gossips: Gossip[];
   const numberOfGossips = 3;
 
-  describe.only("without signatures", () => {
+  describe("without signatures", () => {
     beforeEach(async () => {
       consensuses = [];
       gossips = [];
@@ -38,7 +38,6 @@ describe("Gossip", function () {
       const senderId = 0;
       const recipientId = 1;
       const buffer = new Buffer(JSON.stringify({ foo: "bar" }));
-      console.log("XX", buffer.toString());
 
       await gossips[senderId].unicastMessage(gossips[recipientId].localAddress, "consensus", "TEST_MESSAGE", buffer, true);
       await delay(1000);
@@ -108,14 +107,14 @@ describe("Gossip", function () {
         const consensus = consensuses[i];
         if (i != senderId) {
           expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-          // expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
+          expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
         } else {
           expect(consensus.gossipMessageReceived).to.have.not.been.called;
         }
       }
     });
 
-    xit("verifies signatures");
+    xit("fails with wrong signature");
   });
 
   afterEach(async () => {
