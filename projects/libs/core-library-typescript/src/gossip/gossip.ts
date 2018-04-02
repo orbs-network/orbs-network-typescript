@@ -1,6 +1,7 @@
 import * as WebSocket from "ws";
 
 import { logger, types } from "../common-library";
+import Signatures from "../common-library/signatures";
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
@@ -25,12 +26,17 @@ export class Gossip {
   listeners: Map<string, any> = new Map();
   peers: any;
   readonly port: number;
+  signatures: Signatures;
+  signMessages: boolean;
 
-  constructor(input: { localAddress: string, port: number, peers: types.ClientMap }) {
+  constructor(input: { localAddress: string, port: number, peers: types.ClientMap, signatures: Signatures, signMessages: boolean }) {
     this.port = input.port;
     this.server = new WebSocket.Server({ port: input.port });
     this.peers = input.peers;
     this.localAddress = input.localAddress;
+    this.signatures = input.signatures;
+    this.signMessages = input.signMessages;
+
     this.server.on("connection", (ws) => {
       this.prepareConnection(ws);
     });
@@ -82,6 +88,14 @@ export class Gossip {
         return;
       }
 
+      if (this.signMessages) {
+        const rawMessage = JSON.parse(objectRaw.toString());
+
+        if (!this.signatures.verifyMessage(rawMessage, sender)) {
+          throw new Error(`Could not verify message from ${sender}`);
+        }
+      }
+
       if (!this.listeners.has(broadcastGroup)) {
         const peer = this.peers[broadcastGroup];
         if (!peer) {
@@ -91,7 +105,7 @@ export class Gossip {
       }
 
       this.listeners.get(broadcastGroup).gossipMessageReceived({
-        fromAddress: sender.toString(),
+        fromAddress: sender,
         broadcastGroup,
         messageType: objectType,
         buffer: objectRaw
@@ -108,10 +122,13 @@ export class Gossip {
     }
   }
 
-  broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
+  broadcastMessage(broadcastGroup: string, objectType: string, object: any, immediate: boolean) {
+    const payload = JSON.stringify(this.signMessages ? this.signatures.signMessage(object) : object);
+    const serializedObject = new Buffer(payload);
+
     this.clients.forEach((client: WebSocket, address: string) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]), handleWSError(address, client.url));
+        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), serializedObject]), handleWSError(address, client.url));
       }
     });
   }
