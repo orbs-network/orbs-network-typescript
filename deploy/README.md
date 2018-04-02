@@ -186,3 +186,7 @@ AWS services **required** for node deployment to work:
 4. CloudFormation
 
 Route53 is **optional** unless you want to use DNS zone that points to your node.
+
+## Private and public key management
+
+TODO: describe the flow
