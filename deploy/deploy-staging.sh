@@ -11,13 +11,7 @@ export ETHEREUM_NODE_IP=ethereum.services.orbs-test.com
 
 npm run build-ts
 
-# ssh-keygen -t rsa -b 4096 -C "orbs-global-$AWS_ACCOUNT_ID-staging-$REGION" -f temp-keys/orbs-global-$AWS_ACCOUNT_ID-staging-$REGION-secret-block-key -N ""
-
-# ssh-keygen -t rsa -b 4096 -C "orbs-global-$AWS_ACCOUNT_ID-staging-$REGION" -f temp-keys/orbs-global-$AWS_ACCOUNT_ID-staging-$REGION-secret-message-key -N ""
-
-# ssh-keygen -f temp-keys/orbs-global-506367651493-staging-ca-central-1-secret-message-key.pub -e -m pem > temp-keys/orbs-global-506367651493-staging-ca-central-1-secret-message-key.pub.pem
-
-node dist/deploy.js \
+node dist/multi-account.js \
     --region $REGIONS \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -26,7 +20,5 @@ node dist/deploy.js \
     --docker-tag ${DOCKER_TAG} \
     --step $DEPLOY_STEP \
     --ethereum-node-ip $ETHEREUM_NODE_IP \
-    --secret-block-key temp-keys/orbs-global-$AWS_ACCOUNT_ID-staging-$REGION-secret-block-key \
-    --secret-message-key temp-keys/orbs-global-$AWS_ACCOUNT_ID-staging-$REGION-secret-message-key \
     --remove-node \
     --deploy-node

@@ -32,9 +32,6 @@ services:
       ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
-      - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
-      - /opt/orbs/private-keys/message:/opt/orbs/private-keys/message
-      - /opt/keys/block:/opt/keys/block
     networks:
       default:
 
@@ -52,8 +49,6 @@ services:
       VALIDATE_SUBSCRIPTION: 'true'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
-      - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
-      - /opt/orbs/private-keys/message:/opt/orbs/private-keys/message
     networks:
       default:
 
@@ -70,8 +65,6 @@ services:
     volumes:
       - /opt/orbs/db:/opt/orbs/db
       - /opt/orbs/logs:/opt/orbs/logs
-      - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
-      - /opt/orbs/private-keys/message:/opt/orbs/private-keys/message
     networks:
       default:
 
@@ -86,8 +79,6 @@ services:
       SERVICE_NAME: virtual-machine
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
-      - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
-      - /opt/orbs/private-keys/message:/opt/orbs/private-keys/message
     networks:
       default:
 
@@ -104,8 +95,6 @@ services:
       SERVICE_NAME: virtual-machine
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
-      - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
-      - /opt/orbs/private-keys/message:/opt/orbs/private-keys/message
     networks:
       default:
 
