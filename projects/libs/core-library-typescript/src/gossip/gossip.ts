@@ -5,15 +5,14 @@ import { Signatures } from "../common-library";
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
-  buf.writeUInt8(Math.min(str.length, 255), 0);
-  // TODO: fix it later, cuts off part of a string
-  buf.write(str, 1, 255, "utf8");
+  buf.writeUInt32BE(str.length, 0);
+  buf.write(str, 1, str.length, "utf8");
   return buf;
 }
 
 function escapeBuffer(buffer: Buffer): Buffer {
   const buf = Buffer.alloc(1);
-  buf.writeUInt8(buffer.length, 0);
+  buf.writeUInt32BE(buffer.length, 0);
   return Buffer.concat([buf, buffer]);
 }
 
@@ -67,7 +66,7 @@ export class Gossip {
       let offset = 0;
 
       function readString(buf: Buffer): string {
-        const len: number = buf.readUInt8(offset);
+        const len: number = buf.readUInt32BE(offset);
         const str: string = buf.toString("utf8", offset + 1, offset + 1 + len);
         offset += 1 + len;
         return str;
