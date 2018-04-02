@@ -14,7 +14,8 @@ export interface SignaturesConfig {
     privateKeyPath?: string
   };
 }
-export default class Signatures {
+
+export class Signatures {
   config: SignaturesConfig;
   SIGNATURE_FORMAT: crypto.HexBase64Latin1Encoding = "base64";
   SIGNATURE_TYPE = "sha256";

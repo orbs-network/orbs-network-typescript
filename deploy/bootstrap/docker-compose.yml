@@ -12,6 +12,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: gossip
+      SIGN_MESSAGES: 'true'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
       - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message

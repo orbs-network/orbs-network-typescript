@@ -1,7 +1,7 @@
 import * as WebSocket from "ws";
 
 import { logger, types } from "../common-library";
-import Signatures from "../common-library/signatures";
+import { Signatures } from "../common-library";
 
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
