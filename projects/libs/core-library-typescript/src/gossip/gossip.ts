@@ -6,8 +6,15 @@ import Signatures from "../common-library/signatures";
 function stringToBuffer(str: string): Buffer {
   const buf = Buffer.alloc(1 + str.length);
   buf.writeUInt8(Math.min(str.length, 255), 0);
+  // TODO: fix it later, cuts off part of a string
   buf.write(str, 1, 255, "utf8");
   return buf;
+}
+
+function escapeBuffer(buffer: Buffer): Buffer {
+  const buf = Buffer.alloc(1);
+  buf.writeUInt8(buffer.length, 0);
+  return Buffer.concat([buf, buffer]);
 }
 
 function handleWSError(address: string, url: string) {
@@ -82,16 +89,18 @@ export class Gossip {
         return;
       }
 
-      const [recipient, broadcastGroup, objectType, objectRaw] = [readString(message), readString(message), readString(message), message.slice(offset)];
+      const [recipient, broadcastGroup, objectType, objectRaw, signature] = [readString(message), readString(message), readString(message), readString(message), message.slice(offset)];
 
       if (recipient !== "" && recipient !== this.localAddress) {
         return;
       }
 
-      if (this.signMessages) {
-        const rawMessage = JSON.parse(objectRaw.toString());
+      console.log(`ObjectType "${objectType.toString()}"`);
+      console.log(`ObjectRaw "${objectRaw.toString()}"`);
+      console.log(`Signature "${signature.toString()}"`);
 
-        if (!this.signatures.verifyMessage(rawMessage, sender)) {
+      if (this.signMessages) {
+        if (!this.signatures.verifyMessage(objectRaw, signature.toString("base64"), sender)) {
           throw new Error(`Could not verify message from ${sender}`);
         }
       }
@@ -108,7 +117,7 @@ export class Gossip {
         fromAddress: sender,
         broadcastGroup,
         messageType: objectType,
-        buffer: objectRaw
+        buffer: Buffer.from(objectRaw)
       });
     });
 
@@ -122,13 +131,12 @@ export class Gossip {
     }
   }
 
-  broadcastMessage(broadcastGroup: string, objectType: string, object: any, immediate: boolean) {
-    const payload = JSON.stringify(this.signMessages ? this.signatures.signMessage(object) : object);
-    const serializedObject = new Buffer(payload);
+  broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
+    const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : stringToBuffer("");
 
     this.clients.forEach((client: WebSocket, address: string) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), serializedObject]), handleWSError(address, client.url));
+        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), escapeBuffer(object), signature]), handleWSError(address, client.url));
       }
     });
   }
