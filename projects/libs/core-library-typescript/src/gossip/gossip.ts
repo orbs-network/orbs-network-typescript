@@ -2,19 +2,8 @@ import * as WebSocket from "ws";
 
 import { logger, types } from "../common-library";
 import { Signatures } from "../common-library";
-
-function stringToBuffer(str: string): Buffer {
-  const buf = Buffer.alloc(1 + str.length);
-  buf.writeUInt32BE(str.length, 0);
-  buf.write(str, 1, str.length, "utf8");
-  return buf;
-}
-
-function escapeBuffer(buffer: Buffer): Buffer {
-  const buf = Buffer.alloc(1);
-  buf.writeUInt32BE(buffer.length, 0);
-  return Buffer.concat([buf, buffer]);
-}
+import * as stringify from "json-stable-stringify";
+import * as _ from "lodash";
 
 function handleWSError(address: string, url: string) {
   return (err: Error) => {
@@ -49,7 +38,7 @@ export class Gossip {
   }
 
   helloMessage(): Buffer {
-    return stringToBuffer(this.localAddress);
+    return new Buffer(stringify({ sender: this.localAddress, hello: true }));
   }
 
   prepareConnection(ws: WebSocket) {
@@ -63,16 +52,8 @@ export class Gossip {
     });
 
     ws.on("message", (message: Buffer) => {
-      let offset = 0;
-
-      function readString(buf: Buffer): string {
-        const len: number = buf.readUInt32BE(offset);
-        const str: string = buf.toString("utf8", offset + 1, offset + 1 + len);
-        offset += 1 + len;
-        return str;
-      }
-
-      const sender = readString(message);
+      const rawMessage = JSON.parse(message.toString());
+      const { sender, hello, recipient, broadcastGroup, objectType, buffer, signature } = rawMessage;
 
       if (this.localAddress == sender) {
         logger.info("Connected to myself. Disconnecting");
@@ -80,7 +61,7 @@ export class Gossip {
         return;
       }
 
-      if (offset === message.length) {
+      if (hello) {
         // 'hello' message
         remoteAddress = sender;
         this.clients.set(sender, ws);
@@ -88,16 +69,14 @@ export class Gossip {
         return;
       }
 
-      const [recipient, broadcastGroup, objectType, objectRaw, signature] = [readString(message), readString(message), readString(message), readString(message), message.slice(offset)];
-
-      if (recipient !== "" && recipient !== this.localAddress) {
+      if (!_.isEmpty(recipient) && recipient !== this.localAddress) {
         return;
       }
 
-      const objectAsBuffer = Buffer.from(objectRaw);
+      const payload = Buffer.from(buffer.data);
 
       if (this.signMessages) {
-        if (!this.signatures.verifyMessage(objectAsBuffer, signature.toString("base64"), sender)) {
+        if (!this.signatures.verifyMessage(payload, signature.toString("base64"), sender)) {
           throw new Error(`Could not verify message from ${sender}`);
         }
       }
@@ -114,7 +93,7 @@ export class Gossip {
         fromAddress: sender,
         broadcastGroup,
         messageType: objectType,
-        buffer: objectAsBuffer
+        buffer: payload
       });
     });
 
@@ -129,19 +108,36 @@ export class Gossip {
   }
 
   broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
-    const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : stringToBuffer("");
+    const signature = this.signMessages ? this.signatures.signMessage(object) : undefined;
+
+    const message = new Buffer(stringify({
+      sender: this.localAddress,
+      broadcastGroup,
+      objectType,
+      buffer: object,
+      signature
+    }));
 
     this.clients.forEach((client: WebSocket, address: string) => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(""), stringToBuffer(broadcastGroup), stringToBuffer(objectType), escapeBuffer(object), signature]), handleWSError(address, client.url));
+        client.send(message, handleWSError(address, client.url));
       }
     });
   }
 
   unicastMessage(recipientAddress: string, broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     const remote: WebSocket = this.clients.get(recipientAddress);
-    const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : stringToBuffer("");
-    const message: Buffer = Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(recipientAddress), stringToBuffer(broadcastGroup), stringToBuffer(objectType), escapeBuffer(object), signature]);
+    const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : undefined;
+
+    const message = new Buffer(stringify({
+      sender: this.localAddress,
+      recipient: recipientAddress,
+      broadcastGroup,
+      objectType,
+      buffer: object,
+      signature
+    }));
+
     if (remote) {
       remote.send(message, handleWSError(recipientAddress, remote.url));
     }
