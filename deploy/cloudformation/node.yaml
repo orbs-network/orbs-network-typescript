@@ -407,12 +407,12 @@ Resources:
                   AWS_STACK_NAME: !Ref "AWS::StackId"
         provision_keys:
           files:
-            /opt/keys/message/secret-key:
+            /opt/orbs/private-keys/message/secret-key:
               content: !Ref SecretMessageKey
               mode: "000400"
               # TODO: change later to whatever user we use inside the container
               owner: root
-            /opt/keys/block/secret-key:
+            /opt/orbs/private-keys/block/secret-key:
               content: !Ref SecretBlockKey
               mode: "000400"
               # TODO: change later to whatever user we use inside the container

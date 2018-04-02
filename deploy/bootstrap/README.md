@@ -2,8 +2,10 @@
 
 Environment variables are in the `.env` files.
 
+Secrets are in `.env-secrets`.
+
+`crontab` will be installed automatically with `bootstrap.sh`.
+
 ## Debugging
 
-```
-ssh -t -o StrictHostKeyChecking=no ec2-user@pelmeni.nodes.orbs-test.com "tail -f /var/log/orbs-bootstrap.log"
-```
+Check out `/var/log/orbs-bootstrap.log` or `/var/log/cfn-init*`
