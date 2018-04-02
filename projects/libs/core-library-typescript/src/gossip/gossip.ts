@@ -143,7 +143,8 @@ export class Gossip {
 
   unicastMessage(recipientAddress: string, broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     const remote: WebSocket = this.clients.get(recipientAddress);
-    const message: Buffer = Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(recipientAddress), stringToBuffer(broadcastGroup), stringToBuffer(objectType), object]);
+    const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : stringToBuffer("");
+    const message: Buffer = Buffer.concat([stringToBuffer(this.localAddress), stringToBuffer(recipientAddress), stringToBuffer(broadcastGroup), stringToBuffer(objectType), escapeBuffer(object), signature]);
     if (remote) {
       remote.send(message, handleWSError(recipientAddress, remote.url));
     }
