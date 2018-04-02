@@ -16,6 +16,8 @@ export interface SignaturesConfig {
 }
 export default class Signatures {
   config: SignaturesConfig;
+  SIGNATURE_FORMAT = "base64";
+  SIGNATURE_TYPE = "sha256";
 
   public constructor(signaturesConfig: SignaturesConfig) {
     this.config = signaturesConfig;
@@ -26,25 +28,20 @@ export default class Signatures {
     return rawKey;
   }
 
-  private signObject(object: any, key: string): any {
-    const sign = crypto.createSign("sha256");
+  private signObject(object: any, key: string): string {
+    const sign = crypto.createSign(this.SIGNATURE_TYPE);
     sign.update(stringify(object));
 
-    const signature = sign.sign(key, "hex");
-    const signendObject: any = _.clone(object);
-    signendObject.signature = signature;
-
-    return signendObject;
+    return sign.sign(key, this.SIGNATURE_FORMAT);
   }
 
-  private verifyObject(object: any, publicKey: string): boolean {
-    const { signature } = object;
-    const payload = stringify(_.omit(object, "signature"));
+  private verifyObject(object: any, signature: string, publicKey: string): boolean {
+    const payload = stringify(object);
 
-    const verify = crypto.createVerify("sha256");
+    const verify = crypto.createVerify(this.SIGNATURE_TYPE);
     verify.update(payload);
 
-    return verify.verify(publicKey, signature, "hex");
+    return verify.verify(publicKey, signature, this.SIGNATURE_FORMAT);
   }
 
   private getPublicKey(path: string, keyName: string): string {
@@ -55,13 +52,13 @@ export default class Signatures {
     return this.getKey(`${path}/${keyName}`);
   }
 
-  public signMessage(object: any) {
+  public signMessage(object: any): string {
     const privateKey = this.getKey(this.config.message.privateKeyPath);
     return this.signObject(object, privateKey);
   }
 
-  public verifyMessage(object: any, publicKeyName: string) {
+  public verifyMessage(object: any, signature: string, publicKeyName: string): boolean {
     const publicKey = this.getPublicKey(this.config.message.publicKeysPath, publicKeyName);
-    return this.verifyObject(object, publicKey);
+    return this.verifyObject(object, signature, publicKey);
   }
 }
