@@ -39,7 +39,7 @@ workflows:
             - build-server
           filters:
             branches:
-              only: master
+              only: feature/key-management
       - e2e-testnet:
           requires:
             - deploy
