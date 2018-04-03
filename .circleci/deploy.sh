@@ -1,5 +1,7 @@
 #!/bin/bash -xe
 
+export DOCKER_TAG=$(./docker-tag.sh)
+
 cd deploy
 npm install
 
