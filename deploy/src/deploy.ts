@@ -97,16 +97,21 @@ function getDefaultDockerImageTag() {
 
 function pushDockerImage(options: any) {
   const dockerImage = getDockerImageName(options);
+  const dockerTag = getDockerImageTag(options);
 
   shell.exec(`$(${getAWSCredentialsAsEnvVars(options)} aws ecr get-login --no-include-email --region ${options.region})`);
-  shell.exec(`docker push ${dockerImage}`);
+  shell.exec(`docker push ${dockerImage}:${dockerTag}`);
+}
+
+function getDockerImageTag(options: any) {
+  const defaultTag = getDefaultDockerImageTag();
+  return options.dockerTag || defaultTag;
 }
 
 function tagDockerImage(options: any) {
   const defaultImage = "orbs";
-  const defaultTag = getDefaultDockerImageTag();
   const dockerImage = getDockerImageName(options);
-  const dockerTag = options.dockerTag || defaultTag;
+  const dockerTag = getDockerImageTag(options);
 
   console.log(`docker tag ${defaultImage}:${dockerTag} ${dockerImage}:${dockerTag}`);
   shell.exec(`docker tag ${defaultImage}:${dockerTag} ${dockerImage}:${dockerTag}`);
