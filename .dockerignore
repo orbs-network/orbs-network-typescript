@@ -31,3 +31,8 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Deploy & config
+deploy
+.circleci
+.vscode
