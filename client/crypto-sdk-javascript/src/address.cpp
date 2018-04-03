@@ -19,7 +19,7 @@ Address::~Address() {
     napi_delete_reference(env_, wrapper_);
 }
 
-void Address::Destructor(napi_env env, void *nativeObject, void* /*finalize_hint*/) {
+void Address::Destructor(napi_env env, void *nativeObject, void * /*finalize_hint*/) {
   reinterpret_cast<Address *>(nativeObject)->~Address();
 }
 
@@ -28,13 +28,14 @@ void Address::Destructor(napi_env env, void *nativeObject, void* /*finalize_hint
 napi_value Address::Init(napi_env env, napi_value exports) {
     napi_status status;
     napi_property_descriptor properties[] = {
-        { "MAIN_NETWORK_ID", 0, 0, GetMainNetworkId, NULL, 0, napi_static, 0 },
-        { "TEST_NETWORK_ID", 0, 0, GetTestNetworkId, NULL, 0, napi_static, 0 },
-        { "networkId", 0, 0, GetNetworkId, NULL, 0, napi_default, 0 },
-        { "version", 0, 0, GetVersion, NULL, 0, napi_default, 0 },
-        { "virtualChainId", 0, 0, GetVirtualChainId, NULL, 0, napi_default, 0 },
-        { "accountId", 0, 0, GetAccountId, NULL, 0, napi_default, 0 },
-        { "checksum", 0, 0, GetChecksum, NULL, 0, napi_default, 0 },
+        { "MAIN_NETWORK_ID", 0, 0, GetMainNetworkId, nullptr, 0, napi_static, 0 },
+        { "TEST_NETWORK_ID", 0, 0, GetTestNetworkId, nullptr, 0, napi_static, 0 },
+        { "publicKey", 0, 0, GetPublicKey, nullptr, 0, napi_default, 0 },
+        { "networkId", 0, 0, GetNetworkId, nullptr, 0, napi_default, 0 },
+        { "version", 0, 0, GetVersion, nullptr, 0, napi_default, 0 },
+        { "virtualChainId", 0, 0, GetVirtualChainId, nullptr, 0, napi_default, 0 },
+        { "accountId", 0, 0, GetAccountId, nullptr, 0, napi_default, 0 },
+        { "checksum", 0, 0, GetChecksum, nullptr, 0, napi_default, 0 },
         DECLARE_NAPI_METHOD("toString", ToString),
     };
 
@@ -68,19 +69,19 @@ napi_value Address::New(napi_env env, napi_callback_info info) {
         assert(status == napi_ok);
 
         size_t publicKeyLength;
-        status = napi_get_value_string_utf8(env, args[0], NULL, 0, &publicKeyLength);
+        status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &publicKeyLength);
         assert(status == napi_ok);
         char publicKey[publicKeyLength + 1];
         napi_get_value_string_utf8(env, args[0], publicKey, publicKeyLength + 1, 0);
 
         size_t virtualChainIdLength;
-        status = napi_get_value_string_utf8(env, args[1], NULL, 0, &virtualChainIdLength);
+        status = napi_get_value_string_utf8(env, args[1], nullptr, 0, &virtualChainIdLength);
         assert(status == napi_ok);
         char virtualChainId[virtualChainIdLength + 1];
         napi_get_value_string_utf8(env, args[1], virtualChainId, virtualChainIdLength + 1, 0);
 
         size_t networkIdLength;
-        status = napi_get_value_string_utf8(env, args[2], NULL, 0, &networkIdLength);
+        status = napi_get_value_string_utf8(env, args[2], nullptr, 0, &networkIdLength);
         assert(status == napi_ok);
         char networkId[networkIdLength + 1];
         napi_get_value_string_utf8(env, args[2], networkId, networkIdLength + 1, 0);
@@ -88,7 +89,7 @@ napi_value Address::New(napi_env env, napi_callback_info info) {
         Address *obj = new Address(publicKey, virtualChainId, networkId);
 
         obj->env_ = env;
-        status = napi_wrap(env, jsthis, reinterpret_cast<void*>(obj), Address::Destructor, nullptr, &obj->wrapper_);
+        status = napi_wrap(env, jsthis, reinterpret_cast<void *>(obj), Address::Destructor, nullptr, &obj->wrapper_);
         assert(status == napi_ok);
 
         return jsthis;
@@ -114,6 +115,24 @@ napi_value Address::New(napi_env env, napi_callback_info info) {
     return instance;
 }
 
+napi_value Address::GetPublicKey(napi_env env, napi_callback_info info) {
+    napi_status status;
+
+    napi_value jsthis;
+    status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+    assert(status == napi_ok);
+
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
+    assert(status == napi_ok);
+
+    const string str(Orbs::Utils::Vec2Hex(obj->address_.GetPublicKey()));
+    napi_value res;
+    status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+
+    return res;
+}
+
 napi_value Address::GetNetworkId(napi_env env, napi_callback_info info) {
     napi_status status;
 
@@ -121,8 +140,8 @@ napi_value Address::GetNetworkId(napi_env env, napi_callback_info info) {
     status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     assert(status == napi_ok);
 
-    Address* obj;
-    status = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
     assert(status == napi_ok);
 
     vector<uint8_t> data;
@@ -141,8 +160,8 @@ napi_value Address::GetVersion(napi_env env, napi_callback_info info) {
     status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     assert(status == napi_ok);
 
-    Address* obj;
-    status = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
     assert(status == napi_ok);
 
     napi_value version;
@@ -159,8 +178,8 @@ napi_value Address::GetVirtualChainId(napi_env env, napi_callback_info info) {
     status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     assert(status == napi_ok);
 
-    Address* obj;
-    status = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
     assert(status == napi_ok);
 
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetVirtualChainId()));
@@ -177,8 +196,8 @@ napi_value Address::GetAccountId(napi_env env, napi_callback_info info) {
     status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     assert(status == napi_ok);
 
-    Address* obj;
-    status = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
     assert(status == napi_ok);
 
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetAccountId()));
@@ -195,8 +214,8 @@ napi_value Address::GetChecksum(napi_env env, napi_callback_info info) {
     status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     assert(status == napi_ok);
 
-    Address* obj;
-    status = napi_unwrap(env, jsthis, reinterpret_cast<void**>(&obj));
+    Address *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
     assert(status == napi_ok);
 
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetChecksum()));
