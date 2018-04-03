@@ -17,10 +17,11 @@ if (!NODE_NAME) {
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 const signMessages = (SIGN_MESSAGES || "").toLowerCase() === "true";
-const messageSigatures = new Signatures({
+
+const messageSigatures = signMessages ? new Signatures({
   privateKeyPath: "/opt/orbs/private-keys/message/secret-key",
   publicKeysPath: "/opt/orbs/public-keys/message"
-});
+}) : undefined;
 
 const gossipConfig = {
   nodeName: NODE_NAME,

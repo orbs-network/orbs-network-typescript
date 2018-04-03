@@ -93,6 +93,24 @@ describe("Gossip", function () {
       await delay(1000);
     });
 
+    it("#unicast message triggers the service only at the recipient's node", async () => {
+      const senderId = 0;
+      const recipientId = 1;
+      const buffer = new Buffer(JSON.stringify({ foo: "bar" }));
+
+      await gossips[senderId].unicastMessage(gossips[recipientId].localAddress, "consensus", "TEST_MESSAGE", buffer, true);
+      await delay(1000);
+
+      for (let i = 0; i < numberOfGossips; i++) {
+        const consensus = consensuses[i];
+        if (i == recipientId) {
+          expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
+          expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
+        } else {
+          expect(consensus.gossipMessageReceived).to.have.not.been.called;
+        }
+      }
+    });
 
     it("#broadcast signs messages", async () => {
       const senderId = 0;
