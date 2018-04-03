@@ -125,13 +125,13 @@ export class Gossip {
     });
   }
 
-  unicastMessage(recipientAddress: string, broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
-    const remote: WebSocket = this.clients.get(recipientAddress);
+  unicastMessage(recipient: string, broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
+    const remote: WebSocket = this.clients.get(recipient);
     const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : undefined;
 
     const message = new Buffer(stringify({
       sender: this.localAddress,
-      recipient: recipientAddress,
+      recipient,
       broadcastGroup,
       objectType,
       buffer: object,
@@ -139,11 +139,11 @@ export class Gossip {
     }));
 
     if (remote) {
-      remote.send(message, handleWSError(recipientAddress, remote.url));
+      remote.send(message, handleWSError(recipient, remote.url));
     }
     else {
       this.clients.forEach((remote: WebSocket, address) => {
-        remote.send(message, handleWSError(recipientAddress, remote.url));
+        remote.send(message, handleWSError(recipient, remote.url));
       });
     }
   }
