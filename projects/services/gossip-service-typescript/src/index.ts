@@ -17,11 +17,9 @@ if (!NODE_NAME) {
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 const signMessages = (SIGN_MESSAGES || "").toLowerCase() === "true";
-const sigatures = new Signatures({
-  message: {
-    privateKeyPath: "/opt/orbs/private-keys/message/secret-key",
-    publicKeysPath: "/opt/orbs/public-keys/message"
-  }
+const messageSigatures = new Signatures({
+  privateKeyPath: "/opt/orbs/private-keys/message/secret-key",
+  publicKeysPath: "/opt/orbs/public-keys/message"
 });
 
 const gossipConfig = {
@@ -30,7 +28,7 @@ const gossipConfig = {
   peers,
   gossipPeers: nodeTopology.gossipPeers,
   signMessages: signMessages,
-  signatures: sigatures
+  signatures: messageSigatures
 };
 
 ServiceRunner.run(grpc.gossipServer, new GossipService(gossipConfig), nodeTopology.endpoint);

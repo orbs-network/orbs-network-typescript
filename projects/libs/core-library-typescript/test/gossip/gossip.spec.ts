@@ -82,10 +82,8 @@ describe("Gossip", function () {
           localAddress: `node${i}`, port: 30070 + i, peers: { consensus },
           signMessages: true,
           signatures: new Signatures({
-            message: {
-              privateKeyPath: `${__dirname}/test-private-keys/node${i}`,
-              publicKeysPath: `${__dirname}/test-public-keys/`
-            }
+            privateKeyPath: `${__dirname}/test-private-keys/node${i}`,
+            publicKeysPath: `${__dirname}/test-public-keys/`
           })
         });
         consensuses.push(consensus);
