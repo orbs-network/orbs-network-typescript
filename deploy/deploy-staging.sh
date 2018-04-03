@@ -20,5 +20,7 @@ node dist/multi-account.js \
     --docker-tag ${DOCKER_TAG} \
     --step $DEPLOY_STEP \
     --ethereum-node-ip $ETHEREUM_NODE_IP \
+    --tag-docker-image \
+    --push-docker-image \
     --remove-node \
     --deploy-node
