@@ -76,7 +76,7 @@ export class Gossip {
       const payload = Buffer.from(buffer.data);
 
       if (this.signMessages) {
-        if (!this.signatures.verifyMessage(payload, signature.toString("base64"), sender)) {
+        if (!this.signatures.verify(payload, signature.toString("base64"), sender)) {
           throw new Error(`Could not verify message from ${sender}`);
         }
       }
@@ -108,7 +108,7 @@ export class Gossip {
   }
 
   broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
-    const signature = this.signMessages ? this.signatures.signMessage(object) : undefined;
+    const signature = this.signMessages ? this.signatures.sign(object) : undefined;
 
     const message = new Buffer(stringify({
       sender: this.localAddress,
@@ -127,7 +127,7 @@ export class Gossip {
 
   unicastMessage(recipient: string, broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     const remote: WebSocket = this.clients.get(recipient);
-    const signature = this.signMessages ? Buffer.from(this.signatures.signMessage(object), "base64") : undefined;
+    const signature = this.signMessages ? Buffer.from(this.signatures.sign(object), "base64") : undefined;
 
     const message = new Buffer(stringify({
       sender: this.localAddress,
