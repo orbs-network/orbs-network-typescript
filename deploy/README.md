@@ -189,4 +189,18 @@ Route53 is **optional** unless you want to use DNS zone that points to your node
 
 ## Private and public key management
 
-TODO: describe the flow
+For an example of keys that are being used for Gossip messages, please take a look at `generate-staging-keys.sh`.
+
+Public keys are stored `bootstrap/public-keys/message/${FULL_NODE_NAME}` per node.
+
+Private key is stored in `temp-keys/private-keys/message/${FULL_NODE_NAME}`.
+
+To enable signing Gossip messages, set `SIGN_MESSAGES` to `true` in `docker-compose.yml`.
+
+### Delivery
+
+Public keys and private keys are delivered through different methods. Public keys, like the rest of the `bootstrap`, are uploaded to S3.
+
+Private keys are being embedded into CloudFormation template as so-called no-echo params, which means no one can retrieve them through CLI call or Amazon Console.
+
+On the instance, private keys are being placed to `/opt/keys/private-keys/` and should be mounted inside the container (see `docker-compose.yml`).
