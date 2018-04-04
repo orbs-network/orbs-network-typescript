@@ -7,6 +7,7 @@ import { stubObject } from "ts-sinon";
 import * as chaiBytes from "chai-bytes";
 import { delay } from "bluebird";
 import { Signatures } from "../../src/common-library/signatures";
+import * as shell from "shelljs";
 
 const expect = chai.expect;
 
@@ -73,6 +74,23 @@ describe("Gossip", function () {
   });
 
   describe("with signatures", () => {
+    before(() => {
+      shell.exec(`
+        rm -rf ${__dirname}/test-private-keys
+        mkdir -p ${__dirname}/test-private-keys
+
+        rm -rf ${__dirname}/test-public-keys
+        mkdir -p ${__dirname}/test-public-keys
+      `);
+
+      for (let i = 0; i < numberOfGossips; i++) {
+        shell.exec(`
+          ssh-keygen -t rsa -b 4096 -N "" -f ${__dirname}/test-private-keys/node${i}
+          ssh-keygen -f ${__dirname}/test-private-keys/node${i}.pub -e -m pem > ${__dirname}/test-public-keys/node${i}
+        `);
+      }
+    });
+
     beforeEach(async () => {
       consensuses = [];
       gossips = [];
@@ -93,7 +111,7 @@ describe("Gossip", function () {
       await delay(1000);
     });
 
-    it("#unicast message triggers the service only at the recipient's node", async () => {
+    it("#unicast message signs message and triggers the service only at the recipient's node", async () => {
       const senderId = 0;
       const recipientId = 1;
       const buffer = new Buffer(JSON.stringify({ foo: "bar" }));

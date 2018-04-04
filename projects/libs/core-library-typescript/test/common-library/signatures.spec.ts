@@ -10,7 +10,7 @@ import * as shell from "shelljs";
 
 chai.use(sinonChai);
 
-describe.only("Signatures", () => {
+describe("Signatures", () => {
   before(() => {
     shell.exec(`
       rm -rf ${__dirname}/test-private-keys
