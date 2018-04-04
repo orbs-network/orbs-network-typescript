@@ -10,8 +10,8 @@ export interface SignaturesConfig {
 
 export class Signatures {
   config: SignaturesConfig;
-  SIGNATURE_FORMAT: crypto.HexBase64Latin1Encoding = "base64";
-  SIGNATURE_TYPE = "sha256";
+  SIGNATURE_ENCODING: crypto.HexBase64Latin1Encoding = "base64";
+  HASH_TYPE = "sha256";
 
   private publicKeys = new Map<string, string>();
   private privateKey: string;
@@ -39,26 +39,34 @@ export class Signatures {
   }
 
   private signObject(object: any, key: string): string {
-    const sign = crypto.createSign(this.SIGNATURE_TYPE);
+    const sign = crypto.createSign(this.HASH_TYPE);
     const payload = _.isBuffer(object) ? object : stringify(object);
     sign.update(payload);
 
-    return sign.sign(key, this.SIGNATURE_FORMAT);
+    return sign.sign(key, this.SIGNATURE_ENCODING);
   }
 
   private verifyObject(object: any, signature: string, publicKey: string): boolean {
     const payload = _.isBuffer(object) ? object : stringify(object);
-    const verify = crypto.createVerify(this.SIGNATURE_TYPE);
+    const verify = crypto.createVerify(this.HASH_TYPE);
     verify.update(payload);
 
-    return verify.verify(publicKey, signature, this.SIGNATURE_FORMAT);
+    return verify.verify(publicKey, signature, this.SIGNATURE_ENCODING);
   }
 
   public sign(object: any): string {
+    if (!this.privateKey) {
+      throw new Error(`Private key not found`);
+    }
+
     return this.signObject(object, this.privateKey);
   }
 
   public verify(object: any, signature: string, publicKeyName: string): boolean {
+    if (!this.publicKeys.has(publicKeyName)) {
+      throw new Error(`No public key found: ${publicKeyName}`);
+    }
+
     const publicKey = this.publicKeys.get(publicKeyName);
     return this.verifyObject(object, signature, publicKey);
   }
