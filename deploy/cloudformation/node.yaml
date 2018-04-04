@@ -155,9 +155,6 @@ Parameters:
   CreateNewVPC:
     Type: String
     Default: 'true'
-  ElasticIP:
-    Type: String
-    Default: ''
   EthereumElasticIP:
     Type: String
     Default: ''
@@ -207,10 +204,7 @@ Conditions:
     - !Not [!Equals [!Ref EbsVolumeType, '']]
     - !Not [!Equals [!Ref DeviceName, '']]
   UseCustomAMI: !Not [!Equals [!Ref AmiId, '']]
-  ImportRole: !Equals [!Ref IamRoleInstanceProfile, '']
-  ImportElasticIP: !Equals [!Ref ElasticIP, '']
   ImportEthereumElasticIP: !Equals [!Ref EthereumElasticIP, '']
-  ImportNodeName: !Equals [!Ref NodeName, '']
   ImportDockerImage: !Equals [!Ref DockerImage, '']
 Resources:
   Vpc:
@@ -327,10 +321,8 @@ Resources:
       ImageId: !If [ UseCustomAMI, !Ref AmiId, !FindInMap [ RegionMap, !Ref "AWS::Region", 64 ] ]
       InstanceType: !Select [ 0, !Ref InstanceType ]
       AssociatePublicIpAddress: true
-      IamInstanceProfile: !If
-        - ImportRole
-        - Fn::ImportValue: !Join ["-", ["orbs-network-instance-profile", !Ref NodeEnv, !Ref "AWS::Region"]]
-        - !Ref IamRoleInstanceProfile
+      IamInstanceProfile:
+        Fn::ImportValue: !Join ["-", ["orbs-network-instance-profile", !Ref NodeEnv, !Ref "AWS::Region"]]
       KeyName: !If [ CreateEC2LCWithKeyPair, !Ref KeyName, !Ref "AWS::NoValue" ]
       SecurityGroups: [ !If [ CreateNewSecurityGroup, !Ref SecurityGroup, !Ref SecurityGroupId ] ]
       BlockDeviceMappings: !If
@@ -428,18 +420,15 @@ Resources:
               content: !Sub
                 - |
                   #!/bin/bash -xe
-                  export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} ETHEREUM_NODE_HTTP_ADDRESS=http://${ETHEREUM_NODE_IP}:8545
+                  export EIP=${EIP} DOCKER_TAG=${DOCKER_TAG} NODE_IP=${NODE_IP} NODE_NAME=${NODE_NAME} NODE_ENV=${NODE_ENV} REGION=${REGION} DOCKER_IMAGE=${DOCKER_IMAGE} S3_CONFIG=${S3_CONFIG} ETHEREUM_NODE_HTTP_ADDRESS=http://${ETHEREUM_NODE_IP}:8545
                   hostname ${NODE_NAME}
                   aws s3 sync s3://${S3_CONFIG}/${BOOTSTRAP}/ /opt/${BOOTSTRAP_PATH}/
                   bash -x /opt/${BOOTSTRAP_PATH}/bootstrap.sh &>> /var/log/orbs-bootstrap.log
-                - EIP: !If
-                    - ImportElasticIP
-                    - Fn::ImportValue: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
-                    - !Ref ElasticIP
-                  NODE_NAME: !If
-                    - ImportNodeName
-                    - !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
-                    - !Ref NodeName
+                - EIP:
+                    Fn::ImportValue: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "node-elastic-ip", !Ref NodeEnv, !Ref "AWS::Region"]]
+                  NODE_IP:
+                    Fn::ImportValue: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
+                  NODE_NAME: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
                   ETHEREUM_NODE_IP: !If
                     - ImportEthereumElasticIP
                     - Fn::ImportValue: !Join ["-", ["ethereum-node-elastic-ip-value", !Ref NodeEnv, !Ref "AWS::Region"]]
@@ -476,7 +465,7 @@ Resources:
       Tags:
         -
           Key: Name
-          Value: !Join ["-", ["orbs-network", !Ref NodeEnv, !Ref NodeName]]
+          Value: !Join ["-", [!FindInMap [ NodeNames, !Ref Bootstrap, "name" ], "global", !Ref "AWS::AccountId", !Ref NodeEnv, !Ref "AWS::Region"]]
           PropagateAtLaunch: 'true'
         -
           Key: Description

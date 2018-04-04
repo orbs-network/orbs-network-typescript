@@ -1,14 +1,18 @@
 #!/bin/bash -xe
 
+export CURRENT_NODE_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
 export INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-aws ec2 associate-address --region $REGION --instance-id $INSTANCE_ID --allocation-id $EIP
+
+if [ $CURRENT_NODE_IP != $NODE_IP ]; then
+    aws ec2 associate-address --region $REGION --instance-id $INSTANCE_ID --allocation-id $EIP
+fi
 
 $(aws ecr get-login --no-include-email --region $REGION)
 pip install docker-compose
 
 export ENV_FILE=/opt/orbs/.env
 
-echo NODE_IP=$(curl http://169.254.169.254/latest/meta-data/public-ipv4) >> $ENV_FILE
+echo NODE_IP=$NODE_IP >> $ENV_FILE
 echo NODE_NAME=$NODE_NAME >> $ENV_FILE
 echo NODE_ENV=$NODE_ENV >> $ENV_FILE
 echo INSTANCE_ID=$INSTANCE_ID >> $ENV_FILE
