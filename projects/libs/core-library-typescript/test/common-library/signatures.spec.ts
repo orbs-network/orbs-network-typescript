@@ -6,27 +6,34 @@ import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 import { Signatures } from "../../src/common-library";
 import * as sinon from "sinon";
+import * as shell from "shelljs";
 
 chai.use(sinonChai);
 
-describe("Signatures", () => {
+describe.only("Signatures", () => {
+  before(() => {
+    shell.exec(`
+      rm -rf ${__dirname}/test-private-keys
+      mkdir -p ${__dirname}/test-private-keys
+
+      rm -rf ${__dirname}/test-public-keys
+      mkdir -p ${__dirname}/test-public-keys
+
+      ssh-keygen -t rsa -b 4096 -N "" -f ${__dirname}/test-private-keys/secret-message-key
+      ssh-keygen -f ${__dirname}/test-private-keys/secret-message-key.pub -e -m pem > ${__dirname}/test-public-keys/secret-message-key
+    `);
+  });
+
   describe("#signMessage", () => {
     it("returns a signed object", () => {
       const signatures = new Signatures({
         privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
       });
 
-      const correctSignature = "rfAPwBO/6jY/UixQqsB4pIk9gIN9fWRasnijFUUeNenU9D+0FaURdn2Cwhg/45NkrA6CFpRn6cvLSIZlJUB3SVoQnn/yPFV2NcCyFVZUkX/Ya+7hUe+E8d4EkG4ktuAfUtXadMOTp4LlAGUyAuE8dPpInBzUEqfYjyb4O7IgLO+K/SuZ3TpAdsHXzjkrDKaBsksI/q2DsV2Owj2hzyj3UizwHzApjV6aEfitOQC/XgCxzU4yT3ongWeb1P61pZLvAfeR2ayGpS9g26bKhWZNnFZgQCuIwntj0LRepKQjYiVw6JsZInAQyMB4iICa10EcjHjgix+N3T1SzhtLC9PttgNOpWOY9Cbt7vOlVadgl3DepvrLG98Y2MO/rfwRq41eNTtilt4rZ6ujCdSf4r7T3LVNXNo1k5d2ZUais0SYJuO9hdiRogyIocZxctgS7B4WI6BtOfHapfPpL5N6mzP5ifuStzLhaTjKuGz9fz1Cn33ApTFGk/ybsecD0dMPHk/YC5yNcDxdMwXjssmYqdsaqK2VI8sc04TCp1HnI1bziUkUn2rN+IHSdjbBA2y7t45tJip6znb0XF/gSx/8v08jRy9jouxcVDh+ydGmj0JoVpb5CQDuK3yg1vnukOUjfR1M6cZNK90k9DjyelrgSYZcF9fAzl5FRVO8Zsbdjdv0d4o=";
-
       expect(signatures.sign({
         message: "Hello",
         anotherMessage: "world"
-      })).to.be.eql(correctSignature);
-
-      expect(signatures.sign({
-        anotherMessage: "world",
-        message: "Hello"
-      })).to.be.eql(correctSignature);
+      })).not.to.be.empty;
     });
 
     it("fails if private key is not found", () => {
@@ -58,7 +65,7 @@ describe("Signatures", () => {
         publicKeysPath: `${__dirname}/test-public-keys`
       });
 
-      const keyName = "public-message-key";
+      const keyName = "secret-message-key";
 
       expect(signatureVerifier.verify(message, signature, keyName)).to.be.true;
     });
@@ -76,7 +83,7 @@ describe("Signatures", () => {
         publicKeysPath: `${__dirname}/test-public-keys`
       });
 
-      const keyName = "public-message-key";
+      const keyName = "secret-message-key";
 
       expect(signatureVerifier.verify(message, signature, keyName)).to.be.true;
     });
