@@ -15,7 +15,7 @@ function parseCredentials(path: string) {
     };
   }
   catch (e) {
-    console.error(`WARNING: Could not find credentials, proceeding without them`);
+    console.warn(`WARNING: Could not find credentials, proceeding without them`);
   }
 }
 

@@ -29,7 +29,16 @@ describe("Signatures", () => {
       })).to.be.eql(correctSignature);
     });
 
+    it("fails if private key is not found", () => {
+      const signatures = new Signatures({});
 
+      expect(() => {
+        signatures.sign({
+          message: "Hello",
+          anotherMessage: "world"
+        });
+      }).to.throw("Private key not found");
+    });
   });
 
   describe("#verifyMessage", () => {
@@ -70,6 +79,27 @@ describe("Signatures", () => {
       const keyName = "public-message-key";
 
       expect(signatureVerifier.verify(message, signature, keyName)).to.be.true;
+    });
+
+    it("fails if public key is not found", () => {
+      const signatures = new Signatures({
+        privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
+      });
+
+      const message = {
+        message: "Hello",
+        anotherMessage: "world"
+      };
+
+      const signature = signatures.sign(message);
+
+      const signatureVerifier = new Signatures({
+        publicKeysPath: `${__dirname}/test-public-keys`
+      });
+
+      const keyName = "fake-message-key";
+
+      expect(() => signatureVerifier.verify(message, signature, keyName)).to.throw("No public key found: fake-message-key");
     });
   });
 });
