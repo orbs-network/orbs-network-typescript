@@ -3,21 +3,25 @@ import * as stringify from "json-stable-stringify";
 import * as fs from "fs";
 import * as _ from "lodash";
 
-export interface SignaturesConfig {
+export interface KeyManagerConfig {
   publicKeysPath?: string;
   privateKeyPath?: string;
 }
 
-export class Signatures {
-  config: SignaturesConfig;
+export class KeyManager {
+  config: KeyManagerConfig;
   SIGNATURE_ENCODING: crypto.HexBase64Latin1Encoding = "base64";
   HASH_TYPE = "sha256";
 
   private publicKeys = new Map<string, string>();
   private privateKey: string;
 
-  public constructor(signaturesConfig: SignaturesConfig) {
+  public constructor(signaturesConfig: KeyManagerConfig) {
     this.config = signaturesConfig;
+
+    if (_.isEmpty(this.config.privateKeyPath) && _.isEmpty(this.config.publicKeysPath)) {
+      throw new Error(`Neither private key nor public keys are provided!`);
+    }
 
     this.readPrivateKey();
     this.readPublicKeys();
@@ -38,12 +42,12 @@ export class Signatures {
     }
   }
 
-  private signObject(object: any, key: string): string {
+  private signObject(object: any, privateKey: string): string {
     const sign = crypto.createSign(this.HASH_TYPE);
     const payload = _.isBuffer(object) ? object : stringify(object);
     sign.update(payload);
 
-    return sign.sign(key, this.SIGNATURE_ENCODING);
+    return sign.sign(privateKey, this.SIGNATURE_ENCODING);
   }
 
   private verifyObject(object: any, signature: string, publicKey: string): boolean {

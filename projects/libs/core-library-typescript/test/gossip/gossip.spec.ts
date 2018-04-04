@@ -1,4 +1,4 @@
-import { types } from "../../src/common-library";
+import { types, KeyManager } from "../../src/common-library";
 import { Gossip } from "../../src/gossip";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
@@ -6,7 +6,6 @@ import * as sinonChai from "sinon-chai";
 import { stubObject } from "ts-sinon";
 import * as chaiBytes from "chai-bytes";
 import { delay } from "bluebird";
-import { Signatures } from "../../src/common-library/signatures";
 import * as shell from "shelljs";
 
 const expect = chai.expect;
@@ -74,7 +73,9 @@ describe("Gossip", function () {
   });
 
   describe("with signatures", () => {
-    before(() => {
+    before(async function() {
+      this.timeout(6000);
+
       shell.exec(`
         rm -rf ${__dirname}/test-private-keys
         mkdir -p ${__dirname}/test-private-keys
@@ -98,8 +99,8 @@ describe("Gossip", function () {
         const consensus = stubObject<types.ConsensusClient>(<types.ConsensusClient>{}, ["gossipMessageReceived"]);
         const gossip = new Gossip({
           localAddress: `node${i}`, port: 30070 + i, peers: { consensus },
-          signMessages: true,
-          signatures: new Signatures({
+          keyManager: true,
+          keyManager: new KeyManager({
             privateKeyPath: `${__dirname}/test-private-keys/node${i}`,
             publicKeysPath: `${__dirname}/test-public-keys/`
           })

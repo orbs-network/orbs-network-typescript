@@ -1,6 +1,6 @@
 import * as path from "path";
 
-import { logger, ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers, Signatures } from "orbs-core-library";
+import { logger, ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers, KeyManager } from "orbs-core-library";
 
 import GossipService from "./service";
 
@@ -18,7 +18,7 @@ const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
 const signMessages = (SIGN_MESSAGES || "").toLowerCase() === "true";
 
-const messageSigatures = signMessages ? new Signatures({
+const keyManager = signMessages ? new KeyManager({
   privateKeyPath: "/opt/orbs/private-keys/message/secret-key",
   publicKeysPath: "/opt/orbs/public-keys/message"
 }) : undefined;
@@ -29,7 +29,7 @@ const gossipConfig = {
   peers,
   gossipPeers: nodeTopology.gossipPeers,
   signMessages: signMessages,
-  signatures: messageSigatures
+  keyManager: keyManager
 };
 
 ServiceRunner.run(grpc.gossipServer, new GossipService(gossipConfig), nodeTopology.endpoint);
