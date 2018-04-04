@@ -8,4 +8,4 @@ export * from "./grpc-server";
 export * from "./block-utils";
 export * from "./json-buffer";
 export * from "./transaction-utils";
-export * from "./signatures";
+export * from "./key-manager";

@@ -1,7 +1,7 @@
 import * as WebSocket from "ws";
 
 import { logger, types } from "../common-library";
-import { Signatures } from "../common-library";
+import { KeyManager } from "../common-library";
 import * as stringify from "json-stable-stringify";
 import * as _ from "lodash";
 
@@ -21,15 +21,15 @@ export class Gossip {
   listeners: Map<string, any> = new Map();
   peers: any;
   readonly port: number;
-  signatures: Signatures;
+  keyManager: KeyManager;
   signMessages: boolean;
 
-  constructor(input: { localAddress: string, port: number, peers: types.ClientMap, signatures: Signatures, signMessages: boolean }) {
+  constructor(input: { localAddress: string, port: number, peers: types.ClientMap, keyManager: KeyManager, signMessages: boolean }) {
     this.port = input.port;
     this.server = new WebSocket.Server({ port: input.port });
     this.peers = input.peers;
     this.localAddress = input.localAddress;
-    this.signatures = input.signatures;
+    this.keyManager = input.keyManager;
     this.signMessages = input.signMessages;
 
     this.server.on("connection", (ws) => {
@@ -76,7 +76,7 @@ export class Gossip {
       const payload = Buffer.from(buffer.data);
 
       if (this.signMessages) {
-        if (!this.signatures.verify(payload, signature.toString("base64"), sender)) {
+        if (!this.keyManager.verify(payload, signature.toString("base64"), sender)) {
           throw new Error(`Could not verify message from ${sender}`);
         }
       }
@@ -108,7 +108,7 @@ export class Gossip {
   }
 
   broadcastMessage(broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
-    const signature = this.signMessages ? this.signatures.sign(object) : undefined;
+    const signature = this.signMessages ? this.keyManager.sign(object) : undefined;
 
     const message = new Buffer(stringify({
       sender: this.localAddress,
@@ -127,7 +127,7 @@ export class Gossip {
 
   unicastMessage(recipient: string, broadcastGroup: string, objectType: string, object: Buffer, immediate: boolean) {
     const remote: WebSocket = this.clients.get(recipient);
-    const signature = this.signMessages ? this.signatures.sign(object) : undefined;
+    const signature = this.signMessages ? this.keyManager.sign(object) : undefined;
 
     const message = new Buffer(stringify({
       sender: this.localAddress,

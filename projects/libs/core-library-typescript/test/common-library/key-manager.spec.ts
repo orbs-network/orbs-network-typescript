@@ -4,14 +4,16 @@ import { expect } from "chai";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
-import { Signatures } from "../../src/common-library";
+import { KeyManager } from "../../src/common-library";
 import * as sinon from "sinon";
 import * as shell from "shelljs";
 
 chai.use(sinonChai);
 
-describe("Signatures", () => {
-  before(() => {
+describe("KeyManager", () => {
+  before(async function() {
+    this.timeout(4000);
+
     shell.exec(`
       rm -rf ${__dirname}/test-private-keys
       mkdir -p ${__dirname}/test-private-keys
@@ -24,23 +26,29 @@ describe("Signatures", () => {
     `);
   });
 
+  describe("#constructor", () => {
+    it("fails to instantiate if no keys were passed to constructor", () => {
+      expect(() => new KeyManager({})).to.throw("Neither private key nor public keys are provided!");
+    });
+  });
+
   describe("#signMessage", () => {
     it("returns a signed object", () => {
-      const signatures = new Signatures({
+      const keyManager = new KeyManager({
         privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
       });
 
-      expect(signatures.sign({
+      expect(keyManager.sign({
         message: "Hello",
         anotherMessage: "world"
       })).not.to.be.empty;
     });
 
     it("fails if private key is not found", () => {
-      const signatures = new Signatures({});
-
       expect(() => {
-        signatures.sign({
+        new KeyManager({
+          publicKeysPath: `${__dirname}/test-public-keys/`
+        }).sign({
           message: "Hello",
           anotherMessage: "world"
         });
@@ -50,7 +58,7 @@ describe("Signatures", () => {
 
   describe("#verifyMessage", () => {
     it("verifies message by public key", () => {
-      const signatures = new Signatures({
+      const keyManager = new KeyManager({
         privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
       });
 
@@ -59,9 +67,9 @@ describe("Signatures", () => {
         anotherMessage: "world"
       };
 
-      const signature = signatures.sign(message);
+      const signature = keyManager.sign(message);
 
-      const signatureVerifier = new Signatures({
+      const signatureVerifier = new KeyManager({
         publicKeysPath: `${__dirname}/test-public-keys`
       });
 
@@ -71,15 +79,15 @@ describe("Signatures", () => {
     });
 
     it("works with buffers", () => {
-      const signatures = new Signatures({
+      const keyManager = new KeyManager({
         privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
       });
 
       const message = Buffer.from([0, 1]);
 
-      const signature = signatures.sign(message);
+      const signature = keyManager.sign(message);
 
-      const signatureVerifier = new Signatures({
+      const signatureVerifier = new KeyManager({
         publicKeysPath: `${__dirname}/test-public-keys`
       });
 
@@ -89,7 +97,7 @@ describe("Signatures", () => {
     });
 
     it("fails if public key is not found", () => {
-      const signatures = new Signatures({
+      const keyManager = new KeyManager({
         privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
       });
 
@@ -98,9 +106,9 @@ describe("Signatures", () => {
         anotherMessage: "world"
       };
 
-      const signature = signatures.sign(message);
+      const signature = keyManager.sign(message);
 
-      const signatureVerifier = new Signatures({
+      const signatureVerifier = new KeyManager({
         publicKeysPath: `${__dirname}/test-public-keys`
       });
 

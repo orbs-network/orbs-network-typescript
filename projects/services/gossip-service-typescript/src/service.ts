@@ -3,13 +3,13 @@ import * as _ from "lodash";
 import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
-import { Gossip, Signatures } from "orbs-core-library";
+import { Gossip, KeyManager } from "orbs-core-library";
 
 export interface GossipServiceConfig extends ServiceConfig {
   gossipPort: number;
   peers: any;
   gossipPeers: any;
-  signatures?: Signatures;
+  keyManager?: KeyManager;
   signMessages: boolean;
 }
 
@@ -31,7 +31,7 @@ export default class GossipService extends Service {
       port: gossipConfig.gossipPort,
       localAddress: gossipConfig.nodeName,
       peers: (<GossipServiceConfig>this.config).peers,
-      signatures: (<GossipServiceConfig>this.config).signatures,
+      keyManager: (<GossipServiceConfig>this.config).keyManager,
       signMessages: (<GossipServiceConfig>this.config).signMessages
     });
 
