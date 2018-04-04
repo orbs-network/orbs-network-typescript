@@ -33,13 +33,13 @@ workflows:
   version: 2
   build:
     jobs:
-      - build-server
+      # - build-server
       - deploy:
-          requires:
-            - build-server
+          # requires:
+          #   - build-server
           filters:
             branches:
-              only: master
+              only: feature/key-management
       - e2e-testnet:
           requires:
             - deploy
