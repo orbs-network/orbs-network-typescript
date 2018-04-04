@@ -7,33 +7,24 @@
     android:layout_height="match_parent"
     tools:context="com.orbs.sampleapp.SampleApp">
 
-    <!--<ImageView-->
-    <!--android:id="@+id/logo_image"-->
-    <!--android:contentDescription="@string/logo"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--app:layout_constraintBottom_toBottomOf="@+id/activity_sample_app"-->
-    <!--app:layout_constraintLeft_toLeftOf="@+id/activity_sample_app"-->
-    <!--app:layout_constraintRight_toRightOf="@+id/activity_sample_app"-->
-    <!--app:layout_constraintTop_toTopOf="@+id/activity_sample_app"-->
-    <!--/>-->
-
     <TextView
-        android:id="@+id/hello_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="@+id/activity_sample_app"
-        app:layout_constraintLeft_toLeftOf="@+id/activity_sample_app"
-        app:layout_constraintRight_toRightOf="@+id/activity_sample_app"
-        app:layout_constraintTop_toTopOf="@+id/activity_sample_app"
-        app:layout_constraintVertical_bias="0.64" />
+        android:id="@+id/orbsAddressTextView"
+        android:layout_width="336dp"
+        android:layout_height="23dp"
+        android:text="@string/not_available"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.323" />
 
     <ImageView
         android:id="@+id/imageView"
-        android:contentDescription="@string/logo"
         android:layout_width="285dp"
         android:layout_height="214dp"
+        android:contentDescription="@string/logo"
         android:src="@drawable/orbs"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -42,5 +33,61 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.111" />
 
+    <RadioGroup
+        android:id="@+id/radioGroup2"
+        android:layout_width="237dp"
+        android:layout_height="52dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="112dp"
+        android:checkedButton="@+id/radioButtonTestnet"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="parent">
 
+        <RadioButton
+            android:id="@+id/radioButtonTestnet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onRadioButtonTestnetClicked"
+            android:text="@string/testnet" />
+
+        <RadioButton
+            android:id="@+id/radioButtonMainnet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onRadioButtonMainnetClicked"
+            android:text="@string/mainnet" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="@string/orbs_address"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.091"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.719" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onGenerateNewAddressClick"
+        android:text="@string/generate_new_address"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup2"
+        app:layout_constraintVertical_bias="0.297" />
 </android.support.constraint.ConstraintLayout>

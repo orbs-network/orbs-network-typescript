@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Orbs Android Sample App</string>
+    <string name="not_available">N/A</string>
     <string name="logo">Logo</string>
+    <string name="orbs_address">Orbs Address</string>
+    <string name="testnet">Testnet</string>
+    <string name="mainnet">Mainnet</string>
+    <string name="generate_new_address">Generate New Address</string>
 </resources>
