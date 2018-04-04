@@ -19,7 +19,7 @@ project(crypto-sdk)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include (TestBigEndian)
+include(TestBigEndian)
 TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
 if(IS_BIG_ENDIAN)
  message(FATAL_ERROR "Big endian isn't supported at the moment")
