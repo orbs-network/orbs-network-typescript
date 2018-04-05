@@ -72,7 +72,7 @@ ED25519Key::ED25519Key(const vector<uint8_t> &publicKey) : key_(nullptr) {
     }
 
     if (publicKey.size() != ED25519Key::PUBLIC_KEY_SIZE) {
-        throw invalid_argument("Invalid public key length: " + to_string(publicKey.size()));
+        throw invalid_argument("Invalid public key length: " + Utils::ToString(publicKey.size()));
     }
 
     key_ = new gcry_sexp_t();

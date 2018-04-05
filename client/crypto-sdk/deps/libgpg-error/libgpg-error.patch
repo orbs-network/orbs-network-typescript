@@ -1,18 +1,9 @@
 --- src/logging.c	        2018-04-05 15:52:06.000000000 +0900
 +++ src/logging.c.patched 2018-04-05 15:53:09.000000000 +0900
-@@ -1141,7 +1141,7 @@
- _gpgrt_log_printhex (const void *buffer, size_t length,
-                      const char *fmt, ...)
- {
--  va_list arg_ptr;
-+  va_list arg_ptr = {};
-
-   if (fmt)
-     {
 @@ -1150,7 +1150,7 @@
        va_end (arg_ptr);
      }
    else
 -    _gpgrt_logv_printhex (buffer, length, NULL, NULL);
-+    _gpgrt_logv_printhex (buffer, length, NULL, arg_ptr);
++    _gpgrt_logv_printhex (buffer, length, 0, 0);
  }

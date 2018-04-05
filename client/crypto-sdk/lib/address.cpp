@@ -57,7 +57,7 @@ Address::Address(const ED25519Key &key, const vector<uint8_t> &virtualChainId, u
 
 void Address::Init() {
     if (publicKey_.size() != Address::PUBLIC_KEY_SIZE) {
-        throw invalid_argument("Invalid public key length: " + to_string(publicKey_.size()));
+        throw invalid_argument("Invalid public key length: " + Utils::ToString(publicKey_.size()));
     }
 
     if (!IsValidVirtualChainId(virtualChainId_)) {
@@ -65,7 +65,7 @@ void Address::Init() {
     }
 
     if (!IsValidNetworkId(networkId_)) {
-        throw invalid_argument("Invalid network ID: " + to_string(networkId_));
+        throw invalid_argument("Invalid network ID: " + Utils::ToString(networkId_));
     }
 
     // Initialize version to its current default.

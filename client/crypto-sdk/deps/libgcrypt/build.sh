@@ -168,6 +168,15 @@ case ${PLATFORM} in
         NDK_PLATFORM_COMPAT="android-21"
         build_android
 
+        # Build for x86
+        TARGET_ARCH="i686"
+        CFLAGS="-Os -march=${TARGET_ARCH}"
+        ARCH="x86"
+        HOST_COMPILER="i686-linux-android"
+        NDK_PLATFORM="android-21"
+        NDK_PLATFORM_COMPAT="android-21"
+        build_android
+
         # Build for x86_64
         TARGET_ARCH="westmere"
         CFLAGS="-Os -march=${TARGET_ARCH}"
