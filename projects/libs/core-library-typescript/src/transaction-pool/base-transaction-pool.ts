@@ -22,7 +22,7 @@ export default abstract class BaseTransactionPool {
   public startCleanupTimer() {
     this.cleanupTimer = setInterval(() => {
       const count = this.clearExpiredTransactions();
-      logger.debug("cleaned up ${count} transactions from pool. Class name: ${this.constructor.name}");
+      logger.debug(`Cleaned up ${count} transactions from pool. Class name: ${this.constructor.name}`);
     }, this.cleanupIntervalMs);
   }
 
