@@ -4,17 +4,13 @@
 
 pushd build
 
-if [ -z ${PLATFORM+x} ] ;  then
-    PLATFORM=$(uname -s)
-fi
-
 if [ -n "${DEBUG}" ] ; then
     BUILD_TYPE=Debug
 else
     BUILD_TYPE=Release
 fi
 
-echo "Building ${BUILD_TYPE} version for ${PLATFORM}..."
+echo "Building ${BUILD_TYPE} version for ${PLATFORM:-$(uname -s)}..."
 
 case ${PLATFORM} in
     IOS)

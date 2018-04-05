@@ -1,9 +1,19 @@
 --- src/logging.c	        2018-04-05 15:52:06.000000000 +0900
 +++ src/logging.c.patched 2018-04-05 15:53:09.000000000 +0900
-@@ -1150,7 +1150,7 @@
-       va_end (arg_ptr);
-     }
-   else
+@@ -1142,15 +1142,9 @@
+                      const char *fmt, ...)
+ {
+   va_list arg_ptr;
+-
+-  if (fmt)
+-    {
+-      va_start (arg_ptr, fmt);
+-      _gpgrt_logv_printhex (buffer, length, fmt, arg_ptr);
+-      va_end (arg_ptr);
+-    }
+-  else
 -    _gpgrt_logv_printhex (buffer, length, NULL, NULL);
-+    _gpgrt_logv_printhex (buffer, length, 0, 0);
++  va_start (arg_ptr, fmt);
++  _gpgrt_logv_printhex (buffer, length, fmt, arg_ptr);
++  va_end (arg_ptr);
  }
