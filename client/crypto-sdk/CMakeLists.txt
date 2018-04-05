@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.6)
 
 find_package(PkgConfig)
 find_package(Git)
@@ -25,8 +25,16 @@ if(IS_BIG_ENDIAN)
  message(FATAL_ERROR "Big endian isn't supported at the moment")
 endif()
 
-include(CTest)
-enable_testing()
-
 add_subdirectory(lib)
-add_subdirectory(test)
+
+# iOS and Android don't support Google Test test runner.
+if(PLATFORM STREQUAL "IOS" OR PLATFORM STREQUAL "ANDROID")
+  message("PLATFORM: ${PLATFORM}")
+  message("Google Test is unsupported on ${PLATFORM}")
+else()
+  message("PLATFORM: ${PLATFORM}")
+  include(CTest)
+  enable_testing()
+
+  add_subdirectory(test)
+endif()
