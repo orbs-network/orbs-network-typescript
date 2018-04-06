@@ -9,7 +9,6 @@ public class Address {
     }
 
     static {
-        System.out.println("java.library.path is: " + System.getProperty("java.library.path"));
         System.loadLibrary("cryptosdk-android");
     }
 
