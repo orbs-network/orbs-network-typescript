@@ -165,7 +165,6 @@ The following iOS builds are currently supported:
 > 1. You'd need to have both **Xcode** and **iPhone Simulator** installed.
 > 2. You'd need to run `./clean.sh` before switching to build for another architecture.
 
-
 ```bash
 PLATFORM=IOS ./build.sh
 ```
