@@ -1,13 +1,20 @@
 package com.orbs.cryptosdk;
 
 public class Address {
-    private String address;
+    // This is the "handle" to the underlying native instace.
+    private long selfPtr;
 
     public Address(String publicKey, String virtualChainId, String networkId) {
-        this.address = networkId.equals("M") ? "M1EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1" : "T1EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1";
+        init(publicKey, virtualChainId, networkId);
     }
 
-    public String toString() {
-        return this.address;
+    static {
+        System.out.println("java.library.path is: " + System.getProperty("java.library.path"));
+        System.loadLibrary("cryptosdk-android");
     }
+
+    private native void init(String publicKey, String virtualChainId, String networkId);
+    protected native void finalize();
+
+    public native String toString();
 }

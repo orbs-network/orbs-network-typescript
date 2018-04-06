@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2016 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.orbs.sampleapp;
 
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +14,6 @@ public class SampleApp extends AppCompatActivity {
 
     private String networkId = TESTNET_NETWORK_ID;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -53,12 +37,8 @@ public class SampleApp extends AppCompatActivity {
     }
 
     private void generateAddress() {
-        Address address = new Address("publicKey", VIRTUAL_CHAIN_ID, this.networkId);
-        TextView text = (TextView)findViewById(R.id.orbsAddressTextView);
+        Address address = new Address("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6", VIRTUAL_CHAIN_ID, this.networkId);
+        TextView text = findViewById(R.id.orbsAddressTextView);
         text.setText(address.toString());
-    }
-
-    static {
-        //System.loadLibrary("hello-jni");
     }
 }
