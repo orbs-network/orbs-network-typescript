@@ -5,6 +5,24 @@ function readlink() {
   (cd "$DIR" && echo "$(pwd -P)")
 }
 
+function build_ios() {
+    INSTALL_PREFIX="${PREFIX}/${TARGET_ARCH}"
+
+    make distclean > /dev/null || true
+
+    ./configure \
+        --host=${HOST_COMPILER} \
+        --with-pic \
+        --enable-static \
+        --disable-shared \
+        --disable-nls \
+        --disable-languages \
+        --disable-tests \
+        --prefix="${INSTALL_PREFIX}"
+
+    make -j${PROCESSORS} install
+}
+
 function build_android() {
     case "$(uname -s)" in
         Darwin)
@@ -69,62 +87,34 @@ cd ${LIBGPG_ERROR_PACKAGE}
 
 case ${PLATFORM} in
     IOS)
-        IOS64_PREFIX="$PREFIX/arm64"
-        SIMULATOR64_PREFIX="$PREFIX/simulator64"
-
-        mkdir -p ${IOS64_PREFIX} ${SIMULATOR64_PREFIX}
-
         XCODEDIR=$(xcode-select -p)
-        IOS_SIMULATOR_VERSION_MIN=${IOS_SIMULATOR_VERSION_MIN-"6.0.0"}
-        IOS_VERSION_MIN=${IOS_VERSION_MIN-"6.0.0"}
 
         # Build for the simulator
         BASEDIR="${XCODEDIR}/Platforms/iPhoneSimulator.platform/Developer"
         PATH="${BASEDIR}/usr/bin:$BASEDIR/usr/sbin:$PATH"
         SDK="${BASEDIR}/SDKs/iPhoneSimulator.sdk"
-
-        # x86_64 simulator
+        IOS_SIMULATOR_VERSION_MIN=${IOS_SIMULATOR_VERSION_MIN:-"6.0.0"}
+        TARGET_ARCH="simulator64"
+        HOST_COMPILER="x86_64-apple-darwin"
         export CFLAGS="-O2 -arch x86_64 -isysroot ${SDK} -mios-simulator-version-min=${IOS_SIMULATOR_VERSION_MIN}"
         export LDFLAGS="-arch x86_64 -isysroot ${SDK} -mios-simulator-version-min=${IOS_SIMULATOR_VERSION_MIN}"
-
-        make distclean > /dev/null || true
-
-        ./configure \
-            --host=x86_64-apple-darwin \
-            --with-pic \
-            --enable-static \
-            --disable-shared \
-            --disable-nls \
-            --disable-languages \
-            --disable-tests \
-            --prefix="${SIMULATOR64_PREFIX}"
-
-        make -j${PROCESSORS} install
+        build_ios
 
         # Build for iOS
         BASEDIR="${XCODEDIR}/Platforms/iPhoneOS.platform/Developer"
         PATH="${BASEDIR}/usr/bin:$BASEDIR/usr/sbin:$PATH"
         SDK="${BASEDIR}/SDKs/iPhoneOS.sdk"
-
-        ## 64-bit iOS
+        IOS_VERSION_MIN=${IOS_VERSION_MIN:-"6.0.0"}
+        TARGET_ARCH="arm64"
+        HOST_COMPILER="arm-apple-darwin"
         export CFLAGS="-fembed-bitcode -O2 -arch arm64 -isysroot ${SDK} -mios-version-min=${IOS_VERSION_MIN} -fembed-bitcode"
         export LDFLAGS="-fembed-bitcode -arch arm64 -isysroot ${SDK} -mios-version-min=${IOS_VERSION_MIN} -fembed-bitcode"
+        build_ios
 
-        make distclean > /dev/null
+        # Create a universal binary and include folder.
+        IOS64_PREFIX="$PREFIX/arm64"
+        SIMULATOR64_PREFIX="$PREFIX/simulator64"
 
-        ./configure \
-            --host=arm-apple-darwin \
-            --with-pic \
-            --enable-static \
-            --disable-shared \
-            --disable-nls \
-            --disable-languages \
-            --disable-tests \
-            --prefix="${IOS64_PREFIX}"
-
-        make -j${PROCESSORS} install
-
-        # Create universal binary and include folder
         rm -fr -- "${PREFIX}/include" "${PREFIX}/lib/libgpg-error.a" 2> /dev/null
         mkdir -p -- "${PREFIX}/lib"
         lipo -create \
@@ -132,9 +122,6 @@ case ${PLATFORM} in
             "${IOS64_PREFIX}/lib/libgpg-error.a" \
             -output "${PREFIX}/lib/libgpg-error.a"
         cp -rf -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
-
-        # Cleanup
-        make distclean > /dev/null
 
         ;;
     ANDROID)
@@ -150,14 +137,14 @@ case ${PLATFORM} in
 	    cp -f src/syscfg/lock-obj-pub.x86_64-pc-linux-gnu.h src/syscfg/lock-obj-pub.aarch64-unknown-linux-androideabi.h
         cp -f src/syscfg/lock-obj-pub.arm-unknown-linux-androideabi.h src/syscfg/lock-obj-pub.linux-android.h
 
-        # Build for armv7a
+        # Build for armv7a.
         TARGET_ARCH="armv7-a"
         CFLAGS="-Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=${TARGET_ARCH}"
         ARCH="arm"
         HOST_COMPILER="arm-linux-androideabi"
         build_android
 
-        # Build for armv8-a
+        # Build for armv8-a.
         TARGET_ARCH="armv8-a"
         CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="arm64"
@@ -166,7 +153,7 @@ case ${PLATFORM} in
         NDK_PLATFORM_COMPAT="android-21"
         build_android
 
-        # Build for x86
+        # Build for x86.
         TARGET_ARCH="i686"
         CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="x86"
@@ -175,7 +162,7 @@ case ${PLATFORM} in
         NDK_PLATFORM_COMPAT="android-21"
         build_android
 
-        # Build for x86_64
+        # Build for x86_64.
         TARGET_ARCH="westmere"
         CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="x86_64"

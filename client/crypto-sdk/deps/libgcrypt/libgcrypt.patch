@@ -14,19 +14,21 @@
 
 --- src/sexp.c	2017-11-24 18:38:42.000000000 +0900
 +++ src/sexp.1.c	2018-04-06 13:59:29.000000000 +0900
-@@ -2447,3 +2447,15 @@
+@@ -2447,3 +2447,17 @@
    va_end (arg_ptr);
    return rc;
  }
 +
++#ifdef IMPLEMENT_STPCPY
 +// This implementation is missing when building for x86.
 +char *stpcpy(char *dest, char const *src) {
 +	char *d = dest;
-+    const char *s = src;
++  const char *s = src;
 +
-+    do {
-+        *d++ = *s;
-+    } while (*s++ != '\0');
++  do {
++      *d++ = *s;
++  } while (*s++ != '\0');
 +
-+    return d - 1;
++  return d - 1;
 +}
++#endif

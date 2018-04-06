@@ -5,6 +5,25 @@ function readlink() {
   (cd "$DIR" && echo "$(pwd -P)")
 }
 
+function build_ios() {
+    INSTALL_PREFIX="${PREFIX}/${TARGET_ARCH}"
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/simulator64"
+
+    make distclean > /dev/null || true
+
+    ./configure \
+        --host=${HOST_COMPILER} \
+        --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
+        --with-pic \
+        --enable-static \
+        --disable-shared \
+        --disable-asm \
+        --disable-doc \
+        --prefix="${INSTALL_PREFIX}"
+
+    make -j${PROCESSORS} install
+}
+
 function build_android() {
     case "$(uname -s)" in
         Darwin)
@@ -77,66 +96,34 @@ case ${PLATFORM} in
 
         patch -p0 -N < ../libgcrypt.patch || true
 
-        IOS64_PREFIX="$PREFIX/arm64"
-        SIMULATOR64_PREFIX="$PREFIX/simulator64"
-
-        mkdir -p ${IOS64_PREFIX} ${SIMULATOR64_PREFIX}
-
         XCODEDIR=$(xcode-select -p)
-        IOS_SIMULATOR_VERSION_MIN=${IOS_SIMULATOR_VERSION_MIN-"6.0.0"}
-        IOS_VERSION_MIN=${IOS_VERSION_MIN-"6.0.0"}
 
-        # Build for the simulator
+        # Build for the simulator.
         BASEDIR="${XCODEDIR}/Platforms/iPhoneSimulator.platform/Developer"
         PATH="${BASEDIR}/usr/bin:$BASEDIR/usr/sbin:$PATH"
         SDK="${BASEDIR}/SDKs/iPhoneSimulator.sdk"
-
-        # x86_64 simulator
+        IOS_SIMULATOR_VERSION_MIN=${IOS_SIMULATOR_VERSION_MIN:-"6.0.0"}
+        TARGET_ARCH="simulator64"
+        HOST_COMPILER="x86_64-apple-darwin"
         export CFLAGS="-O2 -arch x86_64 -isysroot ${SDK} -mios-simulator-version-min=${IOS_SIMULATOR_VERSION_MIN}"
         export LDFLAGS="-arch x86_64 -isysroot ${SDK} -mios-simulator-version-min=${IOS_SIMULATOR_VERSION_MIN}"
+        build_ios
 
-        make distclean > /dev/null || true
-
-        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/simulator64"
-
-        ./configure \
-            --host=x86_64-apple-darwin \
-            --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
-            --with-pic \
-            --enable-static \
-            --disable-shared \
-            --disable-asm \
-            --disable-doc \
-            --prefix="${SIMULATOR64_PREFIX}"
-
-        make -j${PROCESSORS} install
-
-        # Build for iOS
+        # Build for iOS.
         BASEDIR="${XCODEDIR}/Platforms/iPhoneOS.platform/Developer"
         PATH="${BASEDIR}/usr/bin:$BASEDIR/usr/sbin:$PATH"
         SDK="${BASEDIR}/SDKs/iPhoneOS.sdk"
-
-        ## 64-bit iOS
+        IOS_VERSION_MIN=${IOS_VERSION_MIN:-"6.0.0"}
+        TARGET_ARCH="arm64"
+        HOST_COMPILER="arm-apple-darwin"
         export CFLAGS="-fembed-bitcode -O2 -arch arm64 -isysroot ${SDK} -mios-version-min=${IOS_VERSION_MIN} -fembed-bitcode"
         export LDFLAGS="-fembed-bitcode -arch arm64 -isysroot ${SDK} -mios-version-min=${IOS_VERSION_MIN} -fembed-bitcode"
+        build_ios
 
-        make distclean > /dev/null
+        # Create a universal binary and include folder.
+        IOS64_PREFIX="$PREFIX/arm64"
+        SIMULATOR64_PREFIX="$PREFIX/simulator64"
 
-        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/arm64"
-
-        ./configure \
-            --host=arm-apple-darwin \
-            --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
-            --with-pic \
-            --enable-static \
-            --disable-shared \
-            --disable-asm \
-            --disable-doc \
-            --prefix="${IOS64_PREFIX}"
-
-        make -j${PROCESSORS} install
-
-        # Create universal binary and include folder
         rm -fr -- "${PREFIX}/include" "${PREFIX}/lib/libgcrypt.a" 2> /dev/null
         mkdir -p -- "${PREFIX}/lib"
         lipo -create \
@@ -144,10 +131,6 @@ case ${PLATFORM} in
             "${IOS64_PREFIX}/lib/libgcrypt.a" \
             -output "${PREFIX}/lib/libgcrypt.a"
         mv -f -- "${IOS64_PREFIX}/include" "$PREFIX/"
-
-        # Cleanup
-        rm -rf -- "${PREFIX}/ios"
-        make distclean > /dev/null
 
         ;;
     ANDROID)
@@ -157,14 +140,14 @@ case ${PLATFORM} in
 
         patch -p0 -N < ../libgcrypt.patch || true
 
-        # Build for armv7a
+        # Build for armv7a.
         TARGET_ARCH="armv7-a"
         CFLAGS="-Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=${TARGET_ARCH}"
         ARCH="arm"
         HOST_COMPILER="arm-linux-androideabi"
         build_android
 
-        # Build for armv8-a
+        # Build for armv8-a.
         TARGET_ARCH="armv8-a"
         CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="arm64"
@@ -173,16 +156,16 @@ case ${PLATFORM} in
         NDK_PLATFORM_COMPAT="android-21"
         build_android
 
-        # Build for x86
+        # Build for x86.
         TARGET_ARCH="i686"
-        CFLAGS="-Os -march=${TARGET_ARCH}"
+        CFLAGS="-Os -march=${TARGET_ARCH} -DIMPLEMENT_STPCPY"
         ARCH="x86"
         HOST_COMPILER="i686-linux-android"
         NDK_PLATFORM="android-21"
         NDK_PLATFORM_COMPAT="android-21"
         build_android
 
-        # Build for x86_64
+        # Build for x86_64.
         TARGET_ARCH="westmere"
         CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="x86_64"
