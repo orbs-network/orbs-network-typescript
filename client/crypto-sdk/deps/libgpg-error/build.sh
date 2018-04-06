@@ -25,7 +25,7 @@ function build_android() {
         exit 1
     fi
 
-    INSTALL_PREFIX="$PREFIX/android/${TARGET_ARCH}"
+    INSTALL_PREFIX="${PREFIX}/${TARGET_ARCH}"
     MAKE_TOOLCHAIN="${ANDROID_NDK_HOME}/build/tools/make_standalone_toolchain.py"
     TOOLCHAIN_DIR="$(pwd)/android-toolchain-${TARGET_ARCH}"
 
@@ -60,7 +60,8 @@ PROCESSORS=${NPROCESSORS:-3}
 LIBGPG_ERROR_VERSION=1.28
 LIBGPG_ERROR_PACKAGE="libgpg-error-${LIBGPG_ERROR_VERSION}"
 
-PREFIX="$(pwd)/../../build/libgpg-error/"
+PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
+PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgpg-error/"
 mkdir -p ${PREFIX}
 PREFIX=$(readlink "${PREFIX}")
 
@@ -68,8 +69,8 @@ cd ${LIBGPG_ERROR_PACKAGE}
 
 case ${PLATFORM} in
     IOS)
-        IOS64_PREFIX="$PREFIX/ios/arm64"
-        SIMULATOR64_PREFIX="$PREFIX/ios/simulator64"
+        IOS64_PREFIX="$PREFIX/arm64"
+        SIMULATOR64_PREFIX="$PREFIX/simulator64"
 
         mkdir -p ${IOS64_PREFIX} ${SIMULATOR64_PREFIX}
 

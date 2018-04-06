@@ -25,7 +25,7 @@ function build_android() {
         exit 1
     fi
 
-    INSTALL_PREFIX="$PREFIX/android/${TARGET_ARCH}"
+    INSTALL_PREFIX="${PREFIX}/${TARGET_ARCH}"
     MAKE_TOOLCHAIN="${ANDROID_NDK_HOME}/build/tools/make_standalone_toolchain.py"
     TOOLCHAIN_DIR="$(pwd)/android-toolchain-${TARGET_ARCH}"
 
@@ -38,7 +38,7 @@ function build_android() {
 
     "$MAKE_TOOLCHAIN" --force --api="$NDK_API_VERSION_COMPAT" --arch="$ARCH" --install-dir="$TOOLCHAIN_DIR" || exit 1
 
-    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/libgpg-error/android/${TARGET_ARCH}"
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/${TARGET_ARCH}"
 
     ./configure \
         --host="${HOST_COMPILER}" \
@@ -62,7 +62,8 @@ PROCESSORS=${NPROCESSORS:-3}
 LIBGCRYPT_VERSION=1.8.2
 LIBGCRYPT_PACKAGE="libgcrypt-${LIBGCRYPT_VERSION}"
 
-PREFIX="$(pwd)/../../build/libgcrypt/"
+PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
+PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgcrypt/"
 mkdir -p ${PREFIX}
 PREFIX=$(readlink "${PREFIX}")
 
@@ -70,12 +71,14 @@ cd ${LIBGCRYPT_PACKAGE}
 
 case ${PLATFORM} in
     IOS)
-        # Fix compilation errors, by patching:
-        #   1. tests/random.c in order to avoid calling the system() function which isn't available on iOS.
+        # Fix compilation errors by:
+        #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
+        #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.
+
         patch -p0 -N < ../libgcrypt.patch || true
 
-        IOS64_PREFIX="$PREFIX/ios/arm64"
-        SIMULATOR64_PREFIX="$PREFIX/ios/simulator64"
+        IOS64_PREFIX="$PREFIX/arm64"
+        SIMULATOR64_PREFIX="$PREFIX/simulator64"
 
         mkdir -p ${IOS64_PREFIX} ${SIMULATOR64_PREFIX}
 
@@ -94,7 +97,7 @@ case ${PLATFORM} in
 
         make distclean > /dev/null || true
 
-        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/libgpg-error/ios/simulator64"
+        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/simulator64"
 
         ./configure \
             --host=x86_64-apple-darwin \
@@ -119,7 +122,7 @@ case ${PLATFORM} in
 
         make distclean > /dev/null
 
-        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/libgpg-error/ios/arm64"
+        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/arm64"
 
         ./configure \
             --host=arm-apple-darwin \
@@ -148,8 +151,10 @@ case ${PLATFORM} in
 
         ;;
     ANDROID)
-        # Fix compilation errors, by patching:
-        #   1. tests/random.c in order to avoid calling the system() function which isn't available on iOS.
+        # Fix compilation errors by:
+        #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
+        #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.
+
         patch -p0 -N < ../libgcrypt.patch || true
 
         # Build for armv7a
@@ -190,7 +195,7 @@ case ${PLATFORM} in
     *)
         make distclean > /dev/null || true
 
-        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/libgpg-error/"
+        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/"
 
         ./configure \
             --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \

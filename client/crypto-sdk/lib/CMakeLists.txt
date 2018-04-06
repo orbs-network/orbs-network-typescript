@@ -3,9 +3,6 @@ file(GLOB CRYPTO_SDK_SRC
   "*.cpp"
 )
 
-set(LIBGPG_ERROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/libgpg-error)
-set(LIBGCRYPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/libgcrypt)
-
 # Currently, there is not support for universal/fat libraries on Android.
 if(PLATFORM STREQUAL "ANDROID")
   if(ANDROID_ABI STREQUAL "armeabi-v7a")
@@ -20,15 +17,27 @@ if(PLATFORM STREQUAL "ANDROID")
     message(FATAL_ERROR "Unsupported Android architecture: ${ANDROID_ABI}")
   endif()
 
-  set(LIBGPG_ERROR_LIBRARY ${LIBGPG_ERROR_DIR}/android/${ARCH}/lib/libgpg-error.a)
-  set(LIBGPG_ERROR_INCLUDE_DIRS ${LIBGPG_ERROR_DIR}/android/${ARCH}/include/)
-  set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/android/${ARCH}/lib/libgcrypt.a)
-  set(LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_DIR}/android/${ARCH}/include)
+  set(LIBGPG_ERROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/android/libgpg-error)
+  set(LIBGPG_ERROR_LIBRARY ${LIBGPG_ERROR_DIR}/${ARCH}/lib/libgpg-error.a)
+  set(LIBGPG_ERROR_INCLUDE_DIRS ${LIBGPG_ERROR_DIR}/${ARCH}/include/)
+
+  set(LIBGCRYPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/android/libgcrypt)
+  set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/${ARCH}/lib/libgcrypt.a)
+  set(LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_DIR}/${ARCH}/include)
 else()
+  if(PLATFORM STREQUAL "IOS")
+    set(LIBGPG_ERROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/ios/libgpg-error)
+    set(LIBGCRYPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/ios/libgcrypt)
+  else()
+    set(LIBGPG_ERROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/libgpg-error)
+    set(LIBGCRYPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/libgcrypt)
+  endif()
+
   set(LIBGPG_ERROR_LIBRARY ${LIBGPG_ERROR_DIR}/lib/libgpg-error.a)
   set(LIBGPG_ERROR_INCLUDE_DIRS ${LIBGPG_ERROR_DIR}/include/)
-  set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/lib/libgcrypt.a)
-  set(LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_DIR}/include)
+
+  set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/lib/ios/libgcrypt.a)
+  set(LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_DIR}/ios/include)
 endif()
 
 add_library(cryptosdk SHARED ${CRYPTO_SDK_SRC})
