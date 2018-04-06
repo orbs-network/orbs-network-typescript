@@ -7,7 +7,7 @@ function readlink() {
 
 function build_ios() {
     INSTALL_PREFIX="${PREFIX}/${TARGET_ARCH}"
-    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/simulator64"
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/${TARGET_ARCH}"
 
     make distclean > /dev/null || true
 

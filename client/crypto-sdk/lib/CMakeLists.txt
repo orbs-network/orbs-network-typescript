@@ -36,8 +36,8 @@ else()
   set(LIBGPG_ERROR_LIBRARY ${LIBGPG_ERROR_DIR}/lib/libgpg-error.a)
   set(LIBGPG_ERROR_INCLUDE_DIRS ${LIBGPG_ERROR_DIR}/include/)
 
-  set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/lib/ios/libgcrypt.a)
-  set(LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_DIR}/ios/include)
+  set(LIBGCRYPT_LIBRARY ${LIBGCRYPT_DIR}/lib/libgcrypt.a)
+  set(LIBGCRYPT_INCLUDE_DIRS ${LIBGCRYPT_DIR}/include)
 endif()
 
 add_library(cryptosdk SHARED ${CRYPTO_SDK_SRC})

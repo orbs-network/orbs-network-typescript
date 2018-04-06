@@ -15,7 +15,7 @@ echo "Building ${BUILD_TYPE} version for ${PLATFORM:-$(uname -s)}..."
 case ${PLATFORM} in
     IOS)
         (cd ../ && CMAKE_ONLY=1 ./clean.sh)
-        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE="toolchains/ios.toolchain.cmake" -DIOS_PLATFORM="iPhoneSimulator"
+        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=IOS -DCMAKE_TOOLCHAIN_FILE="toolchains/ios.toolchain.cmake" -DIOS_PLATFORM="iPhoneSimulator"
         make
 
         ;;
