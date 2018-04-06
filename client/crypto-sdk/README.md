@@ -154,6 +154,12 @@ DEBUG=1 ./build.sh
 ./clean.sh
 ```
 
+> If you only want to clean CMake cache and generated files, you can set the `CMAKE_ONLY` environment variable like so:
+
+```bash
+CMAKE_ONLY=1 ./clean.sh
+```
+
 ### Building for iOS
 
 The following iOS builds are currently supported:
