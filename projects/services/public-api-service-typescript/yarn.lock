@@ -2035,7 +2035,7 @@ optjs@~3.2.2:
     lodash "^4.17.4"
     mali "^0.7.1"
     mkdirp "^0.5.1"
-    orbs-interfaces "file:../../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
+    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"
