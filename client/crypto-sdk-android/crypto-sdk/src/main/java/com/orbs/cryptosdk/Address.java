@@ -1,7 +1,7 @@
 package com.orbs.cryptosdk;
 
 public class Address {
-    // This is the "handle" to the underlying native instace.
+    // This is the "handle" to the underlying native instance.
     private long selfPtr;
 
     public Address(String publicKey, String virtualChainId, String networkId) {
@@ -15,5 +15,6 @@ public class Address {
     private native void init(String publicKey, String virtualChainId, String networkId);
     protected native void finalize();
 
+    public native String getPublicKey();
     public native String toString();
 }

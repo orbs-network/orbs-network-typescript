@@ -1,19 +1,15 @@
 #include "Address.h"
 
 #include "../../../../../crypto-sdk/lib/address.h"
+#include "../../../../../crypto-sdk/lib/utils.h"
 
 using namespace std;
 using namespace Orbs;
 
 static jfieldID getSelfId(JNIEnv *env, jobject thisObj) {
-    static int init = 0;
-    static jfieldID fidSelfPtr;
-    if (!init) {
-        jclass thisClass = env->GetObjectClass(thisObj);
-        fidSelfPtr = env->GetFieldID(thisClass, "selfPtr", "J");
-    }
+    jclass thisClass = env->GetObjectClass(thisObj);
 
-    return fidSelfPtr;
+    return env->GetFieldID(thisClass, "selfPtr", "J");
 }
 
 static Address *getSelf(JNIEnv *env, jobject thisObj) {
@@ -57,9 +53,14 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_finalize(JNIEnv *env, job
     }
 }
 
+JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_Address_getPublicKey(JNIEnv *env, jobject thisObj) {
+    Address *self = getSelf(env, thisObj);
+
+    return env->NewStringUTF(Utils::Vec2Hex(self->GetPublicKey()).c_str());
+}
+
 JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_Address_toString(JNIEnv *env, jobject thisObj) {
     Address *self = getSelf(env, thisObj);
-    const string str(self->ToString());
 
-    return env->NewStringUTF(str.c_str());
+    return env->NewStringUTF(self->ToString().c_str());
 }

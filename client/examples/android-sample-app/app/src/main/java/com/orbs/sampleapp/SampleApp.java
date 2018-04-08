@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.orbs.cryptosdk.CryptoSDK;
 import com.orbs.cryptosdk.Address;
+import com.orbs.cryptosdk.ED25519Key;
 
 public class SampleApp extends AppCompatActivity {
     public static final String VIRTUAL_CHAIN_ID = "640ed3";
@@ -18,6 +20,8 @@ public class SampleApp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_sample_app);
+
+        CryptoSDK.initialize();
     }
 
     public void onGenerateNewAddressClick(View view) {
@@ -37,7 +41,8 @@ public class SampleApp extends AppCompatActivity {
     }
 
     private void generateAddress() {
-        Address address = new Address("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6", VIRTUAL_CHAIN_ID, this.networkId);
+        ED25519Key key = new ED25519Key();
+        Address address = new Address(key.getPublicKey(), VIRTUAL_CHAIN_ID, this.networkId);
         TextView text = findViewById(R.id.orbsAddressTextView);
         text.setText(address.toString());
     }
