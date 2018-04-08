@@ -2,14 +2,16 @@
 
 mkdir -p build
 
-if [ ! -d "build/${PLATFORM}/libgpg-error" ] ; then
+PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
+
+if [ ! -d "build/${PLATFORM_PREFIX}/libgpg-error" ] ; then
     pushd deps/libgpg-error
     ./download.sh
     ./build.sh
     popd
 fi
 
-if [ ! -d "build/${PLATFORM}/libgcrypt/" ] ; then
+if [ ! -d "build/${PLATFORM_PREFIX}/libgcrypt/" ] ; then
     pushd deps/libgcrypt
     ./download.sh
     ./build.sh
