@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include "exports.h"
@@ -16,6 +17,7 @@ public:
     // Generates new public key pair using the ED25519 curve.
     explicit ED25519Key();
     explicit ED25519Key(const std::vector<uint8_t> &publicKey);
+    explicit ED25519Key(const std::string &publicKey);
     virtual ~ED25519Key();
 
     // Exports the public key.
@@ -25,6 +27,8 @@ public:
     ED25519Key(const ED25519Key &other) = delete;
 
 private:
+    void Init(const std::vector<uint8_t> &publicKey);
+
     // Verifies public key pair and throws on error.
     static void VerifyKeyPair(key_t key);
 

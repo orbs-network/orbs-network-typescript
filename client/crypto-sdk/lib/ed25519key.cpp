@@ -1,7 +1,6 @@
 #include "ed25519key.h"
 
 #include <stdexcept>
-#include <string>
 
 #include <gcrypt.h>
 
@@ -67,6 +66,14 @@ ED25519Key::ED25519Key() : key_(nullptr) {
 }
 
 ED25519Key::ED25519Key(const vector<uint8_t> &publicKey) : key_(nullptr) {
+    Init(publicKey);
+}
+
+ED25519Key::ED25519Key(const string &publicKey) : key_(nullptr) {
+    Init(Utils::Hex2Vec(publicKey));
+}
+
+void ED25519Key::Init(const vector<uint8_t> &publicKey) {
     if (CryptoSDK::isFIPSMode()) {
         throw runtime_error("ED25519Key is currently not suppored in FIPS mode!");
     }
