@@ -1940,7 +1940,7 @@ optjs@~3.2.2:
     mali "^0.7.1"
     mkdirp "^0.5.1"
     orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
-    protobufjs "^6.8.4"
+    protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"
     uncaught-exception "^6.0.2"
@@ -2140,7 +2140,7 @@ protobufjs@^5.0.0:
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protobufjs@^6.8.4:
+protobufjs@^6.8.6:
   version "6.8.6"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.8.6.tgz#ce3cf4fff9625b62966c455fc4c15e4331a11ca2"
   dependencies:

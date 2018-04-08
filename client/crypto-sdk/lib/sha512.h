@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
+#include "exports.h"
+
 namespace Orbs {
 
-class SHA512 {
+class CRYPTO_EXPORT SHA512 {
 public:
     static void Hash(const std::vector<uint8_t> &data, std::vector<uint8_t> &res);
     static void Hash(const std::vector<uint8_t> &data, std::string &res);

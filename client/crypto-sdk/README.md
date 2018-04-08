@@ -12,7 +12,7 @@ In order to implement some of the functionality, we have elected to use libgcryp
 
 ### Build System
 
-Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`.
+Complete cmake setup to build both the crypto-sdk library and its tests (support for both release and debug builds). Prerequisites are defined as `ExternalProject` with either specific git tag clone (`gtest`, and `gmock`) or downloaded from URL with SHA256 verification (`libgpg_error`, and `libgcrypt`).
 
 ## Address Scheme
 
@@ -98,8 +98,8 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
   * Source: [https://github.com/google/googletest.git](https://github.com/google/googletest.git)
   * Version: `release-1.8.0` git tag.
 * Libgpg-error (`libgpg_error`): Libgpg-error is a small library that originally defined common error values for all GnuPG components.
-  * Source: [https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.27.tar.bz2)
-  * Version: 1.27.
+  * Source: [https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.28.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.28.tar.bz2)
+  * Version: 1.28.
 * Libgcrypt (`libgcrypt`): Libgcrypt is a general purpose cryptographic library originally based on code from GnuPG.
   * Source: [https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2](https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.2.tar.bz2)
   * Version: 1.8.2.
@@ -107,6 +107,7 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 ## Prerequisites
 
 1. [CMake](https://cmake.org)
+2. [Xcode](https://developer.apple.com/xcode/) + iPhone Simulator (64bit)
 
 ```bash
 brew install cmake
@@ -132,6 +133,22 @@ DEBUG=1 ./build.sh
 
 ```bash
 ./clean.sh
+```
+
+### Building for iOS
+
+The following iOS builds are currently supported:
+
+1. iPhone Simulator 64bit.
+2. iOS 64bit.
+
+> In order to build for iOS, you'd need to provide the `PLATFORM=IOS` environment variable. Please note that:
+> 1. You'd need to have both **Xcode** and **iPhone Simulator** installed.
+> 2. You'd need to run `./clean.sh` before switching to build for another architecture.
+
+
+```bash
+PLATFORM=IOS ./build.sh
 ```
 
 ## Test

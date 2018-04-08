@@ -4,11 +4,12 @@
 #include <string>
 #include <vector>
 
+#include "exports.h"
 #include "ed25519key.h"
 
 namespace Orbs {
 
-class Address {
+class CRYPTO_EXPORT Address {
 public:
     static const uint8_t MAIN_NETWORK_ID;
     static const uint8_t TEST_NETWORK_ID;
