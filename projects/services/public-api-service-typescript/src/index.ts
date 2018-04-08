@@ -3,6 +3,7 @@ import * as path from "path";
 import { ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers, logger } from "orbs-core-library";
 
 import PublicApiService from "./service";
+import PublicApiHTTPService from "./http-service";
 
 const { NODE_NAME, VALIDATE_SUBSCRIPTION } = process.env;
 
@@ -23,3 +24,4 @@ const nodeConfig = {
 };
 
 ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);
+

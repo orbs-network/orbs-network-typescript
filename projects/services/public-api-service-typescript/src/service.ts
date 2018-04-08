@@ -6,7 +6,7 @@ import { Service, ServiceConfig } from "orbs-core-library";
 import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
 import { PublicApi } from "orbs-core-library";
 
-class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
+export class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
   private validate: boolean;
 
   constructor(validate: boolean) {
@@ -20,6 +20,7 @@ class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
 
 export interface PublicApiServiceConfig extends ServiceConfig {
   validateSubscription: boolean;
+  httpPort: number;
 }
 
 export default class PublicApiService extends Service {
