@@ -142,36 +142,36 @@ case ${PLATFORM} in
 
         # Build for armv7a.
         TARGET_ARCH="armv7-a"
-        CFLAGS="-Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=${TARGET_ARCH}"
         ARCH="arm"
         HOST_COMPILER="arm-linux-androideabi"
+        export CFLAGS="-Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=${TARGET_ARCH}"
         build_android
 
         # Build for armv8-a.
         TARGET_ARCH="armv8-a"
-        CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="arm64"
         HOST_COMPILER="aarch64-linux-android"
         NDK_PLATFORM="android-21"
         NDK_PLATFORM_COMPAT="android-21"
+        export CFLAGS="-Os -march=${TARGET_ARCH}"
         build_android
 
         # Build for x86.
         TARGET_ARCH="i686"
-        CFLAGS="-Os -march=${TARGET_ARCH} -DIMPLEMENT_STPCPY"
         ARCH="x86"
         HOST_COMPILER="i686-linux-android"
         NDK_PLATFORM="android-21"
         NDK_PLATFORM_COMPAT="android-21"
+        export CFLAGS="-Os -march=${TARGET_ARCH} -DIMPLEMENT_STPCPY"
         build_android
 
         # Build for x86_64.
         TARGET_ARCH="westmere"
-        CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="x86_64"
         HOST_COMPILER="x86_64-linux-android"
         NDK_PLATFORM="android-21"
         NDK_PLATFORM_COMPAT="android-21"
+        export CFLAGS="-Os -march=${TARGET_ARCH}"
         build_android
 
         ;;
