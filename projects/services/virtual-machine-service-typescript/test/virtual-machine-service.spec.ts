@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import * as getPort from "get-port";
 
 import { types, grpc, GRPCServerBuilder, Service, ServiceConfig } from "orbs-core-library";
-import VirtualMachineServer from "../src/server";
+import virtualMachineServer from "../src/server";
 
 const { expect } = chai;
 
@@ -53,7 +53,7 @@ describe("vm service tests", () => {
       const stubStorageServiceConfig = {nodeName: NODE_NAME};
       const stubStorageState = { "balances.account1": "10", "balances.account2": "0" };
 
-      server = VirtualMachineServer(topology, vmEnv)
+      server = virtualMachineServer(topology, vmEnv)
         .withService("StateStorage", new StubStorageServer(stubStorageServiceConfig, stubStorageState))
         .onEndpoint(endpoint);
       server.start();

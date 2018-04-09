@@ -12,7 +12,7 @@ function parseContractList(smartContractsToLoad: string) {
     }
   }
 
-export default function VirtualMachineServer(nodeTopology: any, env: any) {
+export default function(nodeTopology: any, env: any) {
     const { NODE_NAME, SMART_CONTRACTS_TO_LOAD } = env;
 
     if (!NODE_NAME) {
