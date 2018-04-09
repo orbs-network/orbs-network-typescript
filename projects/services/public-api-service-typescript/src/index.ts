@@ -22,4 +22,4 @@ const nodeConfig = {
   validateSubscription
 };
 
-ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);
+ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, nodeConfig), nodeTopology.endpoint);

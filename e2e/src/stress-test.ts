@@ -1,10 +1,11 @@
-import { OrbsClientSession, OrbsContractAdapter } from "orbs-client-sdk";
+import { OrbsClient, OrbsContractAdapter } from "orbs-client-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
 import * as chai from "chai";
 import ChaiBarsPlugin from "./chai-bars-plugin";
 import * as _ from "lodash";
+import { Address } from "orbs-crypto-sdk";
 
 const expect = chai.expect;
 
@@ -13,9 +14,10 @@ chai.use(ChaiBarsPlugin);
 const testConfig = loadDefaultTestConfig();
 
 async function aFooBarAccountWith(input: { senderAddress: string, amountOfBars: number }) {
-  const orbsSession = new OrbsClientSession(input.senderAddress, testConfig.subscriptionKey, testConfig.publicApiClient);
+  const orbsSession = new OrbsClient(input.senderAddress);
+  orbsSession.connectToGrpcNode(testConfig.grpcEndpoint);
   const contractAdapter = new OrbsContractAdapter(orbsSession, "foobar");
-  const account = new FooBarAccount(input.senderAddress, contractAdapter);
+  const account = new FooBarAccount(input.senderAddress.toString(), contractAdapter);
 
   await account.initBalance(input.amountOfBars);
 

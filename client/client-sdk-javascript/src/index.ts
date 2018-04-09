@@ -1,3 +1,2 @@
-export { OrbsClientSession } from "./orbs-client";
-export { initPublicApiClient } from "./public-api-client";
+export { OrbsClient } from "./orbs-client";
 export { OrbsContractAdapter } from "./orbs-contract-adapter";

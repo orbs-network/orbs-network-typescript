@@ -48,10 +48,7 @@ export class OrbsClientSession {
     const signedTransaction = this.generateTransaction(contractAddress, payload);
 
     const res = await this.orbsClient.sendTransaction({
-      transaction: signedTransaction,
-      transactionSubscriptionAppendix: {
-        subscriptionKey: this.subscriptionKey
-      }
+      transaction: signedTransaction
     });
     await delay(this.timeout);
     return res;
