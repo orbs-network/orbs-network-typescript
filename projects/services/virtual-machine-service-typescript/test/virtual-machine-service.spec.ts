@@ -1,82 +1,77 @@
 import * as chai from "chai";
 import * as mocha from "mocha";
-import { types, VirtualMachine, grpc, grpcServer, GRPCServerBuilder } from "orbs-core-library";
-import { CallContractOutput } from "orbs-interfaces";
 import * as _ from "lodash";
-import VirtualMachineService from "../src/service";
 import * as getPort from "get-port";
 
+import { types, grpc, GRPCServerBuilder, Service, ServiceConfig } from "orbs-core-library";
+import VirtualMachineServer from "../src/server";
 
 const { expect } = chai;
 
+class StubStorageServer extends Service implements types.StateStorageServer {
+  state: { [id: string]: string };
 
-// just validates the address (sender name) and nothing else
-class StubStorageClient implements types.StateStorageClient {
-    keyMap: { [id: string]: string };
-    contractAddress: types.ContractAddress;
-
-    constructor(opts: { contractAddress: types.ContractAddress, keyMap: { [id: string]: string } }) {
-      this.contractAddress = opts.contractAddress;
-      this.keyMap = opts.keyMap;
-    }
-
-    readKeys(input: types.ReadKeysInput): types.ReadKeysOutput {
-      if (input.contractAddress.address != this.contractAddress.address) {
-        throw new Error(`State storage supports only a single contract ${this.contractAddress} != ${input.contractAddress}`);
-      }
-      return { values: _.pick(this.keyMap, input.keys) };
-    }
+  constructor(nodeConfig: ServiceConfig, keyMap: { [id: string]: string }) {
+    super(nodeConfig);
+    this.state = keyMap;
   }
 
+  initialize(): Promise<void> {
+    return Promise.resolve();
+  }
+  shutdown(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  @Service.RPCMethod
+  readKeys(rpc: types.ReadKeysContext): void {
+    rpc.res = { values: _.pick(this.state, rpc.req.keys)};
+  }
+}
 
 describe("vm service tests", () => {
-    let virtualMachine: VirtualMachine;
-    let stateStorage: StubStorageClient;
+    let server: GRPCServerBuilder;
+    let endpoint: string;
 
-    const senderAddress: types.UniversalAddress = {
+    before(async () => {
+      endpoint = `127.0.0.1:${await getPort()}`;
+
+      const topology =  {
+                  peers: [
+                    {
+                      service: "storage",
+                      endpoint,
+                    },
+                  ],
+                };
+
+      const SMART_CONTRACTS_TO_LOAD = JSON.stringify([{address: "peon", filename: "foobar-smart-contract"}]);
+      const NODE_NAME = "tester";
+      const vmEnv = { NODE_NAME, SMART_CONTRACTS_TO_LOAD };
+      const stubStorageServiceConfig = {nodeName: NODE_NAME};
+      const stubStorageState = { "balances.account1": "10", "balances.account2": "0" };
+
+      server = VirtualMachineServer(topology, vmEnv)
+        .withService("StateStorage", new StubStorageServer(stubStorageServiceConfig, stubStorageState))
+        .onEndpoint(endpoint);
+      server.start();
+    });
+
+    it("should-load-contract-from-service", async () => {
+      const senderAddress: types.UniversalAddress = {
         id: new Buffer("account1"),
         scheme: 0,
         checksum: 0,
         networkId: 0
       };
 
-    const payload = JSON.stringify({
-      method: "getMyBalance",
-      args: []
-    });
-
-    const nodeConfig = { nodeName: "tester" };
-
-    let service: VirtualMachineService;
-    let server: GRPCServerBuilder;
-    let endpoint: string;
-
-    beforeEach(async () => {
-      endpoint = `127.0.0.1:${await getPort()}`;
-
-      stateStorage = new StubStorageClient({
-        contractAddress: {address: "peon" },
-        keyMap: { "balances.account1": "10", "balances.account2": "0" }
+      const payload = JSON.stringify({
+        method: "getMyBalance",
+        args: []
       });
 
-      const contractRegistryConfig = {
-        contracts: [
-          {address: "peon", filename: "foobar-smart-contract"}
-        ]
-      };
-
-      virtualMachine = new VirtualMachine(contractRegistryConfig, stateStorage);
-      service = new VirtualMachineService(virtualMachine,  { nodeName: "tester" });
-      server = grpcServer.builder()
-        .withService("VirtualMachine", service)
-        .onEndpoint(endpoint);
-      server.start();
-    });
-
-    it("should-load-contract-from-service", async () => {
-      let result: CallContractOutput;
       const client = grpc.virtualMachineClient({ endpoint });
-      result = await client.callContract({
+      const result = await client.callContract({
           sender: senderAddress,
           contractAddress: {address: "peon"},
           payload: payload  // if payload is not a json string this ends poorly
@@ -85,7 +80,7 @@ describe("vm service tests", () => {
       expect(result.resultJson).to.equal("10");
     });
 
-    afterEach(async () => {
+    after(async () => {
       server.stop();
     });
 });
