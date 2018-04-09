@@ -1,8 +1,6 @@
 import * as chai from "chai";
 import * as mocha from "mocha";
-// import { VirtualMachine } from "../../../libs/core-library-typescript/src/virtual-machine";
-// import { types } from "../../../libs/core-library-typescript/src/common-library/types";
-import { types, VirtualMachine, ServiceRunner, grpc, GRPCRuntime } from "orbs-core-library";
+import { types, VirtualMachine, grpc, grpcServer, GRPCServerBuilder } from "orbs-core-library";
 import { CallContractOutput } from "orbs-interfaces";
 import * as _ from "lodash";
 import VirtualMachineService from "../src/service";
@@ -47,8 +45,10 @@ describe("vm service tests", () => {
       args: []
     });
 
+    const nodeConfig = { nodeName: "tester" };
+
     let service: VirtualMachineService;
-    let server: GRPCRuntime;
+    let server: GRPCServerBuilder;
     let endpoint: string;
 
     beforeEach(async () => {
@@ -67,7 +67,10 @@ describe("vm service tests", () => {
 
       virtualMachine = new VirtualMachine(contractRegistryConfig, stateStorage);
       service = new VirtualMachineService(virtualMachine,  { nodeName: "tester" });
-      server = await ServiceRunner.run(grpc.virtualMachineServer, service, endpoint);
+      server = grpcServer.builder()
+        .withService("VirtualMachine", service)
+        .onEndpoint(endpoint);
+      server.start();
     });
 
     it("should-load-contract-from-service", async () => {
@@ -83,6 +86,6 @@ describe("vm service tests", () => {
     });
 
     afterEach(async () => {
-      ServiceRunner.stop(server);
+      server.stop();
     });
 });
