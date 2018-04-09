@@ -2,14 +2,18 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service, ServiceConfig } from "orbs-core-library";
+import { Service, ServiceConfig, JsonBuffer } from "orbs-core-library";
 import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
 import { PublicApiServiceConfig, ConstantTransactionHandlerConfig } from "./service";
 import { PublicApi } from "orbs-core-library";
 import * as express from "express";
 import { Server } from "http";
+import * as bodyParser from "body-parser";
 
-
+export interface PublicApiHTTPServiceConfig extends ServiceConfig {
+  validateSubscription: boolean;
+  httpPort: number;
+}
 
 export default class PublicApiHTTPService extends Service {
   private publicApi: PublicApi;
@@ -19,7 +23,7 @@ export default class PublicApiHTTPService extends Service {
 
   public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.transactionHandler = new TransactionHandler(transactionPool, subscriptionManager, new ConstantTransactionHandlerConfig((<PublicApiServiceConfig>serviceConfig).validateSubscription));
+    this.transactionHandler = new TransactionHandler(transactionPool, subscriptionManager, new ConstantTransactionHandlerConfig((<PublicApiHTTPServiceConfig>serviceConfig).validateSubscription));
 
     this.publicApi = new PublicApi(this.transactionHandler, virtualMachine);
   }
@@ -34,12 +38,14 @@ export default class PublicApiHTTPService extends Service {
 
   private initializeApp() {
     this.app = express();
-    this.app.use(express.json());
+    this.app.use(bodyParser.raw({ type: "*/*" }));
 
     this.app.use("/public/sendTransaction", this.getHTTPSendTransactionRequestHandler());
     this.app.use("/public/callContract", this.getHTTPCallContractRequestHandler());
 
-    this.server = this.app.listen((<PublicApiServiceConfig>this.config).httpPort);
+    const { httpPort } = (<PublicApiHTTPServiceConfig>this.config);
+    this.server = this.app.listen(httpPort);
+    logger.info(`Started HTTP public api on port ${httpPort}`);
   }
 
   private shutdownApp() {
@@ -48,22 +54,24 @@ export default class PublicApiHTTPService extends Service {
 
   private getHTTPSendTransactionRequestHandler(): express.RequestHandler {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const body = JsonBuffer.parseJsonWithBuffers(req.body);
+
       const input: types.SendTransactionInput = {
         transaction: {
           header: {
-            version: _.get(req.body, "transaction.header.version"),
-            sender: _.get(req.body, "transaction.header.sender"),
-            timestamp: _.get(req.body, "transaction.header.timestamp")
+            version: _.get(body, "transaction.header.version"),
+            sender: _.get(body, "transaction.header.sender"),
+            timestamp: _.get(body, "transaction.header.timestamp")
           },
           body: {
             contractAddress: {
-              address: _.get(req.body, "transaction.body.contractAddress")
+              address: _.get(body, "transaction.body.contractAddress.address")
             },
-            payload: _.get(req.body, "transaction.body.payload")
+            payload: _.get(body, "transaction.body.payload")
           }
         },
         transactionSubscriptionAppendix: {
-          subscriptionKey: _.get(req.body, "transactionSubscriptionAppendix.subscriptionKey")
+          subscriptionKey: _.get(body, "transactionSubscriptionAppendix.subscriptionKey")
         }
       };
 
@@ -74,10 +82,12 @@ export default class PublicApiHTTPService extends Service {
 
   private getHTTPCallContractRequestHandler(): express.RequestHandler {
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const body = JsonBuffer.parseJsonWithBuffers(req.body);
+
       const input: types.CallContractInput = {
-        contractAddress: req.body.contractAddress,
-        payload: req.body.payload,
-        sender: req.body.sender
+        contractAddress: body.contractAddress,
+        payload: body.payload,
+        sender: body.sender
       };
 
       const result = await this.publicApi.callContract(input);

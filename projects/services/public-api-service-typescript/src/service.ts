@@ -20,7 +20,6 @@ export class ConstantTransactionHandlerConfig implements TransactionHandlerConfi
 
 export interface PublicApiServiceConfig extends ServiceConfig {
   validateSubscription: boolean;
-  httpPort: number;
 }
 
 export default class PublicApiService extends Service {

@@ -25,3 +25,11 @@ const nodeConfig = {
 
 ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig), nodeTopology.endpoint);
 
+const httpNodeConfig = {
+  nodeName: NODE_NAME,
+  validateSubscription,
+  httpPort: 80
+};
+
+const httpService = new PublicApiHTTPService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig);
+httpService.start();
