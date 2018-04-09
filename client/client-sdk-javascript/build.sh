@@ -6,4 +6,6 @@ yarn install
 
 yarn run build
 
+yarn test
+
 yarn link

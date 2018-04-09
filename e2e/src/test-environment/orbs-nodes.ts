@@ -3,7 +3,6 @@ import * as path from "path";
 import TestComponent from "./test-component";
 import TestSubnet from "./test-subnet";
 import { delay } from "bluebird";
-import { initPublicApiClient } from "orbs-client-sdk";
 
 
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
@@ -46,9 +45,9 @@ export class OrbsNode implements TestComponent {
     await this.runDockerCompose("down");
   }
 
-  public getPublicApiClient(accessFromHost: boolean) {
+  public getGrpcEndpoint(accessFromHost: boolean): string {
     const endpoint = accessFromHost ? `0.0.0.0:${this.config.publicApiHostPort}` : `${this.config.nodePublicApiIp}:51151`;
-    return initPublicApiClient({ endpoint });
+    return endpoint;
   }
 
   public setEthereumSubscriptionContractAddress(contractAddress: string) {
@@ -126,8 +125,8 @@ export class OrbsNodeCluster implements TestComponent {
     return nodes;
   }
 
-  public getAvailableClients(accessFromHost: boolean) {
-    return this.nodes.map(node => node.getPublicApiClient(accessFromHost));
+  public getAvailableGrpcEndpoints(accessFromHost: boolean) {
+    return this.nodes.map(node => node.getGrpcEndpoint(accessFromHost));
   }
 
   public async start() {

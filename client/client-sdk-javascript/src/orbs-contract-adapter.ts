@@ -1,14 +1,14 @@
-import { OrbsClientSession } from ".";
+import { OrbsClient } from "./orbs-client";
 import { SendTransactionOutput } from "orbs-interfaces";
 
 export type OrbsContractMethodArgs = [string | number] | any[];
 
 export class OrbsContractAdapter {
-  orbsSession: OrbsClientSession;
+  orbsClient: OrbsClient;
   contractAddress: string;
 
-  constructor(orbsSession: OrbsClientSession, contractAddress: string) {
-    this.orbsSession = orbsSession;
+  constructor(orbsClient: OrbsClient, contractAddress: string) {
+    this.orbsClient = orbsClient;
     this.contractAddress = contractAddress;
   }
 
@@ -17,7 +17,7 @@ export class OrbsContractAdapter {
       method: methodName,
       args: args
     });
-    return await this.orbsSession.sendTransaction(this.contractAddress, payload);
+    return await this.orbsClient.sendTransaction(this.contractAddress, payload);
   }
 
   public async call(methodName: string, args: OrbsContractMethodArgs) {
@@ -25,6 +25,6 @@ export class OrbsContractAdapter {
       method: methodName,
       args: args
     });
-    return this.orbsSession.call(this.contractAddress, payload);
+    return this.orbsClient.call(this.contractAddress, payload);
   }
 }

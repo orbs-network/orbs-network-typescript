@@ -3,7 +3,7 @@ import * as _ from "lodash";
 import * as crypto from "crypto";
 import { Address, ED25519Key } from "orbs-crypto-sdk";
 
-import { OrbsClientSession, OrbsContractAdapter } from "orbs-client-sdk";
+import { OrbsClient, OrbsContractAdapter } from "orbs-client-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
@@ -26,9 +26,10 @@ const testConfig = loadDefaultTestConfig();
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const senderAddress = generateAddress();
-  const orbsSession = new OrbsClientSession(senderAddress, testConfig.subscriptionKey, testConfig.publicApiClient);
-  const contractAdapter = new OrbsContractAdapter(orbsSession, "foobar");
-  const account = new FooBarAccount(senderAddress, contractAdapter);
+  const orbsClient = new OrbsClient(senderAddress);
+  orbsClient.connectToGrpcNode(testConfig.grpcEndpoint);
+  const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
+  const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
 
   await account.initBalance(input.amountOfBars);
 
@@ -37,9 +38,10 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 
 async function aTextMessageAccount() {
   const senderAddress = generateAddress();
-  const orbsSession = new OrbsClientSession(senderAddress, testConfig.subscriptionKey, testConfig.publicApiClient);
-  const contractAdapter = new OrbsContractAdapter(orbsSession, "text-message");
-  const account = new TextMessageAccount(senderAddress, contractAdapter);
+  const orbsClient = new OrbsClient(senderAddress);
+  orbsClient.connectToGrpcNode(testConfig.grpcEndpoint);
+  const contractAdapter = new OrbsContractAdapter(orbsClient, "text-message");
+  const account = new TextMessageAccount(senderAddress.toString(), contractAdapter);
 
   return account;
 }
