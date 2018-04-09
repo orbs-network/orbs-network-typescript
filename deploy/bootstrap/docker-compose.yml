@@ -42,6 +42,7 @@ services:
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/public-api.js
     ports:
       - 51151:51151
+      - 80:80
     env_file:
       - .env
       - .env-secrets
