@@ -154,6 +154,6 @@ describe("test virtual machine", () => {
       payload: invalidPayload
     });
 
-    expect(result).to.be.ok;
+    expect(result).to.equal("invalid payload received");
   });
 });
