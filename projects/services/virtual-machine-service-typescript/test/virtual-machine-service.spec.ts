@@ -23,6 +23,8 @@ class StubStorageServer extends Service implements types.StateStorageServer {
     return Promise.resolve();
   }
 
+  // if you get a decorator error here from VSC open the settings (cmd+,) and add "javascript.implicitProjectConfig.experimentalDecorators": true
+  // either way it should not affect compilation because of the tsconfig.test.json
   @Service.RPCMethod
   readKeys(rpc: types.ReadKeysContext): void {
     rpc.res = { values: _.pick(this.state, rpc.req.keys)};
@@ -57,7 +59,7 @@ describe("vm service tests", () => {
       server.start();
     });
 
-    it("should-load-contract-from-service", async () => {
+    it("should load contract from service", async () => {
       const senderAddress: types.UniversalAddress = {
         id: new Buffer("account1"),
         scheme: 0,
