@@ -9,11 +9,19 @@ import {
 import BaseSmartContract from "./base-smart-contact";
 import { HardCodedSmartContractRegistry } from "./hard-coded-smart-contract-registry";
 
+// TODO: move to types and force the CallRequest to have that kind of payload?
+export interface CallPayload {
+  method: string;
+  args: [number | string] | any[];
+}
+
 export interface CallRequest {
   sender: types.UniversalAddress;
   payload: string;
   contractAddress: types.ContractAddress;
 }
+
+
 
 export default class HardCodedSmartContractProcessor {
   stateStorageClient: types.StateStorageClient;
@@ -52,8 +60,14 @@ export default class HardCodedSmartContractProcessor {
     }
     const contract = new Contract.default(request.sender.id, stateAdapter);
 
-    const { method, args } = JSON.parse(request.payload);
+    let parsedPayload: CallPayload;
+    try {
+      parsedPayload = JSON.parse(request.payload);
+    } catch (err) {
+      // TODO: should log as info that an invalid payload is caught (and as a metric)
+      return "invalid payload received";
+    }
 
-    return contract[method](...args);
+    return contract[parsedPayload.method](...parsedPayload.args);
   }
 }

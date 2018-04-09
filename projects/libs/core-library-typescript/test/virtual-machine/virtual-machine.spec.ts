@@ -11,6 +11,7 @@ import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-code
 chai.use(cap);
 chai.use(cs);
 const expect = chai.expect;
+const should = chai.should();
 
 class StubStorageClient implements types.StateStorageClient {
   keyMap: { [id: string]: string };
@@ -53,6 +54,13 @@ function aTransactionEntry(builder: { from: string, to: string, amount: number }
 describe("test virtual machine", () => {
   let virtualMachine: VirtualMachine;
   let stateStorage: StubStorageClient;
+
+  const senderAddress: types.UniversalAddress = {
+    id: new Buffer("account1"),
+    scheme: 0,
+    checksum: 0,
+    networkId: 0
+  };
 
   beforeEach(() => {
     stateStorage = new StubStorageClient({
@@ -120,5 +128,32 @@ describe("test virtual machine", () => {
     stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
     stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
     stateDiff.find(item => item.key === "balances.account3").should.have.property("value", "2");
+  });
+
+  it("calls a smart contract", async () => {
+    const validPayload = JSON.stringify({
+      method: "getMyBalance",
+      args: []
+    });
+
+    const result = await virtualMachine.callContract({
+      sender: senderAddress,
+      contractAddress: {address: "foobar"},
+      payload: validPayload
+    });
+
+    expect(result).to.equal(10);
+  });
+
+  it("calls a smart contract with an invalid payload - should not panic", async () => {
+    const invalidPayload = "kuku";
+
+    const result = await virtualMachine.callContract({
+      sender: senderAddress,
+      contractAddress: {address: "foobar"},
+      payload: invalidPayload
+    });
+
+    expect(result).to.be.ok;
   });
 });
