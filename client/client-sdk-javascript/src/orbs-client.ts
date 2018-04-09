@@ -7,10 +7,12 @@ import { createConnection } from "./grpc-connection";
 export class OrbsClient {
   private connection: PublicApiConnection;
   private senderAddress: string;
+  private sendTransactionTimeoutMs: number;
 
-  constructor(senderAddress?: string, connection?: PublicApiConnection) {
+  constructor(senderAddress?: string, connection?: PublicApiConnection, sendTransactionTimeoutMs = 5000) {
     this.senderAddress = senderAddress;
     this.setConnection(connection);
+    this.sendTransactionTimeoutMs = sendTransactionTimeoutMs;
   }
 
   async sendTransaction(contractAddress: string, payload: string): Promise<SendTransactionOutput> {
@@ -21,7 +23,7 @@ export class OrbsClient {
     const transaction = this.generateTransaction(contractAddress, payload);
 
     const res = await this.connection.sendTransaction({ transaction });
-    await delay(10000);
+    await delay(this.sendTransactionTimeoutMs);
     return res;
   }
 
