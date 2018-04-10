@@ -17,6 +17,7 @@ export interface OrbsNodeConfig {
   privateSubnet: string;
   forceRecreate?: boolean;
   publicApiHostPort: number;
+  publicApiHostHTTPPort: number;
   sidechainConnectorPublicIp: string;
   gossipPeers: string[];
   ethereumNodeHttpAddress: string;
@@ -72,6 +73,7 @@ export class OrbsNode implements TestComponent {
             PUBLIC_API_IP: this.config.nodePublicApiIp,
             GOSSIP_PEERS: this.config.gossipPeers,
             PUBLIC_API_HOST_PORT: this.config.publicApiHostPort,
+            PUBLIC_API_HOST_HTTP_PORT: this.config.publicApiHostHTTPPort,
             SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
             SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
             SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS: this.config.ethereumSubscriptionContractAddress,
@@ -119,6 +121,7 @@ export class OrbsNodeCluster implements TestComponent {
         sidechainConnectorPublicIp: this.config.publicApiNetwork.allocateAddress(),
         ethereumNodeHttpAddress: this.config.ethereumNodeHttpAddress,
         publicApiHostPort: 20000 + i,
+        publicApiHostHTTPPort: 30000 + i,
         debugPort: 9229 + i
       }));
     }

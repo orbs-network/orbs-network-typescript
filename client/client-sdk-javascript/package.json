@@ -12,21 +12,25 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "orbs-crypto-sdk": "file:../crypto-sdk-javascript",
     "orbs-interfaces": "file:../../projects/architecture",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "request": "^2.85.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
     "@types/chai": "^4.1.2",
     "@types/mocha": "^5.0.0",
+    "@types/nock": "^9.1.3",
     "@types/node": "^9.6.2",
+    "@types/request-promise": "^4.1.41",
     "@types/sinon": "^4.3.1",
     "@types/sinon-chai": "^2.7.29",
     "chai": "^4.1.2",
     "crypto": "^1.0.1",
     "mocha": "^5.0.5",
+    "nock": "^9.2.4",
     "sinon": "^4.5.0",
     "sinon-chai": "^3.0.0",
     "ts-sinon": "^1.0.12",
