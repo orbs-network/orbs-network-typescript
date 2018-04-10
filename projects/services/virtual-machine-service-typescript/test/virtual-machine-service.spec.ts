@@ -24,7 +24,7 @@ class StubStorageServer extends Service implements types.StateStorageServer {
     return Promise.resolve();
   }
 
-  setState(keyMap: { [id: string]: string }) {
+  givenState(keyMap: { [id: string]: string }) {
     this.state = keyMap;
   }
 
@@ -89,7 +89,7 @@ describe("vm service tests", () => {
     });
 
     it("should load contract from service", async () => {
-      storageServer.setState({ "balances.account1": "10", "balances.account2": "0" });
+      storageServer.givenState({ "balances.account1": "10", "balances.account2": "0" });
       const result = await client.callContract(buildCallRequest("account1", "peon"));
       expect(result.resultJson).to.equal("10");
     });

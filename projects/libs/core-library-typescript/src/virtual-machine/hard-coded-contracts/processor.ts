@@ -57,7 +57,7 @@ export default class HardCodedSmartContractProcessor {
     try {
       return JSON.parse(payload);
     } catch (err) {
-      throw new Error("Unable to parse the method payload. Payload was: " + payload + " Error was: " + err);
+      throw new Error(`Unable to parse the method payload. Payload was: ${payload} Error was: ${err}`);
     }
   }
 
@@ -67,9 +67,9 @@ export default class HardCodedSmartContractProcessor {
       throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
     }
 
-    const parsedPayload = this.parsePayload(request.payload);
+    const { method, args } = this.parsePayload(request.payload);
     const contract = new Contract.default(request.sender.id, stateAdapter);
 
-    return contract[parsedPayload.method](...parsedPayload.args);
+    return contract[method](...args);
   }
 }

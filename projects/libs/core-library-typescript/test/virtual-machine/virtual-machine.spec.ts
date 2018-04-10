@@ -11,7 +11,6 @@ import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-code
 chai.use(cap);
 chai.use(cs);
 const expect = chai.expect;
-const should = chai.should();
 
 class StubStorageClient implements types.StateStorageClient {
   keyMap: { [id: string]: string };
@@ -134,13 +133,13 @@ describe("test virtual machine", () => {
         aTransactionEntry({ from: "account1", to: "account3", amount: 2 })  // account1 = 1, account2 = 7, account3 = 2
       ]
     });
-    stateDiff.should.have.lengthOf(3);
+    expect(stateDiff).to.have.lengthOf(3);
     for (const item of stateDiff) {
-      item.should.have.property("contractAddress").eql({address: "foobar"});
+      expect(item).to.have.property("contractAddress").eql({address: "foobar"});
     }
-    stateDiff.find(item => item.key === "balances.account1").should.have.property("value", "1");
-    stateDiff.find(item => item.key === "balances.account2").should.have.property("value", "7");
-    stateDiff.find(item => item.key === "balances.account3").should.have.property("value", "2");
+    expect(stateDiff).to.containSubset([{key: "balances.account1", value: "1"}])
+      .and.containSubset([{key: "balances.account2", value: "7"}])
+      .and.containSubset([{key: "balances.account3", value: "2"}]);
   });
 
   it("calls a smart contract", async () => {
