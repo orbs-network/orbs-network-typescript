@@ -9,11 +9,19 @@ import {
 import BaseSmartContract from "./base-smart-contact";
 import { HardCodedSmartContractRegistry } from "./hard-coded-smart-contract-registry";
 
+// TODO: move to types and force the CallRequest to have that kind of payload?
+export interface CallPayload {
+  method: string;
+  args: [number | string] | any[];
+}
+
 export interface CallRequest {
   sender: types.UniversalAddress;
   payload: string;
   contractAddress: types.ContractAddress;
 }
+
+
 
 export default class HardCodedSmartContractProcessor {
   stateStorageClient: types.StateStorageClient;
@@ -45,14 +53,22 @@ export default class HardCodedSmartContractProcessor {
     return this.processMethod(request, readonlyAdapter);
   }
 
+  private parsePayload(payload: string): CallPayload {
+    try {
+      return JSON.parse(payload);
+    } catch (err) {
+      throw new Error(`Unable to parse the method payload. Payload was: ${payload} Error was: ${err}`);
+    }
+  }
+
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
     const Contract = this.registry.getContract(request.contractAddress.address);
     if (Contract == undefined) {
       throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
     }
-    const contract = new Contract.default(request.sender.id, stateAdapter);
 
-    const { method, args } = JSON.parse(request.payload);
+    const { method, args } = this.parsePayload(request.payload);
+    const contract = new Contract.default(request.sender.id, stateAdapter);
 
     return contract[method](...args);
   }

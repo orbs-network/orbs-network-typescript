@@ -1,40 +1,49 @@
 {
   "name": "orbs-client-sdk",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "orbs-client-sdk",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": "https://github.com/orbs-network/orbs-network.git",
+  "author": "Orbs Team",
   "license": "MIT",
+  "gypfile": true,
   "scripts": {
     "build": "yarn run build-ts && yarn run tslint",
-    "build-ts": "tsc -d",
+    "build-ts": "tsc",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js"
   },
-  "dependencies": {
-    "bluebird": "^3.5.1",
-    "orbs-crypto-sdk": "file:../crypto-sdk-javascript",
-    "orbs-interfaces": "file:../../projects/architecture",
-    "path": "^0.12.7",
-    "request": "^2.85.0",
-    "request-promise": "^4.2.2"
-  },
   "devDependencies": {
+    "@types/bindings": "^1.3.0",
     "@types/bluebird": "^3.5.20",
     "@types/chai": "^4.1.2",
-    "@types/mocha": "^5.0.0",
+    "@types/chai-as-promised": "^7.1.0",
+    "@types/mocha": "^2.2.47",
     "@types/nock": "^9.1.3",
-    "@types/node": "^9.6.2",
+    "@types/node": "^9.4.4",
     "@types/request-promise": "^4.1.41",
     "@types/sinon": "^4.3.1",
     "@types/sinon-chai": "^2.7.29",
+    "@types/supertest": "^2.0.4",
     "chai": "^4.1.2",
-    "crypto": "^1.0.1",
-    "mocha": "^5.0.5",
-    "nock": "^9.2.4",
+    "chai-as-promised": "^7.1.1",
+    "concurrently": "^3.5.1",
+    "mocha": "^5.0.1",
+    "nock": "^9.2.5",
+    "node-gyp": "^3.6.2",
+    "request-promise": "^4.2.2",
     "sinon": "^4.5.0",
     "sinon-chai": "^3.0.0",
-    "ts-sinon": "^1.0.12",
+    "ts-sinon": "https://github.com/orbs-network/ts-sinon",
     "tslint": "^5.9.1",
-    "typescript": "^2.8.1"
+    "typescript": "^2.7.1"
+  },
+  "dependencies": {
+    "bindings": "^1.3.0",
+    "bluebird": "^3.5.1",
+    "grpc-caller": "https://github.com/electricmonk/grpc-caller",
+    "orbs-interfaces": "file:../../projects/architecture",
+    "path": "^0.12.7"
   }
 }

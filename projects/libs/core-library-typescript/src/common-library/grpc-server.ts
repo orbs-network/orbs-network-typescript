@@ -60,6 +60,14 @@ export class GRPCServerBuilder {
     return all;
   }
 
+  stop(): Promise<any> {
+    const all = Promise.all(this.services.map(s => s.stop()));
+
+    this.mali.close(this.endpoint);
+
+    return all;
+  }
+
 }
 
 export namespace grpcServer {

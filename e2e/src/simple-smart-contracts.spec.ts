@@ -22,7 +22,7 @@ const generateAddress = (): string => {
 };
 
 const testConfig = loadDefaultTestConfig();
-const API_ENDPOINT = "http://localhost:30001";
+const API_ENDPOINT = "http://localhost:30000";
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const senderAddress = generateAddress();

@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import  * as chai from "chai";
-import { Address, ED25519Key } from "orbs-crypto-sdk";
+import { Address } from "../src/address";
+import { ED25519Key } from "../src/ed25519key";
 import { OrbsClient } from "../src";
 import PublicApiConnection from "../src/public-api-connection";
 import { stubInterface } from "ts-sinon";
