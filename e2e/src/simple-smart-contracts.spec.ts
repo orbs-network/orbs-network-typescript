@@ -1,9 +1,8 @@
 import * as chai from "chai";
 import * as _ from "lodash";
 import * as crypto from "crypto";
-import { Address, ED25519Key } from "orbs-crypto-sdk";
 
-import { OrbsClient, OrbsContractAdapter } from "orbs-client-sdk";
+import { OrbsClient, OrbsContractAdapter, Address, ED25519Key } from "orbs-client-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";

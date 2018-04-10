@@ -24,7 +24,6 @@
     "ganache-core": "^2.0.2",
     "nconf": "^0.10.0",
     "orbs-client-sdk": "file:../client/client-sdk-javascript",
-    "orbs-crypto-sdk": "file:../client/crypto-sdk-javascript",
     "orbs-interfaces": "file:../projects/architecture",
     "solc": "0.4.18",
     "underscore": "^1.8.3",
