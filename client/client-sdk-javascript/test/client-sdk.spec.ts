@@ -6,15 +6,14 @@ import PublicApiConnection from "../src/public-api-connection";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import { ContractAddress, Transaction, SendTransactionInput, CallContractInput } from "orbs-interfaces";
-import * as crypto from "crypto";
 
 chai.use(sinonChai);
 
-const publicKey = crypto.randomBytes(32).toString("hex");
+const publicKey = new ED25519Key().publicKey;
 const VIRTUAL_CHAIN_ID = "640ed3";
 const senderAddress = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
 
-describe("A client executes the connector interface with the correct inputs when", async function () {
+describe("A client calls the connector interface with the correct inputs when", async function () {
   let orbsClient: OrbsClient;
   const connection = stubInterface<PublicApiConnection>();
 
