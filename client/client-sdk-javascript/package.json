@@ -1,7 +1,7 @@
 {
-  "name": "orbs-crypto-sdk",
+  "name": "orbs-client-sdk",
   "version": "0.1.0",
-  "description": "orbs-crypto-sdk",
+  "description": "orbs-client-sdk",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "https://github.com/orbs-network/orbs-network.git",
@@ -26,10 +26,20 @@
     "concurrently": "^3.5.1",
     "mocha": "^5.0.1",
     "node-gyp": "^3.6.2",
+    "sinon": "^4.5.0",
+    "sinon-chai": "^3.0.0",
     "tslint": "^5.9.1",
-    "typescript": "^2.7.1"
+    "typescript": "^2.7.1",
+    "@types/bluebird": "^3.5.20",
+    "@types/sinon": "^4.3.1",
+    "@types/sinon-chai": "^2.7.29",
+    "ts-sinon": "https://github.com/orbs-network/ts-sinon"
   },
   "dependencies": {
-    "bindings": "^1.3.0"
+    "bindings": "^1.3.0",
+    "bluebird": "^3.5.1",
+    "grpc-caller": "https://github.com/electricmonk/grpc-caller",
+    "orbs-interfaces": "file:../../projects/architecture",
+    "path": "^0.12.7"
   }
 }

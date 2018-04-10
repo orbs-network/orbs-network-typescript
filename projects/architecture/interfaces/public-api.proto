@@ -5,7 +5,6 @@ import "call-contract.proto";
 
 message SendTransactionInput {
   Transaction transaction = 1;
-  TransactionSubscriptionAppendix transactionSubscriptionAppendix = 2;
 }
 
 message SendTransactionOutput {

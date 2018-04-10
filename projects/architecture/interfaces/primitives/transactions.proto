@@ -23,11 +23,6 @@ message TransactionSubscriptionAppendix {
   // bytes subscriptionSignature = 2; // TODO: how is it calculated?
 }
 
-message SubscriptionSignedTransaction {
-  Transaction transaction = 1;
-  TransactionSubscriptionAppendix transactionSubscriptionAppendix = 2;
-}
-
 message TransactionReceipt {
   bytes txHash = 1;
   bool success = 2; // TODO: This is just a temporary field to distinguish between successful and failed transactions

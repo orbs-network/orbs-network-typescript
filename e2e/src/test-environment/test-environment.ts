@@ -41,9 +41,9 @@ export class TestEnvironment extends TestStack {
         this.started = false;
     }
 
-    public getPublicApiClient() {
+    public discoverGrpcEndpoint(): string {
         // return a client that connects to the first node
-        return this.nodeCluster.getAvailableClients(this.config.connectFromHost)[0];
+      return this.nodeCluster.getAvailableGrpcEndpoints(this.config.connectFromHost)[0];
     }
 
     constructor(config: TestEnvironmentConfig) {
