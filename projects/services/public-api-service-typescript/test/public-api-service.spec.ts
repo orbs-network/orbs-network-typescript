@@ -59,8 +59,7 @@ describe("Public API Service - Component Test", async function () {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
     (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true, expiryTimestamp: Date.now() + 10000000});
     (<sinon.SinonStub>virtualMachine.callContract).returns({resultJson: "some-answer"});
-
-    grpcService = new PublicApiService(virtualMachine, transactionPool, subscriptionManager, {
+    service = new PublicApiService(virtualMachine, transactionPool, {
       nodeName: "tester"
     });
     grpcServer = await ServiceRunner.run(grpc.publicApiServer, grpcService, grpcEndpoint);
@@ -69,7 +68,7 @@ describe("Public API Service - Component Test", async function () {
   it("sent transaction through grpc propagates properly to the transaction pool", async () => {
     const client = grpc.publicApiClient({ endpoint: grpcEndpoint });
 
-    await client.sendTransaction({ transaction, transactionSubscriptionAppendix });
+    await client.sendTransaction({ transaction });
 
     expect(transactionPool.addNewPendingTransaction).to.have.been.calledWith({
       transaction

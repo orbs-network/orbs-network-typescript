@@ -3,20 +3,9 @@ import * as _ from "lodash";
 import { logger, types } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";
-import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
+import { TransactionHandler } from "orbs-core-library";
 import { PublicApi } from "orbs-core-library";
 
-export class ConstantTransactionHandlerConfig implements TransactionHandlerConfig {
-  private validate: boolean;
-
-  constructor(validate: boolean) {
-    this.validate = validate;
-  }
-
-  validateSubscription(): boolean {
-    return this.validate;
-  }
-}
 
 export interface PublicApiServiceConfig extends ServiceConfig {
   validateSubscription: boolean;
@@ -27,9 +16,9 @@ export default class PublicApiService extends Service {
 
   private transactionHandler: TransactionHandler;
 
-  public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
+  public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient , serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.transactionHandler = new TransactionHandler(transactionPool, subscriptionManager, new ConstantTransactionHandlerConfig((<PublicApiServiceConfig>serviceConfig).validateSubscription));
+    this.transactionHandler = new TransactionHandler(transactionPool);
 
     this.publicApi = new PublicApi(this.transactionHandler, virtualMachine);
   }

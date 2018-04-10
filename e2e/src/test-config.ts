@@ -1,13 +1,12 @@
 import { TestEnvironment } from "./test-environment";
 import { PublicApiClient } from "orbs-interfaces";
-import { initPublicApiClient } from "./public-api-client";
 import * as nconf from "nconf";
 
 nconf.env({ parseValues: true });
 
 interface TestConfig {
   testEnvironment?: TestEnvironment;
-  publicApiClient?: PublicApiClient;
+  grpcEndpoint?: string;
   subscriptionKey?: string;
   stressTest: {
     accounts: number
@@ -27,14 +26,14 @@ export function loadDefaultTestConfig(): TestConfig {
     if (!publicApiEndpoint) {
       throw new Error("E2E_PUBLIC_API_ENDPOINT must be defined in a no-deploy configuration");
     }
-    config.publicApiClient = initPublicApiClient({endpoint: publicApiEndpoint});
+    config.grpcEndpoint = publicApiEndpoint;
   } else {
     config.testEnvironment = new TestEnvironment({
       connectFromHost: nconf.get("CONNECT_FROM_HOST"),
       preExistingPublicSubnet: nconf.get("PREEXISTING_PUBLIC_SUBNET"),
       testSubscriptionKey: config.subscriptionKey
     });
-    config.publicApiClient = config.testEnvironment.getPublicApiClient();
+    config.grpcEndpoint = config.testEnvironment.discoverGrpcEndpoint();
   }
 
   return config;
