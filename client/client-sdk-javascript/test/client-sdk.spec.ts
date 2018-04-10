@@ -14,7 +14,7 @@ const publicKey = crypto.randomBytes(32).toString("hex");
 const VIRTUAL_CHAIN_ID = "640ed3";
 const senderAddress = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
 
-describe("", async function () {
+describe("A client executes the connector interface with the correct inputs when", async function () {
   let orbsClient: OrbsClient;
   const connection = stubInterface<PublicApiConnection>();
 
@@ -22,7 +22,7 @@ describe("", async function () {
     orbsClient = new OrbsClient(senderAddress.toString(), connection);
   });
 
-  it("sendTransaction ", async () => {
+  it("sendTransaction() is called", async () => {
     orbsClient.sendTransaction("contractAddress", "payload");
     expect(connection.sendTransaction).to.have.been.calledOnce;
     const { transaction } = <SendTransactionInput>((<sinon.SinonSpy>connection.sendTransaction).getCall(0).args[0]);
@@ -31,7 +31,7 @@ describe("", async function () {
     expect(transaction.header.sender.id).deep.equal(Buffer.from(senderAddress.toString()));
   });
 
-  it("callContract", async () => {
+  it("callContract() is called", async () => {
     (<sinon.SinonStub>connection.callContract).returns({ resultJson: "{}" });
     orbsClient.call("contractAddress", "payload");
     expect(connection.callContract).to.have.been.calledOnce;
