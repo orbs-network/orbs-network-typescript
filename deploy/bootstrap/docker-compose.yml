@@ -48,7 +48,6 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: public-api
-      VALIDATE_SUBSCRIPTION: 'true'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
     networks:

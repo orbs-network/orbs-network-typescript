@@ -18,7 +18,7 @@ export default class PublicApiHTTPService extends Service {
   private app: express.Express;
   private server: Server;
 
-  public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
+  public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
     this.transactionHandler = new TransactionHandler(transactionPool);
 

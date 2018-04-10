@@ -22,12 +22,11 @@ const generateAddress = (): string => {
 };
 
 const testConfig = loadDefaultTestConfig();
-const API_ENDPOINT = "http://localhost:3000";
+const API_ENDPOINT = "http://localhost:30001";
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const senderAddress = generateAddress();
   const orbsClient = new OrbsClient(API_ENDPOINT, senderAddress);
-  orbsClient.connectToGrpcNode(testConfig.grpcEndpoint);
   const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
   const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
 
@@ -39,7 +38,6 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 async function aTextMessageAccount() {
   const senderAddress = generateAddress();
   const orbsClient = new OrbsClient(API_ENDPOINT, senderAddress);
-  orbsClient.connectToGrpcNode(testConfig.grpcEndpoint);
   const contractAdapter = new OrbsContractAdapter(orbsClient, "text-message");
   const account = new TextMessageAccount(senderAddress.toString(), contractAdapter);
 

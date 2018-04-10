@@ -5,7 +5,7 @@ import { ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers, lo
 import PublicApiService from "./service";
 import PublicApiHTTPService from "./http-service";
 
-const { NODE_NAME, VALIDATE_SUBSCRIPTION } = process.env;
+const { NODE_NAME } = process.env;
 
 ErrorHandler.setup();
 
@@ -17,19 +17,16 @@ if (!NODE_NAME) {
 
 const nodeTopology = topology();
 const peers = topologyPeers(nodeTopology.peers);
-const validateSubscription = VALIDATE_SUBSCRIPTION === "true";
 const nodeConfig = {
-  nodeName: NODE_NAME,
-  validateSubscription
+  nodeName: NODE_NAME
 };
 
 ServiceRunner.run(grpc.publicApiServer, new PublicApiService(peers.virtualMachine, peers.transactionPool, nodeConfig), nodeTopology.endpoint);
 
 const httpNodeConfig = {
   nodeName: NODE_NAME,
-  validateSubscription,
   httpPort: 80
 };
 
-const httpService = new PublicApiHTTPService(peers.virtualMachine, peers.transactionPool, peers.subscriptionManager, nodeConfig);
+const httpService = new PublicApiHTTPService(peers.virtualMachine, peers.transactionPool, httpNodeConfig);
 httpService.start();
