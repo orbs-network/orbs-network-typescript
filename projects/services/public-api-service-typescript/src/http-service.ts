@@ -69,8 +69,8 @@ export default class PublicApiHTTPService extends Service {
         }
       };
 
-      const result = await this.publicApi.sendTransaction(input);
-      res.send(result);
+      await this.publicApi.sendTransaction(input);
+      res.send(200);
     };
   }
 
@@ -85,7 +85,7 @@ export default class PublicApiHTTPService extends Service {
       };
 
       const result = await this.publicApi.callContract(input);
-      res.send(result);
+      res.json({resultJson: result});
     };
   }
 }

@@ -77,8 +77,9 @@ describe("Public API Service - Component Test", async function () {
     request(httpEndpoint)
       .post("/public/callContract")
       .send(contractInput)
-      .expect(200, () => {
+      .expect(200, (err, res) => {
         expect(virtualMachine.callContract).to.have.been.calledWith(contractInput);
+        expect(res.body).to.be.eql({ resultJson: "some-answer" });
         done();
       });
   });
