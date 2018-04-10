@@ -51,16 +51,29 @@ function aTransactionEntry(builder: { from: string, to: string, amount: number }
   };
 }
 
-describe("test virtual machine", () => {
-  let virtualMachine: VirtualMachine;
-  let stateStorage: StubStorageClient;
-
+function buildCallRequest(accountName: string, contractAddress: string) {
   const senderAddress: types.UniversalAddress = {
-    id: new Buffer("account1"),
+    id: new Buffer(accountName),
     scheme: 0,
     checksum: 0,
     networkId: 0
   };
+
+  const payload = JSON.stringify({
+    method: "getMyBalance",
+    args: []
+  });
+
+  return {
+    sender: senderAddress,
+    contractAddress: {address: contractAddress},
+    payload: payload
+  };
+}
+
+describe("test virtual machine", () => {
+  let virtualMachine: VirtualMachine;
+  let stateStorage: StubStorageClient;
 
   beforeEach(() => {
     stateStorage = new StubStorageClient({
@@ -136,24 +149,15 @@ describe("test virtual machine", () => {
       args: []
     });
 
-    const result = await virtualMachine.callContract({
-      sender: senderAddress,
-      contractAddress: {address: "foobar"},
-      payload: validPayload
-    });
+    const result = await virtualMachine.callContract(buildCallRequest("account1", "foobar"));
 
     expect(result).to.equal(10);
   });
 
   it("calls a smart contract with an invalid payload - should not panic", async () => {
-    const invalidPayload = "kuku";
+    const callObject = buildCallRequest("account1", "foobar");
+    callObject.payload = "kuku";
 
-    const result = await virtualMachine.callContract({
-      sender: senderAddress,
-      contractAddress: {address: "foobar"},
-      payload: invalidPayload
-    });
-
-    expect(result).to.equal("invalid payload received");
+    chai.expect(virtualMachine.callContract(callObject)).to.be.rejected;
   });
 });
