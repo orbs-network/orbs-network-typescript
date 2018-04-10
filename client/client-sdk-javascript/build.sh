@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
-yarn link orbs-interfaces
-yarn link orbs-crypto-sdk
+rm -rf deps && mkdir -p deps
+ln -s "$(pwd)/../crypto-sdk" deps/crypto-sdk
+
 yarn install
 
 yarn run build
