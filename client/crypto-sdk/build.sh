@@ -31,6 +31,31 @@ function build_android() {
     make
 }
 
+function build_current() {
+    (cd ../ && CMAKE_ONLY=1 ./clean.sh)
+    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=${PLATFORM}
+    make
+}
+
+if [ -z "${PLATFORM}" ]; then
+    SYSNAME="$(uname -s)"
+    case ${SYSNAME} in
+        Darwin)
+            export PLATFORM="Mac"
+
+            ;;
+        Linux)
+            export PLATFORM="Linux"
+
+            ;;
+        *)
+            echo "Unsupport system ${SYSNAME}!"
+            exit 1
+
+            ;;
+    esac
+fi
+
 ./build-deps.sh
 
 pushd build
@@ -64,7 +89,7 @@ case ${PLATFORM} in
 
         ;;
     *)
-        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=${PLATFORM}
         make
 
         ;;

@@ -24,7 +24,7 @@ function build_ios() {
 }
 
 function build_android() {
-    if [ -z "$ANDROID_NDK_HOME" ]; then
+    if [ -z "${ANDROID_NDK_HOME}" ]; then
         case "$(uname -s)" in
             Darwin)
                 ANDROID_NDK_HOME=~/Library/Android/sdk/ndk-bundle
@@ -44,7 +44,7 @@ function build_android() {
     NDK_API_VERSION=$(echo "$NDK_PLATFORM" | sed 's/^android-//')
     NDK_API_VERSION_COMPAT=$(echo "$NDK_PLATFORM_COMPAT" | sed 's/^android-//')
 
-    if [ -z "$ANDROID_NDK_HOME" ]; then
+    if [ -z "${ANDROID_NDK_HOME}" ]; then
         echo "You should set ANDROID_NDK_HOME to the directory containing the Android NDK"
         exit 1
     fi
@@ -76,6 +76,26 @@ function build_android() {
     make -j${PROCESSORS} install
 
     export PATH=${OLD_PATH}
+}
+
+function build_current() {
+    make distclean > /dev/null || true
+
+    ./configure \
+        --with-pic \
+        --enable-static \
+        --disable-shared \
+        --disable-nls \
+        --disable-languages \
+        --prefix="${PREFIX}"
+
+    make -j${PROCESSORS} install
+
+    if [ -n "${CI}" ] ; then
+        make -j${PROCESSORS} check
+    fi
+
+    make distclean > /dev/null || true
 }
 
 NPROCESSORS=$(getconf NPROCESSORS_ONLN 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
@@ -145,14 +165,14 @@ case ${PLATFORM} in
 
         # Build for armv7a.
         TARGET_ARCH="armv7-a"
-        CFLAGS="-Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=${TARGET_ARCH}"
+        export CFLAGS="-Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=${TARGET_ARCH}"
         ARCH="arm"
         HOST_COMPILER="arm-linux-androideabi"
         build_android
 
         # Build for armv8-a.
         TARGET_ARCH="armv8-a"
-        CFLAGS="-Os -march=${TARGET_ARCH}"
+        export CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="arm64"
         HOST_COMPILER="aarch64-linux-android"
         NDK_PLATFORM="android-21"
@@ -161,7 +181,7 @@ case ${PLATFORM} in
 
         # Build for x86.
         TARGET_ARCH="i686"
-        CFLAGS="-Os -march=${TARGET_ARCH}"
+        export CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="x86"
         HOST_COMPILER="i686-linux-android"
         NDK_PLATFORM="android-21"
@@ -170,32 +190,20 @@ case ${PLATFORM} in
 
         # Build for x86_64.
         TARGET_ARCH="westmere"
-        CFLAGS="-Os -march=${TARGET_ARCH}"
+        export CFLAGS="-Os -march=${TARGET_ARCH}"
         ARCH="x86_64"
         HOST_COMPILER="x86_64-linux-android"
         NDK_PLATFORM="android-21"
         NDK_PLATFORM_COMPAT="android-21"
         build_android
 
+        # Build for the current system for testing.
+        export CFLAGS=""
+        build_current
+
         ;;
     *)
-        make distclean > /dev/null || true
-
-        ./configure \
-            --with-pic \
-            --enable-static \
-            --disable-shared \
-            --disable-nls \
-            --disable-languages \
-            --prefix="${PREFIX}"
-
-        make -j${PROCESSORS} install
-
-        if [ -n "${CI}" ] ; then
-            make -j${PROCESSORS} check
-        fi
-
-        make distclean > /dev/null || true
+        build_current
 
         ;;
 esac

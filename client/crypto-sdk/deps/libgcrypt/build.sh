@@ -25,7 +25,7 @@ function build_ios() {
 }
 
 function build_android() {
-    if [ -z "$ANDROID_NDK_HOME" ]; then
+    if [ -z "${ANDROID_NDK_HOME}" ]; then
         case "$(uname -s)" in
             Darwin)
                 ANDROID_NDK_HOME=~/Library/Android/sdk/ndk-bundle
@@ -45,7 +45,7 @@ function build_android() {
     NDK_API_VERSION=$(echo "$NDK_PLATFORM" | sed 's/^android-//')
     NDK_API_VERSION_COMPAT=$(echo "$NDK_PLATFORM_COMPAT" | sed 's/^android-//')
 
-    if [ -z "$ANDROID_NDK_HOME" ]; then
+    if [ -z "${ANDROID_NDK_HOME}" ]; then
         echo "You should set ANDROID_NDK_HOME to the directory containing the Android NDK"
         exit 1
     fi
@@ -79,6 +79,27 @@ function build_android() {
     make -j${PROCESSORS} install
 
     export PATH=${OLD_PATH}
+}
+
+function build_current() {
+    make distclean > /dev/null || true
+
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/"
+
+    ./configure \
+        --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
+        --with-pic \
+        --enable-static \
+        --disable-shared \
+        --disable-asm \
+        --disable-doc \
+        --prefix="${PREFIX}"
+
+    make -j${PROCESSORS} install
+
+    if [ -n "${CI}" ] ; then
+        make -j${PROCESSORS} check
+    fi
 }
 
 NPROCESSORS=$(getconf NPROCESSORS_ONLN 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
@@ -180,24 +201,13 @@ case ${PLATFORM} in
         export CFLAGS="-Os -march=${TARGET_ARCH}"
         build_android
 
+        # Build for the current system for testing.
+        export CFLAGS=""
+        build_current
+
         ;;
     *)
-        make distclean > /dev/null || true
+        build_current
 
-        LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/"
-
-        ./configure \
-            --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
-            --with-pic \
-            --enable-static \
-            --disable-shared \
-            --disable-asm \
-            --disable-doc \
-            --prefix="${PREFIX}"
-
-        make -j${PROCESSORS} install
-
-        if [ -n "${CI}" ] ; then
-            make -j${PROCESSORS} check
-        fi
+        ;;
 esac

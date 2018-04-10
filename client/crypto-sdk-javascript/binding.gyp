@@ -15,13 +15,11 @@
             "include_dirs": [
                 "<(module_root_dir)/deps/"
             ],
-            "libraries": [
-                "-Wl,-rpath,<(module_root_dir)/deps/crypto-sdk/build/lib/",
-            ],
             "conditions": [
                 ["OS=='mac'", {
                     "libraries": [
-                        "<(module_root_dir)/deps/crypto-sdk/build/lib/libcryptosdk.dylib"
+                        "-Wl,-rpath,<(module_root_dir)/deps/crypto-sdk/build/mac/lib/",
+                        "<(module_root_dir)/deps/crypto-sdk/build/mac/lib/libcryptosdk.dylib"
                     ],
                     "xcode_settings": {
                         "OTHER_CPLUSPLUSFLAGS": [
@@ -38,7 +36,8 @@
                 }],
                 ["OS=='linux'", {
                     "libraries": [
-                        "<(module_root_dir)/deps/crypto-sdk/build/lib/libcryptosdk.so"
+                        "-Wl,-rpath,<(module_root_dir)/deps/crypto-sdk/build/linux/lib/",
+                        "<(module_root_dir)/deps/crypto-sdk/build/linux/lib/libcryptosdk.so"
                     ],
                 }]
             ]
