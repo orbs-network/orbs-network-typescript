@@ -2,10 +2,7 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service, ServiceConfig } from "orbs-core-library";
-import { TransactionHandler } from "orbs-core-library";
-import { PublicApi } from "orbs-core-library";
-
+import { Service, ServiceConfig, TransactionHandler, PublicApi } from "orbs-core-library";
 
 export interface PublicApiServiceConfig extends ServiceConfig {
   validateSubscription: boolean;

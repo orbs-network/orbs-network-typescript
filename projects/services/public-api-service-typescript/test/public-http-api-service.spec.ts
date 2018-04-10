@@ -33,10 +33,6 @@ const transaction: types.Transaction = {
   }
 };
 
-const transactionSubscriptionAppendix: types.TransactionSubscriptionAppendix = {
-  subscriptionKey: "foobar"
-};
-
 const contractInput: types.CallContractInput = {
   contractAddress,
   payload: "some-payload",
@@ -71,7 +67,7 @@ describe("Public API Service - Component Test", async function () {
   it("sent transaction through http propagates properly to the transaction pool", (done) => {
     request(httpEndpoint)
       .post("/public/sendTransaction")
-      .send({ transaction, transactionSubscriptionAppendix })
+      .send({ transaction })
       .expect(200, () => {
         expect(transactionPool.addNewPendingTransaction).to.have.been.calledWith({
           transaction

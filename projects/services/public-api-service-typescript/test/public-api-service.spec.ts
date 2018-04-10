@@ -33,10 +33,6 @@ const transaction: types.Transaction = {
   }
 };
 
-const transactionSubscriptionAppendix: types.TransactionSubscriptionAppendix = {
-  subscriptionKey: "foobar"
-};
-
 const contractInput: types.CallContractInput = {
   contractAddress,
   payload: "some-payload",
@@ -59,7 +55,7 @@ describe("Public API Service - Component Test", async function () {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
     (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true, expiryTimestamp: Date.now() + 10000000});
     (<sinon.SinonStub>virtualMachine.callContract).returns({resultJson: "some-answer"});
-    service = new PublicApiService(virtualMachine, transactionPool, {
+    grpcService = new PublicApiService(virtualMachine, transactionPool, {
       nodeName: "tester"
     });
     grpcServer = await ServiceRunner.run(grpc.publicApiServer, grpcService, grpcEndpoint);

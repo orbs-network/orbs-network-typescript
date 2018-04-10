@@ -1,11 +1,8 @@
 import * as _ from "lodash";
 
-import { logger, types } from "orbs-core-library";
-
-import { Service, ServiceConfig, JsonBuffer } from "orbs-core-library";
-import { TransactionHandler, TransactionHandlerConfig } from "orbs-core-library";
-import { PublicApiServiceConfig, ConstantTransactionHandlerConfig } from "./service";
-import { PublicApi } from "orbs-core-library";
+import {  } from "orbs-core-library";
+import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler } from "orbs-core-library";
+import { PublicApiServiceConfig } from "./service";
 import * as express from "express";
 import { Server } from "http";
 import * as bodyParser from "body-parser";
@@ -23,7 +20,7 @@ export default class PublicApiHTTPService extends Service {
 
   public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, subscriptionManager: types.SubscriptionManagerClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
-    this.transactionHandler = new TransactionHandler(transactionPool, subscriptionManager, new ConstantTransactionHandlerConfig((<PublicApiHTTPServiceConfig>serviceConfig).validateSubscription));
+    this.transactionHandler = new TransactionHandler(transactionPool);
 
     this.publicApi = new PublicApi(this.transactionHandler, virtualMachine);
   }
@@ -69,9 +66,6 @@ export default class PublicApiHTTPService extends Service {
             },
             payload: _.get(body, "transaction.body.payload")
           }
-        },
-        transactionSubscriptionAppendix: {
-          subscriptionKey: _.get(body, "transactionSubscriptionAppendix.subscriptionKey")
         }
       };
 
