@@ -49,6 +49,11 @@
     "type": "library",
     "path": "client/crypto-sdk-javascript"
   },
+  "crypto-sdk-android": {
+    "runtime": "Android",
+    "type": "library",
+    "path": "client/crypto-sdk-android"
+  },
   "example-slack-bot": {
     "runtime": "typescript",
     "type": "library",
@@ -57,6 +62,7 @@
   "order": [
     "architecture",
     "crypto-sdk",
+    "crypto-sdk-android",
     "crypto-sdk-javascript",
     "core-library-typescript",
     "gossip-service-typescript",

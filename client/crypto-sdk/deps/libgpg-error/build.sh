@@ -24,14 +24,20 @@ function build_ios() {
 }
 
 function build_android() {
-    case "$(uname -s)" in
-        Darwin)
-            ANDROID_NDK_HOME=~/Library/Android/sdk/ndk-bundle
+    if [ -z "$ANDROID_NDK_HOME" ]; then
+        case "$(uname -s)" in
+            Darwin)
+                ANDROID_NDK_HOME=~/Library/Android/sdk/ndk-bundle
 
-            ;;
-        *)
-            ;;
-    esac
+                ;;
+            Linux)
+                ANDROID_NDK_HOME=/opt/Android/sdk/ndk-bundle
+
+                ;;
+            *)
+                ;;
+        esac
+    fi
 
     NDK_PLATFORM=${NDK_PLATFORM:-"android-16"}
     NDK_PLATFORM_COMPAT="${NDK_PLATFORM_COMPAT:-${NDK_PLATFORM}}"
