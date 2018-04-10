@@ -42,7 +42,6 @@ const contractInput: types.CallContractInput = {
 describe("Public API Service - Component Test", async function () {
   let virtualMachine: types.VirtualMachineClient;
   let transactionPool: types.TransactionPoolClient;
-  let subscriptionManager: types.SubscriptionManagerClient;
 
   let httpService: PublicApiHTTPService;
   let httpEndpoint: string;
@@ -52,15 +51,13 @@ describe("Public API Service - Component Test", async function () {
     httpEndpoint = `http://127.0.0.1:${httpPort}`;
     virtualMachine = stubInterface<types.VirtualMachineClient>();
     transactionPool = stubInterface<types.TransactionPoolClient>();
-    subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true, expiryTimestamp: Date.now() + 10000000});
     (<sinon.SinonStub>virtualMachine.callContract).returns({resultJson: "some-answer"});
 
     const httpServiceConfig = {
       nodeName: "tester",
       httpPort
     };
-    httpService = new PublicApiHTTPService(virtualMachine, transactionPool, subscriptionManager, httpServiceConfig);
+    httpService = new PublicApiHTTPService(virtualMachine, transactionPool, httpServiceConfig);
     httpService.start();
   });
 
