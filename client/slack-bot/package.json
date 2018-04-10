@@ -24,8 +24,7 @@
     "bluebird": "^3.5.1",
     "lodash": "^4.14.98",
     "orbs-interfaces": "file:../../projects/architecture",
-    "orbs-client-sdk": "file:../client-sdk-javascript",
-    "orbs-crypto-sdk": "file:../crypto-sdk-javascript"
+    "orbs-client-sdk": "file:../client-sdk-javascript"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",

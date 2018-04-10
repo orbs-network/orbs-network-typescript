@@ -1,7 +1,6 @@
 import { FooBarAccount } from "./foobar-account";
 import { RTMClient } from "@slack/client";
-import { OrbsClient, OrbsContractAdapter } from "orbs-client-sdk";
-import { Address } from "orbs-crypto-sdk";
+import { OrbsClient, OrbsContractAdapter, Address } from "orbs-client-sdk";
 import * as crypto from "crypto";
 
 interface Config {

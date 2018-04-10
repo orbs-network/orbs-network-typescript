@@ -1,11 +1,10 @@
-import { OrbsClient, OrbsContractAdapter } from "orbs-client-sdk";
+import { OrbsClient, OrbsContractAdapter, Address } from "orbs-client-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
 import * as chai from "chai";
 import ChaiBarsPlugin from "./chai-bars-plugin";
 import * as _ from "lodash";
-import { Address } from "orbs-crypto-sdk";
 
 const expect = chai.expect;
 
