@@ -49,7 +49,7 @@ if [ -z "${PLATFORM}" ]; then
 
             ;;
         *)
-            echo "Unsupport system ${SYSNAME}!"
+            echo "Unsupported system ${SYSNAME}!"
             exit 1
 
             ;;

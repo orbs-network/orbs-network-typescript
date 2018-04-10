@@ -199,6 +199,7 @@ case ${PLATFORM} in
 
         # Build for the current system for testing.
         export CFLAGS=""
+        export CC=""
         build_current
 
         ;;
