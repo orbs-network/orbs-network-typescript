@@ -59,6 +59,11 @@
     "type": "library",
     "path": "client/examples/slack-bot"
   },
+  "example-android-app": {
+    "runtime": "java",
+    "type": "app",
+    "path": "client/examples/android-sample-app"
+  },
   "order": [
     "architecture",
     "crypto-sdk",
@@ -71,6 +76,7 @@
     "sidechain-connector-service-typescript",
     "storage-service-typescript",
     "virtual-machine-service-typescript",
-    "example-slack-bot"
+    "example-slack-bot",
+    "example-android-app"
   ]
 }
