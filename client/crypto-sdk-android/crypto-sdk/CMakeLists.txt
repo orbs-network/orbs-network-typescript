@@ -7,5 +7,19 @@ file(GLOB CRYPTO_SDK_ANDROID_SRC
 
 set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libcryptosdk.so)
 
+if(ANDROID_ABI)
+    set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libcryptosdk.so)
+else()
+    # Ensure jni.h is found for local builds.
+    find_package(JNI REQUIRED)
+    include_directories(${JNI_INCLUDE_DIRS})
+
+    if(APPLE)
+        set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/build/outputs/jar/libcryptosdk.dylib)
+    else()
+        set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/build/outputs/jar/libcryptosdk.so)
+    endif()
+endif()
+
 add_library(cryptosdk-android SHARED ${CRYPTO_SDK_ANDROID_SRC})
 target_link_libraries(cryptosdk-android ${CRYPTO_SDK_LIBRARY})
