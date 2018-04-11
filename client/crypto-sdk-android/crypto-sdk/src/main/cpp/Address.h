@@ -31,6 +31,14 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_finalize
 JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_Address_toString
   (JNIEnv *, jobject);
 
+/*
+ * Class:     com_orbs_cryptosdk_Address
+ * Method:    getPublicKey
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_Address_getPublicKey
+    (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif
