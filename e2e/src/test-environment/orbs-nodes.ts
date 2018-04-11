@@ -46,8 +46,8 @@ export class OrbsNode implements TestComponent {
     await this.runDockerCompose("down");
   }
 
-  public getGrpcEndpoint(accessFromHost: boolean): string {
-    const endpoint = accessFromHost ? `0.0.0.0:${this.config.publicApiHostPort}` : `${this.config.nodePublicApiIp}:51151`;
+  public getApiEndpoint(accessFromHost: boolean): string {
+    const endpoint = accessFromHost ? `http://127.0.0.1:${this.config.publicApiHostHTTPPort}` : `http://${this.config.nodePublicApiIp}:${this.config.publicApiHostHTTPPort}`;
     return endpoint;
   }
 
@@ -128,8 +128,8 @@ export class OrbsNodeCluster implements TestComponent {
     return nodes;
   }
 
-  public getAvailableGrpcEndpoints(accessFromHost: boolean) {
-    return this.nodes.map(node => node.getGrpcEndpoint(accessFromHost));
+  public getAvailableApiEndpoints(accessFromHost: boolean) {
+    return this.nodes.map(node => node.getApiEndpoint(accessFromHost));
   }
 
   public async start() {
