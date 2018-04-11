@@ -35,9 +35,9 @@ describe("A client calls the connector interface with the correct inputs when", 
           payload: "payload"
         });
         return true;
-      }).reply(200);
+      }).reply(200, { result: "ok" });
 
-    await orbsClient.sendTransaction("contractAddress", "payload");
+    expect(await orbsClient.sendTransaction("contractAddress", "payload")).to.be.eql("ok");
   });
 
   it("callContract() is called", async () => {
@@ -46,8 +46,8 @@ describe("A client calls the connector interface with the correct inputs when", 
         expect(res.contractAddress).to.be.eql({ address: "contractAddress" });
         expect(res.payload).to.be.eql("call-payload");
         return true;
-      }).reply(200, { resultJson: `{"some": "answer"}` });
+      }).reply(200, { result: 12 });
 
-    expect(await orbsClient.call("contractAddress", "call-payload")).to.be.eql({ some: "answer" });
+    expect(await orbsClient.call("contractAddress", "call-payload")).to.be.eql(12);
   });
 });

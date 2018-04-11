@@ -69,8 +69,14 @@ export default class PublicApiHTTPService extends Service {
         }
       };
 
-      await this.publicApi.sendTransaction(input);
-      res.send(200);
+      try {
+        await this.publicApi.sendTransaction(input);
+        // placeholder value instead of transaction receipt
+        res.json({ result: "ok" });
+      } catch (err) {
+        logger.error(`HTTP API could not send a transcation`, {err});
+        res.send(500);
+      }
     };
   }
 
@@ -84,8 +90,13 @@ export default class PublicApiHTTPService extends Service {
         sender: body.sender
       };
 
-      const result = await this.publicApi.callContract(input);
-      res.json({resultJson: result});
+      try {
+        const result = JSON.parse(await this.publicApi.callContract(input));
+        res.json({ result });
+      } catch (err) {
+        logger.error(`HTTP API could not call a contract`, {err});
+        res.send(500);
+      }
     };
   }
 }

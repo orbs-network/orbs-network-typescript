@@ -15,19 +15,21 @@ export class OrbsClient {
     this.sendTransactionTimeoutMs = sendTransactionTimeoutMs;
   }
 
-  async sendTransaction(contractAddress: string, payload: string): Promise<SendTransactionOutput> {
+  async sendTransaction(contractAddress: string, payload: string): Promise<any> {
     const transaction = this.generateTransaction(contractAddress, payload);
 
-    const res = await request.post({
+    const body = await request.post({
       url: `${this.endpoint}/public/sendTransaction`,
       body: { transaction },
       json: true
     });
+
+    // TODO: block until we implement transaction receipts with proper sync interface at HTTP endpoint
     await delay(this.sendTransactionTimeoutMs);
-    return res;
+    return body.result;
   }
 
-  async call(contractAddress: string, payload: string) {
+  async call(contractAddress: string, payload: string): Promise<any> {
     const body = await request.post({
       url: `${this.endpoint}/public/callContract`,
       body: {
@@ -38,7 +40,7 @@ export class OrbsClient {
       json: true
     });
 
-    return JSON.parse(body.resultJson);
+    return body.result;
   }
 
   public generateTransaction(contractAddress: string, payload: string, timestamp: number = Date.now()): Transaction {
