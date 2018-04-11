@@ -42,7 +42,6 @@
   "dependencies": {
     "bindings": "^1.3.0",
     "bluebird": "^3.5.1",
-    "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "orbs-interfaces": "file:../../projects/architecture",
     "path": "^0.12.7"
   }
