@@ -47,3 +47,5 @@ else
 fi
 
 gradle assemble${BUILD_TYPE}
+
+./test.sh
