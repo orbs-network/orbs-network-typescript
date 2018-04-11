@@ -20,7 +20,7 @@ export default class StateStorageService extends Service {
   }
 
   async shutdown() {
-
+    this.stateStorage.stopPolling();
   }
 
   async initStateStorage(): Promise<void> {
