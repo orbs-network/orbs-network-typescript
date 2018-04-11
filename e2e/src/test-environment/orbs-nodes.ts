@@ -47,7 +47,7 @@ export class OrbsNode implements TestComponent {
   }
 
   public getApiEndpoint(accessFromHost: boolean): string {
-    const endpoint = accessFromHost ? `http://127.0.0.1:${this.config.publicApiHostHTTPPort}` : `http://${this.config.nodePublicApiIp}:${this.config.publicApiHostHTTPPort}`;
+    const endpoint = accessFromHost ? `http://127.0.0.1:${this.config.publicApiHostHTTPPort}` : `http://${this.config.nodePublicApiIp}:80`;
     return endpoint;
   }
 
