@@ -51,7 +51,7 @@ describe("Public API Service - Component Test", async function () {
     httpEndpoint = `http://127.0.0.1:${httpPort}`;
     virtualMachine = stubInterface<types.VirtualMachineClient>();
     transactionPool = stubInterface<types.TransactionPoolClient>();
-    (<sinon.SinonStub>virtualMachine.callContract).returns({resultJson: "some-answer"});
+    (<sinon.SinonStub>virtualMachine.callContract).returns({ resultJson: JSON.stringify("some-answer") });
 
     const httpServiceConfig = {
       nodeName: "tester",
@@ -66,20 +66,18 @@ describe("Public API Service - Component Test", async function () {
       .post("/public/sendTransaction")
       .send({ transaction })
       .expect(200, () => {
-        expect(transactionPool.addNewPendingTransaction).to.have.been.calledWith({
-          transaction
-        });
+        expect(transactionPool.addNewPendingTransaction).to.have.been.calledWith({ transaction });
         done();
       });
   });
 
-  it("called contract through grpc propagates properly to the virtual machine", (done) => {
+  it("called contract through http propagates properly to the virtual machine", (done) => {
     request(httpEndpoint)
       .post("/public/callContract")
       .send(contractInput)
       .expect(200, (err, res) => {
         expect(virtualMachine.callContract).to.have.been.calledWith(contractInput);
-        expect(res.body).to.be.eql({ resultJson: "some-answer" });
+        expect(res.body).to.be.eql({ result: "some-answer" });
         done();
       });
   });

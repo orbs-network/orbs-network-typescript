@@ -74,8 +74,8 @@ export default class PublicApiHTTPService extends Service {
         // placeholder value instead of transaction receipt
         res.json({ result: "ok" });
       } catch (err) {
-        logger.error(`HTTP API could not send a transcation`, {err});
-        res.send(500);
+        logger.error(`HTTP API could not send a transcation: ${err.toString()}`);
+        res.sendStatus(500);
       }
     };
   }
@@ -94,8 +94,9 @@ export default class PublicApiHTTPService extends Service {
         const result = JSON.parse(await this.publicApi.callContract(input));
         res.json({ result });
       } catch (err) {
-        logger.error(`HTTP API could not call a contract`, {err});
-        res.send(500);
+        console.log(err);
+        logger.error(`HTTP API could not call a contract: ${err.toString()}`);
+        res.sendStatus(500);
       }
     };
   }
