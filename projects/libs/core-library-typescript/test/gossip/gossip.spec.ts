@@ -74,7 +74,7 @@ describe("Gossip", function () {
 
   describe("with signatures", () => {
     before(async function() {
-      this.timeout(6000);
+      this.timeout(20000);
 
       shell.exec(`
         rm -rf ${__dirname}/test-private-keys

@@ -44,11 +44,6 @@
     "type": "library",
     "path": "client/crypto-sdk"
   },
-  "crypto-sdk-javascript": {
-    "runtime": "typescript",
-    "type": "library",
-    "path": "client/crypto-sdk-javascript"
-  },
   "client-sdk-javascript": {
     "runtime": "typescript",
     "type": "library",
@@ -62,7 +57,6 @@
   "order": [
     "architecture",
     "crypto-sdk",
-    "crypto-sdk-javascript",
     "client-sdk-javascript",
     "core-library-typescript",
     "gossip-service-typescript",

@@ -36,7 +36,6 @@ function generateAddress(username: string): string {
 async function getAccount(username: string, config: Config): Promise<FooBarAccount> {
   const address = generateAddress(username);
   const orbsClient = new OrbsClient(address, undefined, config.timeout);
-  orbsClient.connectToGrpcNode(config.endpoint);
   const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
   const account = new FooBarAccount(username, address, contractAdapter);
 

@@ -11,10 +11,10 @@ const expect = chai.expect;
 chai.use(ChaiBarsPlugin);
 
 const testConfig = loadDefaultTestConfig();
+const { API_ENDPOINT } = process.env;
 
 async function aFooBarAccountWith(input: { senderAddress: string, amountOfBars: number }) {
-  const orbsSession = new OrbsClient(input.senderAddress);
-  orbsSession.connectToGrpcNode(testConfig.grpcEndpoint);
+  const orbsSession = new OrbsClient(API_ENDPOINT, input.senderAddress);
   const contractAdapter = new OrbsContractAdapter(orbsSession, "foobar");
   const account = new FooBarAccount(input.senderAddress.toString(), contractAdapter);
 

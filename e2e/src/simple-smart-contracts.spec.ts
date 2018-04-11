@@ -25,8 +25,7 @@ const testConfig = loadDefaultTestConfig();
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const senderAddress = generateAddress();
-  const orbsClient = new OrbsClient(senderAddress);
-  orbsClient.connectToGrpcNode(testConfig.grpcEndpoint);
+  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress);
   const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
   const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
 
@@ -37,8 +36,7 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 
 async function aTextMessageAccount() {
   const senderAddress = generateAddress();
-  const orbsClient = new OrbsClient(senderAddress);
-  orbsClient.connectToGrpcNode(testConfig.grpcEndpoint);
+  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress);
   const contractAdapter = new OrbsContractAdapter(orbsClient, "text-message");
   const account = new TextMessageAccount(senderAddress.toString(), contractAdapter);
 

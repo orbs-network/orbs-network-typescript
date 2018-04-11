@@ -6,7 +6,7 @@ nconf.env({ parseValues: true });
 
 interface TestConfig {
   testEnvironment?: TestEnvironment;
-  grpcEndpoint?: string;
+  apiEndpoint?: string;
   subscriptionKey?: string;
   stressTest: {
     accounts: number
@@ -26,14 +26,14 @@ export function loadDefaultTestConfig(): TestConfig {
     if (!publicApiEndpoint) {
       throw new Error("E2E_PUBLIC_API_ENDPOINT must be defined in a no-deploy configuration");
     }
-    config.grpcEndpoint = publicApiEndpoint;
+    config.apiEndpoint = publicApiEndpoint;
   } else {
     config.testEnvironment = new TestEnvironment({
       connectFromHost: nconf.get("CONNECT_FROM_HOST"),
       preExistingPublicSubnet: nconf.get("PREEXISTING_PUBLIC_SUBNET"),
       testSubscriptionKey: config.subscriptionKey
     });
-    config.grpcEndpoint = config.testEnvironment.discoverGrpcEndpoint();
+    config.apiEndpoint = config.testEnvironment.discoverApiEndpoint();
   }
 
   return config;
