@@ -40,7 +40,7 @@
     "path": "projects/services/virtual-machine-service-typescript"
   },
   "crypto-sdk": {
-    "runtime": "C++",
+    "runtime": "c++",
     "type": "library",
     "path": "client/crypto-sdk"
   },
