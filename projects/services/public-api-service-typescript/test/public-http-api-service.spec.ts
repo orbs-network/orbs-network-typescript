@@ -91,9 +91,6 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
 
 
 describe("Public API Service - Component Test", async function () {
-  let virtualMachine: types.VirtualMachineClient;
-  let transactionPool: types.TransactionPoolClient;
-
   let httpService: PublicApiHTTPService;
   let httpEndpoint: string;
 
@@ -102,10 +99,6 @@ describe("Public API Service - Component Test", async function () {
   beforeEach(async () => {
     const httpPort = await getPort();
     httpEndpoint = `http://127.0.0.1:${httpPort}`;
-    virtualMachine = stubInterface<types.VirtualMachineClient>();
-    transactionPool = stubInterface<types.TransactionPoolClient>();
-    (<sinon.SinonStub>virtualMachine.callContract).returns({ resultJson: JSON.stringify("some-answer") });
-
     const endpoint = `0.0.0.0:${await getPort()}`;
 
     grpcService = grpcServer.builder()
