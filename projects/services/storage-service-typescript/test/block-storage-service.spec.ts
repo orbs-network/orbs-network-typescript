@@ -15,7 +15,6 @@ const { expect } = chai;
 ErrorHandler.setup();
 
 describe("new storage server test", function () {
-  this.timeout(10000);
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
@@ -67,10 +66,11 @@ describe("new storage server test", function () {
 
   it("should fetch genesis block for an empty database", async () => {
     const lastBlock = await blockClient.getLastBlock({});
-    expect(lastBlock.block.header.height).to.equal(0);
+    return expect(lastBlock.block.header.height).to.equal(0);
   });
 
-  it("checks state storage", async () => {
+  it("state storage can return keys", async () => {
+    // adding another block as currently the state storage polling will never return when the database has only the genesis block
     const lastBlock = await blockClient.getLastBlock({});
     const nextBlock = BlockUtils.buildNextBlock({
       transactions: [],
@@ -79,6 +79,7 @@ describe("new storage server test", function () {
     }, lastBlock.block);
     blockClient.addBlock({ block: nextBlock });
 
+    // this should take around 200 ms waiting for the polling
     const state = await stateClient.readKeys({ contractAddress: { address: "does-not-exist" }, keys: [] });
     return expect(state).to.have.deep.property("values", {});
   });
