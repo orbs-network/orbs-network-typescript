@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import * as fs from "fs";
+import * as fse from "fs-extra";
 import * as path from "path";
 import * as getPort from "get-port";
 import { stubInterface } from "ts-sinon";
@@ -47,12 +47,7 @@ describe("new storage server test", function () {
     const transactionPoolStub = stubInterface<TransactionPoolService>();
 
     // handle the filesystem for this test, will empty the db folder before starting the services
-    // TODO: move outside, talk to kirill
-    if (!fs.existsSync(BLOCK_STORAGE_DB_PATH)) {
-      fs.mkdirSync(BLOCK_STORAGE_DB_PATH);
-    }
-    const files = fs.readdirSync(BLOCK_STORAGE_DB_PATH).map(f => path.join(BLOCK_STORAGE_DB_PATH, f));
-    files.forEach(f => fs.unlinkSync(f));
+    fse.emptyDirSync(BLOCK_STORAGE_DB_PATH);
 
     server = storageServer(topology, storageEnv)
       .withService("Gossip", gossipServerStub)
