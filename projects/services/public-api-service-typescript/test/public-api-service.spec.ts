@@ -1,6 +1,6 @@
 import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service } from "orbs-core-library";
 import * as chai from "chai";
-import PublicApiHTTPService from "../src/http-service";
+import PublicApiHTTPService from "../src/service";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";

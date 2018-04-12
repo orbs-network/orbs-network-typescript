@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import { ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers, logger } from "orbs-core-library";
-import PublicApiHTTPService from "./http-service";
+import PublicApiHTTPService from "./service";
 import httpServer from "./server";
 
 const { NODE_NAME } = process.env;

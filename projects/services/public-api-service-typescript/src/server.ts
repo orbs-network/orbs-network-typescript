@@ -1,4 +1,4 @@
-import PublicApiHTTPService from "./http-service";
+import PublicApiHTTPService from "./service";
 import { topologyPeers } from "orbs-core-library";
 
 export default function (nodeTopology: any, env: any): PublicApiHTTPService {
