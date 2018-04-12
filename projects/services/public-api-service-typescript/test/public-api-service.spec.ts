@@ -97,16 +97,16 @@ describe("Public API Service - Component Test", async function () {
 
   let grpcService: GRPCServerBuilder;
 
-  describe("Read http api", () => {
+  describe("Real HTTP API", () => {
     beforeEach(async () => {
       const httpPort = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
-      const endpoint = `0.0.0.0:${await getPort()}`;
+      const grpcEndpoint = `0.0.0.0:${await getPort()}`;
 
       grpcService = grpcServer.builder()
         .withService("VirtualMachine", new FakeVirtualMachineService({ nodeName: "tester" }))
         .withService("TransactionPool", new FakeTransactionPool({ nodeName: "tester" }))
-        .onEndpoint(endpoint);
+        .onEndpoint(grpcEndpoint);
 
       grpcService.start();
 
@@ -114,11 +114,11 @@ describe("Public API Service - Component Test", async function () {
         peers: [
           {
             service: "virtual-machine",
-            endpoint,
+            endpoint: grpcEndpoint,
           },
           {
             service: "consensus",
-            endpoint
+            endpoint: grpcEndpoint
           }
         ],
       };
@@ -139,7 +139,7 @@ describe("Public API Service - Component Test", async function () {
     });
   });
 
-  describe("Fake http api", () => {
+  describe("Fake HTTP API", () => {
     let httpService: Server;
 
     beforeEach(async () => {

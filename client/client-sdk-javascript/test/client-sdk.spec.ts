@@ -15,7 +15,8 @@ chai.use(sinonChai);
 const publicKey = new ED25519Key().publicKey;
 const VIRTUAL_CHAIN_ID = "640ed3";
 const senderAddress = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
-const API_ENDPOINT = "http://localhost:8888";
+const HTTP_PORT = 8888;
+const API_ENDPOINT = `http://localhost:${HTTP_PORT}`;
 const TIMEOUT = 20;
 
 const universalAddress: UniversalAddress = {
@@ -53,7 +54,7 @@ describe("A client calls the connector interface with the correct inputs when", 
 
   beforeEach(async () => {
     orbsClient = new OrbsClient(API_ENDPOINT, senderAddress.toString(), TIMEOUT);
-    httpServer = mockHttpServer(expectedTransaction, expectedContract).listen(8888);
+    httpServer = mockHttpServer(expectedTransaction, expectedContract).listen(HTTP_PORT);
   });
 
   it("sendTransaction() is called", async () => {
