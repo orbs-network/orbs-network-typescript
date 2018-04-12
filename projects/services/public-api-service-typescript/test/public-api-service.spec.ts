@@ -1,11 +1,12 @@
 import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
-import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
 import httpServer from "../src/server";
+import mockHttpServer from "../../../../client/client-sdk-javascript/test/mock-server";
+import { Server } from "http";
 
 chai.use(sinonChai);
 
@@ -96,58 +97,78 @@ describe("Public API Service - Component Test", async function () {
 
   let grpcService: GRPCServerBuilder;
 
-  beforeEach(async () => {
-    const httpPort = await getPort();
-    httpEndpoint = `http://127.0.0.1:${httpPort}`;
-    const endpoint = `0.0.0.0:${await getPort()}`;
+  describe("Read http api", () => {
+    beforeEach(async () => {
+      const httpPort = await getPort();
+      httpEndpoint = `http://127.0.0.1:${httpPort}`;
+      const endpoint = `0.0.0.0:${await getPort()}`;
 
-    grpcService = grpcServer.builder()
-      .withService("VirtualMachine", new FakeVirtualMachineService({ nodeName: "tester" }))
-      .withService("TransactionPool", new FakeTransactionPool({ nodeName: "tester" }))
-      .onEndpoint(endpoint);
+      grpcService = grpcServer.builder()
+        .withService("VirtualMachine", new FakeVirtualMachineService({ nodeName: "tester" }))
+        .withService("TransactionPool", new FakeTransactionPool({ nodeName: "tester" }))
+        .onEndpoint(endpoint);
 
-    grpcService.start();
+      grpcService.start();
 
-    const topology = {
-      peers: [
-        {
-          service: "virtual-machine",
-          endpoint,
-        },
-        {
-          service: "consensus",
-          endpoint
-        }
-      ],
-    };
+      const topology = {
+        peers: [
+          {
+            service: "virtual-machine",
+            endpoint,
+          },
+          {
+            service: "consensus",
+            endpoint
+          }
+        ],
+      };
 
-    const env = {
-      NODE_NAME: "tester",
-      HTTP_PORT: httpPort
-    };
-    httpService = httpServer(topology, env);
-    httpService.start();
+      const env = {
+        NODE_NAME: "tester",
+        HTTP_PORT: httpPort
+      };
+      httpService = httpServer(topology, env);
+      httpService.start();
+    });
+
+    runTests();
+
+    afterEach(async () => {
+      httpService.stop();
+      grpcService.stop();
+    });
   });
 
-  it("sent transaction through http propagates properly to the transaction pool", (done) => {
-    request(httpEndpoint)
-      .post("/public/sendTransaction")
-      .send({ transaction })
-      .expect(200, done);
+  describe("Fake http api", () => {
+    let httpService: Server;
+
+    beforeEach(async () => {
+      const httpPort = await getPort();
+      httpEndpoint = `http://127.0.0.1:${httpPort}`;
+
+      httpService = mockHttpServer(transaction, contractInput).listen(httpPort);
+    });
+
+    runTests();
+
+    afterEach(async () => {
+      httpService.close();
+    });
   });
 
-  it("called contract through http propagates properly to the virtual machine", (done) => {
-    request(httpEndpoint)
-      .post("/public/callContract")
-      .send(contractInput)
-      .expect(200, (err, res) => {
-        expect(res.body).to.be.eql({ result: "some-answer" });
-        done();
-      });
-  });
+  function runTests() {
+    it("sent transaction through http propagates properly to the transaction pool", () => {
+      return request(httpEndpoint)
+        .post("/public/sendTransaction")
+        .send({ transaction })
+        .expect(200, { result: "ok" });
+    });
 
-  afterEach(async () => {
-    httpService.stop();
-    grpcService.stop();
-  });
+    it("called contract through http propagates properly to the virtual machine", () => {
+      return request(httpEndpoint)
+        .post("/public/callContract")
+        .send(contractInput)
+        .expect(200, { result: "some-answer" });
+    });
+  }
 });
