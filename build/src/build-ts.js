@@ -5,7 +5,7 @@ const shell = require('shelljs');
 const projects = require('../../config/projects.json');
 require('colors');
 
-const RUNTIMES = ['typescript', 'protobuf', 'c++'];
+const RUNTIMES = ['typescript', 'protobuf', 'c++', 'java'];
 
 async function main() {
   projects.order.forEach((projectName) => {

@@ -27,11 +27,13 @@ function build_android() {
     if [ -z "${ANDROID_NDK_HOME}" ]; then
         case "$(uname -s)" in
             Darwin)
-                ANDROID_NDK_HOME=~/Library/Android/sdk/ndk-bundle
+                ANDROID_SDK_HOME=~/Library/Android/sdk
+                ANDROID_NDK_HOME=~${ANDROID_SDK_HOME}/ndk-bundle
 
                 ;;
             Linux)
-                ANDROID_NDK_HOME=/opt/Android/sdk/ndk-bundle
+                ANDROID_SDK_HOME=/opt/Android/sdk
+                ANDROID_NDK_HOME=~${ANDROID_SDK_HOME}/ndk-bundle
 
                 ;;
             *)

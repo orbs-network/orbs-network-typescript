@@ -61,7 +61,7 @@
   },
   "example-android-app": {
     "runtime": "java",
-    "type": "app",
+    "type": "android-app",
     "path": "client/examples/android-sample-app"
   },
   "order": [
