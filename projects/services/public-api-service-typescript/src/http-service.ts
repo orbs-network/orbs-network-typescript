@@ -2,7 +2,6 @@ import * as _ from "lodash";
 
 import {  } from "orbs-core-library";
 import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler } from "orbs-core-library";
-import { PublicApiServiceConfig } from "./service";
 import * as express from "express";
 import { Server } from "http";
 import * as bodyParser from "body-parser";

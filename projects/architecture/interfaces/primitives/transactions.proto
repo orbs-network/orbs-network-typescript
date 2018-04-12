@@ -32,3 +32,10 @@ message TransactionEntry {
   bytes txHash = 1;
   Transaction transaction = 2;
 }
+
+message SendTransactionInput {
+  Transaction transaction = 1;
+}
+
+message SendTransactionOutput {
+}

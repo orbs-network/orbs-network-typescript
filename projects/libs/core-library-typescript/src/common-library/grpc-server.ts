@@ -12,7 +12,6 @@ protos.set("TransactionPool", "transaction-pool.proto");
 protos.set("Gossip", "gossip.proto");
 protos.set("BlockStorage", "block-storage.proto");
 protos.set("StateStorage", "state-storage.proto");
-protos.set("PublicApi", "public-api.proto");
 protos.set("VirtualMachine", "virtual-machine.proto");
 protos.set("SidechainConnector", "sidechain-connector.proto");
 protos.set("Management", "management.proto");

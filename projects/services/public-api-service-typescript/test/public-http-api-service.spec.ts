@@ -1,10 +1,11 @@
-import { types, ErrorHandler } from "orbs-core-library";
+import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/http-service";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
+import httpServer from "../src/server";
 
 chai.use(sinonChai);
 
@@ -39,12 +40,60 @@ const contractInput: types.CallContractInput = {
   sender: senderAddress
 };
 
+class FakeVirtualMachineService extends Service implements types.VirtualMachineServer {
+  async initialize(): Promise<void> {
+
+  }
+
+  async shutdown(): Promise<void> {
+
+  }
+
+  @Service.RPCMethod
+  callContract(rpc: types.CallContractContext): void {
+    rpc.res = { resultJson: JSON.stringify("some-answer") };
+  }
+
+  processTransactionSet(rpc: types.ProcessTransactionSetContext): void {
+    throw new Error("Method not implemented.");
+  }
+}
+
+class FakeTransactionPool extends Service implements types.TransactionPoolServer {
+  addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext): void {
+    throw new Error("Method not implemented.");
+  }
+
+  getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext): void {
+    throw new Error("Method not implemented.");
+  }
+
+  markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext): void {
+    throw new Error("Method not implemented.");
+  }
+
+  gossipMessageReceived(rpc: types.GossipMessageReceivedContext): void {
+    throw new Error("Method not implemented.");
+  }
+
+  async initialize(): Promise<void> {
+
+  }
+
+  async shutdown(): Promise<void> {
+
+  }
+}
+
+
 describe("Public API Service - Component Test", async function () {
   let virtualMachine: types.VirtualMachineClient;
   let transactionPool: types.TransactionPoolClient;
 
   let httpService: PublicApiHTTPService;
   let httpEndpoint: string;
+
+  let grpcService: GRPCServerBuilder;
 
   beforeEach(async () => {
     const httpPort = await getPort();
@@ -53,11 +102,33 @@ describe("Public API Service - Component Test", async function () {
     transactionPool = stubInterface<types.TransactionPoolClient>();
     (<sinon.SinonStub>virtualMachine.callContract).returns({ resultJson: JSON.stringify("some-answer") });
 
-    const httpServiceConfig = {
-      nodeName: "tester",
-      httpPort
+    const endpoint = `0.0.0.0:${await getPort()}`;
+
+    grpcService = grpcServer.builder()
+      .withService("VirtualMachine", new FakeVirtualMachineService({ nodeName: "tester" }))
+      .withService("TransactionPool", new FakeTransactionPool({ nodeName: "tester" }))
+      .onEndpoint(endpoint);
+
+    grpcService.start();
+
+    const topology = {
+      peers: [
+        {
+          service: "virtual-machine",
+          endpoint,
+        },
+        {
+          service: "consensus",
+          endpoint
+        }
+      ],
     };
-    httpService = new PublicApiHTTPService(virtualMachine, transactionPool, httpServiceConfig);
+
+    const env = {
+      NODE_NAME: "tester",
+      HTTP_PORT: httpPort
+    };
+    httpService = httpServer(topology, env);
     httpService.start();
   });
 
@@ -76,13 +147,13 @@ describe("Public API Service - Component Test", async function () {
       .post("/public/callContract")
       .send(contractInput)
       .expect(200, (err, res) => {
-        expect(virtualMachine.callContract).to.have.been.calledWith(contractInput);
         expect(res.body).to.be.eql({ result: "some-answer" });
         done();
       });
   });
 
   afterEach(async () => {
-    httpService.shutdown();
+    httpService.stop();
+    grpcService.stop();
   });
 });
