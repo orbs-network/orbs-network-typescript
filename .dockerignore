@@ -31,3 +31,14 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Client binaries
+.gradle
+client/crypto-sdk/build
+client/crypto-sdk/deps/libgpg-error/libgpg-error-*
+client/crypto-sdk/deps/libgcrypt/libgcrypt-*
+client/crypto-sdk-android/crypto-sdk/.externalNativeBuild
+client/crypto-sdk-android/crypto-sdk/build
+client/crypto-sdk-javascript/build
+client/crypto-sdk-javascript/deps
+examples/android-sample-app/build
