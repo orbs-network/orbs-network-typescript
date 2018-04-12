@@ -51,6 +51,9 @@ class FakeVirtualMachineService extends Service implements types.VirtualMachineS
 
   @Service.RPCMethod
   callContract(rpc: types.CallContractContext): void {
+    expect(rpc.req.contractAddress).to.be.eql({ address: "contractAddress" });
+    expect(rpc.req.payload).to.be.eql("some-payload");
+
     rpc.res = { resultJson: JSON.stringify("some-answer") };
   }
 
@@ -60,8 +63,9 @@ class FakeVirtualMachineService extends Service implements types.VirtualMachineS
 }
 
 class FakeTransactionPool extends Service implements types.TransactionPoolServer {
+  @Service.RPCMethod
   addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext): void {
-    throw new Error("Method not implemented.");
+    expect(rpc.req).to.be.eql({ transaction });
   }
 
   getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext): void {
@@ -136,10 +140,7 @@ describe("Public API Service - Component Test", async function () {
     request(httpEndpoint)
       .post("/public/sendTransaction")
       .send({ transaction })
-      .expect(200, () => {
-        expect(transactionPool.addNewPendingTransaction).to.have.been.calledWith({ transaction });
-        done();
-      });
+      .expect(200, done);
   });
 
   it("called contract through http propagates properly to the virtual machine", (done) => {
