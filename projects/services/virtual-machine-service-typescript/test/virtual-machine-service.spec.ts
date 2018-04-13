@@ -83,9 +83,11 @@ describe("vm service tests", () => {
       server = virtualMachineServer(topology, vmEnv)
         .withService("StateStorage", storageServer)
         .onEndpoint(endpoint);
-      server.start();
 
       client = grpc.virtualMachineClient({ endpoint });
+
+      // this ensures tests will run after the service is up
+      return server.start();
     });
 
     it("should load contract from service", async () => {
@@ -95,6 +97,6 @@ describe("vm service tests", () => {
     });
 
     after(async () => {
-      server.stop();
+      return server.stop();
     });
 });
