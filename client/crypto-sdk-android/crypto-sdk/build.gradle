@@ -12,6 +12,7 @@ android {
 
         externalNativeBuild {
             cmake {
+                version '3.10.2'
                 arguments '-DPLATFORM=ANDROID'
                 cppFlags '-fexceptions -std=c++11'
             }
@@ -44,15 +45,7 @@ android {
         def buildType = variant.getBuildType().getName()
         def buildTypeName = buildType.capitalize()
 
-        task("create${buildTypeName}BuildDir") {
-            def folder = new File(localBuildDir)
-            if (!folder.exists()) {
-                folder.mkdirs()
-            }
-        }
-
         task("run${buildTypeName}CMake",type: Exec) {
-            dependsOn "create${buildTypeName}BuildDir"
             workingDir localBuildDir
             commandLine 'cmake'
             args '../../../'

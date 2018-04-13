@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 function readlink() {
   DIR=$(echo "${1%/*}")
@@ -25,23 +25,6 @@ function build_ios() {
 }
 
 function build_android() {
-    if [ -z "${ANDROID_NDK_HOME}" ]; then
-        case "$(uname -s)" in
-            Darwin)
-                ANDROID_SDK_HOME=~/Library/Android/sdk
-                ANDROID_NDK_HOME=~${ANDROID_SDK_HOME}/ndk-bundle
-
-                ;;
-            Linux)
-                ANDROID_SDK_HOME=/opt/Android/sdk
-                ANDROID_NDK_HOME=~${ANDROID_SDK_HOME}/ndk-bundle
-
-                ;;
-            *)
-                ;;
-        esac
-    fi
-
     NDK_PLATFORM=${NDK_PLATFORM-"android-16"}
     NDK_PLATFORM_COMPAT="${NDK_PLATFORM_COMPAT:-${NDK_PLATFORM}}"
     NDK_API_VERSION=$(echo "$NDK_PLATFORM" | sed 's/^android-//')
@@ -84,9 +67,9 @@ function build_android() {
 }
 
 function build_current() {
-    make distclean > /dev/null || true
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${LOCAL_PLATFORM_PREFIX}/libgpg-error/"
 
-    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/"
+    make distclean > /dev/null || true
 
     ./configure \
         --with-gpg-error-prefix=${LIBGPG_ERROR_PREFIX} \
@@ -104,6 +87,23 @@ function build_current() {
     fi
 }
 
+case "$(uname -s)" in
+    Darwin)
+        LOCAL_PLATFORM="Mac"
+        ANDROID_HOME=~/Library/Android/sdk
+        ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+
+        ;;
+    Linux)
+        LOCAL_PLATFORM="Linux"
+        ANDROID_HOME=/opt/Android/sdk
+        ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+
+        ;;
+    *)
+        ;;
+esac
+
 NPROCESSORS=$(getconf NPROCESSORS_ONLN 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null)
 PROCESSORS=${NPROCESSORS:-3}
 
@@ -111,9 +111,14 @@ LIBGCRYPT_VERSION=1.8.2
 LIBGCRYPT_PACKAGE="libgcrypt-${LIBGCRYPT_VERSION}"
 
 PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
+LOCAL_PLATFORM_PREFIX=$(echo "${LOCAL_PLATFORM}" | awk '{print tolower($0)}')
 PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgcrypt/"
-mkdir -p ${PREFIX}
+LOCAL_PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgcrypt/"
+
+mkdir -p ${PREFIX} ${LOCAL_PREFIX}
+
 PREFIX=$(readlink "${PREFIX}")
+LOCAL_PREFIX=$(readlink "${LOCAL_PREFIX}")
 
 cd ${LIBGCRYPT_PACKAGE}
 

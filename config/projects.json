@@ -50,7 +50,7 @@
     "path": "client/crypto-sdk-javascript"
   },
   "crypto-sdk-android": {
-    "runtime": "Android",
+    "runtime": "java",
     "type": "library",
     "path": "client/crypto-sdk-android"
   },

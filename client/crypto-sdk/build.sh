@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 function build_ios() {
     echo "Building for ${IOS_PLATFORM}..."
@@ -14,13 +14,13 @@ function build_android() {
     if [ -z "$ANDROID_NDK_HOME" ]; then
         case "$(uname -s)" in
             Darwin)
-                ANDROID_SDK_HOME=~/Library/Android/sdk
-                ANDROID_NDK_HOME=~${ANDROID_SDK_HOME}/ndk-bundle
+                ANDROID_HOME=~/Library/Android/sdk
+                ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
                 ;;
             Linux)
-                ANDROID_SDK_HOME=/opt/Android/sdk
-                ANDROID_NDK_HOME=~${ANDROID_SDK_HOME}/ndk-bundle
+                ANDROID_HOME=/opt/Android/sdk
+                ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
                 ;;
             *)
@@ -35,28 +35,28 @@ function build_android() {
 
 function build_current() {
     (cd ../ && CMAKE_ONLY=1 ./clean.sh)
-    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=${PLATFORM}
+    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=${LOCAL_PLATFORM}
     make
 }
 
-if [ -z "${PLATFORM}" ]; then
-    SYSNAME="$(uname -s)"
-    case ${SYSNAME} in
-        Darwin)
-            export PLATFORM="Mac"
+SYSNAME="$(uname -s)"
+case ${SYSNAME} in
+    Darwin)
+        export LOCAL_PLATFORM="Mac"
 
-            ;;
-        Linux)
-            export PLATFORM="Linux"
+        ;;
+    Linux)
+        export LOCAL_PLATFORM="Linux"
 
-            ;;
-        *)
-            echo "Unsupported system ${SYSNAME}!"
-            exit 1
+        ;;
+    *)
+        echo "Unsupported system ${SYSNAME}!"
+        exit 1
 
-            ;;
-    esac
-fi
+        ;;
+esac
+
+export PLATFORM=${PLATFORM:-${LOCAL_PLATFORM}}
 
 ./build-deps.sh
 
@@ -89,10 +89,10 @@ case ${PLATFORM} in
         ANDROID_ABI="x86_64"
         build_android
 
+        build_current
         ;;
     *)
-        cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=${PLATFORM}
-        make
+        build_current
 
         ;;
 esac
