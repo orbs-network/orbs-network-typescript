@@ -15,9 +15,9 @@ else()
     include_directories(${JNI_INCLUDE_DIRS})
 
     if(APPLE)
-        set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/build/outputs/jar/libcryptosdk.dylib)
+        set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/mac/libcryptosdk.dylib)
     else()
-        set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/build/outputs/jar/libcryptosdk.so)
+        set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/linux/libcryptosdk.so)
     endif()
 endif()
 

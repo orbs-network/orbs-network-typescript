@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 apply plugin: 'com.android.library'
 
 android {
@@ -57,7 +59,26 @@ android {
             commandLine 'make'
         }
 
+        task("copy${buildTypeName}CryptoSDKLibrary", type: Copy) {
+            def localPlatform
+            def cryptoSDKName
+            if (OperatingSystem.current().isMacOsX()) {
+                localPlatform = 'mac'
+                cryptoSDKName = 'libcryptosdk.dylib'
+            } else if (OperatingSystem.current().isLinux()) {
+                localPlatform = 'linux'
+                cryptoSDKName = 'libcryptosdk.so'
+            } else {
+                throw new GradleException('Unsupported platform!')
+            }
+
+            from("src/main/jniLibs/${localPlatform}/")
+            into(localBuildDir)
+            include(cryptoSDKName)
+        }
+
         task("create${buildTypeName}Jar", type: Copy) {
+            dependsOn "copy${buildTypeName}CryptoSDKLibrary"
             from("build/intermediates/packaged-classes/${buildType}/")
             into(localBuildDir)
             include('classes.jar')

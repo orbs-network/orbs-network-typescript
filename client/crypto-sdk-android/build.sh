@@ -12,7 +12,6 @@ fi
 JNILIBS_DIR=crypto-sdk/src/main/jniLibs
 CRYPTO_SDK_BUILD_DIR=../crypto-sdk/build
 CRYPTO_SDK_ANDROID_BUILD_DIR=${CRYPTO_SDK_BUILD_DIR}/android
-CRYPTO_SDK_JAVA_BUILD_DIR=crypto-sdk/build/outputs/jar
 mkdir -p ${JNILIBS_DIR}/armeabi-v7a/ ${JNILIBS_DIR}/arm64-v8a/ ${JNILIBS_DIR}/x86/ ${JNILIBS_DIR}/x86_64/
 cp -f ${CRYPTO_SDK_ANDROID_BUILD_DIR}/armv7-a/lib/libcryptosdk.so ${JNILIBS_DIR}/armeabi-v7a/
 cp -f ${CRYPTO_SDK_ANDROID_BUILD_DIR}/armv8-a/lib/libcryptosdk.so ${JNILIBS_DIR}/arm64-v8a/
@@ -37,8 +36,8 @@ case "$(uname -s)" in
         ;;
 esac
 
-mkdir -p ${CRYPTO_SDK_JAVA_BUILD_DIR}
-cp -f ${CRYPTO_SDK_BUILD_DIR}/${LOCAL_LIBRARY} ${CRYPTO_SDK_JAVA_BUILD_DIR}
+mkdir -p ${JNILIBS_DIR}/${LOCAL_PLATFORM}
+cp -f ${CRYPTO_SDK_BUILD_DIR}/${LOCAL_LIBRARY} ${JNILIBS_DIR}/${LOCAL_PLATFORM}/
 
 if [ -n "${DEBUG}" ] ; then
     BUILD_TYPE=Debug
