@@ -2,7 +2,7 @@ import { crc32 } from "crc";
 import * as bs58 from "bs58";
 import * as crypto from "crypto";
 
-export default class Address {
+export class Address {
   readonly networkId: string;
   readonly virtualChainId: string;
   readonly publicKey: Buffer;

@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "./addresses.proto";
-
 message Transaction {
   TransactionHeader header = 1;
   string payload = 2;

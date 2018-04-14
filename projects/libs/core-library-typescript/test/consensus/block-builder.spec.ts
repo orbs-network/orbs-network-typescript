@@ -6,7 +6,7 @@ import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 import { TransactionPoolClient, VirtualMachineClient, BlockStorageClient } from "orbs-interfaces";
 import { BlockUtils, TransactionUtils } from "../../src/common-library";
-import Address, { createContractAddress } from "../../src/common-library/address";
+import { Address, createContractAddress } from "../../src/common-library/address";
 import * as sinon from "sinon";
 import { createHash } from "crypto";
 

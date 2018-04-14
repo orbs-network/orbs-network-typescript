@@ -1,5 +1,5 @@
 import { types } from "../common-library/types";
-import Address, { createContractAddress } from "../common-library/address";
+import  { Address, createContractAddress } from "../common-library/address";
 import { createHash } from "crypto";
 
 export default function aDummyTransaction(timestamp?: number): types.Transaction {
