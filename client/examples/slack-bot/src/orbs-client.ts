@@ -1,6 +1,6 @@
 import { delay } from "bluebird";
 import { PublicApiClient, Transaction, UniversalAddress } from "orbs-interfaces";
-import { Address } from "orbs-crypto-sdk";
+import { Address } from "orbs-client-sdk";
 import * as crypto from "crypto";
 
 type OrbsHardCodedContractMethodArgs = [string | number] | any[];
@@ -60,7 +60,7 @@ export class OrbsClientSession {
   async call(contractAddress: string, payload: string) {
     const { resultJson } = await this.orbsClient.callContract({
       sender: this.getAddress(),
-      contractAddress: {address: contractAddress},
+      contractAddress: { address: contractAddress },
       payload: payload
     });
     return JSON.parse(resultJson);
@@ -74,14 +74,14 @@ export class OrbsClientSession {
         timestamp: Date.now().toString()
       },
       body: {
-        contractAddress: {address: contractAddress},
+        contractAddress: { address: contractAddress },
         payload: payload
       },
     };
   }
 
   public getAddress(): UniversalAddress {
-    return {id: new Buffer(this.senderAddress), scheme: 0, networkId: 0, checksum: 0};
+    return { id: new Buffer(this.senderAddress), scheme: 0, networkId: 0, checksum: 0 };
   }
 }
 
