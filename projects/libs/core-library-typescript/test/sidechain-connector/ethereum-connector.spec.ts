@@ -88,13 +88,13 @@ describe("Ethereum connector", () => {
           }, []);
       });
       it("should return the values passed to the contract constructor", () => {
-        expect(res).to.own.property("result");
-        expect(res.result).to.own.property("intValue", intValue.toString());
-        expect(res.result).to.own.property("stringValue", stringValue);
+        expect(res).to.ownProperty("result");
+        expect(res.result).to.ownProperty("intValue", intValue.toString());
+        expect(res.result).to.ownProperty("stringValue", stringValue);
       });
       it("should return a valid block with a recent timestamp", () => {
-        expect(res).to.own.property("block");
-        expect(res.block).to.own.property("timestamp");
+        expect(res).to.ownProperty("block");
+        expect(res.block).to.ownProperty("timestamp");
         const now = Date.now() / 1000;
         expect(res.block.timestamp).to.be.gt(now - 600);
         expect(res.block.timestamp).to.be.lt(now + 10);

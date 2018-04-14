@@ -4,23 +4,14 @@ import "./addresses.proto";
 
 message Transaction {
   TransactionHeader header = 1;
-  TransactionBody body = 2;
+  string payload = 2;
 }
 
 message TransactionHeader {
   uint32 version = 1;
-  UniversalAddress sender = 2;
+  bytes sender = 2;
   uint64 timestamp = 3;
-}
-
-message TransactionBody {
-  ContractAddress contractAddress = 1;
-  string payload = 2;
-}
-
-message TransactionSubscriptionAppendix {
-  string subscriptionKey = 1; // TODO: what's the key format?
-  // bytes subscriptionSignature = 2; // TODO: how is it calculated?
+  bytes contractAddress = 4;
 }
 
 message TransactionReceipt {

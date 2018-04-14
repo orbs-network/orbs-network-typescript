@@ -3,8 +3,7 @@ import { Gossip } from "../../src/gossip";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
-import { stubObject } from "ts-sinon";
-import * as chaiBytes from "chai-bytes";
+import { stubObject, stubInterface } from "ts-sinon";
 import { delay } from "bluebird";
 import * as shell from "shelljs";
 
@@ -12,7 +11,6 @@ const expect = chai.expect;
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
-chai.use(chaiBytes);
 
 describe("Gossip", function () {
   this.timeout(20000);
@@ -26,7 +24,8 @@ describe("Gossip", function () {
       gossips = [];
       for (let i = 0; i < numberOfGossips; i++) {
         const consensus = stubObject<types.ConsensusClient>(<types.ConsensusClient>{}, ["gossipMessageReceived"]);
-        const gossip = new Gossip({ localAddress: `node${i}`, port: 30070 + i, peers: { consensus } });
+        const keyManager = stubInterface<KeyManager>();
+        const gossip = new Gossip({ localAddress: `node${i}`, port: 30070 + i, peers: { consensus }, keyManager, signMessages: false});
         consensuses.push(consensus);
         gossips.push(gossip);
       }
@@ -46,7 +45,7 @@ describe("Gossip", function () {
         const consensus = consensuses[i];
         if (i == recipientId) {
           expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-          expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
+          expect((<sinon.SinonSpy>consensus.gossipMessageReceived).getCall(0).args[0]).to.have.property("buffer").which.deep.equal(buffer);
         } else {
           expect(consensus.gossipMessageReceived).to.have.not.been.called;
         }
@@ -64,7 +63,7 @@ describe("Gossip", function () {
         const consensus = consensuses[i];
         if (i != senderId) {
           expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-          expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
+          expect((<sinon.SinonSpy>consensus.gossipMessageReceived).getCall(0).args[0]).to.have.property("buffer").which.deep.equal(buffer);
         } else {
           expect(consensus.gossipMessageReceived).to.have.not.been.called;
         }
@@ -99,7 +98,7 @@ describe("Gossip", function () {
         const consensus = stubObject<types.ConsensusClient>(<types.ConsensusClient>{}, ["gossipMessageReceived"]);
         const gossip = new Gossip({
           localAddress: `node${i}`, port: 30070 + i, peers: { consensus },
-          keyManager: true,
+          signMessages: true,
           keyManager: new KeyManager({
             privateKeyPath: `${__dirname}/test-private-keys/node${i}`,
             publicKeysPath: `${__dirname}/test-public-keys/`
@@ -124,7 +123,7 @@ describe("Gossip", function () {
         const consensus = consensuses[i];
         if (i == recipientId) {
           expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-          expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
+          expect((<sinon.SinonSpy>consensus.gossipMessageReceived).getCall(0).args[0]).to.have.property("buffer").which.deep.equal(buffer);
         } else {
           expect(consensus.gossipMessageReceived).to.have.not.been.called;
         }
@@ -142,7 +141,7 @@ describe("Gossip", function () {
         const consensus = consensuses[i];
         if (i != senderId) {
           expect(consensus.gossipMessageReceived).to.have.been.calledOnce;
-          expect(consensus.gossipMessageReceived.getCall(0).args[0]).to.have.property("buffer").which.equalBytes(buffer);
+          expect((<sinon.SinonSpy>consensus.gossipMessageReceived).getCall(0).args[0]).to.have.property("buffer").which.deep.equal(buffer);
         } else {
           expect(consensus.gossipMessageReceived).to.have.not.been.called;
         }

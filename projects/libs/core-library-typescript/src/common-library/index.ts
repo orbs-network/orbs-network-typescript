@@ -9,3 +9,4 @@ export * from "./block-utils";
 export * from "./json-buffer";
 export * from "./transaction-utils";
 export * from "./key-manager";
+export * from "./address";

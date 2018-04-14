@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { Contracts, HardCodedSmartContractRegistry, HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
+import { createContractAddress } from "../../src/common-library/address";
 
 function stubConfig(contracts: Contracts) {
   return {
@@ -11,18 +12,19 @@ function stubConfig(contracts: Contracts) {
 
 const STUB_CONTRACT_FILE_NAME =  "stub-contract";
 
+const VCHAIN_ID = "010101";
+const CONTRACT_NAME = "test";
+const CONTRACT_ADDRESS = createContractAddress(CONTRACT_NAME, VCHAIN_ID);
+
 describe("the hard-coded smart contract registry", () => {
-
-  it("registers contracts from config when a config is provided", () => {
-
-    const registry = new HardCodedSmartContractRegistry(stubConfig([{address: "address1", filename: STUB_CONTRACT_FILE_NAME}]));
-
-    expect(registry.contractAddresses()).to.eql(["address1"]);
+  let registry: HardCodedSmartContractRegistry;
+  beforeEach(() => {
+    registry = new HardCodedSmartContractRegistry(stubConfig([{vchainId: "010101", name: CONTRACT_NAME, filename: STUB_CONTRACT_FILE_NAME}]));
   });
 
-  it("retreives a contract by address", () => {
-    const registry = new HardCodedSmartContractRegistry(stubConfig([{address: "test", filename: STUB_CONTRACT_FILE_NAME}]));
+  it("retrieves a contract by address", () => {
+    registry = new HardCodedSmartContractRegistry(stubConfig([{vchainId: "010101", name: CONTRACT_NAME, filename: STUB_CONTRACT_FILE_NAME}]));
 
-    expect(registry.getContract("test")).to.have.property("default").that.is.a("function");
+    expect(registry.getContractByRawAddress(CONTRACT_ADDRESS.toBuffer())).to.have.property("default").that.is.a("function");
   });
 });

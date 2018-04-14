@@ -7,19 +7,21 @@ import { stubInterface } from "ts-sinon";
 import { BlockUtils } from "../../src/common-library";
 import { StateStorage } from "../../src/state-storage";
 import * as sinon from "sinon";
+import { createContractAddress } from "../../src/common-library/address";
 
 chai.use(sinonChai);
 
-function anInitialBlockChain(numOfBlocks, stateDiff: types.ModifiedStateKey[]): types.Block[] {
+function anInitialBlockChain(numOfBlocks: number, stateDiff: types.ModifiedStateKey[]): types.Block[] {
   const blocks: types.Block[] = [];
   let prevBlock: types.Block;
   for (let i = 0; i < numOfBlocks - 1; i++) {
-    prevBlock = BlockUtils.buildNextBlock({transactions: [], stateDiff: []}, prevBlock);
+    prevBlock = BlockUtils.buildNextBlock({transactions: [], stateDiff: [], transactionReceipts: []}, prevBlock);
     blocks.push(prevBlock);
   }
   // one last block with the state diff
   const lastBlock = BlockUtils.buildNextBlock({
     transactions: [],
+    transactionReceipts: [],
     stateDiff
   }, prevBlock);
   blocks.push(lastBlock);
@@ -32,12 +34,12 @@ function anInitialBlockChain(numOfBlocks, stateDiff: types.ModifiedStateKey[]): 
 describe("the state storage", () => {
   let blockStorage: types.BlockStorageClient;
   let stateStorage: StateStorage;
-  const contractAddress: types.ContractAddress = { address: "dummyContract" };
+  const contractAddress = createContractAddress("dummyContract").toBuffer();
   const blocks = anInitialBlockChain(4, [{contractAddress , key: "dummyKey", value: "dummyValue"}]);
   before(async () => {
     blockStorage = stubInterface<types.BlockStorageClient>();
     const lastBlock = blocks[blocks.length - 1];
-    blockStorage.getLastBlock.returns({block: blocks[blocks.length - 1]});
+    (<sinon.SinonStub>blockStorage.getLastBlock).returns({block: blocks[blocks.length - 1]});
     blockStorage.getBlocks = input => ({ blocks: blocks.slice(input.lastBlockHeight + 1) });
 
     stateStorage = new StateStorage(blockStorage);
