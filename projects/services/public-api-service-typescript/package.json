@@ -19,6 +19,8 @@
     "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js"
   },
   "dependencies": {
+    "bs58": "^4.0.1",
+    "express": "^4.16.3",
     "lodash": "^4.17.5",
     "orbs-core-library": "file:../../libs/core-library-typescript"
   },

@@ -32,7 +32,7 @@ export default class BlockBuilder {
           await this.appendNextBlock();
         }
       } catch (err) {
-        logger.error("newBlockAppendTick error: " + err);
+        logger.error(`newBlockAppendTick error: ${JSON.stringify(err)}`);
       }
     }, this.pollIntervalMs);
   }

@@ -13,12 +13,11 @@ const expect = chai.expect;
 chai.should();
 chai.use(ChaiBarsPlugin);
 
-const VIRTUAL_CHAIN_ID = "640ed3";
-const generateAddress = (): string => {
+const generateAddress = (): Address => {
   const key = new ED25519Key();
-  const address = new Address(key.publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+  const address = new Address(key.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
 
-  return address.toString();
+  return address;
 };
 
 const testConfig = loadDefaultTestConfig();

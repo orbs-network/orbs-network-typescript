@@ -6,41 +6,18 @@ import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 import { PendingTransactionPool, CommittedTransactionPool } from "../../src/transaction-pool";
+import aDummyTransaction from "../../src/test-kit/dummy-transaction";
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 
 function aValidTransaction() {
-  const transaction: types.Transaction = {
-    header: {
-      version: 0,
-      sender: {id: new Buffer("sender"), scheme: 0, networkId: 0, checksum: 0},
-      timestamp: Date.now().toString()
-    },
-    body: {
-      contractAddress: {address: "address"},
-      payload: "payload"
-    }
-  };
-
-  return transaction;
+  return aDummyTransaction();
 }
 
 function anExpiredTransaction() {
-  const transaction: types.Transaction = {
-    header: {
-      version: 0,
-      sender: {id: new Buffer("sender"), scheme: 0, networkId: 0, checksum: 0},
-      timestamp: (Date.now() - 60 * 1000 * 10).toString() // of 10 minutes ago
-    },
-    body: {
-      contractAddress: {address: "address"},
-      payload: "payload"
-    }
-  };
-
-  return transaction;
+  return aDummyTransaction(Date.now() - 60 * 1000 * 10);
 }
 
 describe("Transaction Pool", () => {
@@ -50,7 +27,7 @@ describe("Transaction Pool", () => {
   beforeEach(() => {
     gossip = stubInterface<types.GossipClient>();
     const committedTransactionPool = stubInterface<CommittedTransactionPool>();
-    committedTransactionPool.hasTransactionWithId.returns(false);
+    (<sinon.SinonStub>committedTransactionPool.hasTransactionWithId).returns(false);
     transactionPool = new PendingTransactionPool(gossip, committedTransactionPool, { transactionLifespanMs: 30000, cleanupIntervalMs: 1000 });
   });
 
@@ -63,7 +40,7 @@ describe("Transaction Pool", () => {
     expect(gossip.broadcastMessage).to.have.been.called;
   });
 
-  it("two identical transaction are processed only once", async () => {
+  it("two identical transactions are processed only once", async () => {
     const tx = aValidTransaction();
     const txid = await transactionPool.addNewPendingTransaction(tx);
     await expect(transactionPool.addNewPendingTransaction(tx)).to.eventually.be.rejectedWith(
@@ -116,7 +93,6 @@ describe("Transaction Pool", () => {
     it("", async () => {
       const tx1 = aValidTransaction();
       await transactionPool.addNewPendingTransaction(tx1);
-      console.log("transactionPool.transactionLifespanMs", transactionPool.transactionLifespanMs);
       clock.tick(transactionPool.transactionLifespanMs + 1);
 
       const tx2 = aValidTransaction();

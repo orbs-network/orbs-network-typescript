@@ -8,6 +8,7 @@ import {
 
 import BaseSmartContract from "./base-smart-contact";
 import { HardCodedSmartContractRegistry } from "./hard-coded-smart-contract-registry";
+import { bs58EncodeRawAddress } from "../..";
 
 // TODO: move to types and force the CallRequest to have that kind of payload?
 export interface CallPayload {
@@ -16,12 +17,10 @@ export interface CallPayload {
 }
 
 export interface CallRequest {
-  sender: types.UniversalAddress;
+  sender: Buffer;
   payload: string;
-  contractAddress: types.ContractAddress;
+  contractAddress: Buffer;
 }
-
-
 
 export default class HardCodedSmartContractProcessor {
   stateStorageClient: types.StateStorageClient;
@@ -62,13 +61,13 @@ export default class HardCodedSmartContractProcessor {
   }
 
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
-    const Contract = this.registry.getContract(request.contractAddress.address);
+    const Contract = this.registry.getContractByRawAddress(request.contractAddress);
     if (Contract == undefined) {
       throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
     }
 
     const { method, args } = this.parsePayload(request.payload);
-    const contract = new Contract.default(request.sender.id, stateAdapter);
+    const contract = new Contract.default(bs58EncodeRawAddress(request.sender), stateAdapter);
 
     return contract[method](...args);
   }

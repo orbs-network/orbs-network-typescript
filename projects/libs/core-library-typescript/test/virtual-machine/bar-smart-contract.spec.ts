@@ -6,12 +6,14 @@ import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-st
 import BarSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/foobar-smart-contract";
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
 import { types } from "../../src";
+import Address, { createContractAddress } from "../../src/common-library/address";
+import { createHash } from "crypto";
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {
   lastBlockId: number;
   stateCache: StateCache;
 
-  constructor(contractAddress: types.ContractAddress, stateCache: StateCache) {
+  constructor(contractAddress: Buffer, stateCache: StateCache) {
     super(contractAddress);
 
     this.stateCache = stateCache;
@@ -26,9 +28,9 @@ export default class ContractStateMemCacheAccessor extends BaseContractStateAcce
   }
 }
 
-const CONTRACT_ADDRESS = {address: "barbar"};
-const SENDER_ADDRESS = "1111";
-const RECIPIENT_ADDRESS = "2222";
+const CONTRACT_ADDRESS = createContractAddress("foobar").toBuffer();
+const SENDER_ADDRESS = new Address(createHash("sha256").update("sender").digest()).toBase58();
+const RECIPIENT_ADDRESS = new Address(createHash("sha256").update("recipient").digest()).toBase58();
 const adapter = new ContractStateMemCacheAccessor(CONTRACT_ADDRESS, new StateCache());
 const senderContract = new BarSmartContract(SENDER_ADDRESS, adapter);
 const recipientContract = new BarSmartContract(RECIPIENT_ADDRESS, adapter);

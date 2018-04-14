@@ -3,9 +3,9 @@ import { types } from "../common-library/types";
 import { StateCache } from "./state-cache";
 
 export abstract class BaseContractStateAccessor {
-  protected contractAddress: types.ContractAddress;
+  protected contractAddress: Buffer;
 
-  constructor(contractAddress: types.ContractAddress) {
+  constructor(contractAddress: Buffer) {
     this.contractAddress = contractAddress;
   }
 
@@ -22,7 +22,7 @@ export class ContractStateReadOnlyAccessor extends BaseContractStateAccessor {
   stateStorageClient: types.StateStorageClient;
   stateCache: StateCache;
 
-  constructor(contractAddress: types.ContractAddress, stateCache: StateCache, stateStorageClient: types.StateStorageClient) {
+  constructor(contractAddress: Buffer, stateCache: StateCache, stateStorageClient: types.StateStorageClient) {
     super(contractAddress);
     this.stateCache = stateCache;
     this.stateStorageClient = stateStorageClient;

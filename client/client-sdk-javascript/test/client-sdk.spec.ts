@@ -3,69 +3,53 @@ import  * as chai from "chai";
 import { Address } from "../src/address";
 import { ED25519Key } from "../src/ed25519key";
 import { OrbsClient } from "../src";
-import PublicApiConnection from "../src/public-api-connection";
 import * as sinonChai from "sinon-chai";
 import * as nock from "nock";
-import { ContractAddress, Transaction, SendTransactionInput, CallContractInput, UniversalAddress } from "orbs-interfaces";
 import mockHttpServer from "./mock-server";
 import { Server } from "http";
+import { stubInterface } from "ts-sinon";
+import { Transaction, SendTransactionInput, CallContractInput } from "orbs-interfaces";
+import * as crypto from "crypto";
 
 chai.use(sinonChai);
 
-const publicKey = new ED25519Key().publicKey;
+const senderPublicKey = new ED25519Key().publicKey;
 const VIRTUAL_CHAIN_ID = "640ed3";
-const senderAddress = new Address(publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+const senderAddress = new Address(senderPublicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+const contractKey = crypto.createHash("sha256").update("contractName").digest("hex");
+const contractAddress = new Address(contractKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
 const HTTP_PORT = 8888;
 const API_ENDPOINT = `http://localhost:${HTTP_PORT}`;
 const TIMEOUT = 20;
 
-const universalAddress: UniversalAddress = {
-  id: new Buffer(senderAddress.toString()),
-  networkId: Number(Address.TEST_NETWORK_ID),
-  checksum: 0,
-  scheme: 0
-};
-
-const expectedTransaction: Transaction = {
-  header: {
-    version: 0,
-    sender: universalAddress,
-    timestamp: Date.now().toString()
-  },
-  body: {
-    contractAddress: {
-      address: "contractAddress"
-    },
-    payload: "payload"
-  }
-};
-
-const expectedContract: CallContractInput = {
-  sender: universalAddress,
-  contractAddress: {
-    address: "contractAddress"
-  },
-  payload: "call-payload"
-};
-
 describe("A client calls the connector interface with the correct inputs when", async function () {
   let orbsClient: OrbsClient;
-  let httpServer: Server;
 
   beforeEach(async () => {
-    orbsClient = new OrbsClient(API_ENDPOINT, senderAddress.toString(), TIMEOUT);
-    httpServer = mockHttpServer(expectedTransaction, expectedContract).listen(HTTP_PORT);
+    orbsClient = new OrbsClient(API_ENDPOINT, senderAddress, TIMEOUT);
   });
 
   it("sendTransaction() is called", async () => {
-    expect(await orbsClient.sendTransaction("contractAddress", "payload")).to.be.eql("ok");
+    nock(API_ENDPOINT)
+      .post("/public/sendTransaction", (res: any) => {
+        expect(res.transaction).to.haveOwnProperty("header");
+        expect(res.transaction.header).to.haveOwnProperty("senderAddressBase58", senderAddress.toString());
+        expect(res.transaction.header).to.haveOwnProperty("contractAddressBase58", contractAddress.toString());
+        expect(res.transaction).to.haveOwnProperty("payload", "payload");
+        return true;
+      }).reply(200, { result: "ok" });
+
+    expect(await orbsClient.sendTransaction(contractAddress, "payload")).to.be.eql("ok");
   });
 
   it("callContract() is called", async () => {
-    expect(await orbsClient.call("contractAddress", "call-payload")).to.be.eql("some-answer");
-  });
+    nock(API_ENDPOINT)
+      .post("/public/callContract", (res: any) => {
+        expect(res.contractAddressBase58).to.be.eql(contractAddress.toString());
+        expect(res.payload).to.be.eql("call-payload");
+        return true;
+      }).reply(200, { result: 12 });
 
-  afterEach(async () => {
-    httpServer.close();
+    expect(await orbsClient.call(contractAddress, "call-payload")).to.be.eql(12);
   });
 });

@@ -25,8 +25,8 @@ export class VirtualMachine {
       try {
         await this.processor.processTransaction({
           sender: transaction.header.sender,
-          payload: transaction.body.payload,
-          contractAddress: transaction.body.contractAddress,
+          payload: transaction.payload,
+          contractAddress: transaction.header.contractAddress,
         }, transactionScopeStateCache);
         success = true;
         stateCache.merge(transactionScopeStateCache.getModifiedKeys());
@@ -34,7 +34,7 @@ export class VirtualMachine {
         if (!err.expected) {
           throw err;
         } else {
-          logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${err}`);
+          logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${JSON.stringify(err)}`);
           continue;
         }
       } finally {

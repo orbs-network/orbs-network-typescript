@@ -7,7 +7,7 @@ service StateStorage {
 }
 
 message ReadKeysInput {
-  ContractAddress contractAddress = 1;
+  bytes contractAddress = 1;
   repeated string keys = 2;
 }
 
