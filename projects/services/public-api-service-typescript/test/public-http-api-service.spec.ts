@@ -1,11 +1,10 @@
-import { types, ErrorHandler } from "orbs-core-library";
+import { types, ErrorHandler, bs58DecodeRawAddress } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/http-service";
 import { stubInterface } from "ts-sinon";
 import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
-import * as bs58 from "bs58";
 
 chai.use(sinonChai);
 
@@ -43,8 +42,8 @@ describe("Public API Service - Component Test", async function () {
       header: {
         version: 0,
         timestamp: transactionTimestamp,
-        sender: bs58.decode(senderAddressBase58),
-        contractAddress: bs58.decode(contractAddressBase58)
+        sender: bs58DecodeRawAddress(senderAddressBase58),
+        contractAddress: bs58DecodeRawAddress(contractAddressBase58)
       },
       payload
     };
@@ -66,9 +65,9 @@ describe("Public API Service - Component Test", async function () {
   });
 
   it("called contract through http propagates properly to the virtual machine", (done) => {
-    const virtualMachineCallContractInput : types.CallContractInput = {
-      sender: bs58.decode(senderAddressBase58),
-      contractAddress: bs58.decode(contractAddressBase58),
+    const virtualMachineCallContractInput: types.CallContractInput = {
+      sender: bs58DecodeRawAddress(senderAddressBase58),
+      contractAddress: bs58DecodeRawAddress(contractAddressBase58),
       payload
     };
     request(httpEndpoint)
