@@ -1,8 +1,8 @@
-import { OrbsHardCodedContractAdapter } from "./orbs-client";
+import { OrbsContractAdapter } from "orbs-client-sdk";
 export class FooBarContractClient {
-  adapter: OrbsHardCodedContractAdapter;
+  adapter: OrbsContractAdapter;
 
-  public constructor(adapter: OrbsHardCodedContractAdapter) {
+  public constructor(adapter: OrbsContractAdapter) {
     this.adapter = adapter;
   }
 
@@ -24,7 +24,7 @@ export class FooBarAccount {
   foobarContractClient: FooBarContractClient;
   readonly address: string;
 
-  constructor(accountAddress: string, adapter: OrbsHardCodedContractAdapter) {
+  constructor(accountAddress: string, adapter: OrbsContractAdapter) {
     this.foobarContractClient = new FooBarContractClient(adapter);
     this.address = accountAddress;
   }

@@ -1,12 +1,10 @@
-import { PublicApiClient } from "orbs-interfaces";
-import { initPublicApiClient } from "./public-api-client";
-import { OrbsClientSession, OrbsHardCodedContractAdapter, generateAddress } from "./orbs-client";
 import { FooBarAccount } from "./foobar-account";
 import { RTMClient } from "@slack/client";
+import { OrbsClient, OrbsContractAdapter, Address } from "orbs-client-sdk";
+import * as crypto from "crypto";
 
 interface Config {
-  subscriptionKey: string;
-  publicApiClient: PublicApiClient;
+  endpoint: string;
   timeout: number;
 }
 
@@ -21,17 +19,24 @@ const {
 const PULL_REQUEST_AWARD = 100;
 
 const config = {
-  subscriptionKey: "0x0213e3852b8afeb08929a0f448f2f693b0fc3ebe",
-  publicApiClient: initPublicApiClient({
-    endpoint: ORBS_API_ENDPOINT
-  }),
+  endpoint: ORBS_API_ENDPOINT,
   timeout: Number(TRANSACTION_TIMEOUT) || 2000
 };
 
+
+function generateAddress(username: string): string {
+  const virtualChainId = "640ed3";
+  const publicKey = crypto.createHash("sha256").update(username).digest("hex");
+  const address = new Address(publicKey, virtualChainId, Address.TEST_NETWORK_ID);
+
+  return address.toString();
+}
+
+
 async function getAccount(username: string, config: Config): Promise<FooBarAccount> {
   const address = generateAddress(username);
-  const orbsSession = new OrbsClientSession(address, config.subscriptionKey, config.publicApiClient, config.timeout);
-  const contractAdapter = new OrbsHardCodedContractAdapter(orbsSession, "foobar");
+  const orbsClient = new OrbsClient(address, undefined, config.timeout);
+  const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
   const account = new FooBarAccount(username, address, contractAdapter);
 
   return Promise.resolve(account);

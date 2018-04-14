@@ -41,3 +41,7 @@ docker-compose.test.yml.tmp*
 # Databases
 db
 .ldb_history
+
+# keys
+private-keys
+public-keys

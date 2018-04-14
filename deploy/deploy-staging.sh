@@ -11,7 +11,7 @@ export ETHEREUM_NODE_IP=ethereum.services.orbs-test.com
 
 npm run build-ts
 
-node dist/deploy.js \
+node dist/multi-account.js \
     --region $REGIONS \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \

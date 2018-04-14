@@ -45,3 +45,8 @@ client/crypto-sdk-android/crypto-sdk/build
 client/crypto-sdk-javascript/build
 client/crypto-sdk-javascript/deps
 examples/android-sample-app/build
+
+# Deploy & config
+deploy
+.circleci
+.vscode

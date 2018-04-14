@@ -3,12 +3,14 @@ import * as _ from "lodash";
 import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
-import { Gossip } from "orbs-core-library";
+import { Gossip, KeyManager } from "orbs-core-library";
 
 export interface GossipServiceConfig extends ServiceConfig {
   gossipPort: number;
   peers: any;
   gossipPeers: any;
+  keyManager?: KeyManager;
+  signMessages: boolean;
 }
 
 export default class GossipService extends Service {
@@ -25,8 +27,13 @@ export default class GossipService extends Service {
 
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
-    this.gossip = new Gossip({ port: gossipConfig.gossipPort, localAddress: gossipConfig.nodeName,
-      peers: (<GossipServiceConfig>this.config).peers });
+    this.gossip = new Gossip({
+      port: gossipConfig.gossipPort,
+      localAddress: gossipConfig.nodeName,
+      peers: (<GossipServiceConfig>this.config).peers,
+      keyManager: (<GossipServiceConfig>this.config).keyManager,
+      signMessages: (<GossipServiceConfig>this.config).signMessages
+    });
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();

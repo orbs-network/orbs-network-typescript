@@ -12,7 +12,6 @@ protos.set("TransactionPool", "transaction-pool.proto");
 protos.set("Gossip", "gossip.proto");
 protos.set("BlockStorage", "block-storage.proto");
 protos.set("StateStorage", "state-storage.proto");
-protos.set("PublicApi", "public-api.proto");
 protos.set("VirtualMachine", "virtual-machine.proto");
 protos.set("SidechainConnector", "sidechain-connector.proto");
 protos.set("Management", "management.proto");
@@ -56,6 +55,14 @@ export class GRPCServerBuilder {
     const all = Promise.all(this.services.map(s => s.start()));
 
     this.mali.start(this.endpoint);
+
+    return all;
+  }
+
+  stop(): Promise<any> {
+    const all = Promise.all(this.services.map(s => s.stop()));
+
+    this.mali.close(this.endpoint);
 
     return all;
   }

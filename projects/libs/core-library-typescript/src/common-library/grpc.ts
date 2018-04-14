@@ -134,14 +134,6 @@ export namespace grpc {
     return client({ proto: "transaction-pool.proto", name: "TransactionPool", endpoint });
   }
 
-  export function publicApiServer({ endpoint, service }: { endpoint: string, service: types.PublicApiServer }) {
-    return runServer({ proto: "public-api.proto", name: "PublicApi", endpoint, service });
-  }
-
-  export function publicApiClient({ endpoint }: { endpoint: string }): types.PublicApiClient {
-    return client({ proto: "public-api.proto", name: "PublicApi", endpoint });
-  }
-
   export function virtualMachineServer({ endpoint, service }: { endpoint: string, service: types.VirtualMachineServer }) {
     return runServer({ proto: "virtual-machine.proto", name: "VirtualMachine", endpoint, service });
   }

@@ -3,7 +3,6 @@ import * as path from "path";
 import TestComponent from "./test-component";
 import TestSubnet from "./test-subnet";
 import { delay } from "bluebird";
-import { initPublicApiClient } from "../public-api-client";
 
 
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
@@ -18,6 +17,7 @@ export interface OrbsNodeConfig {
   privateSubnet: string;
   forceRecreate?: boolean;
   publicApiHostPort: number;
+  publicApiHostHTTPPort: number;
   sidechainConnectorPublicIp: string;
   gossipPeers: string[];
   ethereumNodeHttpAddress: string;
@@ -46,9 +46,9 @@ export class OrbsNode implements TestComponent {
     await this.runDockerCompose("down");
   }
 
-  public getPublicApiClient(accessFromHost: boolean) {
-    const endpoint = accessFromHost ? `0.0.0.0:${this.config.publicApiHostPort}` : `${this.config.nodePublicApiIp}:51151`;
-    return initPublicApiClient({ endpoint });
+  public getApiEndpoint(accessFromHost: boolean): string {
+    const endpoint = accessFromHost ? `http://127.0.0.1:${this.config.publicApiHostHTTPPort}` : `http://${this.config.nodePublicApiIp}:80`;
+    return endpoint;
   }
 
   public setEthereumSubscriptionContractAddress(contractAddress: string) {
@@ -73,6 +73,7 @@ export class OrbsNode implements TestComponent {
             PUBLIC_API_IP: this.config.nodePublicApiIp,
             GOSSIP_PEERS: this.config.gossipPeers,
             PUBLIC_API_HOST_PORT: this.config.publicApiHostPort,
+            PUBLIC_API_HOST_HTTP_PORT: this.config.publicApiHostHTTPPort,
             SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
             SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
             SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS: this.config.ethereumSubscriptionContractAddress,
@@ -120,14 +121,15 @@ export class OrbsNodeCluster implements TestComponent {
         sidechainConnectorPublicIp: this.config.publicApiNetwork.allocateAddress(),
         ethereumNodeHttpAddress: this.config.ethereumNodeHttpAddress,
         publicApiHostPort: 20000 + i,
+        publicApiHostHTTPPort: 30000 + i,
         debugPort: 9229 + i
       }));
     }
     return nodes;
   }
 
-  public getAvailableClients(accessFromHost: boolean) {
-    return this.nodes.map(node => node.getPublicApiClient(accessFromHost));
+  public getAvailableApiEndpoints(accessFromHost: boolean) {
+    return this.nodes.map(node => node.getApiEndpoint(accessFromHost));
   }
 
   public async start() {

@@ -30,11 +30,10 @@ services:
       file: docker-compose.test.base.yml
       service: base-service
     working_dir: /opt/orbs/projects/services/public-api-service-typescript/
-    environment:
-      VALIDATE_SUBSCRIPTION: 'true'
     command: node  --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/public-api.js
     ports:
       - ${PUBLIC_API_HOST_PORT}:51151
+      - ${PUBLIC_API_HOST_HTTP_PORT}:80
     volumes_from:
       - shared_volumes
     networks:
