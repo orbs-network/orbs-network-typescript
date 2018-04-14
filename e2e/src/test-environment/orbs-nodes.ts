@@ -7,7 +7,8 @@ import { delay } from "bluebird";
 
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
 const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
-const TEST_SMART_CONTRACTS = [{address: "foobar", filename: "foobar-smart-contract"}, {address: "text-message", filename: "text-message-smart-contract"}];
+// TODO: vchainId should not be hard-coded but rather propagated from the test config!!!
+const TEST_SMART_CONTRACTS = [{vchainId: "640ed3", name : "foobar", filename: "foobar-smart-contract"}, {address: "text-message", filename: "text-message-smart-contract"}];
 
 export interface OrbsNodeConfig {
   nodeName: string;
