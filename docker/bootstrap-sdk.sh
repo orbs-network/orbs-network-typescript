@@ -24,17 +24,20 @@ export PATH="${GRADLE_HOME}/bin:${PATH}"
 
 # Install Android SDK
 ANDROID_TARGET_SDK=${ANDROID_TARGET_SDK:-"android-27"}
-ANDROID_SDK_TOOLS=${ANDROID_SDK_TOOLS:-"27.0.3"}
+ANDROID_SDK_TOOLS=${ANDROID_SDK_TOOLS:-"3859397"}
 ANDROID_BUILD_TOOLS=${ANDROID_BUILD_TOOLS:-"build-tools-27.0.3"}
-ANDROID_SDK_URL="https://dl.google.com/android/repository/build-tools_r${ANDROID_SDK_TOOLS}-linux.zip"
+ANDROID_SDK_TOOLS_URL="https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip"
 export ANDROID_HOME="${SDK_HOME}/Android/sdk"
 
 mkdir -p ${ANDROID_HOME}
-curl -sSL ${ANDROID_SDK_URL} -o android-sdk.zip
+curl -sSL ${ANDROID_SDK_TOOLS_URL} -o android-sdk.zip
 unzip android-sdk.zip -d ${ANDROID_HOME}
 rm -rf android-sdk.zip
 
 export PATH="${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${PATH}"
+
+# Accept all licences
+yes | ${ANDROID_HOME}/tools/bin/sdkmanager --licenses
 
 # Install Android NDK
 ANDROID_NDK_VERSION=${ANDROID_NDK_VERSION:-"r16b"}
