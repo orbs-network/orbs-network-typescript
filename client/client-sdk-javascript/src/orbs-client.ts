@@ -19,7 +19,7 @@ export class OrbsClient {
 
     const body = await request.post({
       url: `${this.endpoint}/public/sendTransaction`,
-      body: { transaction },
+      body: transaction,
       json: true
     });
 
