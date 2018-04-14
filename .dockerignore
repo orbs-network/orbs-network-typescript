@@ -32,6 +32,9 @@ bower_components
 .DS_Store
 Thumbs.db
 
+# Local configuration file (sdk path, etc)
+local.properties
+
 # Client binaries
 .gradle
 client/crypto-sdk/build
