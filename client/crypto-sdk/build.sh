@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 function build_ios() {
     echo "Building for ${IOS_PLATFORM}..."

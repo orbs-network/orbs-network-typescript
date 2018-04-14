@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 function readlink() {
   DIR=$(echo "${1%/*}")

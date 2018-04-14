@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
 apt-get update
 apt-get install -y git-core build-essential curl pkg-config file unzip default-jdk

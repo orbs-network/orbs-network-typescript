@@ -67,7 +67,6 @@
   "order": [
     "architecture",
     "crypto-sdk",
-    "crypto-sdk-android",
     "crypto-sdk-javascript",
     "core-library-typescript",
     "gossip-service-typescript",
@@ -77,6 +76,7 @@
     "storage-service-typescript",
     "virtual-machine-service-typescript",
     "example-slack-bot",
+    "crypto-sdk-android",
     "example-android-app"
   ]
 }
