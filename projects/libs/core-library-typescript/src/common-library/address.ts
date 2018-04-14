@@ -52,7 +52,7 @@ export class Address {
 
 export function createContractAddress(contractName: string, vchainId = Address.SYSTEM_VCHAINID) {
   const publicKey = crypto.createHash("sha256").update(contractName).digest();
-  return new Address(publicKey);
+  return new Address(publicKey, vchainId);
 }
 
 export function bs58EncodeRawAddress(rawAddress: Buffer) {
