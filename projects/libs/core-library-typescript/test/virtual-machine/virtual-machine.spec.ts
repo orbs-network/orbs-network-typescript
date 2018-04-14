@@ -8,7 +8,7 @@ import chaiSubset = require("chai-subset");
 import * as path from "path";
 import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-coded-contracts/processor";
 import { HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
-import Address, { createContractAddress } from "../../src/common-library/address";
+import { Address, createContractAddress } from "../../src/common-library/address";
 import { createHash } from "crypto";
 import { stubInterface } from "ts-sinon";
 

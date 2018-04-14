@@ -1,5 +1,5 @@
 import * as path from "path";
-import Address, { createContractAddress, bs58EncodeRawAddress } from "../../common-library/address";
+import { Address, createContractAddress, bs58EncodeRawAddress } from "../../common-library/address";
 
 export type Contracts = { vchainId: string, name: string; filename: string; }[];
 

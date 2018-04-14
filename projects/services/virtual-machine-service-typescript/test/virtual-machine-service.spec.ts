@@ -3,11 +3,17 @@ import * as mocha from "mocha";
 import * as _ from "lodash";
 import * as getPort from "get-port";
 
-import { types, grpc, GRPCServerBuilder, Service, ServiceConfig } from "orbs-core-library";
+import { types, grpc, GRPCServerBuilder, Service, ServiceConfig, createContractAddress, Address } from "orbs-core-library";
 import virtualMachineServer from "../src/server";
-import { VirtualMachineClient } from "../../../libs/core-library-typescript/node_modules/orbs-interfaces";
+import { createHash } from "crypto";
 
 const { expect } = chai;
+
+const SMART_CONTRACT_NAME = "peon";
+const SMART_CONTRACT_VCHAIN = "010101";
+const SMART_CONTRACT_ADDRESS = createContractAddress(SMART_CONTRACT_NAME, SMART_CONTRACT_VCHAIN);
+const ACCOUNT1 = new Address(createHash("sha256").update("account1").digest());
+const ACCOUNT2 = new Address(createHash("sha256").update("account2").digest());
 
 class StubStorageServer extends Service implements types.StateStorageServer {
   state: { [id: string]: string };
@@ -36,29 +42,27 @@ class StubStorageServer extends Service implements types.StateStorageServer {
   }
 }
 
-function buildCallRequest(accountName: string, contractAddress: string) {
-  const senderAddress: types.UniversalAddress = {
-    id: new Buffer(accountName),
-    scheme: 0,
-    checksum: 0,
-    networkId: 0
-  };
 
+function buildCallRequest(account: Address, contractAddress: Address) {
   const payload = JSON.stringify({
     method: "getMyBalance",
     args: []
   });
 
   return {
-    sender: senderAddress,
-    contractAddress: {address: contractAddress},
+    sender: account.toBuffer(),
+    contractAddress: contractAddress.toBuffer(),
     payload: payload
   };
 }
 
+function accountBalanceKey(account: Address) {
+  return `balances.${account.toBase58()}`;
+}
+
 describe("vm service tests", () => {
     let server: GRPCServerBuilder;
-    let client: VirtualMachineClient;
+    let client: types.VirtualMachineClient;
     let storageServer: StubStorageServer;
 
     before(async () => {
@@ -73,11 +77,11 @@ describe("vm service tests", () => {
                   ],
                 };
 
-      const SMART_CONTRACTS_TO_LOAD = JSON.stringify([{address: "peon", filename: "foobar-smart-contract"}]);
+      const SMART_CONTRACTS_TO_LOAD = JSON.stringify([{vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract"}]);
       const NODE_NAME = "tester";
       const vmEnv = { NODE_NAME, SMART_CONTRACTS_TO_LOAD };
       const stubStorageServiceConfig = {nodeName: NODE_NAME};
-      const stubStorageState = { "balances.account1": "10", "balances.account2": "0" };
+      const stubStorageState = { [accountBalanceKey(ACCOUNT1)]: "10", [accountBalanceKey(ACCOUNT2)]: "0" };
 
       storageServer = new StubStorageServer(stubStorageServiceConfig, stubStorageState);
       server = virtualMachineServer(topology, vmEnv)
@@ -89,8 +93,8 @@ describe("vm service tests", () => {
     });
 
     it("should load contract from service", async () => {
-      storageServer.givenState({ "balances.account1": "10", "balances.account2": "0" });
-      const result = await client.callContract(buildCallRequest("account1", "peon"));
+      storageServer.givenState({ [accountBalanceKey(ACCOUNT1)]: "10" , [accountBalanceKey(ACCOUNT2)]: "0" });
+      const result = await client.callContract(buildCallRequest(ACCOUNT1, SMART_CONTRACT_ADDRESS));
       expect(result.resultJson).to.equal("10");
     });
 

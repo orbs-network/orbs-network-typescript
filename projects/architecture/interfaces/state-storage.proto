@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "./primitives/addresses.proto";
-
 service StateStorage {
   rpc ReadKeys (ReadKeysInput) returns (ReadKeysOutput);
 }

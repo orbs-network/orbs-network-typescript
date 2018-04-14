@@ -6,7 +6,7 @@ import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-st
 import BarSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/foobar-smart-contract";
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
 import { types } from "../../src";
-import Address, { createContractAddress } from "../../src/common-library/address";
+import { Address, createContractAddress } from "../../src/common-library/address";
 import { createHash } from "crypto";
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {

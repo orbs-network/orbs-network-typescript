@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import Address from "../../src/common-library/address";
+import { Address } from "../../src/common-library";
 
 describe("an address", () => {
   it("is properly initialized by a public key #1", () => {
