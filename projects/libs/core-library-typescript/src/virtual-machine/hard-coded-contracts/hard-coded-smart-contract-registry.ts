@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Address, createContractAddress, bs58EncodeRawAddress } from "../../common-library/address";
+import { Address, createContractAddress, bs58EncodeRawAddress, logger } from "../../common-library";
 
 export type Contracts = { vchainId: string, name: string; filename: string; }[];
 
@@ -23,6 +23,8 @@ export class HardCodedSmartContractRegistry {
     const contractAddress = createContractAddress(name, vchainId);
 
     this.loadedContracts.set(contractAddress.toBase58(), theModule);
+
+    logger.info(`Registered a new contract with address ${contractAddress.toBase58()}. vchainId: ${vchainId}, name: ${name}, filename: ${filename}`);
 
     return contractAddress;
   }
