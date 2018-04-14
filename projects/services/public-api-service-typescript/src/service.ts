@@ -1,11 +1,10 @@
 import * as _ from "lodash";
 
 import {  } from "orbs-core-library";
-import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler } from "orbs-core-library";
+import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler, bs58DecodeRawAddress } from "orbs-core-library";
 import * as express from "express";
 import { Server } from "http";
 import * as bodyParser from "body-parser";
-import * as bs58 from "bs58";
 
 export interface PublicApiHTTPServiceConfig extends ServiceConfig {
   validateSubscription: boolean;
@@ -57,9 +56,9 @@ export default class PublicApiHTTPService extends Service {
         transaction: {
           header: {
             version: _.get(body, "header.version"),
-            sender: bs58.decode(_.get(body, "header.senderAddressBase58")),
+            sender: bs58DecodeRawAddress(_.get(body, "header.senderAddressBase58")),
             timestamp: _.get(body, "header.timestamp"),
-            contractAddress: bs58.decode(_.get(body, "header.contractAddressBase58")),
+            contractAddress: bs58DecodeRawAddress(_.get(body, "header.contractAddressBase58")),
           },
           payload: _.get(body, "payload")
         }
@@ -81,9 +80,9 @@ export default class PublicApiHTTPService extends Service {
       const body = JsonBuffer.parseJsonWithBuffers(req.body);
 
       const input: types.CallContractInput = {
-        contractAddress: bs58.decode(body.contractAddressBase58),
+        contractAddress: bs58DecodeRawAddress(body.contractAddressBase58),
         payload: body.payload,
-        sender: bs58.decode(body.senderAddressBase58)
+        sender: bs58DecodeRawAddress(body.senderAddressBase58)
       };
 
       try {
