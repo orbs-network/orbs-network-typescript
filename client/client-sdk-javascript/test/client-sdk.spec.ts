@@ -32,10 +32,10 @@ describe("A client calls the connector interface with the correct inputs when", 
   it("sendTransaction() is called", async () => {
     nock(API_ENDPOINT)
       .post("/public/sendTransaction", (res: any) => {
-        expect(res.transaction).to.haveOwnProperty("header");
-        expect(res.transaction.header).to.haveOwnProperty("senderAddressBase58", senderAddress.toString());
-        expect(res.transaction.header).to.haveOwnProperty("contractAddressBase58", contractAddress.toString());
-        expect(res.transaction).to.haveOwnProperty("payload", "payload");
+        expect(res).to.haveOwnProperty("header");
+        expect(res.header).to.haveOwnProperty("senderAddressBase58", senderAddress.toString());
+        expect(res.header).to.haveOwnProperty("contractAddressBase58", contractAddress.toString());
+        expect(res).to.haveOwnProperty("payload", "payload");
         return true;
       }).reply(200, { result: "ok" });
 
