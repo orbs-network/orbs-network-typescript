@@ -15,8 +15,8 @@ const testConfig = loadDefaultTestConfig();
 const { API_ENDPOINT } = process.env;
 
 async function aFooBarAccountWith(input: { senderAddress: Address, amountOfBars: number }) {
-  const orbsSession = new OrbsClient(API_ENDPOINT, input.senderAddress);
-  const contractAdapter = new OrbsContractAdapter(orbsSession, "foobar");
+  const orbsClient = new OrbsClient(API_ENDPOINT, input.senderAddress);
+  const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
   const account = new FooBarAccount(input.senderAddress.toString(), contractAdapter);
 
   await account.initBalance(input.amountOfBars);
