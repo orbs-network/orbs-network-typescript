@@ -4,7 +4,7 @@ import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
-import aDummyTransaction from "../../src/test-kit/dummy-transaction";
+import { aDummyTransaction } from "../../src/test-kit/transaction-builders";
 
 const { expect } = chai;
 

@@ -9,6 +9,7 @@ import { BlockUtils, TransactionUtils } from "../../src/common-library";
 import { Address, createContractAddress } from "../../src/common-library/address";
 import * as sinon from "sinon";
 import { createHash } from "crypto";
+import { aDummyTransactionSet } from "../../src/test-kit/transaction-builders";
 
 chai.use(sinonChai);
 
@@ -26,29 +27,6 @@ function aGenesisBlock(): types.Block {
       stateDiff: []
     }
   });
-}
-
-function aDummyTransaction(publicKey: Buffer): types.Transaction {
-  return {
-      header: {
-        version: 0,
-        sender: new Address(publicKey).toBuffer(),
-        timestamp: Date.now().toString(),
-        contractAddress: createContractAddress("dummyContract").toBuffer()
-      },
-      payload: "{}"
-  };
-}
-
-function aDummyTransactionSet(numberOfTransactions = 3): types.Transaction[] {
-  const transactions: types.Transaction[] = [];
-  for (let i = 0; i < numberOfTransactions; i++) {
-    const transaction = aDummyTransaction(createHash("sha256").update(`address${i}`).digest());
-    const txHash = TransactionUtils.calculateTransactionHash(transaction);
-    transactions.push(transaction);
-  }
-
-  return transactions;
 }
 
 function aDummyStateDiff(): types.ModifiedStateKey[] {
