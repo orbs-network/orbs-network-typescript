@@ -40,8 +40,11 @@ Address::Address(const vector<uint8_t> &publicKey, const vector<uint8_t> &virtua
 Address::Address(const string &publicKey, const string &virtualChainId, const std::string &networkId) :
     publicKey_(Utils::Hex2Vec(publicKey)), virtualChainId_(Utils::Hex2Vec(virtualChainId))  {
 
-    vector<uint8_t> decodedNetworkId = Base58::Decode(networkId);
-    if (networkId.size() != NETWORK_ID_SIZE || !IsValidNetworkId(static_cast<uint8_t>(networkId[0]))) {
+    if (networkId.size() != NETWORK_ID_SIZE) {
+        throw invalid_argument("Invalid network ID size: " + Utils::ToString(networkId.size()));
+    }
+
+    if (!IsValidNetworkId(Utils::FromString<uint8_t>(networkId.substr(0, NETWORK_ID_SIZE)))) {
         throw invalid_argument("Invalid network ID: " + networkId);
     }
 
