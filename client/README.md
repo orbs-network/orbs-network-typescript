@@ -122,11 +122,13 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 ### Android
 
 1. [Android Studio](https://developer.android.com/studio/index.html) (3.1 or higher)
-2. [Android SDK](https://developer.android.com/studio/intro/update.html)
+2. [Android SDK](https://developer.android.com/studio/intro/update.html). Please install these plugins via Android Studio's SDK Manager.
     * Install the LLDB plug-in.
     * Install the CMake plug-in.
     * Install Build Tools 27.0.3.
 3. [Android NDK](https://developer.android.com/ndk/downloads/index.html). For development, you can also install the NDK as an Android Studio plug-in.
+4. JDK 1.8+.
+5. Gradle 4+.
 
 ```bash
 brew install cmake
