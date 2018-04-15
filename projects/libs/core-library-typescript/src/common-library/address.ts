@@ -63,6 +63,7 @@ export function bs58EncodeRawAddress(rawAddress: Buffer): string {
 
 export function bs58DecodeRawAddress(base58Address: string): Buffer {
   return Buffer.concat([
-    Buffer.from(base58Address.slice(0, 2), "utf8"),
-    bs58.decode(base58Address.slice(2))]);
+    Buffer.from(base58Address.slice(0, 1), "utf8"),
+    Buffer.from(base58Address.slice(1, 3), "hex"),
+    bs58.decode(base58Address.slice(3))]);
 }
