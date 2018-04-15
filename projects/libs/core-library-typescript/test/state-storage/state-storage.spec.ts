@@ -10,6 +10,7 @@ import * as sinon from "sinon";
 import { createContractAddress } from "../../src/common-library/address";
 
 chai.use(sinonChai);
+chai.use(chaiAsPromised);
 
 function anInitialBlockChain(numOfBlocks: number, stateDiff: types.ModifiedStateKey[]): types.Block[] {
   const blocks: types.Block[] = [];
@@ -42,8 +43,7 @@ describe("the state storage", () => {
     (<sinon.SinonStub>blockStorage.getLastBlock).returns({block: blocks[blocks.length - 1]});
     blockStorage.getBlocks = input => ({ blocks: blocks.slice(input.lastBlockHeight + 1) });
 
-    stateStorage = new StateStorage(blockStorage);
-    stateStorage.poll();
+    stateStorage = new StateStorage(blockStorage, 200);
   });
 
   it("is quickly synced with the block storage after starts polling", async() => {
@@ -52,6 +52,6 @@ describe("the state storage", () => {
   });
 
   after(async () => {
-    stateStorage.stopPolling();
+    stateStorage.stop();
   });
 });
