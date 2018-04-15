@@ -74,3 +74,17 @@ TEST(Utils, converts_value_to_string) {
     res = Utils::ToString("Hello World!");
     EXPECT_STREQ(res.c_str(), "Hello World!");
 }
+
+TEST(Utils, converts_string_to_value) {
+    int res = Utils::FromString<int>("1");
+    EXPECT_EQ(res, 1);
+
+    int res2 = Utils::FromString<int>("-10");
+    EXPECT_EQ(res2, -10);
+
+    double res3 = Utils::FromString<double>("1.5");
+    EXPECT_EQ(res3, 1.5f);
+
+    unsigned int res4 = Utils::FromString<unsigned int>("0");
+    EXPECT_EQ(res4, 0);
+}
