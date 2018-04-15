@@ -5,7 +5,7 @@ import * as crypto from "crypto";
 
 export type OrbsContractMethodArgs = [string | number] | any[];
 
-export class OrbsContractAdapter {
+export class OrbsContract {
   orbsClient: OrbsClient;
   private contractAddress: Address;
 

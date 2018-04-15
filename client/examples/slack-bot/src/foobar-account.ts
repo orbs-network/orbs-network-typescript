@@ -1,4 +1,4 @@
-import { OrbsContractAdapter } from "orbs-client-sdk";
+import { OrbsContract } from "orbs-client-sdk";
 
 export interface Message {
   recipient: string;
@@ -9,25 +9,25 @@ export interface Message {
 }
 
 export class FooBarAccount {
-  adapter: OrbsContractAdapter;
+  contract: OrbsContract;
   address: string;
   username: string;
 
-  public constructor(username: string, address: string, adapter: OrbsContractAdapter) {
+  public constructor(username: string, address: string, contract: OrbsContract) {
     this.username = username;
-    this.adapter = adapter;
+    this.contract = contract;
     this.address = address;
   }
 
   public async transfer(to: string, amount: number) {
-    return await this.adapter.sendTransaction("transfer", [to, amount]);
+    return await this.contract.sendTransaction("transfer", [to, amount]);
   }
 
   public async initBalance(account: string, balance: number) {
-    return await this.adapter.sendTransaction("initBalance", [account, balance]);
+    return await this.contract.sendTransaction("initBalance", [account, balance]);
   }
 
   public async getMyBalance() {
-    return this.adapter.call("getMyBalance", []);
+    return this.contract.call("getMyBalance", []);
   }
 }
