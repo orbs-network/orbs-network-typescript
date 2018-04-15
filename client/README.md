@@ -130,6 +130,8 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 4. JDK 1.8+.
 5. Gradle 4+.
 
+Note: in order to build using Android Studio, please make sure to have `local.properties` files (next to `build.gradle`), specifying both `sdk.dir` and `ndk.dir` (usually, these are generated automatically for you).
+
 ```bash
 brew install cmake
 ```
