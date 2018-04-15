@@ -1,4 +1,4 @@
-import { OrbsClient, OrbsContractAdapter, Address } from "orbs-client-sdk";
+import { OrbsClient, OrbsContract, Address } from "orbs-client-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
@@ -16,7 +16,7 @@ const { API_ENDPOINT } = process.env;
 
 async function aFooBarAccountWith(input: { senderAddress: Address, amountOfBars: number }) {
   const orbsClient = new OrbsClient(API_ENDPOINT, input.senderAddress);
-  const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
+  const contractAdapter = new OrbsContract(orbsClient, "foobar");
   const account = new FooBarAccount(input.senderAddress.toString(), contractAdapter);
 
   await account.initBalance(input.amountOfBars);

@@ -1,6 +1,6 @@
 import { FooBarAccount } from "./foobar-account";
 import { RTMClient } from "@slack/client";
-import { OrbsClient, OrbsContractAdapter, Address } from "orbs-client-sdk";
+import { OrbsClient, OrbsContract, Address } from "orbs-client-sdk";
 import * as crypto from "crypto";
 
 interface Config {
@@ -36,8 +36,8 @@ function generateAddress(username: string): string {
 async function getAccount(username: string, config: Config): Promise<FooBarAccount> {
   const address = generateAddress(username);
   const orbsClient = new OrbsClient(address, undefined, config.timeout);
-  const contractAdapter = new OrbsContractAdapter(orbsClient, "foobar");
-  const account = new FooBarAccount(username, address, contractAdapter);
+  const contract = new OrbsContract(orbsClient, "foobar");
+  const account = new FooBarAccount(username, address, contract);
 
   return Promise.resolve(account);
 }
