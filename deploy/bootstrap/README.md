@@ -24,6 +24,7 @@ Service-specific configuration:
 * `SIGN_MESSAGES` is used by `gossip` to verify incoming messages from other nodes. Refer to [documentation](../README.md) to learn more about key management.
 * `ETHEREUM_CONTRACT_ADDRESS` is used by `consensus` to bill customers.
 * `BLOCK_STORAGE_DB_PATH` is used by `storage` to point where the store the blocks.
+* `BLOCK_STORAGE_POLL_INTERVAL` is used by `storage` to determine how ofter to poll for new blocks from other nodes to prevent being out of sync.
 
 ## Debugging
 
