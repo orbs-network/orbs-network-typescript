@@ -1,8 +1,8 @@
 import { cloneDeep } from "lodash";
-import { types } from "..";
+import { types, bs58DecodeRawAddress, bs58EncodeRawAddress } from "..";
 
 export interface StateCacheKey {
-  contractAddress: types.ContractAddress;
+  contractAddress: Buffer;
   key: string;
 }
 
@@ -39,12 +39,12 @@ export class StateCache {
 
   private encodeMapKey(key: StateCacheKey) {
     // TODO: not sure this approach guarantees uniqueness of the key. insecure!
-    return [key.contractAddress.address, key.key].join("|");
+    return [bs58EncodeRawAddress(key.contractAddress), key.key].join(":");
   }
 
   private decodeMapKey(encodedKey: string): StateCacheKey {
-    const [address, key] = encodedKey.split("|");
-    const contractAddress: types.ContractAddress = { address };
+    const [address, key] = encodedKey.split(":");
+    const contractAddress = bs58DecodeRawAddress(address);
     return { contractAddress, key };
   }
 

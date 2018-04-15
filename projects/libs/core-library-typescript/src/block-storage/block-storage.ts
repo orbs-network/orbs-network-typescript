@@ -108,7 +108,7 @@ export class BlockStorage {
     }
 
     if (block.header.height !== this.lastBlock.header.height + 1) {
-      throw new Error(`Invalid block height of block: ${JSON.stringify(block)}!`);
+      throw new Error(`Invalid block height of block: ${JSON.stringify(block)}! Should have been ${this.lastBlock.header.height + 1}`);
     }
 
     const lastBlockHash = BlockUtils.calculateBlockHash(this.lastBlock);

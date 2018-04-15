@@ -1,0 +1,111 @@
+import org.gradle.internal.os.OperatingSystem
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 27
+        versionCode 1
+        versionName '1.0'
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+
+        externalNativeBuild {
+            cmake {
+                version '3.10.2'
+                arguments '-DPLATFORM=ANDROID'
+                cppFlags '-fexceptions -std=c++11'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles.add(file('proguard-rules.pro'))
+        }
+    }
+
+    sourceSets {
+        main {
+            jni.srcDirs = []
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }
+
+    def localBuildDir = "${projectDir.absolutePath}/build/outputs/jar"
+
+    libraryVariants.all { variant ->
+        def buildType = variant.getBuildType().getName()
+        def buildTypeName = buildType.capitalize()
+
+        task("run${buildTypeName}CMake",type: Exec) {
+            workingDir localBuildDir
+            commandLine 'cmake'
+            args '../../../'
+        }
+
+        task("run${buildTypeName}Make", type: Exec) {
+            dependsOn "run${buildTypeName}CMake"
+            workingDir localBuildDir
+            commandLine 'make'
+        }
+
+        task("copy${buildTypeName}CryptoSDKLibrary", type: Copy) {
+            def localPlatform
+            def cryptoSDKName
+            if (OperatingSystem.current().isMacOsX()) {
+                localPlatform = 'mac'
+                cryptoSDKName = 'libcryptosdk.dylib'
+            } else if (OperatingSystem.current().isLinux()) {
+                localPlatform = 'linux'
+                cryptoSDKName = 'libcryptosdk.so'
+            } else {
+                throw new GradleException('Unsupported platform!')
+            }
+
+            from("src/main/jniLibs/${localPlatform}/")
+            into(localBuildDir)
+            include(cryptoSDKName)
+        }
+
+        task("create${buildTypeName}Jar", type: Copy) {
+            dependsOn "copy${buildTypeName}CryptoSDKLibrary"
+            from("build/intermediates/packaged-classes/${buildType}/")
+            into(localBuildDir)
+            include('classes.jar')
+            rename('classes.jar', "crypto-sdk-${buildType}.jar")
+        }
+
+        assemble.dependsOn "run${buildTypeName}Make", "create${buildTypeName}Jar"
+    }
+
+    tasks.withType(Test) {
+        systemProperty 'java.library.path', localBuildDir
+    }
+
+    testOptions {
+        unitTests.all {
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen { false }
+                showStandardStreams = true
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    testImplementation fileTree(dir: 'build/outputs/jar', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+}

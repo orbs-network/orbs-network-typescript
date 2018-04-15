@@ -6,7 +6,7 @@ export namespace TransactionUtils {
   export function calculateTransactionHash(transaction: types.Transaction): Buffer {
     const hash = createHash("sha256");
     hash.update(stringify(transaction.header));
-    hash.update(stringify(transaction.body));
+    hash.update(stringify(transaction.payload));
     return hash.digest();
   }
 

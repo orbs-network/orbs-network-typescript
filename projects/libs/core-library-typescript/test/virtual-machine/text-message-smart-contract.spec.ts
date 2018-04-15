@@ -6,12 +6,14 @@ import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-st
 import TextMessageSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/text-message-smart-contract";
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
 import { types } from "../../src";
+import { Address, createContractAddress } from "../../src/common-library/address";
+import { createHash } from "crypto";
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {
   lastBlockId: number;
   stateCache: StateCache;
 
-  constructor(contractAddress: types.ContractAddress, stateCache: StateCache) {
+  constructor(contractAddress: Buffer, stateCache: StateCache) {
     super(contractAddress);
 
     this.stateCache = stateCache;
@@ -26,13 +28,13 @@ export default class ContractStateMemCacheAccessor extends BaseContractStateAcce
   }
 }
 
-const CONTRACT_ADDRESS = {address: "text-message-contract-address"};
-const ALICE_ADDRESS = "Alice";
-const BOB_ADDRESS = "Bob";
+const CONTRACT_ADDRESS = createContractAddress("text-message-contract").toBuffer();
+const ALICE_ADDRESS = new Address(createHash("sha256").update("Alice").digest()).toBase58();
+const BOB_ADDRESS = new Address(createHash("sha256").update("Bob").digest()).toBase58();
 
-let adapter;
-let aliceContract;
-let bobContract;
+let adapter: BaseContractStateAccessor;
+let aliceContract: BaseSmartContract;
+let bobContract: BaseSmartContract;
 
 describe("text message contract ", () => {
   beforeEach(() => {
@@ -51,8 +53,8 @@ describe("text message contract ", () => {
     expect(message.timestamp).to.equal(timestamp);
     expect(message.processedAtTimestamp).to.be.greaterThan(timestamp);
     expect(message.message).to.equal("hello");
-    expect(message.sender).to.equal("Alice");
-    expect(message.recipient).to.equal("Bob");
+    expect(message.sender).to.equal(ALICE_ADDRESS);
+    expect(message.recipient).to.equal(BOB_ADDRESS);
   });
 
   it("sends multiple messages between accounts", async () => {
@@ -73,14 +75,14 @@ describe("text message contract ", () => {
     expect(bobMessage1.timestamp).to.equal(timestamp1);
     expect(bobMessage1.processedAtTimestamp).to.be.greaterThan(timestamp1);
     expect(bobMessage1.message).to.equal("hello");
-    expect(bobMessage1.sender).to.equal("Alice");
-    expect(bobMessage1.recipient).to.equal("Bob");
+    expect(bobMessage1.sender).to.equal(ALICE_ADDRESS);
+    expect(bobMessage1.recipient).to.equal(BOB_ADDRESS);
 
     expect(bobMessage2.timestamp).to.equal(timestamp2);
     expect(bobMessage2.processedAtTimestamp).to.be.greaterThan(timestamp2);
     expect(bobMessage2.message).to.equal("is anybody in here?");
-    expect(bobMessage2.sender).to.equal("Alice");
-    expect(bobMessage2.recipient).to.equal("Bob");
+    expect(bobMessage2.sender).to.equal(ALICE_ADDRESS);
+    expect(bobMessage2.recipient).to.equal(BOB_ADDRESS);
 
     const aliceMessages = await aliceContract.getMyMessages();
 
@@ -91,7 +93,7 @@ describe("text message contract ", () => {
     expect(aliceMessage1.timestamp).to.equal(timestamp3);
     expect(aliceMessage1.processedAtTimestamp).to.be.greaterThan(timestamp3);
     expect(aliceMessage1.message).to.equal("sup");
-    expect(aliceMessage1.sender).to.equal("Bob");
-    expect(aliceMessage1.recipient).to.equal("Alice");
+    expect(aliceMessage1.sender).to.equal(BOB_ADDRESS);
+    expect(aliceMessage1.recipient).to.equal(ALICE_ADDRESS);
   });
 });

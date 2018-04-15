@@ -242,11 +242,11 @@ static napi_value GetNetworkId(napi_env env, napi_callback_info info, uint8_t ne
 }
 
 napi_value Address::GetMainNetworkId(napi_env env, napi_callback_info info) {
-    return ::GetNetworkId(env, info,Orbs::Address::MAIN_NETWORK_ID);
+    return ::GetNetworkId(env, info, Orbs::Address::MAIN_NETWORK_ID);
 }
 
 napi_value Address::GetTestNetworkId(napi_env env, napi_callback_info info) {
-    return ::GetNetworkId(env, info,Orbs::Address::TEST_NETWORK_ID);
+    return ::GetNetworkId(env, info, Orbs::Address::TEST_NETWORK_ID);
 }
 
 napi_value Address::ToString(napi_env env, napi_callback_info info) {

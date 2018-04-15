@@ -45,7 +45,7 @@ export class StateStorage {
     }
   }
 
-  public async readKeys(contractAddress: types.ContractAddress, keys: string[]) {
+  public async readKeys(contractAddress: Buffer, keys: string[]) {
     await this.waitForBlockState();
 
     return await this.kvstore.getMany(contractAddress, keys);

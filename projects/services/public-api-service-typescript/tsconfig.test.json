@@ -17,7 +17,7 @@
     "paths": {
       "*": [
           "node_modules/*",
-          "test/types/*"
+          "src/types/*"
       ]
     }
   },

@@ -1,6 +1,7 @@
 import * as path from "path";
+import { Address, createContractAddress, bs58EncodeRawAddress, logger } from "../../common-library";
 
-export type Contracts = { address: string; filename: string; }[];
+export type Contracts = { vchainId: string, name: string; filename: string; }[];
 
 export interface HardCodedSmartContractRegistryConfig {
   contracts: Contracts;
@@ -8,24 +9,27 @@ export interface HardCodedSmartContractRegistryConfig {
 }
 
 export class HardCodedSmartContractRegistry {
-  loadedContracts = new Map<string, any>();
+  private loadedContracts = new Map<string, any>();
 
   constructor(config: HardCodedSmartContractRegistryConfig) {
     const contractsToLoad =  config.contracts || [];
     const root = config.registryRoot || path.resolve(__dirname, "registry");
-    contractsToLoad.forEach(contract => this.registerContract(contract.address, contract.filename, root));
+    contractsToLoad.forEach(contract => this.registerContract(contract.vchainId, contract.name, contract.filename, root));
   }
 
-  private registerContract(address: string, filename: string, root: string) {
+  private registerContract(vchainId: string, name: string, filename: string, root: string) {
     const theModule = require(path.resolve(root, filename)); // TODO this is extremely unsafe; replace with something that has some notion of security
-    this.loadedContracts.set(address, theModule);
+
+    const contractAddress = createContractAddress(name, vchainId);
+
+    this.loadedContracts.set(contractAddress.toBase58(), theModule);
+
+    logger.info(`Registered a new contract with address ${contractAddress.toBase58()}. vchainId: ${vchainId}, name: ${name}, filename: ${filename}`);
+
+    return contractAddress;
   }
 
-  public contractAddresses(): string[] {
-    return Array.from(this.loadedContracts.keys());
-  }
-
-  public getContract(address: string): any {
-    return this.loadedContracts.get(address);
+  public getContractByRawAddress(address: Buffer): any {
+    return this.loadedContracts.get(bs58EncodeRawAddress(address));
   }
 }
