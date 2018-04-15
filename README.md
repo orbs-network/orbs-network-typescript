@@ -1,6 +1,6 @@
 # Orbs
 
-This wrapper project will set up a full working environment including all sub projects. There is no need to clone every individual sub project, this repo is the only one you need.
+This is a monorepo that contains all Orbs projects, including both server implementation and client SDK.
 
 ## Installation
 
@@ -47,14 +47,7 @@ Please refer to [documentation](deploy/README.md) in `deploy` folder.
 ./docker-build.sh && ./docker-test.sh
 ```
 
-`docker-test.sh` has environment variables that allow you to customize its behaviour:
-* `DOCKER_IMAGE` and `DOCKER_TAG` environment variables to `docker-test.sh` if the image is already pre-built
-* `FORCE_RECREATE` recreates all containers (off by default)
-* `STAY_UP` if you do not want containers to go down (off by default)
-* `LOCAL` if you want to mount local volumes from `docker-compose.test.volumes.local.yml`
-
-Pairing `LOCAL` with `watch.sh` is highly recommended for local development.
-
+Pleaser refer to [documentation](e2e/README.md) in `e2e` folder to learn more about end to end testing.
 
 ## Development
 
