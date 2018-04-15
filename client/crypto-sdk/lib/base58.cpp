@@ -7,6 +7,8 @@
 
 #include <assert.h>
 
+#include "utils.h"
+
 using namespace std;
 using namespace Orbs;
 
@@ -102,7 +104,7 @@ const vector<uint8_t> Base58::Decode(const string &data) {
         // Decode base58 character
         const size_t ch = BASE58_CHARACTERS.find_first_of(c);
         if (ch == string::npos) {
-            throw invalid_argument("Invalid character: " + to_string(c));
+            throw invalid_argument("Invalid character: " + Utils::ToString(c));
         }
 
         // Apply "b256 = b256 * 58 + ch".

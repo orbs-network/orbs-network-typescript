@@ -58,3 +58,19 @@ TEST(Utils, throws_on_invalid_hex_converts_hex_to_vector) {
     EXPECT_THROW(Utils::Hex2Vec("e3b0c44298fc1c149afbf4c"), invalid_argument);
     EXPECT_THROW(Utils::Hex2Vec("E3B0C44298FC1C149AFBF4C"), invalid_argument);
 }
+
+TEST(Utils, converts_value_to_string) {
+    string res;
+
+    res = Utils::ToString(1);
+    EXPECT_STREQ(res.c_str(), "1");
+
+    res = Utils::ToString(0);
+    EXPECT_STREQ(res.c_str(), "0");
+
+    res = Utils::ToString(000);
+    EXPECT_STREQ(res.c_str(), "0");
+
+    res = Utils::ToString("Hello World!");
+    EXPECT_STREQ(res.c_str(), "Hello World!");
+}

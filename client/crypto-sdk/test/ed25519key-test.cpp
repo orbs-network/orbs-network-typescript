@@ -45,6 +45,23 @@ TEST(ED25519Key, imports_ed25519_pulic_key) {
     EXPECT_THAT(publicKey2, ElementsAreArray(key2.GetPublicKey()));
 }
 
+TEST(ED25519Key, imports_ed25519_pulic_key_as_string) {
+    if (CryptoSDK::isFIPSMode()) {
+        EXPECT_THROW(ED25519Key key, runtime_error);
+        return;
+    }
+
+    const string publicKey1("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65");
+    ED25519Key key1(publicKey1);
+
+    EXPECT_THAT(Utils::Hex2Vec(publicKey1), ElementsAreArray(key1.GetPublicKey()));
+
+    const string publicKey2("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6");
+    ED25519Key key2(publicKey2);
+
+    EXPECT_THAT(Utils::Hex2Vec(publicKey2), ElementsAreArray(key2.GetPublicKey()));
+}
+
 TEST(ED25519Key, throws_on_invalid_arguments_imports_ed25519_pulic_key) {
      if (CryptoSDK::isFIPSMode()) {
         EXPECT_THROW(ED25519Key key, runtime_error);

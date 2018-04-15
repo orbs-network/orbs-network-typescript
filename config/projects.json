@@ -40,7 +40,7 @@
     "path": "projects/services/virtual-machine-service-typescript"
   },
   "crypto-sdk": {
-    "runtime": "C++",
+    "runtime": "c++",
     "type": "library",
     "path": "client/crypto-sdk"
   },
@@ -49,10 +49,20 @@
     "type": "library",
     "path": "client/client-sdk-javascript"
   },
+  "crypto-sdk-android": {
+    "runtime": "java",
+    "type": "library",
+    "path": "client/crypto-sdk-android"
+  },
   "example-slack-bot": {
     "runtime": "typescript",
     "type": "library",
-    "path": "client/slack-bot"
+    "path": "client/examples/slack-bot"
+  },
+  "example-android-app": {
+    "runtime": "java",
+    "type": "android-app",
+    "path": "client/examples/android-sample-app"
   },
   "order": [
     "architecture",
@@ -65,6 +75,8 @@
     "sidechain-connector-service-typescript",
     "storage-service-typescript",
     "virtual-machine-service-typescript",
-    "example-slack-bot"
+    "example-slack-bot",
+    "crypto-sdk-android",
+    "example-android-app"
   ]
 }
