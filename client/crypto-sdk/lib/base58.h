@@ -4,9 +4,11 @@
 #include <string>
 #include <vector>
 
+#include "exports.h"
+
 namespace Orbs {
 
-class Base58 {
+class CRYPTO_EXPORT Base58 {
 public:
     // Encode a byte vector to a base58 encoded string.
     static const std::string Encode(const std::vector<uint8_t> &data);

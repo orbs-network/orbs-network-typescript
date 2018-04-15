@@ -32,6 +32,20 @@ bower_components
 .DS_Store
 Thumbs.db
 
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Client binaries
+.gradle
+client/crypto-sdk/build
+client/crypto-sdk/deps/libgpg-error/libgpg-error-*
+client/crypto-sdk/deps/libgcrypt/libgcrypt-*
+client/crypto-sdk-android/crypto-sdk/.externalNativeBuild
+client/crypto-sdk-android/crypto-sdk/build
+client/crypto-sdk-javascript/build
+client/crypto-sdk-javascript/deps
+examples/android-sample-app/build
+
 # Deploy & config
 deploy
 .circleci

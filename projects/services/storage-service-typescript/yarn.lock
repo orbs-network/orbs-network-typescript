@@ -71,6 +71,10 @@
   dependencies:
     "@types/node" "*"
 
+"@types/json-stable-stringify@^1.0.32":
+  version "1.0.32"
+  resolved "https://registry.yarnpkg.com/@types/json-stable-stringify/-/json-stable-stringify-1.0.32.tgz#121f6917c4389db3923640b2e68de5fa64dda88e"
+
 "@types/lodash@^4.14.99":
   version "4.14.106"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.106.tgz#6093e9a02aa567ddecfe9afadca89e53e5dce4dd"
@@ -2036,18 +2040,20 @@ optjs@~3.2.2:
 "orbs-core-library@file:../../libs/core-library-typescript":
   version "0.1.0"
   dependencies:
+    "@types/json-stable-stringify" "^1.0.32"
     bignumber.js "^6.0.0"
     bind-decorator "^1.0.11"
     bluebird "^3.5.1"
     gaggle "git+https://github.com/lbeder/gaggle.git"
     grpc "^1.9.0"
     grpc-caller "https://github.com/electricmonk/grpc-caller"
+    json-stable-stringify "^1.0.1"
     leveldown "^3.0.0"
     levelup "^2.0.1"
     lodash "^4.17.4"
     mali "^0.7.1"
     mkdirp "^0.5.1"
-    orbs-interfaces "file:../../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
+    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"

@@ -5,7 +5,7 @@ const shell = require('shelljs');
 const projects = require('../../config/projects.json');
 require('colors');
 
-const RUNTIMES = ['typescript', 'protobuf', 'C++'];
+const RUNTIMES = ['typescript', 'protobuf', 'c++', 'java'];
 
 async function main() {
   projects.order.forEach((projectName) => {
@@ -20,7 +20,7 @@ async function main() {
     console.log(`* Building ${projectName}\n`.green);
     shell.cd(projectPath);
 
-    const shellStringOutput = shell.exec(project.runtime !== 'C++' ? './build.sh' : './rebuild.sh');
+    const shellStringOutput = shell.exec(project.runtime !== 'c++' ? './build.sh' : './rebuild.sh');
     if (shellStringOutput.code !== 0) {
       throw new Error(`Error ${shellStringOutput.code} in ${projectPath}\n`.red);
     }
