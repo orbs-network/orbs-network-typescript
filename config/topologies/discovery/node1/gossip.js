@@ -7,10 +7,6 @@ module.exports = {
   project: 'gossip-service-typescript',
   peers: [
     {
-      service: 'public-api',
-      endpoint: 'public-api:51151',
-    },
-    {
       service: 'consensus',
       endpoint: 'consensus:51151',
     },
