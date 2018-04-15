@@ -22,16 +22,16 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 ### Network ID Encoding
 
-| Value (hex) | Network  | Base58 encoding |
-| :---------: | :------: | :-------------: |
-| 14          | Main net | M               |
-| 1A          | Test net | T               |
+| Network  | Value | Value (hex) |
+| :------: | :---: | :---------: |
+| Main net | M     | 4d          |
+| Test net | T     | 54          |
 
 ### Address Scheme Encoding
 
-| Value (hex) | Address Scheme | Base58 encoding |
-| :---------: | :------------- | :-------------: |
-| 00          | Rev1           | 1               |
+| Address Scheme | Value (hex) |
+| :------------: | :---------- |
+| Rev1           | 00          |
 
 ### Address Scheme: 0
 
@@ -53,13 +53,13 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 4. Prepend the Network ID, Address Scheme and Virtual Chain ID to the Account ID:
 
-    Network ID + Address Scheme + Virtual Chain ID + Account ID: `1400640ed3c13052d8208230a58ab363708c08e78f1125f488`
+    Network ID + Address Scheme + Virtual Chain ID + Account ID: `4d00640ed3c13052d8208230a58ab363708c08e78f1125f488`
 
 5. Calculate the CRC32 checksum of the result:
 
-    Checksum: `61f04bfc`
+    Checksum: `8113211c`
 
-    Raw public address: `1400640ed3c13052d8208230a58ab363708c08e78f1125f48861f04bfc`
+    Raw public address: `4d00640ed3c13052d8208230a58ab363708c08e78f1125f4888113211c`
 
 6. Encode the raw public address to Base58:
 
@@ -67,11 +67,11 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
     a. Network ID: `M`
 
-    b. Address Scheme: `1`
+    b. Address Scheme: `0`
 
-    c. Virtual Chain ID + Account ID + Checksum: `EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1`
+    c. Virtual Chain ID + Account ID + Checksum: `EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4R42dE3`
 
-    Public address: `M1EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1`
+    Public address: `M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4R42dE3`
 
 ### Algorithms
 
