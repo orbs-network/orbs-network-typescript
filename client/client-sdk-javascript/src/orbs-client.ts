@@ -2,6 +2,7 @@ import { delay } from "bluebird";
 import { Transaction, SendTransactionOutput } from "orbs-interfaces";
 import * as request from "request-promise";
 import { Address } from "./address";
+import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest } from "./orbs-api-interface";
 
 export class OrbsClient {
   private endpoint: string;
@@ -15,7 +16,7 @@ export class OrbsClient {
   }
 
   async sendTransaction(contractAddress: Address, payload: string): Promise<any> {
-    const transaction = this.generateTransaction(contractAddress, payload);
+    const transaction = this.generateTransactionRequest(contractAddress, payload);
 
     const body = await request.post({
       url: `${this.endpoint}/public/sendTransaction`,
@@ -29,20 +30,21 @@ export class OrbsClient {
   }
 
   async call(contractAddress: Address, payload: string): Promise<any> {
+    const callData: OrbsAPICallContractRequest = {
+      senderAddressBase58: this.senderAddress.toString(),
+      contractAddressBase58: contractAddress.toString(),
+      payload: payload
+    };
     const body = await request.post({
       url: `${this.endpoint}/public/callContract`,
-      body: {
-        senderAddressBase58: this.senderAddress.toString(),
-        contractAddressBase58: contractAddress.toString(),
-        payload: payload
-      },
+      body: callData,
       json: true
     });
 
     return body.result;
   }
 
-  public generateTransaction(contractAddress: Address, payload: string, timestamp: number = Date.now()) {
+  public generateTransactionRequest(contractAddress: Address, payload: string, timestamp: number = Date.now()): OrbsAPISendTransactionRequest {
     return {
       header: {
         version: 0,
