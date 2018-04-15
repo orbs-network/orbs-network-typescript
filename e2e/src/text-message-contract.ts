@@ -1,4 +1,4 @@
-import { OrbsContractAdapter } from "orbs-client-sdk";
+import { OrbsContract } from "orbs-client-sdk";
 
 export interface Message {
   recipient: string;
@@ -9,10 +9,10 @@ export interface Message {
 }
 
 export class TextMessageAccount {
-  adapter: OrbsContractAdapter;
+  adapter: OrbsContract;
   address: string;
 
-  public constructor(address: string, adapter: OrbsContractAdapter) {
+  public constructor(address: string, adapter: OrbsContract) {
     this.adapter = adapter;
     this.address = address;
   }

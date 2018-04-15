@@ -5,8 +5,11 @@ import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 import { TransactionPoolClient, VirtualMachineClient, BlockStorageClient } from "orbs-interfaces";
-import { BlockUtils } from "../../src/common-library";
+import { BlockUtils, TransactionUtils } from "../../src/common-library";
+import { Address, createContractAddress } from "../../src/common-library/address";
 import * as sinon from "sinon";
+import { createHash } from "crypto";
+import { aDummyTransactionSet } from "../../src/test-kit/transaction-builders";
 
 chai.use(sinonChai);
 
@@ -26,42 +29,10 @@ function aGenesisBlock(): types.Block {
   });
 }
 
-function aDummyTransaction(addressId): types.Transaction {
-  const senderAddress: types.UniversalAddress = {
-    id: new Buffer(addressId),
-    scheme: 0,
-    checksum: 0,
-    networkId: 0
-  };
-
-  return {
-      header: {
-        version: 0,
-        sender: senderAddress,
-        timestamp: Date.now().toString()
-      },
-      body: {
-        contractAddress: {address: "dummyContract"},
-        payload: Math.random().toString(),
-      }
-  };
-}
-
-function aDummyTransactionSet(numberOfTransactions = 3): types.Transaction[] {
-  const transactions: types.Transaction[] = [];
-  for (let i = 0; i < numberOfTransactions; i++) {
-    const transaction = aDummyTransaction(`address${i}`);
-    const txHash = new Buffer(`dummyHash${i}`);
-    transactions.push(transaction);
-  }
-
-  return transactions;
-}
-
 function aDummyStateDiff(): types.ModifiedStateKey[] {
   return [
     {
-      contractAddress: {address: "dummyContract"},
+      contractAddress: createContractAddress("dummyContract").toBuffer(),
       key: "dummyKey",
       value: "dummyValue",
     }
@@ -71,22 +42,27 @@ function aDummyStateDiff(): types.ModifiedStateKey[] {
 
 describe("a block", () => {
   let blockBuilder: BlockBuilder;
-  let newBlockBuildCallback;
+  let newBlockBuildCallback: sinon.SinonSpyStatic;
 
   const dummyTransactionSet = aDummyTransactionSet();
   const dummyStateDiff = aDummyStateDiff();
-  const dummyTransactionReceipts = [{ txHash: new Buffer("dummyhash"), success: true }];
+  const dummyTransactionReceipts: types.TransactionReceipt[] = dummyTransactionSet.map(tx => ({
+    txHash: TransactionUtils.calculateTransactionHash(tx),
+    success: true
+  }));
 
   beforeEach(async () => {
-    const blockStorage: BlockStorageClient = stubInterface<types.BlockStorageClient>();
-    blockStorage.getLastBlock.returns({block: aGenesisBlock()});
+    const blockStorage = stubInterface<types.BlockStorageClient>();
+    (<sinon.SinonStub>blockStorage.getLastBlock).returns({block: aGenesisBlock()});
 
     newBlockBuildCallback = sinon.spy();
 
-    const transactionEntries: types.TransactionEntry[] = dummyTransactionSet.map(transaction => ({ transaction, txHash: new Buffer("dummyHash")}));
+    const transactionEntries: types.TransactionEntry[] = dummyTransactionSet.map(transaction => (
+      { transaction, txHash: new Buffer("dummyHash")
+    }));
     const pullAllPendingTransactionsOutput: types.GetAllPendingTransactionsOutput = { transactionEntries };
     const transactionPool = stubInterface<types.TransactionPoolClient>();
-    transactionPool.getAllPendingTransactions.returns(pullAllPendingTransactionsOutput);
+    (<sinon.SinonStub>transactionPool.getAllPendingTransactions).returns(pullAllPendingTransactionsOutput);
 
 
     const processTransactionSetOutput: types.ProcessTransactionSetOutput = {
@@ -95,10 +71,11 @@ describe("a block", () => {
     };
 
     const virtualMachine = stubInterface<types.VirtualMachineClient>();
-    virtualMachine.processTransactionSet.returns(processTransactionSetOutput);
+    (<sinon.SinonStub>virtualMachine.processTransactionSet).returns(processTransactionSetOutput);
 
-    blockBuilder = new BlockBuilder({ virtualMachine, transactionPool, blockStorage, newBlockBuildCallback, pollIntervalMs: 10});
-
+    blockBuilder = new BlockBuilder(
+      { virtualMachine, transactionPool, blockStorage, newBlockBuildCallback, pollIntervalMs: 10
+      });
   });
 
   describe("block builder polling", () => {
@@ -124,7 +101,7 @@ describe("a block", () => {
       }, 100);
     });
 
-    after(async () => {
+    afterEach(async () => {
       await blockBuilder.shutdown();
     });
   });

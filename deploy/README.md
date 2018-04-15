@@ -119,7 +119,7 @@ node src/deploy.js \
     --deploy-node --parity
 ```
 
-## PROPOSAL: Delivery to the clients
+## Delivery to the clients
 
 ### Requirements
 
