@@ -6,7 +6,7 @@ import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 import { PendingTransactionPool, CommittedTransactionPool } from "../../src/transaction-pool";
-import aDummyTransaction from "../../src/test-kit/dummy-transaction";
+import { aDummyTransaction } from "../../src/test-kit/transaction-builders";
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -17,7 +17,7 @@ function aValidTransaction() {
 }
 
 function anExpiredTransaction() {
-  return aDummyTransaction(Date.now() - 60 * 1000 * 10);
+  return aDummyTransaction({ timestamp: Date.now() - 60 * 1000 * 10 });
 }
 
 describe("Transaction Pool", () => {
