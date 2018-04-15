@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { Address } from "../../src/common-library";
 
 describe("an address", () => {
-  it("is properly initialized by a public key #1", () => {
+  it.only("is properly initialized by a public key #1", () => {
     const publicKey = "8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65";
     const virtualChainId = "640ed3";
     const networkId = Address.MAIN_NETWORK_ID;
@@ -14,8 +14,8 @@ describe("an address", () => {
     expect(address.version).to.equal(0);
     expect(address.virtualChainId).to.equal("640ed3");
     expect(address.accountId.toString("hex")).to.equal("c13052d8208230a58ab363708c08e78f1125f488");
-    expect(address.checksum).to.equal(0x61f04bfc);
-    expect(address.toBase58()).to.equal("M1EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4QFsJu1");
+    expect(address.checksum).to.equal(0x0b4af4d2);
+    expect(address.toBase58()).to.equal("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
   });
 
   it("is properly initialized by public key #2", () => {
@@ -29,7 +29,7 @@ describe("an address", () => {
     expect(address2.version).to.equal(0);
     expect(address2.virtualChainId).to.equal("9012ca");
     expect(address2.accountId.toString("hex")).to.equal("44068acc1b9ffc072694b684fc11ff229aff0b28");
-    expect(address2.checksum).to.equal(0xd971f700);
-    expect(address2.toBase58()).to.equal("T1LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMpsdEej");
+    expect(address2.checksum).to.equal(0x258c93e8);
+    expect(address2.toBase58()).to.equal("T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
   });
 });

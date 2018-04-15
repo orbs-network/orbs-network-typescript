@@ -22,14 +22,14 @@ const uint8_t Address::TEST_NETWORK_ID = 0x54; // "T"
 const uint8_t Address::VERSION = 0;
 const uint32_t Address::PUBLIC_KEY_SIZE = 32;
 const uint32_t Address::NETWORK_ID_SIZE = 1;
-const uint32_t Address::VERSION_SIZE = 1;
+const uint32_t Address::VERSION_SIZE = 2;
 const uint32_t Address::VIRTUAL_CHAIN_ID_SIZE = 3;
 const uint8_t Address::VIRTUAL_CHAIN_ID_MSB = 0x08;
 const uint32_t Address::ACCOUNT_ID_SIZE = 20;
 const uint32_t Address::CHECKSUM_SIZE = 4;
 
-// Network ID [1] + Version [1] + BASE58 of (Virtual Chain ID + Account ID + Checksum) [37].
-const uint32_t Address::ADDRESS_LENGTH = 39;
+// Network ID [1] + Version [2] + BASE58 of (Virtual Chain ID + Account ID + Checksum) [37].
+const uint32_t Address::ADDRESS_LENGTH = 40;
 
 Address::Address(const vector<uint8_t> &publicKey, const vector<uint8_t> &virtualChainId, uint8_t networkId) :
     publicKey_(publicKey), virtualChainId_(virtualChainId), networkId_(networkId) {
@@ -124,7 +124,7 @@ const string Address::ToString() const {
     stringstream str;
 
     // Push the network ID and the version as is.
-    str << networkId_ << static_cast<int>(version_);
+    str << networkId_ << hex << setw(2) << setfill('0') << static_cast<int>(version_);
 
     // Concatenate the virtual chain ID, the account ID, and the checksum together.
     vector<uint8_t> rawAddress;

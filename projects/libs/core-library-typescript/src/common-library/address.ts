@@ -11,8 +11,8 @@ export class Address {
   readonly checksum: number;
   private fullAddress: Buffer;
 
-  static readonly MAIN_NETWORK_ID = "14";
-  static readonly TEST_NETWORK_ID = "1a";
+  static readonly MAIN_NETWORK_ID = "4d";
+  static readonly TEST_NETWORK_ID = "54";
   static readonly SYSTEM_VCHAINID = "000000";
 
   constructor(publicKey: Buffer, virtualChainId = Address.SYSTEM_VCHAINID, networkId = Address.TEST_NETWORK_ID) {
@@ -55,17 +55,14 @@ export function createContractAddress(contractName: string, vchainId = Address.S
   return new Address(publicKey, vchainId);
 }
 
-export function bs58EncodeRawAddress(rawAddress: Buffer) {
-    // two first bytes encoded separately
-    return bs58.encode(rawAddress.slice(0, 1))
-    + bs58.encode(rawAddress.slice(1, 2))
-    + bs58.encode(rawAddress.slice(2));
+export function bs58EncodeRawAddress(rawAddress: Buffer): string {
+  return rawAddress.slice(0, 1).toString("utf8") +
+    rawAddress.slice(1, 2).toString("hex") +
+    bs58.encode(rawAddress.slice(2));
 }
 
-export function bs58DecodeRawAddress(base58Address: string) {
+export function bs58DecodeRawAddress(base58Address: string): Buffer {
   return Buffer.concat([
-    bs58.decode(base58Address.slice(0, 1)),
-    bs58.decode(base58Address.slice(1, 2)),
+    Buffer.from(base58Address.slice(0, 2), "utf8"),
     bs58.decode(base58Address.slice(2))]);
 }
-

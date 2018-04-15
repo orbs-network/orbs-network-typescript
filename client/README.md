@@ -67,11 +67,11 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
     a. Network ID: `M`
 
-    b. Address Scheme: `0`
+    b. Address Scheme: `00`
 
     c. Virtual Chain ID + Account ID + Checksum: `EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4R42dE3`
 
-    Public address: `M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4R42dE3`
+    Public address: `M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4R42dE3`
 
 ### Algorithms
 
