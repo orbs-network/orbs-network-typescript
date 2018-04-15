@@ -11,22 +11,20 @@ function build_ios() {
 function build_android() {
     echo "Building for ${ANDROID_ABI}..."
 
-    if [ -z "$ANDROID_NDK_HOME" ]; then
-        case "$(uname -s)" in
-            Darwin)
-                ANDROID_HOME=~/Library/Android/sdk
-                ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+    case "$(uname -s)" in
+        Darwin)
+            ANDROID_HOME=${ANDROID_HOME:-~/Library/Android/sdk}
+            ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
-                ;;
-            Linux)
-                ANDROID_HOME=/opt/Android/sdk
-                ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+            ;;
+        Linux)
+            ANDROID_HOME=${ANDROID_HOME:-/opt/Android/sdk}
+            ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
-                ;;
-            *)
-                ;;
-        esac
-    fi
+            ;;
+        *)
+            ;;
+    esac
 
     (cd ../ && CMAKE_ONLY=1 ./clean.sh)
     cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=ANDROID -DANDROID_ABI=${ANDROID_ABI} -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
