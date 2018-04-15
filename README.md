@@ -13,45 +13,7 @@ This wrapper project will set up a full working environment including all sub pr
 
 ## Configuration
 
-> You can use the exported `Config` singleton, from the `common-library-typescript` library, in order to access the configuration key-value store. As a convention, it'll look for the configuration file based on the environment type:
-
-* Development (default): `config/development.json`.
-* Test (`NODE_ENV=test`): `config/test.json`.
-* Staging/Production (`NODE_ENV=production`): `config/production.json`.
-
-You can pass values through environment, but you have to replace colon (`:`) with double underscore (`__`) for it to work. For example, `logger:logzio:apiKey` becomes `logger__logzio__apiKey`.
-
-### Configuration Keys
-
-#### `logger`
-
-> Global logger configuration:
-
-* `level`: The level of messages that should be logged. Possible values are: `debug`, `info`, `warn`, `error`. Default is `info`.
-* `fileName`: The filename of the log file to write the output to. Default is `logs/default.log`.
-* `maxSize`: The max size (in bytes) of the log file. If the size is exceeded then a new file is created and a counter will become a suffix of the log file. Default is `10MB`.
-* `maxFiles`: The limit of the number of files created when the size of the log file is exceeded. Default is `10`.
-* `console`: Whether logging to the console/stdout should be enabled.
-* `logzio`: Logz.io configuration:
-  * `enabled`: Whether shipping logs to Logz.io should be enabled.
-  * `apiKey`: The Logz.io API key (i.e., account token).
-
-> For example:
-
-```json
-{
-  "logger": {
-    "level": "debug",
-    "fileName": "logs/development.log",
-    "maxSize": 1024000,
-    "maxFiles": 4,
-    "logzio": {
-      "enabled": false,
-      "apiKey": "API_KEY"
-    }
-  }
-}
-```
+Please refer to [documentation](deploy/bootstrap/README.md) in `deploy/bootstrap` folder.
 
 ## Build (slow)
 
@@ -73,30 +35,11 @@ You can pass values through environment, but you have to replace colon (`:`) wit
 
 ## Run Inside of Docker
 
-`docker-compose up` will build an image.
+`./docker-build.sh` will build an image.
 
-### Docker in AWS CloudFormation
+### Deployment to AWS
 
-Install `ecs-cli`
-
-```bash
-sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-darwin-amd64-latest
-chmod +x /usr/local/bin/ecs-cli
-```
-
-If you want to pull images, log into AWS Elastic Container Registry.
-
-```bash
-$(aws ecr get-login --no-include-email --region us-west-2)
-```
-
-Deploy new stack:
-
-```bash
-ecs-cli compose --file docker-compose.staging.yml --ecs-params ecs-params.yml --region us-west-2 --cluster orbs-network-staging up
-```
-
-Please refer to [documentation](deploy/cloudformation/README.md) in `deploy/cloudformation` folder.
+Please refer to [documentation](deploy/README.md) in `deploy` folder.
 
 ### Run Tests In Staging-like Environment
 

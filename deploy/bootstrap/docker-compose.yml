@@ -93,7 +93,7 @@ services:
       - .env
       - .env-secrets
     environment:
-      SERVICE_NAME: virtual-machine
+      SERVICE_NAME: sidechain-connector
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
     networks:
