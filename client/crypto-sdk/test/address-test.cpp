@@ -169,7 +169,7 @@ TEST(Address, converts_to_string) {
     virtualChainId = vector<uint8_t>(rawVirtualChainId, rawVirtualChainId + sizeof(rawVirtualChainId) - 1);
     Address a1(publicKey, virtualChainId, Address::MAIN_NETWORK_ID);
 
-    EXPECT_STREQ(a1.ToString().c_str(), "M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
+    EXPECT_STREQ(a1.ToString().c_str(), "M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
 
     uint8_t rawPublicKey2[] = "\x8d\x41\xd0\x55\xd0\x04\x59\xbe\x37\xf7\x49\xda\x2c\xaf\x87\xbd\x4c\xed\x6f\xaf\xa3\x35\xb1\xf2\x14\x2e\x0f\x44\x50\x1b\x2c\x65";
     uint8_t rawVirtualChainId2[] = "\x64\x0e\xd3";
@@ -177,7 +177,7 @@ TEST(Address, converts_to_string) {
     virtualChainId = vector<uint8_t>(rawVirtualChainId2, rawVirtualChainId2 + sizeof(rawVirtualChainId2) - 1);
     Address a2(publicKey, virtualChainId, Address::TEST_NETWORK_ID);
 
-    EXPECT_STREQ(a2.ToString().c_str(), "T0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp");
+    EXPECT_STREQ(a2.ToString().c_str(), "T00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp");
 
     uint8_t rawPublicKey3[] = "\x7a\x46\x34\x87\xbb\x0e\xb5\x84\xda\xbc\xcd\x52\x39\x85\x06\xb4\xa2\xdd\x43\x25\x03\xcc\x6b\x7b\x58\x2f\x87\x83\x2a\xd1\x04\xe6";
     uint8_t rawVirtualChainId3[] = "\x90\x12\xca";
@@ -185,7 +185,7 @@ TEST(Address, converts_to_string) {
     virtualChainId = vector<uint8_t>(rawVirtualChainId3, rawVirtualChainId3 + sizeof(rawVirtualChainId3) - 1);
     Address a3(publicKey, virtualChainId, Address::MAIN_NETWORK_ID);
 
-    EXPECT_STREQ(a3.ToString().c_str(), "M0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMqZ9vza");
+    EXPECT_STREQ(a3.ToString().c_str(), "M00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMqZ9vza");
 
     uint8_t rawPublicKey4[] = "\x7a\x46\x34\x87\xbb\x0e\xb5\x84\xda\xbc\xcd\x52\x39\x85\x06\xb4\xa2\xdd\x43\x25\x03\xcc\x6b\x7b\x58\x2f\x87\x83\x2a\xd1\x04\xe6";
     uint8_t rawVirtualChainId4[] = "\x90\x12\xca";
@@ -193,7 +193,7 @@ TEST(Address, converts_to_string) {
     virtualChainId = vector<uint8_t>(rawVirtualChainId4, rawVirtualChainId4 + sizeof(rawVirtualChainId4) - 1);
     Address a4(publicKey, virtualChainId, Address::TEST_NETWORK_ID);
 
-    EXPECT_STREQ(a4.ToString().c_str(), "T0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
+    EXPECT_STREQ(a4.ToString().c_str(), "T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
 }
 
 TEST(Address, throws_on_invalid_arguments_on_creation) {
@@ -280,41 +280,40 @@ TEST(Address, verifies_account_public_address) {
     EXPECT_FALSE(Address::IsValid(""));
 
     // Too short.
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qq"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qq"));
 
     // Too long.
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1a"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1aa"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1a"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1aa"));
 
     // Invalid BASE58.
-
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqOyVxWdhYCgGzpnaL4qBy4N3Qqa1"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4I3Qqa1"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFq0yVxWdhYCgGzpnaL4qBy4N3Qqa1"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqal"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnna+FqRyVxWdhYCgGzpnaL4qBy4N3Qqa1"));
-    EXPECT_FALSE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3/qa1"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqOyVxWdhYCgGzpnaL4qBy4N3Qqa1"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4I3Qqa1"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFq0yVxWdhYCgGzpnaL4qBy4N3Qqa1"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqal"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnna+FqRyVxWdhYCgGzpnaL4qBy4N3Qqa1"));
+    EXPECT_FALSE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3/qa1"));
 
     // Incorrect virtual chain ID.
-    EXPECT_FALSE(Address::IsValid("M0xKxXz7LPuyXmhxpoaNkr96jKrT99FsJ3AXQr"));
-    EXPECT_FALSE(Address::IsValid("M0H8exm1WU6CTGcpFiupsL7g1zN9dYoxMZ8ZrF"));
+    EXPECT_FALSE(Address::IsValid("M00xKxXz7LPuyXmhxpoaNkr96jKrT99FsJ3AXQr"));
+    EXPECT_FALSE(Address::IsValid("M00H8exm1WU6CTGcpFiupsL7g1zN9dYoxMZ8ZrF"));
 
     // Incorrect network ID.
-    EXPECT_FALSE(Address::IsValid("\"0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TXq9Zh"));
-    EXPECT_FALSE(Address::IsValid("30EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4NZTSK1"));
+    EXPECT_FALSE(Address::IsValid("\"00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TXq9Zh"));
+    EXPECT_FALSE(Address::IsValid("300EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4NZTSK1"));
 
     // Incorrect version.
-    EXPECT_FALSE(Address::IsValid("M5EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TZpGvu"));
-    EXPECT_FALSE(Address::IsValid("MFEXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4RjxghL"));
+    EXPECT_FALSE(Address::IsValid("M05EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TZpGvu"));
+    EXPECT_FALSE(Address::IsValid("M0FEXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4RjxghL"));
 
     // Incorrect checksum.
-    EXPECT_FALSE(Address::IsValid("M0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMnxhySx"));
-    EXPECT_FALSE(Address::IsValid("M0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMjMfiiL"));
+    EXPECT_FALSE(Address::IsValid("M00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMnxhySx"));
+    EXPECT_FALSE(Address::IsValid("M00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMjMfiiL"));
 
     // Correct addresses.
-    EXPECT_TRUE(Address::IsValid("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1"));
-    EXPECT_TRUE(Address::IsValid("T0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp"));
-    EXPECT_TRUE(Address::IsValid("M0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMqZ9vza"));
-    EXPECT_TRUE(Address::IsValid("T0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR"));
+    EXPECT_TRUE(Address::IsValid("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1"));
+    EXPECT_TRUE(Address::IsValid("T00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp"));
+    EXPECT_TRUE(Address::IsValid("M00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMqZ9vza"));
+    EXPECT_TRUE(Address::IsValid("T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR"));
 }

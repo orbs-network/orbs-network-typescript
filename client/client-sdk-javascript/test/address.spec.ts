@@ -15,7 +15,7 @@ describe("an address", () => {
     expect(address.virtualChainId).to.equal("640ed3");
     expect(address.accountId).to.equal("c13052d8208230a58ab363708c08e78f1125f488");
     expect(address.checksum).to.equal("0b4af4d2");
-    expect(address.toString()).to.equal("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
+    expect(address.toString()).to.equal("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
 
     const publicKey2 = "7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6";
     const virtualChainId2 = "9012ca";
@@ -28,7 +28,7 @@ describe("an address", () => {
     expect(address2.virtualChainId).to.equal("9012ca");
     expect(address2.accountId).to.equal("44068acc1b9ffc072694b684fc11ff229aff0b28");
     expect(address2.checksum).to.equal("258c93e8");
-    expect(address2.toString()).to.equal("T0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
+    expect(address2.toString()).to.equal("T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
   });
 
   it("is properly initialized by an ed25519 public key", async () => {
@@ -43,7 +43,7 @@ describe("an address", () => {
     expect(address.virtualChainId).to.equal("640ed3");
     expect(address.accountId).to.equal("c13052d8208230a58ab363708c08e78f1125f488");
     expect(address.checksum).to.equal("0b4af4d2");
-    expect(address.toString()).to.equal("M0EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
+    expect(address.toString()).to.equal("M00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4N3Qqa1");
 
     const key2 = new ED25519Key("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6");
     const virtualChainId2 = "9012ca";
@@ -56,7 +56,7 @@ describe("an address", () => {
     expect(address2.virtualChainId).to.equal("9012ca");
     expect(address2.accountId).to.equal("44068acc1b9ffc072694b684fc11ff229aff0b28");
     expect(address2.checksum).to.equal("258c93e8");
-    expect(address2.toString()).to.equal("T0LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
+    expect(address2.toString()).to.equal("T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
   });
 
   it("is properly initialized by a random public key", async () => {

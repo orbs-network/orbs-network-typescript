@@ -12,10 +12,10 @@ chai.use(sinonChai);
 
 const { expect } = chai;
 
-const senderAddressBase58 = "T1EXMPcRV5F1qEbMtPZXLEuT2BMyWS4BHuhhFUf";
-const contractAddressBase58 = "T1EXMPWkjkg3o75TAKYL69AfjnGprWYcctzrw5d";
+const senderAddressBase58 = "T00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp";
+const contractAddressBase58 = "T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR";
 const transactionTimestamp = "12345678";
-const payload = JSON.stringify({foo: "bar"});
+const payload = JSON.stringify({ foo: "bar" });
 
 const sendTransactionRequestData = {
   header: {
@@ -35,12 +35,12 @@ const callContractRequestData = {
 
 const expectedAddNewPendingTransactionInput: types.AddNewPendingTransactionInput = {
   transaction: {
-      header: {
+    header: {
       version: 0,
       timestamp: transactionTimestamp,
       sender: bs58DecodeRawAddress(senderAddressBase58),
       contractAddress: bs58DecodeRawAddress(contractAddressBase58)
-      },
+    },
     payload
   }
 };
