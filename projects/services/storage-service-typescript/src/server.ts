@@ -6,7 +6,7 @@ import BlockStorageService from "./block-storage-service";
 import StateStorageService from "./state-storage-service";
 
 export default function(nodeTopology: any, env: any) {
-    const { NODE_NAME, NODE_ENV, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = env;
+    const { NODE_NAME, NODE_ENV, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH, STATE_STORAGE_POLL_INTERVAL } = env;
 
     if (!NODE_NAME) {
         throw new Error("NODE_NAME can't be empty!");
@@ -20,7 +20,7 @@ export default function(nodeTopology: any, env: any) {
       dbPath: blockStorageDBPath,
       pollInterval: Number(BLOCK_STORAGE_POLL_INTERVAL) || 5000
     };
-    const stateStorageConfig = { nodeName: NODE_NAME };
+    const stateStorageConfig = { nodeName: NODE_NAME, pollInterval: Number(STATE_STORAGE_POLL_INTERVAL) || 200 };
 
     return grpcServer.builder()
                      .withService("BlockStorage", new BlockStorageService(peers.gossip, peers.transactionPool, blockStorageConfig))

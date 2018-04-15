@@ -13,19 +13,35 @@ export class StateStorage {
   private kvstore = new InMemoryKVStore();
   private lastBlockHeight: number;
   private pollInterval: NodeJS.Timer;
+  private pollIntervalMs: number;
+  private engineRunning: boolean;
 
-  public constructor(blockStorage: types.BlockStorageClient) {
+  public constructor(blockStorage: types.BlockStorageClient, pollInterval: number) {
     this.blockStorage = blockStorage;
+    this.pollIntervalMs = pollInterval;
+    logger.debug(`creating state storage with poll interval of ${this.pollIntervalMs}`);
+
+    this.engineRunning = true;
+    this.startPolling();
   }
 
-  public poll() {
-    this.pollInterval = setInterval(() => this.pollBlockStorageCallback(), 200);
+  public stop() {
+    this.engineRunning = false;
+    this.stopPolling();
   }
 
-  public stopPolling() {
+  private startPolling() {
+    if (this.engineRunning) {
+      this.pollInterval = setInterval(() => this.pollBlockStorageCallback(), this.pollIntervalMs);
+      logger.debug(`polling started, interval is ${this.pollIntervalMs}`);
+    }
+  }
+
+  private stopPolling() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
       this.pollInterval = undefined;
+      logger.debug("polling stopped");
     }
   }
 
@@ -48,11 +64,26 @@ export class StateStorage {
   }
 
   private async pollBlockStorageCallback() {
-    const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
+    let blocks: types.GetBlocksOutput;
+    try {
+      blocks = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
+    }
+    catch (err) {
+      logger.warn(`could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
+    }
 
-    // Assuming an ordered list of blocks.
-    for (const block of blocks) {
-      await this.syncNextBlock(block);
+    if (blocks != undefined) {
+      // until we finish syncing all of them, lets stop the polling
+      try {
+        this.stopPolling();
+        // Assuming an ordered list of blocks.
+        for (const block of blocks.blocks) {
+          await this.syncNextBlock(block);
+        }
+      }
+      finally {
+        this.startPolling();
+      }
     }
   }
 

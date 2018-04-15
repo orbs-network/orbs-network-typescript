@@ -15,6 +15,8 @@ const { expect } = chai;
 
 ErrorHandler.setup();
 
+logger.configure({ level: "debug" });
+
 describe("storage server test", function () {
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
