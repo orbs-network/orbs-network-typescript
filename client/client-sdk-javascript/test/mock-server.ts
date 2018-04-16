@@ -9,14 +9,14 @@ export default function createMockServer(expectedTransaction: Transaction, expec
 
   app.use(express.json());
 
-  app.use("/public/sendTransaction", (req, res) => {
+  app.use("/public/sendTransaction", (req: express.Request, res: express.Response) => {
     // TODO: check header
     expect(req.body.transaction.body).to.be.eql(expectedTransaction.body);
 
     res.json({ result: "ok" });
   });
 
-  app.use("/public/callContract", (req, res) => {
+  app.use("/public/callContract", (req: express.Request, res: express.Response) => {
     // TODO: check sender
     expect(req.body.contractAddress).to.be.eql(expectedContract.contractAddress);
     expect(req.body.payload).to.be.eql(expectedContract.payload);
