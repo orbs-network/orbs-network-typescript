@@ -19,7 +19,7 @@ export class StateStorage {
   public constructor(blockStorage: types.BlockStorageClient, pollInterval: number) {
     this.blockStorage = blockStorage;
     this.pollIntervalMs = pollInterval;
-    logger.debug(`creating state storage with poll interval of ${this.pollIntervalMs}`);
+    logger.debug(`Creating state storage with poll interval of ${this.pollIntervalMs}`);
 
     this.engineRunning = true;
     this.startPolling();
@@ -33,7 +33,7 @@ export class StateStorage {
   private startPolling() {
     if (this.engineRunning) {
       this.pollInterval = setInterval(() => this.pollBlockStorage(), this.pollIntervalMs);
-      logger.debug(`polling started, interval is ${this.pollIntervalMs}`);
+      logger.debug(`Polling started, interval is ${this.pollIntervalMs}`);
     }
   }
 
@@ -41,7 +41,7 @@ export class StateStorage {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
       this.pollInterval = undefined;
-      logger.debug("polling stopped");
+      logger.debug("Polling stopped");
     }
   }
 
@@ -79,7 +79,7 @@ export class StateStorage {
     }
     catch (err) {
       if (err instanceof ReferenceError) {
-        logger.warn(`could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
+        logger.warn(`Could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
       }
       else {
         throw err;
