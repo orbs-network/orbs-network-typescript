@@ -64,9 +64,18 @@ export class StateStorage {
   }
 
   public async pollBlockStorage() {
-    let blocks: types.GetBlocksOutput;
+    // until we finish syncing all of them, lets stop the polling
+    this.stopPolling();
+
     try {
-      blocks = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
+      const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
+
+      if (blocks != undefined) {
+        // Assuming an ordered list of blocks.
+        for (const block of blocks) {
+          await this.syncNextBlock(block);
+        }
+      }
     }
     catch (err) {
       if (err instanceof ReferenceError) {
@@ -76,19 +85,8 @@ export class StateStorage {
         throw err;
       }
     }
-
-    if (blocks != undefined) {
-      // until we finish syncing all of them, lets stop the polling
-      try {
-        this.stopPolling();
-        // Assuming an ordered list of blocks.
-        for (const block of blocks.blocks) {
-          await this.syncNextBlock(block);
-        }
-      }
-      finally {
-        this.startPolling();
-      }
+    finally {
+      this.startPolling();
     }
   }
 
