@@ -144,9 +144,7 @@ napi_value Address::GetNetworkId(napi_env env, napi_callback_info info) {
     status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
     assert(status == napi_ok);
 
-    vector<uint8_t> data;
-    data.push_back(obj->address_.GetNetworkId());
-    const string str(Orbs::Base58::Encode(data));
+    const string str(Orbs::Utils::ToString(obj->address_.GetNetworkId()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
 
@@ -232,9 +230,7 @@ static napi_value GetNetworkId(napi_env env, napi_callback_info info, uint8_t ne
     status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
     assert(status == napi_ok);
 
-    vector<uint8_t> data;
-    data.push_back(networkId);
-    const string str(Orbs::Base58::Encode(data));
+    const string str(Orbs::Utils::ToString(networkId));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
 

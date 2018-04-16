@@ -23,7 +23,7 @@ export default class TextMessageSmartContract extends BaseSmartContract {
 
     await this.appendMessage({
       recipient,
-      sender: this.sender,
+      sender: this.senderAddressBase58,
       timestamp,
       processedAtTimestamp,
       message
@@ -31,11 +31,11 @@ export default class TextMessageSmartContract extends BaseSmartContract {
   }
 
   public async getMyMessages(): Promise<Message[]> {
-    return this.getMessages(this.sender);
+    return this.getMessages(this.senderAddressBase58);
   }
 
   private async getMessages(account: string): Promise<Message[]> {
-    const messages = await this.stateAccessor.load(this.getMessageKey(account));
+    const messages = await this.state.load(this.getMessageKey(account));
     return messages != undefined ? JSON.parse(messages) : [];
   }
 
@@ -43,7 +43,7 @@ export default class TextMessageSmartContract extends BaseSmartContract {
     const messages = await this.getMessages(message.recipient);
     messages.push(message);
 
-    return this.stateAccessor.store(this.getMessageKey(message.recipient), JSON.stringify(messages));
+    return this.state.store(this.getMessageKey(message.recipient), JSON.stringify(messages));
   }
 
   private getMessageKey(account: string) {

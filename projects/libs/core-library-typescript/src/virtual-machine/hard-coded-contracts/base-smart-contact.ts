@@ -3,12 +3,12 @@ import { BaseContractStateAccessor } from "../contract-state-accessor";
 export default abstract class BaseSmartContract {
   [index: string]: any;
 
-  readonly stateAccessor: BaseContractStateAccessor;
-  readonly sender: string;
+  readonly state: BaseContractStateAccessor;
+  readonly senderAddressBase58: string;
 
-  constructor(sender: string, stateAccessor: BaseContractStateAccessor) {
-    this.sender = sender;
-    this.stateAccessor = stateAccessor;
+  constructor(senderAddressBase58: string, state: BaseContractStateAccessor) {
+    this.senderAddressBase58 = senderAddressBase58;
+    this.state = state;
   }
 
   validationError(message: string) {

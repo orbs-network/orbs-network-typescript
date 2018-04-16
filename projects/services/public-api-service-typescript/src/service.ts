@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 import {  } from "orbs-core-library";
-import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler } from "orbs-core-library";
+import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler, bs58DecodeRawAddress } from "orbs-core-library";
 import * as express from "express";
 import { Server } from "http";
 import * as bodyParser from "body-parser";
@@ -55,16 +55,12 @@ export default class PublicApiHTTPService extends Service {
       const input: types.SendTransactionInput = {
         transaction: {
           header: {
-            version: _.get(body, "transaction.header.version"),
-            sender: _.get(body, "transaction.header.sender"),
-            timestamp: _.get(body, "transaction.header.timestamp")
+            version: _.get(body, "header.version"),
+            sender: bs58DecodeRawAddress(_.get(body, "header.senderAddressBase58")),
+            timestamp: _.get(body, "header.timestamp"),
+            contractAddress: bs58DecodeRawAddress(_.get(body, "header.contractAddressBase58")),
           },
-          body: {
-            contractAddress: {
-              address: _.get(body, "transaction.body.contractAddress.address")
-            },
-            payload: _.get(body, "transaction.body.payload")
-          }
+          payload: _.get(body, "payload")
         }
       };
 
@@ -84,9 +80,9 @@ export default class PublicApiHTTPService extends Service {
       const body = JsonBuffer.parseJsonWithBuffers(req.body);
 
       const input: types.CallContractInput = {
-        contractAddress: body.contractAddress,
+        contractAddress: bs58DecodeRawAddress(body.contractAddressBase58),
         payload: body.payload,
-        sender: body.sender
+        sender: bs58DecodeRawAddress(body.senderAddressBase58)
       };
 
       try {

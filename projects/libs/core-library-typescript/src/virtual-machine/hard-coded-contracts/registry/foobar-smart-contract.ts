@@ -8,7 +8,7 @@ export default class FooBarSmartContract extends BaseSmartContract {
       throw this.validationError("transaction amount must be > 0");
     }
 
-    const senderBalance: number = await this.getBalance(this.sender);
+    const senderBalance: number = await this.getBalance(this.senderAddressBase58);
     if (senderBalance < amount) {
       throw this.validationError(`balance is not sufficient ${senderBalance} < ${amount}`);
     }
@@ -17,7 +17,7 @@ export default class FooBarSmartContract extends BaseSmartContract {
     // TODO: conversion of float to string is lossy
     const recipientBalance: number = await this.getBalance(recipient);
 
-    await this.setBalance(this.sender, senderBalance - amount);
+    await this.setBalance(this.senderAddressBase58, senderBalance - amount);
     await this.setBalance(recipient, recipientBalance + amount);
   }
 
@@ -26,16 +26,16 @@ export default class FooBarSmartContract extends BaseSmartContract {
   }
 
   public async getMyBalance() {
-    return this.getBalance(this.sender);
+    return this.getBalance(this.senderAddressBase58);
   }
 
   private async getBalance(account: string) {
-    const balance = await this.stateAccessor.load(this.getAccountBalanceKey(account));
+    const balance = await this.state.load(this.getAccountBalanceKey(account));
     return balance != undefined ? JSON.parse(balance) : 0;
   }
 
   private async setBalance(account: string, amount: number) {
-    return this.stateAccessor.store(this.getAccountBalanceKey(account), JSON.stringify(amount));
+    return this.state.store(this.getAccountBalanceKey(account), JSON.stringify(amount));
   }
 
   private getAccountBalanceKey(account: string) {

@@ -1,13 +1,11 @@
 syntax = "proto3";
 
-import "./primitives/addresses.proto";
-
 service StateStorage {
   rpc ReadKeys (ReadKeysInput) returns (ReadKeysOutput);
 }
 
 message ReadKeysInput {
-  ContractAddress contractAddress = 1;
+  bytes contractAddress = 1;
   repeated string keys = 2;
 }
 
