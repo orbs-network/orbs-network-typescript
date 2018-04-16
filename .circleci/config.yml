@@ -5,6 +5,7 @@ jobs:
     steps:
       - checkout
       - run: ./.circleci/setup-rngd.sh
+      - run: ./docker/build-server-base.sh
       - run: ./docker-build.sh
       - run: ./docker-test.sh
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
@@ -45,6 +46,7 @@ workflows:
   build:
     jobs:
       - build-sdk
+      - build-server
       # - build-server
       # - deploy:
       #     requires:
