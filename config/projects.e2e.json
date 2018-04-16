@@ -1,0 +1,28 @@
+{
+  "architecture": {
+    "runtime": "protobuf",
+    "type": "static",
+    "path": "projects/architecture"
+  },
+  "crypto-sdk": {
+    "runtime": "c++",
+    "type": "library",
+    "path": "client/crypto-sdk"
+  },
+  "client-sdk-javascript": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/client-sdk-javascript"
+  },
+  "e2e": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "e2e"
+  },
+  "order": [
+    "architecture",
+    "crypto-sdk",
+    "client-sdk-javascript",
+    "e2e"
+  ]
+}
