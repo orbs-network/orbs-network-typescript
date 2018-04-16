@@ -11,8 +11,9 @@ import * as crypto from "crypto";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
 import { OrbsContract, OrbsContractMethodArgs } from "../src/orbs-contract";
 import { method } from "bluebird";
-import * as java from "java";
+import { createJavaOrbsContract } from "./java-sdk-helper";
 import "mocha";
+import { SendTransactionOutput } from "orbs-interfaces";
 
 chai.use(sinonChai);
 
@@ -25,6 +26,42 @@ const API_ENDPOINT = `http://localhost:${HTTP_PORT}`;
 const TIMEOUT = 20;
 const SENDER_PUBLIC_KEY = new ED25519Key().publicKey;
 const SENDER_ADDRESS = new Address(SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+
+interface OrbsContractAdapter {
+  sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> ;
+  call(methodName: string, args: OrbsContractMethodArgs): Promise<any> ;
+}
+
+class TypeScriptContractAdapter implements OrbsContractAdapter {
+
+  orbsContract: OrbsContract;
+
+  constructor(orbsContract: OrbsContract) {
+    this.orbsContract = orbsContract;
+  }
+
+  async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
+    return this.orbsContract.sendTransaction(methodName, args);
+  }
+  async call(methodName: string, args: OrbsContractMethodArgs) {
+    return this.orbsContract.call(methodName, args);
+  }
+}
+
+class JavaContractAdapter implements OrbsContractAdapter {
+  javaContract: any;
+
+  constructor(javaContract: any) {
+    this.javaContract = javaContract;
+  }
+
+  async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
+    return this.javaContract.sendTransaction(methodName, args);
+  }
+  async call(methodName: string, args: OrbsContractMethodArgs) {
+    return this.javaContract.call(methodName, args);
+  }
+}
 
 function expectedContractAddressBase58(contractName: string) {
   const contractKey = crypto.createHash("sha256").update(contractName).digest("hex");
@@ -63,16 +100,22 @@ before(() => {
 });
 
 describe("The Javascript SDK", () => {
-  const orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS.toString(), TIMEOUT);
+  const orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
 
-  testContract(new OrbsContract(orbsClient, CONTRACT_NAME));
+  testContract(new TypeScriptContractAdapter(new OrbsContract(orbsClient, CONTRACT_NAME)));
+});
+
+describe("The Java SDK", () => {
+  const javaContract = createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT);
+
+  testContract(new JavaContractAdapter(javaContract));
 });
 
 after(async () => {
   httpServer.close();
 });
 
-function testContract(orbsContract: OrbsContract) {
+function testContract(orbsContract: OrbsContractAdapter) {
   describe("calls the connector interface with the correct inputs when", async function () {
 
     it("sendTransaction() is called", async () => {
