@@ -1,15 +1,22 @@
 import { OrbsClient } from "./orbs-client";
 import { SendTransactionOutput } from "orbs-interfaces";
+import { Address } from "./address";
+import * as crypto from "crypto";
 
 export type OrbsContractMethodArgs = [string | number] | any[];
 
-export class OrbsContractAdapter {
+export class OrbsContract {
   orbsClient: OrbsClient;
-  contractAddress: string;
+  private contractAddress: Address;
 
-  constructor(orbsClient: OrbsClient, contractAddress: string) {
+  constructor(orbsClient: OrbsClient, contractName: string) {
     this.orbsClient = orbsClient;
-    this.contractAddress = contractAddress;
+    const contractKey = crypto.createHash("sha256").update(contractName).digest("hex");
+    this.contractAddress = new Address(
+      contractKey,
+      this.orbsClient.senderAddress.virtualChainId,
+      this.orbsClient.senderAddress.networkId.toString()
+    );
   }
 
   public async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {

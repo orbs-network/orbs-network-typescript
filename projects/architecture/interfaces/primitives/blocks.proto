@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "transactions.proto";
-import "addresses.proto";
 
 message BlockHeader {
   uint32 version = 1;
@@ -16,7 +15,7 @@ message BlockBody {
 }
 
 message ModifiedStateKey {
-  ContractAddress contractAddress = 1;
+  bytes contractAddress = 1;
   string key = 2;
   string value = 3;
 }

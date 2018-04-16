@@ -1,4 +1,4 @@
-import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service } from "orbs-core-library";
+import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
@@ -12,33 +12,43 @@ chai.use(sinonChai);
 
 const { expect } = chai;
 
-const senderAddress: types.UniversalAddress = {
-  id: new Buffer("sender"),
-  scheme: 0,
-  checksum: 0,
-  networkId: 0
-};
+const senderAddressBase58 = "T00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp";
+const contractAddressBase58 = "T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR";
+const transactionTimestamp = "12345678";
+const payload = JSON.stringify({ foo: "bar" });
 
-const contractAddress: types.ContractAddress = {
-  address: "contractAddress"
-};
-
-const transaction: types.Transaction = {
+const sendTransactionRequestData = {
   header: {
     version: 0,
-    sender: senderAddress,
-    timestamp: Date.now().toString()
+    senderAddressBase58,
+    timestamp: transactionTimestamp,
+    contractAddressBase58
   },
-  body: {
-    contractAddress,
-    payload: Math.random().toString(),
+  payload,
+};
+
+const callContractRequestData = {
+  senderAddressBase58,
+  contractAddressBase58,
+  payload,
+};
+
+const expectedAddNewPendingTransactionInput: types.AddNewPendingTransactionInput = {
+  transaction: {
+    header: {
+      version: 0,
+      timestamp: transactionTimestamp,
+      sender: bs58DecodeRawAddress(senderAddressBase58),
+      contractAddress: bs58DecodeRawAddress(contractAddressBase58)
+    },
+    payload
   }
 };
 
-const contractInput: types.CallContractInput = {
-  contractAddress,
-  payload: "some-payload",
-  sender: senderAddress
+const expectedVirtualMachineCallContractInput: types.CallContractInput = {
+  sender: bs58DecodeRawAddress(senderAddressBase58),
+  contractAddress: bs58DecodeRawAddress(contractAddressBase58),
+  payload
 };
 
 class FakeVirtualMachineService extends Service implements types.VirtualMachineServer {
@@ -52,8 +62,7 @@ class FakeVirtualMachineService extends Service implements types.VirtualMachineS
 
   @Service.RPCMethod
   callContract(rpc: types.CallContractContext): void {
-    expect(rpc.req.contractAddress).to.be.eql({ address: "contractAddress" });
-    expect(rpc.req.payload).to.be.eql("some-payload");
+    expect(rpc.req).to.be.eql(expectedVirtualMachineCallContractInput);
 
     rpc.res = { resultJson: JSON.stringify("some-answer") };
   }
@@ -66,7 +75,7 @@ class FakeVirtualMachineService extends Service implements types.VirtualMachineS
 class FakeTransactionPool extends Service implements types.TransactionPoolServer {
   @Service.RPCMethod
   addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext): void {
-    expect(rpc.req).to.be.eql({ transaction });
+    expect(rpc.req).to.be.eql(expectedAddNewPendingTransactionInput);
   }
 
   getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext): void {
@@ -146,7 +155,7 @@ describe("Public API Service - Component Test", async function () {
       const httpPort = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
-      httpService = mockHttpServer(transaction, contractInput).listen(httpPort);
+      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData).listen(httpPort);
     });
 
     runTests();
@@ -160,14 +169,14 @@ describe("Public API Service - Component Test", async function () {
     it("sent transaction through http propagates properly to the transaction pool", () => {
       return request(httpEndpoint)
         .post("/public/sendTransaction")
-        .send({ transaction })
+        .send(sendTransactionRequestData)
         .expect(200, { result: "ok" });
     });
 
     it("called contract through http propagates properly to the virtual machine", () => {
       return request(httpEndpoint)
         .post("/public/callContract")
-        .send(contractInput)
+        .send(callContractRequestData)
         .expect(200, { result: "some-answer" });
     });
   }

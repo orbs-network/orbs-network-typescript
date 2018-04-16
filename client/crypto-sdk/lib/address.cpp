@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 
 #include <assert.h>
 
@@ -15,20 +16,20 @@
 using namespace std;
 using namespace Orbs;
 
-const uint8_t Address::MAIN_NETWORK_ID = 0x14; // "M" in BASE58.
-const uint8_t Address::TEST_NETWORK_ID = 0x1A; // "T" in BASE58;
+const uint8_t Address::MAIN_NETWORK_ID = 0x4d; // "M"
+const uint8_t Address::TEST_NETWORK_ID = 0x54; // "T"
 
 const uint8_t Address::VERSION = 0;
 const uint32_t Address::PUBLIC_KEY_SIZE = 32;
 const uint32_t Address::NETWORK_ID_SIZE = 1;
-const uint32_t Address::VERSION_SIZE = 1;
+const uint32_t Address::VERSION_SIZE = 2;
 const uint32_t Address::VIRTUAL_CHAIN_ID_SIZE = 3;
 const uint8_t Address::VIRTUAL_CHAIN_ID_MSB = 0x08;
 const uint32_t Address::ACCOUNT_ID_SIZE = 20;
 const uint32_t Address::CHECKSUM_SIZE = 4;
 
-// Network ID [1] + Version [1] + BASE58 of (Virtual Chain ID + Account ID + Checksum) [37].
-const uint32_t Address::ADDRESS_LENGTH = 39;
+// Network ID [1] + Version [2] + BASE58 of (Virtual Chain ID + Account ID + Checksum) [37].
+const uint32_t Address::ADDRESS_LENGTH = 40;
 
 Address::Address(const vector<uint8_t> &publicKey, const vector<uint8_t> &virtualChainId, uint8_t networkId) :
     publicKey_(publicKey), virtualChainId_(virtualChainId), networkId_(networkId) {
@@ -39,12 +40,15 @@ Address::Address(const vector<uint8_t> &publicKey, const vector<uint8_t> &virtua
 Address::Address(const string &publicKey, const string &virtualChainId, const std::string &networkId) :
     publicKey_(Utils::Hex2Vec(publicKey)), virtualChainId_(Utils::Hex2Vec(virtualChainId))  {
 
-    vector<uint8_t> decodedNetworkId = Base58::Decode(networkId);
-    if (decodedNetworkId.size() != NETWORK_ID_SIZE || !IsValidNetworkId(decodedNetworkId[0])) {
+    if (networkId.size() != NETWORK_ID_SIZE) {
+        throw invalid_argument("Invalid network ID size: " + Utils::ToString(networkId.size()));
+    }
+
+    if (!IsValidNetworkId(Utils::FromString<uint8_t>(networkId.substr(0, NETWORK_ID_SIZE)))) {
         throw invalid_argument("Invalid network ID: " + networkId);
     }
 
-    networkId_ = decodedNetworkId[0];
+    networkId_ = static_cast<uint8_t>(networkId[0]);
 
     Init();
 }
@@ -119,15 +123,8 @@ const vector<uint8_t> &Address::GetChecksum() const {
 const string Address::ToString() const {
     stringstream str;
 
-    // BASE58 encode the network ID and append it to the result.
-    vector<uint8_t> networkIdData;
-    networkIdData.push_back(networkId_);
-    str << Base58::Encode(networkIdData);
-
-    // BASE58 decode the version and append it to the result.
-    vector<uint8_t> versionData;
-    versionData.push_back(version_);
-    str << Base58::Encode(versionData);
+    // Push the network ID and the version as is.
+    str << networkId_ << hex << setw(2) << setfill('0') << static_cast<int>(version_);
 
     // Concatenate the virtual chain ID, the account ID, and the checksum together.
     vector<uint8_t> rawAddress;
@@ -152,44 +149,27 @@ bool Address::IsValidVirtualChainId(const vector<uint8_t> &virtualChainId) {
 }
 
 bool Address::IsValid(const string &address) {
-    // log(256) / log(58), rounded up. Used to calculate the length of the data that was encoded using BASE58.
-    static const float LOG256_OVER_LOG58 = 138.0f / 100;
-
     if (address.length() != Address::ADDRESS_LENGTH) {
         return false;
     }
 
-    // Decode the network ID separately.
+    // Check the network ID and the version without separately, without decoding from BASE58.
     vector<uint8_t> decoded;
     uint32_t offset = 0;
-    try {
-        uint32_t size = Address::NETWORK_ID_SIZE * LOG256_OVER_LOG58;
-        decoded = Base58::Decode(address.substr(offset, size));
-        offset += size;
-    } catch (const logic_error &e) {
+
+    uint8_t networkId = static_cast<uint8_t>(address[offset]);
+    if (!IsValidNetworkId(networkId)) {
         return false;
     }
 
-    if (decoded.size() != NETWORK_ID_SIZE || !IsValidNetworkId(decoded[0])) {
+    offset += Address::NETWORK_ID_SIZE;
+
+    uint8_t version = Utils::FromString<int>(address.substr(offset, Address::VERSION_SIZE));
+    if (!IsValidVersion(version)) {
         return false;
     }
 
-    uint8_t networkId = decoded[0];
-
-    // Decode the version separately.
-    try {
-        uint32_t size = Address::VERSION_SIZE * LOG256_OVER_LOG58;
-        decoded = Base58::Decode(address.substr(offset, size));
-        offset += size;
-    } catch (const logic_error &e) {
-        return false;
-    }
-
-    if (decoded.size() != VERSION_SIZE || !IsValidVersion(decoded[0])) {
-        return false;
-    }
-
-    uint8_t version = decoded[0];
+    offset += Address::VERSION_SIZE;
 
     // Decode the remaining fields.
     try {
