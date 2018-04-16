@@ -7,6 +7,6 @@ export * from "./types";
 export * from "./grpc-server";
 export * from "./block-utils";
 export * from "./json-buffer";
-export * from "./transaction-utils";
+export * from "./transaction-helper";
 export * from "./key-manager";
 export * from "./address";
