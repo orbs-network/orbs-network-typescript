@@ -1,0 +1,11 @@
+FROM orbs:base-sdk
+
+ENV PROJECT_TYPE=e2e
+
+RUN apt-get install -y python-pip && pip install docker-compose && (curl -fsSL get.docker.com | bash)
+
+ADD . /opt/orbs
+
+RUN ./build.sh
+
+WORKDIR /opt/orbs/e2e
