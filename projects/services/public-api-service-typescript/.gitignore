@@ -1,3 +1,4 @@
 # Ignore built ts files
 dist/**/*
 test/mock-server.ts
+src/orbs-api-interface.ts
