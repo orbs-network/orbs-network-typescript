@@ -84,7 +84,7 @@ export class BlockStorage {
 
     // lastBlock is undefined when the service did not initialize the logic/load() did not run yet
     if (this.lastBlock === undefined) {
-      throw new Error("Block Storage not initiailized");
+      throw new ReferenceError("Block Storage not initiailized");
     }
 
     for (let i = fromLastBlockHeight; i < this.lastBlock.header.height; ++i) {

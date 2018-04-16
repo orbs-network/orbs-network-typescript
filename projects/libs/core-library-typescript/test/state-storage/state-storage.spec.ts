@@ -37,13 +37,15 @@ describe("the state storage", () => {
   let stateStorage: StateStorage;
   const contractAddress = createContractAddress("dummyContract").toBuffer();
   const blocks = anInitialBlockChain(4, [{contractAddress , key: "dummyKey", value: "dummyValue"}]);
-  before(async () => {
+  const pollingInterval = 200;
+  beforeEach((done) => {
     blockStorage = stubInterface<types.BlockStorageClient>();
     const lastBlock = blocks[blocks.length - 1];
     (<sinon.SinonStub>blockStorage.getLastBlock).returns({block: blocks[blocks.length - 1]});
     blockStorage.getBlocks = input => ({ blocks: blocks.slice(input.lastBlockHeight + 1) });
 
-    stateStorage = new StateStorage(blockStorage, 200);
+    stateStorage = new StateStorage(blockStorage, pollingInterval);
+    done();
   });
 
   it("is quickly synced with the block storage after starts polling", async() => {
@@ -51,7 +53,20 @@ describe("the state storage", () => {
     await expect(stateStorage.readKeys(contractAddress, ["dummyKey"])).to.eventually.eql(expectedResult);
   });
 
-  after(async () => {
+  it("polling did not expload when blockStorage did not initialize", () => {
+    blockStorage.getBlocks = input => { throw new ReferenceError("Block Storage not initiailized"); };
     stateStorage.stop();
+    expect(async () => { await stateStorage.pollBlockStorage(); }).to.not.throw();
+  });
+
+  it("polling exploads when blockStorage returns an unexpected error", async() => {
+    blockStorage.getBlocks = input => { throw new Error("some-random-error"); };
+    stateStorage.stop();
+    await expect(stateStorage.pollBlockStorage()).to.be.rejectedWith(Error);
+  });
+
+  afterEach((done) => {
+    stateStorage.stop();
+    done();
   });
 });

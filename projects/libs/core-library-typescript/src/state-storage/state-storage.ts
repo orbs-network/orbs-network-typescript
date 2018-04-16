@@ -32,7 +32,7 @@ export class StateStorage {
 
   private startPolling() {
     if (this.engineRunning) {
-      this.pollInterval = setInterval(() => this.pollBlockStorageCallback(), this.pollIntervalMs);
+      this.pollInterval = setInterval(() => this.pollBlockStorage(), this.pollIntervalMs);
       logger.debug(`polling started, interval is ${this.pollIntervalMs}`);
     }
   }
@@ -63,13 +63,18 @@ export class StateStorage {
     throw new Error(`Timeout in attempt to read block state (${block.header.height} != ${this.lastBlockHeight})`);
   }
 
-  private async pollBlockStorageCallback() {
+  public async pollBlockStorage() {
     let blocks: types.GetBlocksOutput;
     try {
       blocks = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
     }
     catch (err) {
-      logger.warn(`could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
+      if (err instanceof ReferenceError) {
+        logger.warn(`could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
+      }
+      else {
+        throw err;
+      }
     }
 
     if (blocks != undefined) {
