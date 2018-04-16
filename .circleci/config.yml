@@ -4,7 +4,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - run: ./.circleci/setup-rngd.sh
       - run: ./docker/build-server-base.sh
       - run: ./docker-build.sh
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
@@ -37,6 +36,7 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run: ./.circleci/setup-rngd.sh
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
       - run: ./.circleci/docker-pull.sh
       - run: ./docker/build-sdk-base.sh
