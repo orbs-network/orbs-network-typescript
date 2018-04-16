@@ -5,7 +5,7 @@ import { TransactionStatus } from "orbs-interfaces";
 
 export class PendingTransactionPool extends BaseTransactionPool {
   private pendingTransactions = new Map<string, types.Transaction>();
-  public committedTransactionPool: CommittedTransactionPool;
+  private committedTransactionPool: CommittedTransactionPool;
   private gossip: types.GossipClient;
 
   constructor(gossip: types.GossipClient, committedTransactionPool: CommittedTransactionPool, config?: TransactionPoolConfig) {
