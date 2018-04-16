@@ -11,6 +11,8 @@ import * as crypto from "crypto";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
 import { OrbsContract, OrbsContractMethodArgs } from "../src/orbs-contract";
 import { method } from "bluebird";
+import * as java from "java";
+import "mocha";
 
 chai.use(sinonChai);
 
@@ -55,25 +57,31 @@ const expectedCallContractRequest: OrbsAPICallContractRequest = {
   payload: expectedPayload(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
 };
 
-describe("A client calls the connector interface with the correct inputs when", async function () {
-  let orbsContract: OrbsContract;
-  let httpServer: Server;
-
-  beforeEach(async () => {
-    const orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
-    orbsContract = new OrbsContract(orbsClient, CONTRACT_NAME);
-    httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest).listen(HTTP_PORT);
-  });
-
-  it("sendTransaction() is called", async () => {
-    expect(await orbsContract.sendTransaction(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("ok");
-  });
-
-  it("callContract() is called", async () => {
-    expect(await orbsContract.call(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("some-answer");
-  });
-
-  afterEach(async () => {
-    httpServer.close();
-  });
+let httpServer: Server;
+before(() => {
+  httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest).listen(HTTP_PORT);
 });
+
+describe("The Javascript SDK", () => {
+  const orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS.toString(), TIMEOUT);
+
+  testContract(new OrbsContract(orbsClient, CONTRACT_NAME));
+});
+
+after(async () => {
+  httpServer.close();
+});
+
+function testContract(orbsContract: OrbsContract) {
+  describe("calls the connector interface with the correct inputs when", async function () {
+
+    it("sendTransaction() is called", async () => {
+      expect(await orbsContract.sendTransaction(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("ok");
+    });
+
+    it("callContract() is called", async () => {
+      expect(await orbsContract.call(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("some-answer");
+    });
+
+  });
+}
