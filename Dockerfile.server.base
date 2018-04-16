@@ -2,7 +2,7 @@ FROM node:9-stretch
 
 ARG CI
 ENV CI=$CI
-ENV PROJECT_TYPE="sdk"
+ENV PROJECT_TYPE="server"
 
 VOLUME [ "/opt/orbs/logs", "/opt/orbs/db" ]
 
