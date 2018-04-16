@@ -50,3 +50,6 @@ examples/android-sample-app/build
 deploy
 .circleci
 .vscode
+
+# build artifacts
+artifacts
