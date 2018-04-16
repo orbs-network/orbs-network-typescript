@@ -21,6 +21,16 @@ public:
 
         return os.str() ;
     }
+
+    template <typename T>
+    static const T FromString(const std::string &str) {
+        std::stringstream s(str);
+
+        T value;
+        s >> value;
+
+        return value;
+    }
 };
 
 }
