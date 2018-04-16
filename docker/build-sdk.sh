@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t orbs:base-sdk -f Dockerfile.sdk .
+docker build -t orbs:sdk -f Dockerfile.sdk .
