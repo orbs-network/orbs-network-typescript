@@ -44,8 +44,9 @@ describe("storage server test", function () {
 
     const NODE_NAME = "tester";
     const BLOCK_STORAGE_POLL_INTERVAL = 5000;
+    const STATE_STORAGE_POLL_INTERVAL = 200;
     const BLOCK_STORAGE_DB_PATH = path.join(os.tmpdir(), "orbsdbtest");
-    const storageEnv = { NODE_NAME, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH };
+    const storageEnv = { NODE_NAME, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH, STATE_STORAGE_POLL_INTERVAL };
     const gossipServerStub = stubInterface<GossipService>();
     const transactionPoolStub = stubInterface<TransactionPoolService>();
 
