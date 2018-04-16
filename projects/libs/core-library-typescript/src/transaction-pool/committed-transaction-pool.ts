@@ -5,7 +5,7 @@ import BaseTransactionPool from "./base-transaction-pool";
 import { TransactionReceipt } from "orbs-interfaces";
 
 export class CommittedTransactionPool extends BaseTransactionPool {
-  public committedTransactions = new Map<string, {
+  private committedTransactions = new Map<string, {
     receipt: types.TransactionReceipt, entryTimestamp: number
   }>();
 
