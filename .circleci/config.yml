@@ -33,6 +33,14 @@ jobs:
       - run: ./.circleci/docker-pull.sh
       - run: ./.circleci/deploy.sh
 
+  # e2e:
+  #   machine: true
+  #   steps:
+  #     - checkout
+  #     - run: $(aws ecr get-login --no-include-email --region us-west-2)
+  #     - run: ./.circleci/docker-pull.sh
+  #     - run: ./docker-test.sh
+
   e2e-testnet:
     machine: true
     steps:
@@ -47,16 +55,19 @@ workflows:
     jobs:
       - build-sdk
       - build-server
-      # - build-server
-      # - deploy:
+      # - e2e:
       #     requires:
+      #       - build-sdk
       #       - build-server
-      #     filters:
-      #       branches:
-      #         only: master
-      # - e2e-testnet:
-      #     requires:
-      #       - deploy
-      #     filters:
-      #       branches:
-      #         only: master
+      - deploy:
+          requires:
+            - build-server
+          filters:
+            branches:
+              only: master
+      - e2e-testnet:
+          requires:
+            - deploy
+          filters:
+            branches:
+              only: master
