@@ -1,4 +1,4 @@
-FROM orbs:server-base
+FROM orbs:base-server
 
 ADD . /opt/orbs
 
