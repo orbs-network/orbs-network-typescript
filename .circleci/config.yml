@@ -12,6 +12,17 @@ jobs:
       - store_artifacts:
           path: logs
 
+  build-sdk:
+    machine: true
+    steps:
+      - checkout
+      - run: ./.circleci/setup-rngd.sh
+      - run: ./docker/build-sdk-base.sh
+      - run: ./docker/build-sdk.sh
+      - run: ./.circleci/export-artifacts.sh
+      - store_artifacts:
+          path: logs
+
   deploy:
     machine: true
     steps:
@@ -33,16 +44,17 @@ workflows:
   version: 2
   build:
     jobs:
-      - build-server
-      - deploy:
-          requires:
-            - build-server
-          filters:
-            branches:
-              only: master
-      - e2e-testnet:
-          requires:
-            - deploy
-          filters:
-            branches:
-              only: master
+      - build-sdk
+      # - build-server
+      # - deploy:
+      #     requires:
+      #       - build-server
+      #     filters:
+      #       branches:
+      #         only: master
+      # - e2e-testnet:
+      #     requires:
+      #       - deploy
+      #     filters:
+      #       branches:
+      #         only: master

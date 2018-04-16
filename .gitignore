@@ -45,3 +45,6 @@ db
 # keys
 private-keys
 public-keys
+
+# build artifacts
+artifacts
