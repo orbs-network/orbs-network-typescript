@@ -1,7 +1,7 @@
 import { types } from "../common-library/types";
 import  { Address, createContractAddress } from "../common-library/address";
 import { createHash } from "crypto";
-import { TransactionUtils } from "..";
+import { TransactionHelper } from "..";
 
 export function aDummyTransaction(overrides: {timestamp?: number, senderPublicKey?: Buffer} = {}): types.Transaction {
   const senderPublicKey: Buffer = overrides.senderPublicKey == undefined ?
@@ -22,7 +22,7 @@ export function aDummyTransactionSet(numberOfTransactions = 3): types.Transactio
   const transactions: types.Transaction[] = [];
   for (let i = 0; i < numberOfTransactions; i++) {
     const transaction = aDummyTransaction({senderPublicKey: createHash("sha256").update(`address${i}`).digest()});
-    const txHash = TransactionUtils.calculateTransactionHash(transaction);
+    const txHash = new TransactionHelper(transaction).calculateHash();
     transactions.push(transaction);
   }
 

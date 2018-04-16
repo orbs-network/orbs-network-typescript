@@ -1,12 +1,11 @@
-import { logger, types, TransactionUtils } from "../common-library";
+import { logger, types, TransactionHelper } from "../common-library";
 import { CommittedTransactionPool } from "./committed-transaction-pool";
 import BaseTransactionPool, { TransactionPoolConfig } from "./base-transaction-pool";
-
-const {calculateTransactionHash, calculateTransactionId} = TransactionUtils;
+import { TransactionStatus } from "orbs-interfaces";
 
 export class PendingTransactionPool extends BaseTransactionPool {
   private pendingTransactions = new Map<string, types.Transaction>();
-  private committedTransactionPool: CommittedTransactionPool;
+  public committedTransactionPool: CommittedTransactionPool;
   private gossip: types.GossipClient;
 
   constructor(gossip: types.GossipClient, committedTransactionPool: CommittedTransactionPool, config?: TransactionPoolConfig) {
@@ -19,6 +18,20 @@ export class PendingTransactionPool extends BaseTransactionPool {
     const txid = await this.storePendingTransaction(transaction);
     await this.broadcastTransactionToOtherNodes(transaction);
     return txid;
+  }
+
+  public getTransactionStatus(txid: string): types.GetTransactionStatusOutput {
+    let receipt: types.TransactionReceipt;
+    let status: types.TransactionStatus = TransactionStatus.NOT_FOUND;
+
+    if (this.pendingTransactions.has(txid)) {
+      status = types.TransactionStatus.PENDING;
+    } else if (this.committedTransactionPool.hasTransactionWithId(txid)) {
+      receipt = this.committedTransactionPool.getTransactionReceiptWithId(txid);
+      status = types.TransactionStatus.COMMITTED;
+    }
+
+    return { status , receipt };
   }
 
   public getAllPendingTransactions(): types.TransactionEntry[] {
@@ -45,18 +58,18 @@ export class PendingTransactionPool extends BaseTransactionPool {
     return count;
   }
 
-  public markCommittedTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
-    this.committedTransactionPool.addCommittedTransactions(transactionEntries);
+  public markCommittedTransactions(transactionReceipts: types.TransactionReceipt[]) {
+    this.committedTransactionPool.addCommittedTransactions(transactionReceipts);
 
-    this.clearTransactions(transactionEntries);
+    this.clearCommittedTransactionsFromPendingPool(transactionReceipts);
   }
 
   public getQueueSize(): number {
     return this.pendingTransactions.size;
   }
 
-  private clearTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
-    for (const { txHash, timestamp } of transactionEntries) {
+  private clearCommittedTransactionsFromPendingPool(transactionReceipts: types.TransactionReceipt[]) {
+    for (const { txHash } of transactionReceipts) {
       const txid = txHash.toString("hex");
       this.pendingTransactions.delete(txid);
     }
@@ -68,7 +81,7 @@ export class PendingTransactionPool extends BaseTransactionPool {
       throw new Error(`transaction ${JSON.stringify(transaction)} has expired. not storing in the pool`);
     }
 
-    const txid = calculateTransactionId(transaction);
+    const txid = new TransactionHelper(transaction).calculateTransactionId();
     if (this.pendingTransactions.has(txid) || this.committedTransactionPool.hasTransactionWithId(txid)) {
       throw new Error(`transaction with id ${txid} already exists in the transaction pool`);
     }

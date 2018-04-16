@@ -2,18 +2,27 @@ import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import { createHash } from "crypto";
 import BaseTransactionPool from "./base-transaction-pool";
+import { TransactionReceipt } from "orbs-interfaces";
 
 export class CommittedTransactionPool extends BaseTransactionPool {
-  private committedTransactions = new Map<string, number>();
+  public committedTransactions = new Map<string, {
+    receipt: types.TransactionReceipt, entryTimestamp: number
+  }>();
 
   public hasTransactionWithId(txid: string): boolean {
     return this.committedTransactions.has(txid);
   }
 
+  public getTransactionReceiptWithId(txid: string): types.TransactionReceipt {
+    if (this.hasTransactionWithId(txid)) {
+      return this.committedTransactions.get(txid).receipt;
+    }
+  }
+
   public clearExpiredTransactions(): number {
     let count = 0;
-    for (const [txid, timestamp] of this.committedTransactions.entries()) {
-      if (this.isExpired(timestamp)) {
+    for (const [txid, entry] of this.committedTransactions.entries()) {
+      if (this.isExpired(entry.entryTimestamp)) {
         this.committedTransactions.delete(txid);
         count++;
       }
@@ -21,15 +30,11 @@ export class CommittedTransactionPool extends BaseTransactionPool {
     return count;
   }
 
-  public addCommittedTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
-    for (const { txHash, timestamp } of transactionEntries) {
-      const txid = txHash.toString("hex");
-
-      if (this.isExpired(Number(timestamp))) {
-        continue;
-      }
-
-      this.committedTransactions.set(txid, Number(timestamp));
+  public addCommittedTransactions(transactionReceipts: types.TransactionReceipt[]) {
+    const entryTimestamp = Date.now();
+    for (const receipt of transactionReceipts) {
+      const txid = receipt.txHash.toString("hex");
+      this.committedTransactions.set(txid, { entryTimestamp, receipt });
     }
   }
 }
