@@ -86,6 +86,10 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
     throw new Error("Method not implemented.");
   }
 
+  getTransactionStatus(rpc: types.GetTransactionStatusContext): void {
+    throw new Error("Method not implemented.");
+  }
+
   gossipMessageReceived(rpc: types.GossipMessageReceivedContext): void {
     throw new Error("Method not implemented.");
   }
