@@ -2,7 +2,8 @@
 
 const path = require('path');
 const shell = require('shelljs');
-const projects = require('../../config/projects.json');
+const PROJECT_TYPE = process.env.PROJECT_TYPE;
+const projects = require(`../../config/projects.${PROJECT_TYPE}.json`);
 require('colors');
 
 const RUNTIMES = ['typescript', 'protobuf', 'c++', 'java'];
