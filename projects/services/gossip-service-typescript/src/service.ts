@@ -73,6 +73,7 @@ export default class GossipService extends Service {
 
   @Service.SilentRPCMethod
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
+    logger.debug(`Gossip service sending broadcast message`);
     this.gossip.broadcastMessage(rpc.req.broadcastGroup, rpc.req.messageType, rpc.req.buffer, rpc.req.immediate);
 
     rpc.res = {};

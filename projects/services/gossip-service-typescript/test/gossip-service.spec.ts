@@ -1,10 +1,12 @@
 import * as mocha from "mocha";
 import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
 import * as getPort from "get-port";
 import { stubInterface } from "ts-sinon";
+import * as sinon from "sinon";
 
-import { types, ErrorHandler, GRPCServerBuilder, grpc, logger } from "orbs-core-library";
-import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
+import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, Gossip } from "orbs-core-library";
+import { GossipClient } from "orbs-interfaces";
 import GossipService from "../src/service";
 import gossipServer from "../src/server";
 import ConsensusService from "../../consensus-service-typescript/src/consensus-service";
@@ -15,12 +17,21 @@ ErrorHandler.setup();
 
 logger.configure({ level: "debug" });
 
+chai.use(chaiAsPromised);
+
 describe("gossip server test", function () {
-  let server: GRPCServerBuilder;
+  this.timeout(10000);
+  let serverA: GRPCServerBuilder;
+  let serverB: GRPCServerBuilder;
+  let gossipAClient: GossipClient;
+  let consensusStub: ConsensusService;
 
   beforeEach(async () => {
+    // note about gossip connections: the grpc needs one endpoint,
+    // and then the gossip port must be different as its websocket based unrelated to the grpc server/service
     const gossipPort = await getPort();
-    const endpoint = `127.0.0.1:${gossipPort}`;
+    const anotherGossipPort = await getPort();
+    const endpoint = `127.0.0.1:${await getPort()}`;
     const anotherEndpoint = `127.0.0.1:${await getPort()}`;
 
     const topology =  {
@@ -35,26 +46,60 @@ describe("gossip server test", function () {
         },
       ],
       gossipPort: gossipPort,
-      gossipPeers: [ anotherEndpoint ]
+      gossipPeers: [ `ws://127.0.0.1:${anotherGossipPort}` ]
     };
 
-    const NODE_NAME = "tester";
+    const anotherTopology =  {
+      peers: [
+        {
+          service: "consensus",
+          endpoint: anotherEndpoint,
+        },
+        {
+          service: "storage",
+          endpoint: anotherEndpoint,
+        },
+      ],
+      gossipPort: anotherGossipPort,
+      gossipPeers: [ `ws://127.0.0.1:${gossipPort}` ]
+    };
+
+    let NODE_NAME = "testerA";
     const SIGN_MESSAGES = false;
     const GOSSIP_PEER_POLL_INTERVAL = 5000;
     const gossipEnv = { NODE_NAME, SIGN_MESSAGES, GOSSIP_PEER_POLL_INTERVAL };
-    const consensusServiceStub = stubInterface<ConsensusService>();
+    consensusStub = stubInterface<ConsensusService>();
 
-    server = gossipServer(topology, gossipEnv)
-      .withService("Consensus", consensusServiceStub);
+    serverA = gossipServer(topology, gossipEnv)
+      .withService("Consensus", consensusStub)
+      .onEndpoint(endpoint);
 
-    return server.start();
+
+    NODE_NAME = "testerB";
+    const gossipBEnv = { NODE_NAME, SIGN_MESSAGES, GOSSIP_PEER_POLL_INTERVAL };
+
+    serverB = gossipServer(anotherTopology, gossipBEnv)
+      .withService("Consensus", consensusStub)
+      .onEndpoint(anotherEndpoint);
+
+
+    gossipAClient = grpc.gossipClient({ endpoint });
+
+    return Promise.all([serverA.start(), serverB.start()]);
   });
 
-  it("dummy test", async () => {
-    return expect(false).to.be.true;
+  it("test broadcast", (done) => {
+    setTimeout(() => {
+      const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
+      gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
+      setTimeout(() => {
+        expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
+        done();
+      }, 1000);
+    }, 3000);
   });
 
   afterEach(() => {
-    return server.stop();
+    return Promise.all([serverA.stop(), serverB.stop()]);
   });
 });
