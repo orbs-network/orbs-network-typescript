@@ -35,7 +35,13 @@ Please refer to [documentation](deploy/bootstrap/README.md) in `deploy/bootstrap
 
 ## Run Inside of Docker
 
-`./docker-build.sh` will build an image.
+Build process is separated between 3 parts:
+
+* build server: `./docker/build-server-base.sh && ./docker-build.sh`
+* build sdk: `./docker/build-sdk-base.sh && ./docker/build-sdk.sh`
+* build e2e: `./docker/build-sdk-base.sh && ./docker/build-e2e.sh`
+
+You don't have to rebuild your base images most of the time unless something changed in `docker` folder or one of the docker files.
 
 ### Deployment to AWS
 
@@ -50,6 +56,13 @@ Please refer to [documentation](deploy/README.md) in `deploy` folder.
 Pleaser refer to [documentation](e2e/README.md) in `e2e` folder to learn more about end to end testing.
 
 ## Development
+
+`PROJECT_TYPE` variable is responsible for building a certain part of the system: `server`, `sdk` or `e2e`.
+
+```bash
+export PROJECT_TYPE=server
+./build.sh
+```
 
 ### Visual Studio Code
 
