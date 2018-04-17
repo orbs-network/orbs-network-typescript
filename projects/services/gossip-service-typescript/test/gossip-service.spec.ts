@@ -92,10 +92,11 @@ describe("gossip server test", function () {
     setTimeout(() => {
       const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
       gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
+      // this delay is so we give the gossip time to actually send the message, it takes about 2 milliseconds,we must put a delay as there may be a race condition
       setTimeout(() => {
         expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
         done();
-      }, 1000);
+      }, 200);
     }, 3000);
   });
 
