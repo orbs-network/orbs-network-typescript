@@ -11,6 +11,7 @@ export interface GossipServiceConfig extends ServiceConfig {
   gossipPeers: any;
   keyManager?: KeyManager;
   signMessages: boolean;
+  peerPollInterval: number;
 }
 
 export default class GossipService extends Service {
@@ -27,6 +28,7 @@ export default class GossipService extends Service {
 
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
+    logger.debug(`Gossip service starting with config: ${JSON.stringify(gossipConfig)}`);
     this.gossip = new Gossip({
       port: gossipConfig.gossipPort,
       localAddress: gossipConfig.nodeName,
@@ -52,7 +54,7 @@ export default class GossipService extends Service {
       } else {
         logger.info(`${this.gossip.localAddress} has active broadcast groups`, { broadcastGroups });
       }
-    }, 5000);
+    }, gossipConfig.peerPollInterval);
 
     setTimeout(() => {
       this.connectToGossipPeers();

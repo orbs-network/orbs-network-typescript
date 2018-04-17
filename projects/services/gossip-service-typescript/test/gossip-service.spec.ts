@@ -40,7 +40,8 @@ describe("gossip server test", function () {
 
     const NODE_NAME = "tester";
     const SIGN_MESSAGES = false;
-    const gossipEnv = { NODE_NAME, SIGN_MESSAGES };
+    const GOSSIP_PEER_POLL_INTERVAL = 5000;
+    const gossipEnv = { NODE_NAME, SIGN_MESSAGES, GOSSIP_PEER_POLL_INTERVAL };
     const consensusServiceStub = stubInterface<ConsensusService>();
 
     server = gossipServer(topology, gossipEnv)
