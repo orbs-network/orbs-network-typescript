@@ -86,13 +86,13 @@ function build_current() {
 case "$(uname -s)" in
     Darwin)
         LOCAL_PLATFORM="Mac"
-        ANDROID_HOME=~/Library/Android/sdk
+        ANDROID_HOME=${ANDROID_HOME:-~/Library/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
     Linux)
         LOCAL_PLATFORM="Linux"
-        ANDROID_HOME=/opt/Android/sdk
+        ANDROID_HOME=${ANDROID_HOME:-/opt/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
@@ -109,7 +109,7 @@ LIBGPG_ERROR_PACKAGE="libgpg-error-${LIBGPG_ERROR_VERSION}"
 PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
 LOCAL_PLATFORM_PREFIX=$(echo "${LOCAL_PLATFORM}" | awk '{print tolower($0)}')
 PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgpg-error/"
-LOCAL_PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgpg-error/"
+LOCAL_PREFIX="$(pwd)/../../build/${LOCAL_PLATFORM_PREFIX}/libgpg-error/"
 
 mkdir -p ${PREFIX} ${LOCAL_PREFIX}
 

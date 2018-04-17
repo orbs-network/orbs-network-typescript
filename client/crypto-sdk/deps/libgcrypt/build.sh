@@ -78,7 +78,7 @@ function build_current() {
         --disable-shared \
         --disable-asm \
         --disable-doc \
-        --prefix="${PREFIX}"
+        --prefix="${LOCAL_PREFIX}"
 
     make -j${PROCESSORS} install
 
@@ -90,13 +90,13 @@ function build_current() {
 case "$(uname -s)" in
     Darwin)
         LOCAL_PLATFORM="Mac"
-        ANDROID_HOME=~/Library/Android/sdk
+        ANDROID_HOME=${ANDROID_HOME:-~/Library/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
     Linux)
         LOCAL_PLATFORM="Linux"
-        ANDROID_HOME=/opt/Android/sdk
+        ANDROID_HOME=${ANDROID_HOME:-/opt/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
@@ -113,7 +113,7 @@ LIBGCRYPT_PACKAGE="libgcrypt-${LIBGCRYPT_VERSION}"
 PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
 LOCAL_PLATFORM_PREFIX=$(echo "${LOCAL_PLATFORM}" | awk '{print tolower($0)}')
 PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgcrypt/"
-LOCAL_PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgcrypt/"
+LOCAL_PREFIX="$(pwd)/../../build/${LOCAL_PLATFORM_PREFIX}/libgcrypt/"
 
 mkdir -p ${PREFIX} ${LOCAL_PREFIX}
 
