@@ -1,34 +1,14 @@
 import * as path from "path";
 
-import { logger, ErrorHandler, grpc, Service, ServiceRunner, topology, topologyPeers } from "orbs-core-library";
-
-import BlockStorageService from "./block-storage-service";
-import StateStorageService from "./state-storage-service";
-
-const { NODE_NAME, NODE_ENV, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH } = process.env;
+import { logger, ErrorHandler, Service, topology } from "orbs-core-library";
+import storageServer from "./server";
 
 ErrorHandler.setup();
 
 Service.initLogger(path.join(__dirname, "../../../../logs/storage.log"));
 
-if (!NODE_NAME) {
-  throw new Error("NODE_NAME can't be empty!");
-}
-
 const nodeTopology = topology();
-const peers = topologyPeers(nodeTopology.peers);
 
-const blockStorageDBPath = BLOCK_STORAGE_DB_PATH || path.resolve(path.join("../../../db", NODE_ENV || "development") + "blocks.db");
-
-const blockStorageConfig = {
-  nodeName: NODE_NAME,
-  dbPath: blockStorageDBPath,
-  pollInterval: Number(BLOCK_STORAGE_POLL_INTERVAL) || 5000
-};
-
-const stateStorageConfig = { nodeName: NODE_NAME };
-
-ServiceRunner.runMulti(grpc.storageServiceServer, [
-  new BlockStorageService(peers.gossip, peers.transactionPool, blockStorageConfig),
-  new StateStorageService(peers.blockStorage, stateStorageConfig)
-], nodeTopology.endpoint);
+storageServer(nodeTopology, process.env)
+  .onEndpoint(nodeTopology.endpoint)
+  .start();
