@@ -16,7 +16,8 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js"
+    "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js",
+    "test-spec": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/test/$SPEC/$SPEC.spec.js"
   },
   "dependencies": {
     "@types/json-stable-stringify": "^1.0.32",

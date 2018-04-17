@@ -82,6 +82,11 @@ export class BlockStorage {
   public async getBlocks(fromLastBlockHeight: number): Promise<types.Block[]> {
     const blocks: types.Block[] = [];
 
+    // lastBlock is undefined when the service did not initialize the logic/load() did not run yet
+    if (this.lastBlock === undefined) {
+      throw new ReferenceError("Block Storage not initiailized");
+    }
+
     for (let i = fromLastBlockHeight; i < this.lastBlock.header.height; ++i) {
       blocks.push(await this.getBlock(i + 1));
     }
