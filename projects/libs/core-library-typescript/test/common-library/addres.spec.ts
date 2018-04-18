@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { Address } from "../../src/common-library";
 
 describe("an address", () => {
-  it.only("is properly initialized by a public key #1", () => {
+  it("is properly initialized by a public key #1", () => {
     const publicKey = "8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65";
     const virtualChainId = "640ed3";
     const networkId = Address.MAIN_NETWORK_ID;
