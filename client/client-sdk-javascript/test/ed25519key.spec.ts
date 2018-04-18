@@ -27,4 +27,16 @@ describe("an ed25519 key", () => {
     expect(key1.publicKey).not.to.be.equal(key2.publicKey);
     expect(key2.publicKey).not.to.be.equal(key3.publicKey);
   });
+
+  it("can sign and verify messages", async () => {
+    expect(true).to.be.false;
+  });
+
+  it("can sign messages which can be verified externally", async () => {
+    expect(true).to.be.false;
+  });
+
+  it("can verify externally signed messages", async () => {
+    expect(true).to.be.false;
+  });
 });
