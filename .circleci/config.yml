@@ -18,8 +18,6 @@ jobs:
       - run: ./.circleci/setup-rngd.sh
       - run: ./docker/build-sdk-base.sh
       - run: ./docker/build-sdk.sh
-      - run: ./docker/extract-sdk.sh
-      - run: ./.circleci/export-artifacts.sh
       - store_artifacts:
           path: logs
 
