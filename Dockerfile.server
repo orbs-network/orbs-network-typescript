@@ -2,4 +2,4 @@ FROM orbs:base-server
 
 ADD . /opt/orbs
 
-RUN yarn run build && yarn cache clean
+RUN ./build-server.sh && yarn cache clean

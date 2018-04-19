@@ -3,7 +3,7 @@ FROM node:9-stretch
 ARG CI
 ENV CI=$CI
 
-ADD package.json yarn.lock .yarnrc docker/bootstrap-*.sh /opt/orbs/
+ADD package.json yarn.lock .yarnrc docker/bootstrap-sdk.sh /opt/orbs/
 
 WORKDIR /opt/orbs
 

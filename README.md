@@ -59,10 +59,11 @@ Pleaser refer to [documentation](e2e/README.md) in `e2e` folder to learn more ab
 
 `PROJECT_TYPE` variable is responsible for building a certain part of the system: `server`, `sdk` or `e2e`.
 
-```bash
-export PROJECT_TYPE=server
-./build.sh
-```
+There are shortcut scripts that are tailored for a specific type of build.
+
+* `./build-sdk.sh`
+* `./build-server.sh`
+* `./build-e2e.sh`
 
 ### Visual Studio Code
 
