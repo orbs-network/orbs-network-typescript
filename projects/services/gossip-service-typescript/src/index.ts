@@ -9,6 +9,6 @@ ErrorHandler.setup();
 Service.initLogger(path.join(__dirname, "../../../../logs/gossip.log"));
 
 const nodeTopology = topology();
-gossipServer(topology, process.env)
+gossipServer(nodeTopology, process.env)
   .onEndpoint(nodeTopology.endpoint)
   .start();
