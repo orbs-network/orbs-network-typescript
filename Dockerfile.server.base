@@ -6,9 +6,7 @@ ENV PROJECT_TYPE="server"
 
 VOLUME [ "/opt/orbs/logs", "/opt/orbs/db" ]
 
-# TODO: move to later stage, use cache for ts compiler & top level software
-
-ADD package.json yarn.lock .yarnrc docker/bootstrap-*.sh docker/install*.sh /opt/orbs/
+ADD package.json yarn.lock .yarnrc docker/bootstrap-server.sh /opt/orbs/
 
 WORKDIR /opt/orbs
 
