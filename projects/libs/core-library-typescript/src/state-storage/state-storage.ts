@@ -13,19 +13,35 @@ export class StateStorage {
   private kvstore = new InMemoryKVStore();
   private lastBlockHeight: number;
   private pollInterval: NodeJS.Timer;
+  private pollIntervalMs: number;
+  private engineRunning: boolean;
 
-  public constructor(blockStorage: types.BlockStorageClient) {
+  public constructor(blockStorage: types.BlockStorageClient, pollInterval: number) {
     this.blockStorage = blockStorage;
+    this.pollIntervalMs = pollInterval;
+    logger.debug(`Creating state storage with poll interval of ${this.pollIntervalMs}`);
+
+    this.engineRunning = true;
+    this.startPolling();
   }
 
-  public poll() {
-    this.pollInterval = setInterval(() => this.pollBlockStorageCallback(), 200);
+  public stop() {
+    this.engineRunning = false;
+    this.stopPolling();
   }
 
-  public stopPolling() {
+  private startPolling() {
+    if (this.engineRunning) {
+      this.pollInterval = setInterval(() => this.pollBlockStorage(), this.pollIntervalMs);
+      logger.debug(`Polling started, interval is ${this.pollIntervalMs}`);
+    }
+  }
+
+  private stopPolling() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
       this.pollInterval = undefined;
+      logger.debug("Polling stopped");
     }
   }
 
@@ -47,12 +63,30 @@ export class StateStorage {
     throw new Error(`Timeout in attempt to read block state (${block.header.height} != ${this.lastBlockHeight})`);
   }
 
-  private async pollBlockStorageCallback() {
-    const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
+  public async pollBlockStorage() {
+    // until we finish syncing all of them, lets stop the polling
+    this.stopPolling();
 
-    // Assuming an ordered list of blocks.
-    for (const block of blocks) {
-      await this.syncNextBlock(block);
+    try {
+      const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
+
+      if (blocks != undefined) {
+        // Assuming an ordered list of blocks.
+        for (const block of blocks) {
+          await this.syncNextBlock(block);
+        }
+      }
+    }
+    catch (err) {
+      if (err instanceof ReferenceError) {
+        logger.warn(`Could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
+      }
+      else {
+        throw err;
+      }
+    }
+    finally {
+      this.startPolling();
     }
   }
 
