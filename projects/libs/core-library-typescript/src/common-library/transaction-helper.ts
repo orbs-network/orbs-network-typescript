@@ -19,6 +19,11 @@ export class TransactionHelper implements types.Transaction {
   }
 
   public calculateTransactionId(): string {
-    return this.calculateHash().toString("hex");
+    const hash = this.calculateHash();
+    return transactionHashToId(hash);
   }
+}
+
+export function transactionHashToId(hash: Buffer) {
+  return hash.toString("hex");
 }
