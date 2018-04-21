@@ -3,6 +3,7 @@ import { types } from "../common-library/types";
 import { createHash } from "crypto";
 import BaseTransactionPool from "./base-transaction-pool";
 import { TransactionReceipt } from "orbs-interfaces";
+import { transactionHashToId } from "..";
 
 export class CommittedTransactionPool extends BaseTransactionPool {
   private committedTransactions = new Map<string, {
@@ -33,7 +34,7 @@ export class CommittedTransactionPool extends BaseTransactionPool {
   public addCommittedTransactions(transactionReceipts: types.TransactionReceipt[]) {
     const entryTimestamp = Date.now();
     for (const receipt of transactionReceipts) {
-      const txid = receipt.txHash.toString("hex");
+      const txid = transactionHashToId(receipt.txHash);
       this.committedTransactions.set(txid, { entryTimestamp, receipt });
     }
   }
