@@ -89,6 +89,7 @@ describe("gossip server test", function () {
   });
 
   it("test broadcast", (done) => {
+    // delay to let gossip finish registering the above 'servers'
     setTimeout(() => {
       const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
       gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
@@ -97,7 +98,7 @@ describe("gossip server test", function () {
         expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
         done();
       }, 200);
-    }, 3000);
+    }, 200);
   });
 
   afterEach(() => {

@@ -56,9 +56,7 @@ export default class GossipService extends Service {
       }
     }, gossipConfig.peerPollInterval);
 
-    setTimeout(() => {
-      this.connectToGossipPeers();
-    }, Math.ceil(Math.random() * 3000));
+    this.connectToGossipPeers();
   }
 
   async connectToGossipPeers() {
