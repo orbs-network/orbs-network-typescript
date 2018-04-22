@@ -15,11 +15,28 @@ export class Address {
   static readonly TEST_NETWORK_ID = "54";
   static readonly SYSTEM_VCHAINID = "000000";
 
-  constructor(publicKey: Buffer, virtualChainId = Address.SYSTEM_VCHAINID, networkId = Address.TEST_NETWORK_ID) {
+  constructor(
+    publicKey?: Buffer,
+    virtualChainId = Address.SYSTEM_VCHAINID,
+    networkId = Address.TEST_NETWORK_ID,
+    accountId?: Buffer
+  ) {
     this.networkId = networkId;
     this.virtualChainId = virtualChainId;
-    this.publicKey = publicKey;
-    this.accountId = this.calculateAccountId();
+
+    if (publicKey) {
+      this.publicKey = publicKey;
+      this.accountId = this.calculateAccountId();
+      if (accountId != undefined) {
+        if (!this.accountId.equals(accountId)) {
+          throw new Error("accountId not matched to publicId");
+        }
+      }
+    } else {
+      if (accountId == undefined)
+        throw new Error("publicId or accountId not defined. At least one of them must be defined");
+      this.accountId = accountId;
+    }
     this.fullAddress = this.generateFullAddressNoChecksum();
     this.checksum = crc32(this.fullAddress);
   }
@@ -48,11 +65,29 @@ export class Address {
     const rawAddress = this.toBuffer();
     return bs58EncodeRawAddress(rawAddress);
   }
-}
 
-export function createContractAddress(contractName: string, vchainId = Address.SYSTEM_VCHAINID) {
-  const publicKey = crypto.createHash("sha256").update(contractName).digest();
-  return new Address(publicKey, vchainId);
+  static fromBuffer(rawAddress: Buffer, publicKey?: Buffer, validateChecksum = true): Address {
+    const networkId = rawAddress.slice(0, 1).toString("hex");
+    const version = rawAddress.readUInt8(1);
+    const vchainId = rawAddress.slice(2, 5).toString("hex");
+    const accountId = rawAddress.slice(5, 25);
+
+    const address = new Address(publicKey, vchainId, networkId, accountId);
+
+    if (validateChecksum) {
+      const checksum = rawAddress.readUInt32BE(25);
+      if (address.checksum != checksum) {
+        throw new Error(`checksum of raw address failed 0x${address.checksum.toString(16)}!=0x${checksum.toString(16)}`);
+      }
+    }
+
+    return address;
+  }
+
+  static createContractAddress(contractName: string, vchainId = Address.SYSTEM_VCHAINID) {
+    const publicKey = crypto.createHash("sha256").update(contractName).digest();
+    return new Address(publicKey, vchainId);
+  }
 }
 
 export function bs58EncodeRawAddress(rawAddress: Buffer): string {
