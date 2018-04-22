@@ -9,4 +9,6 @@ Service.initLogger(path.join(__dirname, "../../../../logs/sidechain-connector.lo
 
 const nodeTopology = topology();
 
-sidechainConnectorServer(nodeTopology, process.env);
+sidechainConnectorServer(nodeTopology, process.env)
+    .onEndpoint(nodeTopology.endpoint)
+    .start();
