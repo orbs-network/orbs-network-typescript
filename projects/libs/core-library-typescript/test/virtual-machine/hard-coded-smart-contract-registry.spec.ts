@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { Contracts, HardCodedSmartContractRegistry, HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
-import { createContractAddress } from "../../src/common-library/address";
+import { Address } from "../../src/common-library/address";
 
 function stubConfig(contracts: Contracts) {
   return {
@@ -14,7 +14,7 @@ const STUB_CONTRACT_FILE_NAME =  "stub-contract";
 
 const VCHAIN_ID = "010101";
 const CONTRACT_NAME = "test";
-const CONTRACT_ADDRESS = createContractAddress(CONTRACT_NAME, VCHAIN_ID);
+const CONTRACT_ADDRESS = Address.createContractAddress(CONTRACT_NAME, VCHAIN_ID);
 
 describe("the hard-coded smart contract registry", () => {
   let registry: HardCodedSmartContractRegistry;
