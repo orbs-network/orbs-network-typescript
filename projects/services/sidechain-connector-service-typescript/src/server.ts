@@ -1,4 +1,4 @@
-import { topologyPeers, GRPCServerBuilder, grpcServer } from "orbs-core-library";
+import { grpcServer } from "orbs-core-library";
 import SidechainConnectorService from "./service";
 
 
@@ -13,8 +13,8 @@ export default function(nodeTopology: any, env: any) {
         throw new Error("ETHEREUM_NODE_HTTP_ADDRESS can't be empty!");
     }
 
-    const peers = topologyPeers(nodeTopology.peers);
     const serviceConfig = { nodeName: NODE_NAME, ethereumNodeHttpAddress: ETHEREUM_NODE_HTTP_ADDRESS };
 
-    return grpcServer.builder().withService("SidechainConnector", new SidechainConnectorService(serviceConfig));
+    return grpcServer.builder()
+                     .withService("SidechainConnector", new SidechainConnectorService(serviceConfig));
 }

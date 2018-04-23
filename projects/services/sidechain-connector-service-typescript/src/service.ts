@@ -23,6 +23,7 @@ export default class SidechainConnectorService extends Service {
 
   @Service.RPCMethod
   public async callEthereumContract(rpc: types.CallEthereumContractContext) {
+    logger.debug(`Service calling ethereum contract at ${rpc.req.contractAddress}`);
     const { result, block } = await this.sidechainConnector.callEthereumContract(rpc.req);
 
     rpc.res = {
