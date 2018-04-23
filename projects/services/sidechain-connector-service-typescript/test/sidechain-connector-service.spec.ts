@@ -55,6 +55,8 @@ describe("sidechain connector service tests", function () {
             functionInterface: ethFuncInterface,
             parameters: <string[]>[]
         });
+        logger.debug(JSON.stringify(ethSim.getStoredDataFromMemory()));
+        logger.debug(res.resultJson);
         const resultData = JSON.parse(res.resultJson);
         expect(resultData).to.ownProperty("intValue");
         expect(resultData).to.ownProperty("stringValue");
