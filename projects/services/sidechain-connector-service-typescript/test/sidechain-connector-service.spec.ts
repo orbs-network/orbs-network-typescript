@@ -55,11 +55,10 @@ describe("sidechain connector service tests", function () {
             functionInterface: ethFuncInterface,
             parameters: <string[]>[]
         });
-        logger.debug(JSON.stringify(ethSim.getStoredDataFromMemory()));
-        logger.debug(res.resultJson);
+        const truth = ethSim.getStoredDataFromMemory();
         const resultData = JSON.parse(res.resultJson);
-        expect(resultData).to.ownProperty("intValue");
-        expect(resultData).to.ownProperty("stringValue");
+        expect(resultData).to.ownProperty("intValue", truth.intValue.toString());
+        expect(resultData).to.ownProperty("stringValue", truth.stringValue);
         expect(res).to.ownProperty("blockNumber");
         expect(res).to.ownProperty("timestamp");
         const now = Date.now() / 1000;
@@ -68,7 +67,7 @@ describe("sidechain connector service tests", function () {
         expect(res.timestamp).to.be.lt(now + 10);
     });
 
-    after(() => {
+    after(async () => {
         ethSim.close();
         return server.stop();
     });

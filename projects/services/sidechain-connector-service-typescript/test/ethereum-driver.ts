@@ -23,11 +23,11 @@ contract SimpleStorage {
     item.stringValue = _stringValue;
   }
 
-  function getInt() constant public returns (uint256) {
+  function getInt() view public returns (uint256) {
     return item.intValue;
   }
 
-  function getString() constant public returns (string) {
+  function getString() view public returns (string) {
     return item.stringValue;
   }
 
