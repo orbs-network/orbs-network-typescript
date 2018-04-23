@@ -1,6 +1,8 @@
 import { crc32 } from "crc";
 import * as bs58 from "bs58";
 import * as crypto from "crypto";
+import { logger } from ".";
+
 
 export class Address {
   readonly networkId: string;
@@ -26,12 +28,10 @@ export class Address {
 
     if (publicKey) {
       this.publicKey = publicKey;
-      this.accountId = this.calculateAccountId();
       if (accountId != undefined) {
-        if (!this.accountId.equals(accountId)) {
-          throw new Error("accountId not matched to publicId");
-        }
+        throw new Error("either publicKey or accountId can be pre-set, but not both");
       }
+      this.accountId = this.calculateAccountId();
     } else {
       if (accountId == undefined)
         throw new Error("publicId or accountId not defined. At least one of them must be defined");
@@ -72,12 +72,23 @@ export class Address {
     const vchainId = rawAddress.slice(2, 5).toString("hex");
     const accountId = rawAddress.slice(5, 25);
 
-    const address = new Address(publicKey, vchainId, networkId, accountId);
+    let address: Address;
+    if (publicKey) {
+      // if public key for given, we validate that it's mapped to the right account ID
+      address = new Address(publicKey, vchainId, networkId);
+      if (!address.accountId.equals(accountId)) {
+        logger.info(`accountId in address and accountId derived by publicKey don't match ${accountId} != ${address.accountId}`);
+        return undefined;
+      }
+    } else {
+      address = new Address(undefined, vchainId, networkId, accountId);
+    }
 
     if (validateChecksum) {
       const checksum = rawAddress.readUInt32BE(25);
       if (address.checksum != checksum) {
-        throw new Error(`checksum of raw address failed 0x${address.checksum.toString(16)}!=0x${checksum.toString(16)}`);
+        logger.info(`checksum of raw address failed 0x${address.checksum.toString(16)}!=0x${checksum.toString(16)}`);
+        return undefined;
       }
     }
 
