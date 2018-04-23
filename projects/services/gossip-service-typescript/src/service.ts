@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";

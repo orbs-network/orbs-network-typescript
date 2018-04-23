@@ -19,7 +19,6 @@
     "test": "echo No tests available"
   },
   "dependencies": {
-    "lodash": "^4.17.5",
     "orbs-core-library": "file:../../libs/core-library-typescript"
   },
   "devDependencies": {

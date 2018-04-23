@@ -19,7 +19,6 @@
     "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js"
   },
   "dependencies": {
-    "lodash": "^4.17.5",
     "orbs-core-library": "file:../../libs/core-library-typescript"
   },
   "devDependencies": {
@@ -27,7 +26,6 @@
     "@types/chai": "^4.1.2",
     "@types/chai-as-promised": "^7.1.0",
     "@types/get-port": "^3.2.0",
-    "@types/lodash": "^4.14.102",
     "@types/mocha": "^2.2.48",
     "@types/node": "^9.4.4",
     "@types/sinon": "^4.1.3",
