@@ -1,7 +1,7 @@
 
 import * as chai from "chai";
 import { VirtualMachine } from "../../src/virtual-machine";
-import { types, TransactionUtils } from "../../src/common-library";
+import { types, TransactionHelper } from "../../src/common-library";
 import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
@@ -38,7 +38,7 @@ function aTransactionEntry(builder: { from: Address, to: Address, amount: number
   };
   return {
     transaction,
-    txHash: TransactionUtils.calculateTransactionHash(transaction)
+    txHash: new TransactionHelper(transaction).calculateHash()
   };
 }
 

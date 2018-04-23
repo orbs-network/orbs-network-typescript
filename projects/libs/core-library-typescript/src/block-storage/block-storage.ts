@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
-import { BlockUtils , logger, types, JsonBuffer, TransactionUtils } from "../common-library";
+import { BlockUtils , logger, types, JsonBuffer } from "../common-library";
 
 export class BlockStorage {
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
@@ -71,11 +71,8 @@ export class BlockStorage {
   }
 
   private async reportBlockTransactionToPool(block: types.Block) {
-    const transactionEntries: types.CommittedTransactionEntry[] = block.body.transactions.map(transaction => ({
-      txHash: TransactionUtils.calculateTransactionHash(transaction),
-      timestamp: transaction.header.timestamp
-    }));
-    await this.transactionPool.markCommittedTransactions({ transactionEntries });
+    const transactionReceipts = block.body.transactionReceipts;
+    await this.transactionPool.markCommittedTransactions({ transactionReceipts });
   }
 
   // Returns an array of blocks, starting from a specific block ID and up to the last block.

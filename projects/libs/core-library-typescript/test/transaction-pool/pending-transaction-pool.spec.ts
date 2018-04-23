@@ -7,6 +7,7 @@ import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 import { PendingTransactionPool, CommittedTransactionPool } from "../../src/transaction-pool";
 import { aDummyTransaction } from "../../src/test-kit/transaction-builders";
+import { TransactionHelper } from "../../src";
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -23,10 +24,11 @@ function anExpiredTransaction() {
 describe("Transaction Pool", () => {
   let gossip: types.GossipClient;
   let transactionPool: PendingTransactionPool;
+  let committedTransactionPool: CommittedTransactionPool;
 
   beforeEach(() => {
     gossip = stubInterface<types.GossipClient>();
-    const committedTransactionPool = stubInterface<CommittedTransactionPool>();
+    committedTransactionPool = stubInterface<CommittedTransactionPool>();
     (<sinon.SinonStub>committedTransactionPool.hasTransactionWithId).returns(false);
     transactionPool = new PendingTransactionPool(gossip, committedTransactionPool, { transactionLifespanMs: 30000, cleanupIntervalMs: 1000 });
   });
@@ -107,6 +109,41 @@ describe("Transaction Pool", () => {
       const pendingTransactions = transactionPool.getAllPendingTransactions();
       expect(pendingTransactions).to.have.lengthOf(1);
       expect(pendingTransactions[0]).to.have.property("transaction", tx2);
+    });
+  });
+
+  describe("get status of a transaction", () => {
+    it("that is not in the pool", () => {
+      const transaction = aValidTransaction();
+      const txid = new TransactionHelper(transaction).calculateTransactionId();
+      expect(transactionPool.getTransactionStatus(txid)).to.be.eql({
+        status: types.TransactionStatus.NOT_FOUND,
+        receipt: undefined
+      });
+    });
+    it("that is in the pending pool", () => {
+      const transaction = aValidTransaction();
+      const txid = new TransactionHelper(transaction).calculateTransactionId();
+      transactionPool.addNewPendingTransaction(transaction);
+      expect(transactionPool.getTransactionStatus(txid)).to.be.eql({
+        status: types.TransactionStatus.PENDING,
+        receipt: undefined
+      });
+    });
+    it("that was recently committed and is still in the pool", () => {
+      const transaction = new TransactionHelper(aValidTransaction());
+      const txHash = transaction.calculateHash();
+      const receipt: types.TransactionReceipt = {
+        txHash,
+        success: true
+      };
+      const txid = transaction.calculateTransactionId();
+      (<sinon.SinonStub>committedTransactionPool.hasTransactionWithId).withArgs(txid).returns(true);
+      (<sinon.SinonStub>committedTransactionPool.getTransactionReceiptWithId).withArgs(txid).returns(receipt);
+      expect(transactionPool.getTransactionStatus(transaction.calculateTransactionId())).to.be.eql({
+        status: types.TransactionStatus.COMMITTED,
+        receipt
+      });
     });
   });
 });
