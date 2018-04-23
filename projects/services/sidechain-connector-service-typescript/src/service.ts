@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { logger, types } from "orbs-core-library";
 
 import { Service } from "orbs-core-library";
