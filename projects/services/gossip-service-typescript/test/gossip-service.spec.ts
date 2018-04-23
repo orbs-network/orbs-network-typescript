@@ -4,6 +4,7 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as getPort from "get-port";
 import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
+import * as bluebird from "bluebird";
 
 import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, Gossip } from "orbs-core-library";
 import { GossipClient } from "orbs-interfaces";
@@ -88,17 +89,14 @@ describe("gossip server test", function () {
     return Promise.all([serverA.start(), serverB.start()]);
   });
 
-  it("test broadcast", (done) => {
+  it("test broadcast", async () => {
     // delay to let gossip finish registering the above 'servers'
-    setTimeout(async () => {
-      const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
-      await gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
-      // this delay is so we give the gossip time to actually send the message, it takes about 2 milliseconds,we must put a delay as there may be a race condition
-      setTimeout(() => {
-        expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
-        done();
-      }, 200);
-    }, 200);
+    await bluebird.delay(200);
+    const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
+    await gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
+    // this delay is so we give the gossip time to actually send the message, it takes about 2 milliseconds,we must put a delay as there may be a race condition
+    await bluebird.delay(200);
+    expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
   });
 
   afterEach(() => {
