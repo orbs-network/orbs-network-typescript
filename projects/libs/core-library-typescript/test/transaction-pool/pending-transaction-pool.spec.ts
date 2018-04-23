@@ -8,6 +8,7 @@ import * as sinon from "sinon";
 import { PendingTransactionPool } from "../../src/transaction-pool";
 import { aDummyTransaction } from "../../src/test-kit/transaction-builders";
 import { TransactionHelper } from "../../src";
+import { TransactionValidator } from "../../src/transaction-pool/transaction-validator";
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -24,10 +25,16 @@ function anExpiredTransaction() {
 describe("Transaction Pool", () => {
   let gossip: types.GossipClient;
   let transactionPool: PendingTransactionPool;
+  let transactionValidator: TransactionValidator;
 
   beforeEach(() => {
     gossip = stubInterface<types.GossipClient>();
-    transactionPool = new PendingTransactionPool(gossip, { transactionLifespanMs: 30000, cleanupIntervalMs: 1000 });
+    transactionValidator = stubInterface<TransactionValidator>();
+    (<sinon.SinonStub>transactionValidator.validate).returns(true);
+    transactionPool = new PendingTransactionPool(
+      gossip,transactionValidator, {
+        transactionLifespanMs: 30000, cleanupIntervalMs: 1000
+      });
   });
 
   it("transaction that is added can be found in the pool", async () => {
@@ -50,6 +57,15 @@ describe("Transaction Pool", () => {
     expect(transactionEntries[0].transaction).eql(tx);
     expect(gossip.broadcastMessage).to.have.been.called;
   });
+
+  it("if validator rejects a transactions it's not added the pool and an error is thrown", async () => {
+    const tx = aValidTransaction();
+    (<sinon.SinonStub>transactionValidator.validate).returns(false);
+    expect(transactionPool.addNewPendingTransaction(tx)).to.be.rejected;
+    const transactionEntries = await transactionPool.getAllPendingTransactions();
+    expect(transactionEntries).to.have.lengthOf(0);
+  });
+
 
   it("two identical transactions are processed only once", async () => {
     const tx = aValidTransaction();

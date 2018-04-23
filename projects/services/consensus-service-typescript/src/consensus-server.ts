@@ -1,7 +1,7 @@
 import { defaults } from "lodash";
 
 import { grpcServer, types, topologyPeers, logger } from "orbs-core-library";
-import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool } from "orbs-core-library";
+import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "orbs-core-library";
 
 import ConsensusService from "./consensus-service";
 import SubscriptionManagerService from "./subscription-manager-service";
@@ -44,7 +44,8 @@ function makeSubscriptionManager(peers: types.ClientMap) {
 }
 
 function makePendingTransactionPool(peers: types.ClientMap) {
-  return new PendingTransactionPool(peers.gossip);
+  const transactionValidator = new TransactionValidator(peers.subscriptionManager);
+  return new PendingTransactionPool(peers.gossip, transactionValidator);
 }
 
 function makeCommittedTransactionPool() {
