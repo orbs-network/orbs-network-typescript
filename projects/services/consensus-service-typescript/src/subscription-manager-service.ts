@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import bind from "bind-decorator";
 
 import { types } from "orbs-core-library";
@@ -8,7 +7,6 @@ import { SubscriptionManager } from "orbs-core-library";
 
 export default class SubscriptionManagerService extends Service {
   private subscriptionManager: SubscriptionManager;
-  private sidechainConnector: types.SidechainConnectorClient;
 
   public constructor(subscriptionManager: SubscriptionManager, serviceConfig: ServiceConfig) {
     super(serviceConfig);
