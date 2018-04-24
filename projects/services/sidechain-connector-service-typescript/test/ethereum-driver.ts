@@ -42,7 +42,7 @@ contract SimpleStorage {
 }
 `;
 
-export abstract class EthereumSim {
+export abstract class EthereumSimulator {
    contractAddress: string;
    abstract close(): void;
    abstract getStoredDataFromMemory(): StorageContractItem;
@@ -53,7 +53,7 @@ export interface StorageContractItem {
     stringValue: string;
 }
 
-class EthereumSimImpl extends EthereumSim {
+class EthereumSimImpl extends EthereumSimulator {
     public contractAddress: string;
     public ganacheServer: any;
     private port: number;
@@ -109,7 +109,7 @@ class EthereumSimImpl extends EthereumSim {
         this.storedInt = intValue;
         this.storedString = stringValue;
 
-        return Promise.resolve<string>(contractInstance.options.address);
+        return contractInstance.options.address;
     }
 
     public close() {
@@ -117,7 +117,7 @@ class EthereumSimImpl extends EthereumSim {
     }
 }
 
-export default async function createEthSimulator(port: number): Promise<EthereumSim> {
+export default async function createEthSimulator(port: number): Promise<EthereumSimulator> {
     const ethSim = new EthereumSimImpl();
     await ethSim.listen(port);
 

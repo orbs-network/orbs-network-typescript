@@ -7,7 +7,7 @@ import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, Service } from "o
 import { SidechainConnectorClient, EthereumFunctionParameter } from "orbs-interfaces";
 import sidechainConnectorServer from "../src/server";
 import createEthSimulator from "./ethereum-driver";
-import { EthereumSim } from "./ethereum-driver";
+import { EthereumSimulator } from "./ethereum-driver";
 
 
 const { expect } = chai;
@@ -17,7 +17,7 @@ describe("sidechain connector service tests", function () {
     this.timeout(10000);
     let server: GRPCServerBuilder;
     let client: SidechainConnectorClient;
-    let ethSim: EthereumSim;
+    let ethSim: EthereumSimulator;
 
     before(async () => {
         const sidechainEndpoint = `127.0.0.1:${await getPort()}`;
