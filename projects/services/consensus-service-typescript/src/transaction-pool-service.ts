@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import bind from "bind-decorator";
 
 import { types, logger, JsonBuffer } from "orbs-core-library";
