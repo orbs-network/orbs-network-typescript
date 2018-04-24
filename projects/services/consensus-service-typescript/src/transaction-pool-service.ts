@@ -50,7 +50,7 @@ export default class TransactionPoolService extends Service {
 
   @Service.RPCMethod
   public async markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext) {
-    this.pendingTransactionPool.markCommittedTransactions(rpc.req.transactionEntries);
+    this.pendingTransactionPool.markCommittedTransactions(rpc.req.transactionReceipts);
     rpc.res = {};
   }
 
@@ -67,6 +67,12 @@ export default class TransactionPoolService extends Service {
     logger.debug(`getAllPendingTransactions() . returns ${JSON.stringify(rpc.res)}`);
   }
 
+  @Service.RPCMethod
+  public async getTransactionStatus(rpc: types.GetTransactionStatusContext) {
+    const txid = rpc.req.txid;
+    this.pendingTransactionPool.getTransactionStatus(txid);
+  }
+
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
     const obj: any = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
@@ -75,4 +81,6 @@ export default class TransactionPoolService extends Service {
       await this.pendingTransactionPool.onNewBroadcastTransaction(message.transaction);
     }
   }
+
+
 }
