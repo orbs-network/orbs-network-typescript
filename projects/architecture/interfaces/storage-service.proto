@@ -1,4 +1,4 @@
 syntax = "proto3";
 
-import "./block-storage.proto";
-import "./state-storage.proto";
+import "block-storage.proto";
+import "state-storage.proto";

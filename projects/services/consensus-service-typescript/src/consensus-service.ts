@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { types, JsonBuffer } from "orbs-core-library";
 
 import { Service, ServiceConfig } from "orbs-core-library";

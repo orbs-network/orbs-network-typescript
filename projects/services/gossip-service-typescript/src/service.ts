@@ -1,5 +1,3 @@
-import * as _ from "lodash";
-
 import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
@@ -11,6 +9,7 @@ export interface GossipServiceConfig extends ServiceConfig {
   gossipPeers: any;
   keyManager?: KeyManager;
   signMessages: boolean;
+  peerPollInterval: number;
 }
 
 export default class GossipService extends Service {
@@ -27,6 +26,7 @@ export default class GossipService extends Service {
 
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
+    logger.debug(`Gossip service starting with config: ${JSON.stringify(gossipConfig)}`);
     this.gossip = new Gossip({
       port: gossipConfig.gossipPort,
       localAddress: gossipConfig.nodeName,
@@ -52,11 +52,9 @@ export default class GossipService extends Service {
       } else {
         logger.info(`${this.gossip.localAddress} has active broadcast groups`, { broadcastGroups });
       }
-    }, 5000);
+    }, gossipConfig.peerPollInterval);
 
-    setTimeout(() => {
-      this.connectToGossipPeers();
-    }, Math.ceil(Math.random() * 3000));
+    this.connectToGossipPeers();
   }
 
   async connectToGossipPeers() {
@@ -71,6 +69,7 @@ export default class GossipService extends Service {
 
   @Service.SilentRPCMethod
   public async broadcastMessage(rpc: types.BroadcastMessageContext) {
+    logger.debug(`Gossip service sending broadcast message`);
     this.gossip.broadcastMessage(rpc.req.broadcastGroup, rpc.req.messageType, rpc.req.buffer, rpc.req.immediate);
 
     rpc.res = {};
