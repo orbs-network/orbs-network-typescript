@@ -1,0 +1,5 @@
+FROM orbs:base-server
+
+ADD . /opt/orbs
+
+RUN ./build-server.sh && yarn cache clean

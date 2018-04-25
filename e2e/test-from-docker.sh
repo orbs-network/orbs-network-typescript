@@ -14,5 +14,5 @@ docker run -ti --rm --privileged  \
 -e TEST \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $ROOT_DIR/logs:/opt/orbs/logs \
-$DOCKER_IMAGE:$DOCKER_TAG  \
-bash -c 'apt-get update && apt-get install -y python-pip && pip install docker-compose && (curl -fsSL get.docker.com | bash) && cd e2e && ./build.sh && yarn test'
+orbs:e2e  \
+yarn test

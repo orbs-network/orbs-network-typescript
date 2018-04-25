@@ -12,7 +12,7 @@ export default function createMockServer(
 
   app.use(express.json());
 
-  app.use("/public/sendTransaction", (req, res) => {
+  app.use("/public/sendTransaction", (req: express.Request, res: express.Response) => {
     // TODO: check header
     expect(req.body.payload).to.be.eql(expectedSendTransactionRequest.payload);
     expect(req.body.header.senderAddressBase58).to.be.eql(expectedSendTransactionRequest.header.senderAddressBase58);
@@ -21,7 +21,7 @@ export default function createMockServer(
     res.json({ result: "ok" });
   });
 
-  app.use("/public/callContract", (req, res) => {
+  app.use("/public/callContract", (req: express.Request, res: express.Response) => {
     // TODO: check sender
     expect(req.body).to.be.eql(expectedCallContractRequest);
 

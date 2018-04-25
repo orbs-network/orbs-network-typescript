@@ -5,7 +5,7 @@ import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
 import httpServer from "../src/server";
-import mockHttpServer from "../../../../client/client-sdk-javascript/test/mock-server";
+import mockHttpServer from "./mock-server";
 import { Server } from "http";
 
 chai.use(sinonChai);
@@ -83,6 +83,10 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
   }
 
   markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext): void {
+    throw new Error("Method not implemented.");
+  }
+
+  getTransactionStatus(rpc: types.GetTransactionStatusContext): void {
     throw new Error("Method not implemented.");
   }
 

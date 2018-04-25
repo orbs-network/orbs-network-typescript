@@ -5,7 +5,7 @@ import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 import { TransactionPoolClient, VirtualMachineClient, BlockStorageClient } from "orbs-interfaces";
-import { BlockUtils, TransactionUtils } from "../../src/common-library";
+import { BlockUtils, TransactionHelper } from "../../src/common-library";
 import { Address, createContractAddress } from "../../src/common-library/address";
 import * as sinon from "sinon";
 import { createHash } from "crypto";
@@ -47,7 +47,7 @@ describe("a block", () => {
   const dummyTransactionSet = aDummyTransactionSet();
   const dummyStateDiff = aDummyStateDiff();
   const dummyTransactionReceipts: types.TransactionReceipt[] = dummyTransactionSet.map(tx => ({
-    txHash: TransactionUtils.calculateTransactionHash(tx),
+    txHash: new TransactionHelper(tx).calculateHash (),
     success: true
   }));
 

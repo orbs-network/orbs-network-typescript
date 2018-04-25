@@ -7,12 +7,8 @@ service TransactionPool {
   rpc AddNewPendingTransaction (AddNewPendingTransactionInput) returns (AddNewPendingTransactionOutput);
   rpc GetAllPendingTransactions (GetAllPendingTransactionsInput) returns (GetAllPendingTransactionsOutput);
   rpc MarkCommittedTransactions (MarkCommittedTransactionsInput) returns (MarkCommittedTransactionsOutput);
+  rpc GetTransactionStatus (GetTransactionStatusInput) returns (GetTransactionStatusOutput);
   rpc GossipMessageReceived (GossipListenerInput) returns (GossipListenerOutput);
-}
-
-message CommittedTransactionEntry {
-  bytes txHash = 1;
-  uint64 timestamp = 2;
 }
 
 message NewTransactionBroadcastMessage {
@@ -34,8 +30,23 @@ message GetAllPendingTransactionsOutput {
   repeated TransactionEntry transactionEntries = 1;
 }
 
+message GetTransactionStatusInput {
+  string txid = 1;
+}
+
+enum TransactionStatus {
+  NOT_FOUND = 0;
+  PENDING = 1;
+  COMMITTED = 2;
+}
+
+message GetTransactionStatusOutput {
+  TransactionStatus status = 1;
+  TransactionReceipt receipt = 2;
+}
+
 message MarkCommittedTransactionsInput {
-  repeated CommittedTransactionEntry transactionEntries  = 1;
+  repeated TransactionReceipt transactionReceipts  = 1;
 }
 
 message MarkCommittedTransactionsOutput {

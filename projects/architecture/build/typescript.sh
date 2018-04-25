@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 mkdir -p ./dist
+mkdir -p ./intermediate
+rm -rf ./dist/**
 
 ./node_modules/protobufjs/bin/pbjs \
   -p ./node_modules/protobufjs \
@@ -8,9 +10,8 @@ mkdir -p ./dist
   ./interfaces/*.proto > \
   ./dist/protos.json
 
-node ./build/src/ts-index.js > ./dist/index.js
-
-node ./build/src/ts-index-d.js > ./dist/index.d.ts
+node ./build/src/ts-index.js > ./intermediate/index.ts
+tsc -d
 
 echo
 echo "Done generating TypeScript types from *.proto"

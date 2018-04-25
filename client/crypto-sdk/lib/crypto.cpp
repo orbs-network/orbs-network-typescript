@@ -23,6 +23,11 @@ void CryptoSDK::Init() {
         throw runtime_error("Failed to send GCRYCTL_SUSPEND_SECMEM_WARN with: " + string(gcry_strerror(err)));
     }
 
+    // Tells the PRNG to store random numbers in secure memory.
+    if ((err = gcry_control(GCRYCTL_USE_SECURE_RNDPOOL))) {
+        throw runtime_error("Failed to send GCRYCTL_USE_SECURE_RNDPOOL with: " + string(gcry_strerror(err)));
+    }
+
     // Allocate a pool of 16k secure memory. This makes the secure memory available and also drops privileges where
     // needed. Note that by using functions like gcry_xmalloc_secure and gcry_mpi_snew Libgcrypt may expand the secure
     // memory pool with memory which lacks the property of not being swapped out to disk.
@@ -39,27 +44,4 @@ void CryptoSDK::Init() {
     if ((err = gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0))) {
         throw runtime_error("Failed to send GCRYCTL_INITIALIZATION_FINISHED with: " + string(gcry_strerror(err)));
     }
-}
-
-// Initializes the Crypto SDK in FIPS140-2 mode. This method have to be called before using any of the underlying functions.
-void CryptoSDK::InitFIPSMode() {
-    gcry_error_t err;
-    if ((err = gcry_control(GCRYCTL_FORCE_FIPS_MODE))) {
-        throw runtime_error("Failed to send GCRYCTL_FORCE_FIPS_MODE with: " + string(gcry_strerror(err)));
-    }
-
-    if ((err = gcry_control(GCRYCTL_SET_ENFORCED_FIPS_FLAG))) {
-        throw runtime_error("Failed to send GCRYCTL_SET_ENFORCED_FIPS_FLAG with: " + string(gcry_strerror(err)));
-    }
-
-    if ((err = gcry_control(GCRYCTL_SELFTEST))) {
-        throw runtime_error("Failed to send GCRYCTL_SELFTEST with: " + string(gcry_strerror(err)));
-    }
-
-    Init();
-}
-
-// Checks if the SDK is running in FIPS mode.
-bool CryptoSDK::isFIPSMode() {
-    return gcry_fips_mode_active();
 }
