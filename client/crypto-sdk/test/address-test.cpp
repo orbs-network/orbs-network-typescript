@@ -63,11 +63,6 @@ TEST(Address, creates_from_binary_arguments) {
 }
 
 TEST(Address, creates_from_ed25519_key) {
-    if (CryptoSDK::isFIPSMode()) {
-        EXPECT_THROW(ED25519Key key, runtime_error);
-        return;
-    }
-
     vector<uint8_t> publicKey;
     vector<uint8_t> virtualChainId;
 
