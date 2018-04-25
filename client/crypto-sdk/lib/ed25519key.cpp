@@ -35,10 +35,6 @@ static const string ED25519_IMPORT_PUBLIC_KEY =
 
 // Generates new public key pair using the ED25519 curve.
 ED25519Key::ED25519Key() : key_(nullptr) {
-    if (CryptoSDK::isFIPSMode()) {
-        throw runtime_error("ED25519Key is currently not suppored in FIPS mode!");
-    }
-
     key_ = new gcry_sexp_t();
 
     gcry_sexp_t parms = nullptr;
@@ -74,10 +70,6 @@ ED25519Key::ED25519Key(const string &publicKey) : key_(nullptr) {
 }
 
 void ED25519Key::Init(const vector<uint8_t> &publicKey) {
-    if (CryptoSDK::isFIPSMode()) {
-        throw runtime_error("ED25519Key is currently not suppored in FIPS mode!");
-    }
-
     if (publicKey.size() != ED25519Key::PUBLIC_KEY_SIZE) {
         throw invalid_argument("Invalid public key length: " + Utils::ToString(publicKey.size()));
     }

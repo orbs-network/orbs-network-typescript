@@ -10,11 +10,6 @@ using namespace testing;
 using namespace Orbs;
 
 TEST(ED25519Key, generates_ed25519_key) {
-    if (CryptoSDK::isFIPSMode()) {
-        EXPECT_THROW(ED25519Key key, runtime_error);
-        return;
-    }
-
     ED25519Key key1;
     const string publicKey1(Utils::Vec2Hex(key1.GetPublicKey()));
     EXPECT_EQ(publicKey1.length(), ED25519Key::PUBLIC_KEY_SIZE * 2);
@@ -27,11 +22,6 @@ TEST(ED25519Key, generates_ed25519_key) {
 }
 
 TEST(ED25519Key, imports_ed25519_pulic_key) {
-    if (CryptoSDK::isFIPSMode()) {
-        EXPECT_THROW(ED25519Key key, runtime_error);
-        return;
-    }
-
     uint8_t rawPublicKey1[] = "\x8d\x41\xd0\x55\xd0\x04\x59\xbe\x37\xf7\x49\xda\x2c\xaf\x87\xbd\x4c\xed\x6f\xaf\xa3\x35\xb1\xf2\x14\x2e\x0f\x44\x50\x1b\x2c\x65";
     vector<uint8_t> publicKey1(rawPublicKey1, rawPublicKey1 + sizeof(rawPublicKey1) - 1);
     ED25519Key key1(publicKey1);
@@ -46,11 +36,6 @@ TEST(ED25519Key, imports_ed25519_pulic_key) {
 }
 
 TEST(ED25519Key, imports_ed25519_pulic_key_as_string) {
-    if (CryptoSDK::isFIPSMode()) {
-        EXPECT_THROW(ED25519Key key, runtime_error);
-        return;
-    }
-
     const string publicKey1("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65");
     ED25519Key key1(publicKey1);
 
@@ -63,11 +48,6 @@ TEST(ED25519Key, imports_ed25519_pulic_key_as_string) {
 }
 
 TEST(ED25519Key, throws_on_invalid_arguments_imports_ed25519_pulic_key) {
-     if (CryptoSDK::isFIPSMode()) {
-        EXPECT_THROW(ED25519Key key, runtime_error);
-        return;
-    }
-
     vector<uint8_t> publicKey;
 
     // Empty.
