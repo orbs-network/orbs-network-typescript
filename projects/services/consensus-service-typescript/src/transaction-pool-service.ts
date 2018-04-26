@@ -7,7 +7,7 @@ import { PendingTransactionPool, CommittedTransactionPool } from "orbs-core-libr
 
 export default class TransactionPoolService extends Service {
   private pendingTransactionPool: PendingTransactionPool;
-  private committedTransactionPool: CommittedTransactionPool;
+  // private committedTransactionPool: CommittedTransactionPool;
   private monitorPollTimer: NodeJS.Timer;
   private monitorPollIntervalMs = 2000;
 
@@ -19,11 +19,11 @@ export default class TransactionPoolService extends Service {
   async initialize() {
     this.startPoolSizeMonitor();
     this.pendingTransactionPool.startCleanupTimer();
-    this.committedTransactionPool.startCleanupTimer();
+    // this.committedTransactionPool.startCleanupTimer();
   }
 
   async shutdown() {
-    this.committedTransactionPool.stopCleanupTimer();
+    // this.committedTransactionPool.stopCleanupTimer();
     this.pendingTransactionPool.stopCleanupTimer();
     this.stopPoolSizeMonitor();
   }
@@ -55,8 +55,8 @@ export default class TransactionPoolService extends Service {
 
   @Service.RPCMethod
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
-     await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
-     rpc.res = {};
+     const res = await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
+     rpc.res = { txid: res };
   }
 
   @Service.RPCMethod
@@ -69,7 +69,7 @@ export default class TransactionPoolService extends Service {
   @Service.RPCMethod
   public async getTransactionStatus(rpc: types.GetTransactionStatusContext) {
     const txid = rpc.req.txid;
-    this.pendingTransactionPool.getTransactionStatus(txid);
+    rpc.res = this.pendingTransactionPool.getTransactionStatus(txid);
   }
 
   @Service.SilentRPCMethod
