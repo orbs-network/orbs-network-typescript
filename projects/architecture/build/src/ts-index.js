@@ -49,7 +49,7 @@ console.log();
 function exportEnum(name, json) {
   console.log(`export enum ${name} {`);
   _.forEach(json, (value, key) => {
-    console.log(`  ${key} = ${value},`);
+    console.log(`  ${key} = "${key}",`);
   });
   console.log(`}`);
   console.log();
