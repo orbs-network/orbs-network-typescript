@@ -10,5 +10,4 @@ message GetSubscriptionStatusInput {
 
 message GetSubscriptionStatusOutput {
   bool active = 1;
-  uint32 expiryTimestamp = 2;
 }
