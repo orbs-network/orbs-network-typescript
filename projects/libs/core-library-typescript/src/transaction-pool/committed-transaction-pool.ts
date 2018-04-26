@@ -2,7 +2,7 @@ import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import { createHash } from "crypto";
 import BaseTransactionPool from "./base-transaction-pool";
-import { TransactionReceipt } from "orbs-interfaces";
+import { TransactionReceipt, TransactionStatus } from "orbs-interfaces";
 import { transactionHashToId } from "..";
 
 export class CommittedTransactionPool extends BaseTransactionPool {
@@ -18,6 +18,18 @@ export class CommittedTransactionPool extends BaseTransactionPool {
     if (this.hasTransactionWithId(txid)) {
       return this.committedTransactions.get(txid).receipt;
     }
+  }
+
+  public getTransactionStatus(txid: string): types.GetTransactionStatusOutput {
+    let receipt: types.TransactionReceipt;
+    let status: types.TransactionStatus = TransactionStatus.NOT_FOUND;
+
+    if (this.committedTransactions.has(txid)) {
+      receipt = this.getTransactionReceiptWithId(txid);
+      status = types.TransactionStatus.COMMITTED;
+    }
+
+    return { status , receipt };
   }
 
   public clearExpiredTransactions(): number {
