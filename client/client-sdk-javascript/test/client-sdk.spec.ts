@@ -14,7 +14,8 @@ import { method } from "bluebird";
 import { createJavaOrbsContract } from "./java-sdk-helper";
 import "mocha";
 import { SendTransactionOutput } from "orbs-interfaces";
-import { pythonBridge } from "python-bridge";
+import { pythonBridge, PythonBridge } from "python-bridge";
+import * as path from "path";
 
 chai.use(sinonChai);
 
@@ -84,9 +85,9 @@ class PythonContractAdapter implements OrbsContractAdapter {
       this.timeoutInMillis = timeoutInMillis;
   }
 
-  async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
-
+  private async createPython(): Promise<PythonBridge> {
     const python = pythonBridge({
+      cwd: path.resolve("../crypto-sdk-python")
       // python: "python3"
     });
 
@@ -96,19 +97,30 @@ class PythonContractAdapter implements OrbsContractAdapter {
     }
 
     await python.ex`
-      address = orbs_address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
-      client = orbs_http_client(${this.apiEndpoint}, address, ${this.timeoutInMillis})
-      contract = orbs_contract(client, ${this.contractName})`.catch(rethrow);
+      import orbs_client
 
+      address = orbs_client.address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
+      client = orbs_client.http_client(${this.apiEndpoint}, address, ${this.timeoutInMillis})
+      contract = orbs_client.contract(client, ${this.contractName})`.catch(rethrow);
+
+    return python;
+  }
+
+  async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
+
+    const python = await this.createPython();
     const result = await python`contract.send_transaction(${methodName}, ${args})`;
-
     await python.end();
 
     return result;
   }
 
-  call(methodName: string, args: OrbsContractMethodArgs): Promise<any> {
-    throw new Error("Method not implemented.");
+  async call(methodName: string, args: OrbsContractMethodArgs): Promise<any> {
+    const python = await this.createPython();
+    const result = await python`contract.call(${methodName}, ${args})`;
+    await python.end();
+
+    return result;
   }
 
 }
