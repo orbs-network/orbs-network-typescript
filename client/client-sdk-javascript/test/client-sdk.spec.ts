@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect, assert } from "chai";
 import  * as chai from "chai";
 import { Address } from "../src/address";
 import { ED25519Key } from "../src/ed25519key";
@@ -14,6 +14,7 @@ import { method } from "bluebird";
 import { createJavaOrbsContract } from "./java-sdk-helper";
 import "mocha";
 import { SendTransactionOutput } from "orbs-interfaces";
+import { pythonBridge } from "python-bridge";
 
 chai.use(sinonChai);
 
@@ -64,6 +65,54 @@ class JavaContractAdapter implements OrbsContractAdapter {
   }
 }
 
+class PythonContractAdapter implements OrbsContractAdapter {
+  contractName: string;
+  apiEndpoint: string;
+  senderPublicKey: string;
+  virtualChainId: string;
+  networkId: string;
+  timeoutInMillis: number;
+
+  constructor(contractName: string, apiEndpoint: string, senderPublicKey: string,
+    virtualChainId: string, networkId: string, timeoutInMillis: number) {
+
+      this.contractName = contractName;
+      this.apiEndpoint = apiEndpoint;
+      this.senderPublicKey = senderPublicKey;
+      this.virtualChainId = virtualChainId;
+      this.networkId = networkId;
+      this.timeoutInMillis = timeoutInMillis;
+  }
+
+  async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
+
+    const python = pythonBridge({
+      // python: "python3"
+    });
+
+    function rethrow(e: Error) {
+      python.kill("SIGKILL");
+      return Promise.reject(e);
+    }
+
+    await python.ex`
+      address = orbs_address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
+      client = orbs_http_client(${this.apiEndpoint}, address, ${this.timeoutInMillis})
+      contract = orbs_contract(client, ${this.contractName})`.catch(rethrow);
+
+    const result = await python`contract.send_transaction(${methodName}, ${args})`;
+
+    await python.end();
+
+    return result;
+  }
+
+  call(methodName: string, args: OrbsContractMethodArgs): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
+
+}
+
 function expectedContractAddressBase58(contractName: string) {
   const contractKey = crypto.createHash("sha256").update(contractName).digest("hex");
   const contractAddress = new Address(contractKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
@@ -101,31 +150,33 @@ before(() => {
 });
 
 describe("The Javascript SDK", () => {
-  const orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
-
-  testContract(new TypeScriptContractAdapter(new OrbsContract(orbsClient, CONTRACT_NAME)));
+  testContract(() => new TypeScriptContractAdapter(new OrbsContract(new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT), CONTRACT_NAME)));
 });
 
 describe("The Java SDK", () => {
-  const javaContract = createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT);
+  testContract(() => new JavaContractAdapter(createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT)));
+});
 
-  testContract(new JavaContractAdapter(javaContract));
+describe("The Python SDK", () => {
+  testContract(() => new PythonContractAdapter(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT));
 });
 
 after(async () => {
   httpServer.close();
 });
 
-function testContract(orbsContract: OrbsContractAdapter) {
-  describe("calls the connector interface with the correct inputs when", async function () {
+function testContract(makeContract: () => OrbsContractAdapter) {
 
-    it("sendTransaction() is called", async () => {
-      expect(await orbsContract.sendTransaction(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("ok");
+    describe("calls the connector interface with the correct inputs when", async function () {
+
+      it("sendTransaction() is called", async () => {
+        expect(await makeContract().sendTransaction(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("ok");
+      });
+
+      it("callContract() is called", async () => {
+        expect(await makeContract().call(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("some-answer");
+      });
+
     });
 
-    it("callContract() is called", async () => {
-      expect(await orbsContract.call(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("some-answer");
-    });
-
-  });
 }
