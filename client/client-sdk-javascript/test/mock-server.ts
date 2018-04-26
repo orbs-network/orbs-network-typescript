@@ -1,13 +1,15 @@
 import * as chai from "chai";
 import * as express from "express";
-import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest } from "../src/orbs-api-interface";
+import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 
 
 const { expect } = chai;
 
 export default function createMockServer(
   expectedSendTransactionRequest: OrbsAPISendTransactionRequest,
-  expectedCallContractRequest: OrbsAPICallContractRequest): express.Application {
+  expectedCallContractRequest: OrbsAPICallContractRequest,
+  expectedGetTransactionStatusRequest: OrbsAPIGetTransactionStatusRequest,
+): express.Application {
   const app = express();
 
   app.use(express.json());
@@ -26,6 +28,13 @@ export default function createMockServer(
     expect(req.body).to.be.eql(expectedCallContractRequest);
 
     res.json({ result: "some-answer" });
+  });
+
+  app.use("/public/getTransactionStatus", (req: express.Request, res: express.Response) => {
+    // TODO: check sender
+    expect(req.body).to.be.eql(expectedGetTransactionStatusRequest);
+
+    res.json({ status: "COMMITTED", receipt: { success: true } });
   });
 
   return app;
