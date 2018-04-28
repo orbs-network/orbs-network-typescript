@@ -31,10 +31,9 @@ export default function createMockServer(
   });
 
   app.use("/public/getTransactionStatus", (req: express.Request, res: express.Response) => {
-    // TODO: check sender
     expect(req.body).to.be.eql(expectedGetTransactionStatusRequest);
 
-    res.json({ status: "COMMITTED", receipt: { success: true } });
+    res.json({ status: "COMMITTED", receipt: { success: true} });
   });
 
   return app;
