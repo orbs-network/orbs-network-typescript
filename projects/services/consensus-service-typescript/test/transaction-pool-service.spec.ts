@@ -6,7 +6,7 @@ import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 import BigNumber from "bignumber.js";
 
-import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, grpcServer, PendingTransactionPool, CommittedTransactionPool, TransactionHelper } from "orbs-core-library";
+import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, grpcServer, PendingTransactionPool, CommittedTransactionPool, TransactionHelper, TransactionValidator } from "orbs-core-library";
 import { TransactionReceipt, Transaction, TransactionEntry, GossipListenerInput, GossipClient } from "orbs-interfaces";
 import TransactionPoolService from "../src/transaction-pool-service";
 
@@ -57,7 +57,9 @@ describe("transaction pool service tests", function() {
         const endpoint = `127.0.0.1:${await getPort()}`;
         const stubGossip = stubInterface<GossipClient>();
         committedTransactionPool = new CommittedTransactionPool({});
-        pendingTransactionPool = new PendingTransactionPool(stubGossip);
+        const transactionValidator = stubInterface<TransactionValidator>();
+        (<sinon.SinonStub>transactionValidator.validate).returns(false);
+        pendingTransactionPool = new PendingTransactionPool(stubGossip, transactionValidator);
 
         server = grpcServer.builder()
             .withService("TransactionPool", new TransactionPoolService(pendingTransactionPool, committedTransactionPool, { nodeName: "tester"}))

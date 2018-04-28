@@ -32,7 +32,7 @@ describe("Transaction Pool", () => {
     transactionValidator = stubInterface<TransactionValidator>();
     (<sinon.SinonStub>transactionValidator.validate).returns(true);
     transactionPool = new PendingTransactionPool(
-      gossip,transactionValidator, {
+      gossip, transactionValidator, {
         transactionLifespanMs: 30000, cleanupIntervalMs: 1000
       });
   });
