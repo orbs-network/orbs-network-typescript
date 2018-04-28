@@ -1,5 +1,4 @@
 import { OrbsClient } from "./orbs-client";
-import { SendTransactionOutput } from "orbs-interfaces";
 import { Address } from "./address";
 import * as crypto from "crypto";
 
@@ -19,7 +18,7 @@ export class OrbsContract {
     );
   }
 
-  public async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
+  public async sendTransaction(methodName: string, args: OrbsContractMethodArgs) {
     const payload = JSON.stringify({
       method: methodName,
       args: args
