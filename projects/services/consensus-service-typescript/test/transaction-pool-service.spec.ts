@@ -58,7 +58,7 @@ describe("transaction pool service tests", function() {
         const stubGossip = stubInterface<GossipClient>();
         committedTransactionPool = new CommittedTransactionPool({});
         const transactionValidator = stubInterface<TransactionValidator>();
-        (<sinon.SinonStub>transactionValidator.validate).returns(false);
+        (<sinon.SinonStub>transactionValidator.validate).returns(true);
         pendingTransactionPool = new PendingTransactionPool(stubGossip, transactionValidator);
 
         server = grpcServer.builder()
