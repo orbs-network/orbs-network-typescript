@@ -24,7 +24,7 @@ export class SidechainConnector {
   private createEthereumConnector(): EthereumConnector {
     const address = this.options.ethereumNodeHttpAddress || SidechainConnector.DEFAULT_ETHEREUM_NODE_HTTP_ADDRESS;
 
-    logger.info(`setting up connector to ethereum node on address ${address}`);
+    logger.info(`Setting up connector to ethereum node on address ${address}`);
 
     return EthereumConnector.createHttpConnector(address);
   }
