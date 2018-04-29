@@ -74,6 +74,8 @@ class PythonContractAdapter implements OrbsContractAdapter {
   networkId: string;
   timeoutInMillis: number;
 
+  pythonClientRoot = path.resolve(__dirname, "../../../crypto-sdk-python/");
+
   constructor(contractName: string, apiEndpoint: string, senderPublicKey: string,
     virtualChainId: string, networkId: string, timeoutInMillis: number) {
 
@@ -83,12 +85,13 @@ class PythonContractAdapter implements OrbsContractAdapter {
       this.virtualChainId = virtualChainId;
       this.networkId = networkId;
       this.timeoutInMillis = timeoutInMillis;
+
+      console.log(this.pythonClientRoot);
   }
 
   private async createPython(): Promise<PythonBridge> {
     const python = pythonBridge({
-      cwd: path.resolve("../crypto-sdk-python")
-      // python: "python3"
+      env: {PYTHONPATH: this.pythonClientRoot}
     });
 
     function rethrow(e: Error) {
@@ -99,9 +102,9 @@ class PythonContractAdapter implements OrbsContractAdapter {
     await python.ex`
       import orbs_client
 
-      address = orbs_client.address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
-      client = orbs_client.http_client(${this.apiEndpoint}, address, ${this.timeoutInMillis})
-      contract = orbs_client.contract(client, ${this.contractName})`.catch(rethrow);
+      address = orbs_client.Address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
+      client = orbs_client.HttpClient(${this.apiEndpoint}, address, ${this.timeoutInMillis})
+      contract = orbs_client.Contract(client, ${this.contractName})`.catch(rethrow);
 
     return python;
   }
