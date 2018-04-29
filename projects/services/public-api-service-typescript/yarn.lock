@@ -143,6 +143,18 @@
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
 
+"@types/superagent@*":
+  version "3.5.8"
+  resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-3.5.8.tgz#da2b5d6a5bc77b4bf1b6d082ec4c3328ba5c3b9f"
+  dependencies:
+    "@types/node" "*"
+
+"@types/supertest@^2.0.4":
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/@types/supertest/-/supertest-2.0.4.tgz#28770e13293365e240a842d7d5c5a1b3d2dee593"
+  dependencies:
+    "@types/superagent" "*"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -2169,7 +2181,7 @@ optjs@~3.2.2:
     lodash "^4.17.4"
     mali "^0.7.1"
     mkdirp "^0.5.1"
-    orbs-interfaces "file:../../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
+    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"

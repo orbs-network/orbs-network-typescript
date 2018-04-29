@@ -20,7 +20,7 @@ message AddNewPendingTransactionInput {
 }
 
 message AddNewPendingTransactionOutput {
-  // empty
+  string txid = 1;
 }
 
 message GetAllPendingTransactionsInput {
