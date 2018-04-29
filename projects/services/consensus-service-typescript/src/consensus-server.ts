@@ -44,8 +44,11 @@ function makeSubscriptionManager(peers: types.ClientMap) {
 }
 
 function makePendingTransactionPool(peers: types.ClientMap) {
-  const committedTransactionPool = new CommittedTransactionPool();
-  return new PendingTransactionPool(peers.gossip, committedTransactionPool);
+  return new PendingTransactionPool(peers.gossip);
+}
+
+function makeCommittedTransactionPool() {
+  return new CommittedTransactionPool();
 }
 
 export default function(nodeTopology: any) {
@@ -55,5 +58,5 @@ export default function(nodeTopology: any) {
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers), nodeConfig))
     .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers), nodeConfig))
-    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers), nodeConfig));
+    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers), makeCommittedTransactionPool(), nodeConfig));
 }
