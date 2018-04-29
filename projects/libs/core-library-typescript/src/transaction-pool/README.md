@@ -16,3 +16,5 @@
 
 Two transactions are considered duplicate if both their headers and bodies are fully identical.
 The de-dup prevention mechanism works by checking the hash of a transaction, such that in case a transaction is already in the pool (either the pending or committed pool), another transaction with the same hash will be dropped and therefore will never be committed to a future block. Transactions have a "time to live", derived by the timestamp of the transaction, which, if passed, expires and removed from the pool. This is an optimization feature that prevents infinite growth of the pool storage.
+
+The de-duplication and all transaction pool management is done via the transaction pool service, which instruments the committed and pending transaction pools. Pending transaction pool also denies duplicate direct additions.
