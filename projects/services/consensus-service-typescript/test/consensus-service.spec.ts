@@ -6,7 +6,7 @@ import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 
 import { types, ErrorHandler, GRPCServerBuilder, grpc, logger } from "orbs-core-library";
-import { GossipClient } from "orbs-interfaces";
+import { GossipClient, ConsensusClient, GossipListenerInput } from "orbs-interfaces";
 
 import consensusServer from "../src/consensus-server";
 import GossipService from "../../gossip-service-typescript/src/service";
@@ -22,6 +22,7 @@ chai.use(chaiAsPromised);
 
 describe("consensus service tests", function() {
     let server: GRPCServerBuilder;
+    let client: ConsensusClient;
 
     beforeEach(async () => {
         const endpoint = `127.0.0.1:${await getPort()}`;
@@ -59,13 +60,23 @@ describe("consensus service tests", function() {
         const gossipServerStub = stubInterface<GossipService>();
 
         server = consensusServer(fakeTopology, fakeEnv)
-            .withService("Gossip", gossipServerStub);
+            .withService("Gossip", gossipServerStub)
+            .onEndpoint(endpoint);
+
+        client = grpc.consensusClient({ endpoint });
 
         return server.start();
     });
 
     it("should be able to receive a gossip message", async () => {
-        expect(1).to.be.equal(2);
+        const gossipPayload: GossipListenerInput = {
+            broadcastGroup: "consensus",
+            messageType: "RaftMessage",
+            buffer: new Buffer(JSON.stringify({ from: 1, data: { to: 1 }})),
+            fromAddress: "invalid address"
+        };
+
+        expect(await client.gossipMessageReceived(gossipPayload)).to.not.throw;
     });
 
     afterEach(async () => {
