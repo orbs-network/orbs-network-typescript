@@ -17,3 +17,12 @@ export interface OrbsAPICallContractRequest {
 export interface OrbsAPIGetTransactionStatusRequest {
   txid: string;
 }
+
+export interface OrbsAPITransactionReceipt {
+  success: boolean;
+}
+
+export interface OrbsAPIGetTransactionStatusResponse {
+  status: string;
+  receipt?: OrbsAPITransactionReceipt;
+}
