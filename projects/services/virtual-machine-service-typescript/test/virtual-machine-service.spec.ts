@@ -3,7 +3,7 @@ import * as mocha from "mocha";
 import * as _ from "lodash";
 import * as getPort from "get-port";
 
-import { types, grpc, GRPCServerBuilder, Service, ServiceConfig, createContractAddress, Address } from "orbs-core-library";
+import { types, grpc, GRPCServerBuilder, Service, ServiceConfig, Address } from "orbs-core-library";
 import virtualMachineServer from "../src/server";
 import { createHash } from "crypto";
 
@@ -11,7 +11,7 @@ const { expect } = chai;
 
 const SMART_CONTRACT_NAME = "peon";
 const SMART_CONTRACT_VCHAIN = "010101";
-const SMART_CONTRACT_ADDRESS = createContractAddress(SMART_CONTRACT_NAME, SMART_CONTRACT_VCHAIN);
+const SMART_CONTRACT_ADDRESS = Address.createContractAddress(SMART_CONTRACT_NAME, SMART_CONTRACT_VCHAIN);
 const ACCOUNT1 = new Address(createHash("sha256").update("account1").digest());
 const ACCOUNT2 = new Address(createHash("sha256").update("account2").digest());
 

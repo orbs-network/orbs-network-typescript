@@ -6,7 +6,7 @@ import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 import { TransactionPoolClient, VirtualMachineClient, BlockStorageClient } from "orbs-interfaces";
 import { BlockUtils, TransactionHelper } from "../../src/common-library";
-import { Address, createContractAddress } from "../../src/common-library/address";
+import { Address } from "../../src/common-library/address";
 import * as sinon from "sinon";
 import { createHash } from "crypto";
 import { aDummyTransactionSet } from "../../src/test-kit/transaction-builders";
@@ -32,7 +32,7 @@ function aGenesisBlock(): types.Block {
 function aDummyStateDiff(): types.ModifiedStateKey[] {
   return [
     {
-      contractAddress: createContractAddress("dummyContract").toBuffer(),
+      contractAddress: Address.createContractAddress("dummyContract").toBuffer(),
       key: "dummyKey",
       value: "dummyValue",
     }

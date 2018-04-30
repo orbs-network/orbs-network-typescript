@@ -1,5 +1,5 @@
 import { types } from "../common-library/types";
-import  { Address, createContractAddress } from "../common-library/address";
+import  { Address } from "../common-library/address";
 import { createHash } from "crypto";
 import { TransactionHelper } from "..";
 
@@ -12,7 +12,7 @@ export function aDummyTransaction(overrides: {timestamp?: number, senderPublicKe
       version: 0,
       sender: new Address(senderPublicKey).toBuffer(),
       timestamp: (overrides.timestamp == undefined ? Date.now() : overrides.timestamp).toString(),
-      contractAddress: createContractAddress("dummyContract").toBuffer()
+      contractAddress: Address.createContractAddress("dummyContract").toBuffer()
     },
     payload: "{}"
   };
