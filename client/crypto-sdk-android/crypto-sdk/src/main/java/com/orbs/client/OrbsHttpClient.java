@@ -27,7 +27,7 @@ public class OrbsHttpClient {
   }
 
   public String sendHTTPRequest(String path, String jsonPayload) throws Exception {
-    URL url = new URL(this.apiEndpoint);
+    URL url = new URL(this.apiEndpoint + path);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
     connection.setConnectTimeout(this.timeout);

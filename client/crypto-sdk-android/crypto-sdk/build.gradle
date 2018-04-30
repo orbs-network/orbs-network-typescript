@@ -106,6 +106,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'org.json:json:20180130'
     testImplementation fileTree(dir: 'build/outputs/jar', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
 }
