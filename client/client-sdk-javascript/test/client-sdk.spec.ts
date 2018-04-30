@@ -58,11 +58,11 @@ class JavaContractAdapter implements OrbsContractAdapter {
   }
 
   async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
-    return this.javaContract.sendTransaction(methodName, args);
+    return Promise.resolve(this.javaContract.sendTransactionSync(methodName, args));
   }
 
   async call(methodName: string, args: OrbsContractMethodArgs): Promise<any> {
-    return this.javaContract.call(methodName, args);
+    return Promise.resolve(this.javaContract.callSync(methodName, args));
   }
 }
 
