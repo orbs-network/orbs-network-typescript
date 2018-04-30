@@ -76,7 +76,7 @@ describe("transaction pool service tests", function() {
         expect(res).to.be.empty;
     });
 
-    it("service can mark commited transactions which are invlid / not in pending", async () => {
+    it("service can mark committed transactions which are invlid / not in pending", async () => {
         const transaction = createDummyTransaction();
         const helper = new TransactionHelper(transaction);
         const txid = helper.calculateTransactionId();
