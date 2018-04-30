@@ -25,13 +25,6 @@ function makeConsensus(peers: types.ClientMap, consensusConfig: RaftConsensusCon
 
 function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress: string) {
   const subscriptionManagerConfiguration = { ethereumContractAddress };
-
-  if (!subscriptionManagerConfiguration.ethereumContractAddress) {
-    logger.error("ethereumContractAddress wasn't provided! SubscriptionManager is disabled!");
-
-    return;
-  }
-
   return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
 }
 
@@ -54,9 +47,13 @@ export default function(nodeTopology: any, env: any) {
     throw new Error("NUM_OF_NODES can't be 0!");
   }
 
+  if (!ETHEREUM_CONTRACT_ADDRESS) {
+    throw new Error("Must provide ETHEREUM_CONTRACT_ADDRESS");
+  }
+
   const consensusConfig = new DefaultConsensusConfig();
   consensusConfig.nodeName = NODE_NAME;
-  consensusConfig.clusterSize = NUM_OF_NODES;
+  consensusConfig.clusterSize = Number(NUM_OF_NODES);
 
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);
