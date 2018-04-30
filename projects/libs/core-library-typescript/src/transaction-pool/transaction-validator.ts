@@ -27,7 +27,7 @@ export class TransactionValidator {
     }
 
     // checks subscription
-    const subscriptionKey = "0x0000000000000000000000000000000000000000000000000000000000" + contractAddress.virtualChainId;
+    const subscriptionKey = this.getSubscriptionKey(contractAddress);
     const status = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
 
     if (!status.active) {
@@ -35,6 +35,12 @@ export class TransactionValidator {
     }
 
     return status.active;
+  }
+
+  private getSubscriptionKey(contractAddress: Address): string {
+    // we create a subscription key by zero-left-padding the contract's vchain ID
+    const subscriptionKey = "0x0000000000000000000000000000000000000000000000000000000000" + contractAddress.virtualChainId;
+    return subscriptionKey;
   }
 
   constructor(subscriptionManager: types.SubscriptionManagerClient) {
