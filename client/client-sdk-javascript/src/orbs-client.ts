@@ -1,8 +1,7 @@
 import { delay } from "bluebird";
-import { Transaction, SendTransactionOutput } from "orbs-interfaces";
 import * as request from "request-promise";
 import { Address } from "./address";
-import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest } from "./orbs-api-interface";
+import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest, OrbsAPIGetTransactionStatusResponse } from "./orbs-api-interface";
 
 export class OrbsClient {
   private endpoint: string;
@@ -42,6 +41,18 @@ export class OrbsClient {
     });
 
     return body.result;
+  }
+
+  async getTransactionStatus(txid: string): Promise<OrbsAPIGetTransactionStatusResponse> {
+    const requestData: OrbsAPIGetTransactionStatusRequest = { txid };
+
+    const body = await request.post({
+      url: `${this.endpoint}/public/getTransactionStatus`,
+      body: requestData,
+      json: true
+    });
+
+    return body;
   }
 
   public generateTransactionRequest(contractAddress: Address, payload: string, timestamp: number = Date.now()): OrbsAPISendTransactionRequest {
