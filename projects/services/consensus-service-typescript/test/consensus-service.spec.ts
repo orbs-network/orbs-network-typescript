@@ -53,7 +53,7 @@ describe("consensus service tests", function() {
         };
 
         const NODE_NAME = "tester";
-        const NUM_OF_NODES = 2;
+        const NUM_OF_NODES = "2";
         const ETHEREUM_CONTRACT_ADDRESS = "localhost";
         const fakeEnv = { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS };
 
