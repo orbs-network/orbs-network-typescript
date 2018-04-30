@@ -21,7 +21,7 @@ export default class PublicApiHTTPService extends Service {
     super(serviceConfig);
     this.transactionHandler = new TransactionHandler(transactionPool);
 
-    this.publicApi = new PublicApi(this.transactionHandler, virtualMachine);
+    this.publicApi = new PublicApi(this.transactionHandler, virtualMachine, transactionPool);
   }
 
   async initialize() {
@@ -38,6 +38,7 @@ export default class PublicApiHTTPService extends Service {
 
     this.app.use("/public/sendTransaction", this.getHTTPSendTransactionRequestHandler());
     this.app.use("/public/callContract", this.getHTTPCallContractRequestHandler());
+    this.app.use("/public/getTransactionStatus", this.getHTTPGetTransactionStatusRequestHandler());
 
     const { httpPort } = (<PublicApiHTTPServiceConfig>this.config);
     this.server = this.app.listen(httpPort);
@@ -91,6 +92,44 @@ export default class PublicApiHTTPService extends Service {
       } catch (err) {
         console.log(err);
         logger.error(`HTTP API could not call a contract: ${err.toString()}`);
+        res.sendStatus(500);
+      }
+    };
+  }
+
+  private getHTTPGetTransactionStatusRequestHandler(): express.RequestHandler {
+    return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const body = JsonBuffer.parseJsonWithBuffers(req.body);
+
+      const input: types.GetTransactionStatusInput = {
+        txid: body.txid
+      };
+
+      try {
+        const { status, receipt } = await this.publicApi.getTransactionStatus(input);
+        switch (status) {
+          case types.TransactionStatus.NOT_FOUND:
+            res.sendStatus(404);
+            break;
+          case types.TransactionStatus.PENDING:
+            res.json({
+              status: "PENDING"
+            });
+            break;
+          case types.TransactionStatus.COMMITTED:
+            res.json({
+              status: "COMMITTED",
+              receipt: {
+                success: receipt.success
+              }
+            });
+            break;
+          default:
+            throw new Error(`Unexpected transaction status with value ${status}`);
+        }
+      } catch (err) {
+        console.log(err);
+        logger.error(`HTTP API could not get : ${err.toString()}`);
         res.sendStatus(500);
       }
     };

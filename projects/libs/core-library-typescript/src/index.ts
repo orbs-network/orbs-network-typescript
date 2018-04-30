@@ -6,7 +6,7 @@ export { PublicApi, TransactionHandler } from "./public-api";
 export { SidechainConnector, SidechainConnectorOptions } from "./sidechain-connector";
 export { StateStorage } from "./state-storage";
 export { SubscriptionManager } from "./subscription-manager";
-export { PendingTransactionPool, CommittedTransactionPool } from "./transaction-pool";
+export { PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "./transaction-pool";
 export { VirtualMachine } from "./virtual-machine";
 export { Service, ServiceRunner, ServiceConfig } from "./base-service";
 export { FakeGossipClient, generateServiceIPCClient } from "./test-kit";
