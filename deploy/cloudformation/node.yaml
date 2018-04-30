@@ -308,10 +308,6 @@ Resources:
           ToPort: 80
           CidrIp: !Ref PublicAPICidrIp
         - IpProtocol: tcp
-          FromPort: 51151
-          ToPort: 51151
-          CidrIp: !Ref PublicAPICidrIp
-        - IpProtocol: tcp
           FromPort: 8545
           ToPort: 8545
           CidrIp:
