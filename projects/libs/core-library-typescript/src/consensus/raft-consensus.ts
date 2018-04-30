@@ -166,9 +166,6 @@ export class RaftConsensus {
   }
 
   async shutdown() {
-    this.node.close()
-      .then(() => {
-        return this.blockBuilder.shutdown();
-      });
+    await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
   }
 }

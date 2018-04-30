@@ -68,7 +68,7 @@ describe("consensus service tests", function() {
         return server.start();
     });
 
-    it("should be able to receive a gossip message", async () => {
+    it("should be able to later stop the service", async () => {
         const gossipPayload: GossipListenerInput = {
             broadcastGroup: "consensus",
             messageType: "RaftMessage",
