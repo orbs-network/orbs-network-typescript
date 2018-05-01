@@ -141,6 +141,7 @@ export class RaftConsensus {
 
   private async onLeaderElected() {
     if (this.node.isLeader()) {
+      logger.info(`Node ${this.node.id} was elected as a new leader!`);
       this.blockBuilder.start();
       logger.info(`Node ${this.node.id} was elected as a new leader!`);
     } else {

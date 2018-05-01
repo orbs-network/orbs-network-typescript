@@ -54,14 +54,10 @@ export default class BlockStorageService extends Service {
   public async addBlock(rpc: types.AddBlockContext) {
     const block = rpc.req.block;
 
-    if (this.isSyncing()) {
-      logger.info(`Block storage ${this.config.nodeName} is adding new block with height ${block.header.height} while syncing`);
+    logger.info(`Block storage ${this.config.nodeName} is adding new block with height ${block.header.height} while syncing`);
 
-      this.sync.onReceiveBlock(rpc.req.block);
-      await this.sync.appendBlocks();
-    } else {
-      await this.blockStorage.addBlock(rpc.req.block);
-    }
+    this.sync.onReceiveBlock(rpc.req.block);
+    await this.sync.appendBlocks();
 
     rpc.res = {};
   }
