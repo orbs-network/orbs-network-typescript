@@ -10,6 +10,6 @@ Service.initLogger(path.join(__dirname, "../../../../logs/consensus.log"));
 
 const nodeTopology = topology();
 
-consensusServer(nodeTopology)
+consensusServer(nodeTopology, process.env)
   .onEndpoint(nodeTopology.endpoint)
   .start();
