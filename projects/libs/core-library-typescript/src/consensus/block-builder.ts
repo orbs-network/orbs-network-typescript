@@ -6,7 +6,6 @@ export default class BlockBuilder {
   private pollIntervalMs: number;
   private pollInterval: NodeJS.Timer;
   private lastBlock: types.Block;
-  private readyForBlockAppend = false;
   private blockStorage: types.BlockStorageClient;
   private onNewBlockBuild: (block: types.Block) => void;
 
@@ -27,14 +26,18 @@ export default class BlockBuilder {
   private pollForPendingTransactions() {
     this.pollInterval = setInterval(async () => {
       try {
-        if (this.readyForBlockAppend) {
-          logger.debug("blockBuilder tick");
-          await this.appendNextBlock();
-        }
+        logger.debug("blockBuilder tick");
+        await this.appendNextBlock();
       } catch (err) {
         logger.error(`newBlockAppendTick error: ${JSON.stringify(err)}`);
       }
     }, this.pollIntervalMs);
+  }
+
+  private stopPolling() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+    }
   }
 
   private async buildBlockFromPendingTransactions(lastBlock: types.Block): Promise<types.Block> {
@@ -54,12 +57,12 @@ export default class BlockBuilder {
   }
 
   public start() {
-    this.readyForBlockAppend = true;
+    this.pollForPendingTransactions();
     logger.debug("blockBuilder starting..");
   }
 
   public stop() {
-    this.readyForBlockAppend = false;
+    this.stopPolling();
     logger.debug("blockBuilder stopping..");
   }
 
@@ -84,19 +87,16 @@ export default class BlockBuilder {
 
     logger.debug(`Appended new block ${JSON.stringify(block)}`);
 
-    this.readyForBlockAppend = false;
+    this.stopPolling();
 
     return block;
   }
 
 
   async initialize() {
-    this.pollForPendingTransactions();
   }
 
   async shutdown() {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
-    }
+    this.stopPolling();
   }
 }
