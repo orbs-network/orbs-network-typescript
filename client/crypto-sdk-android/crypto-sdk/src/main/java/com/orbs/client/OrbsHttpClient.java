@@ -28,6 +28,10 @@ public class OrbsHttpClient {
 
   public String sendHTTPRequest(String path, String jsonPayload) throws Exception {
     URL url = new URL(this.apiEndpoint + path);
+    System.out.println("URL:");
+    System.out.println(url.toURI().toASCIIString());
+
+
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
     connection.setConnectTimeout(this.timeout);
@@ -40,6 +44,9 @@ public class OrbsHttpClient {
     out.writeUTF(jsonPayload);
     out.flush();
     out.close();
+
+    int status = connection.getResponseCode();
+    System.out.println(status);
 
     BufferedReader buffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
     String result = buffer.lines().collect(Collectors.joining("\n"));

@@ -3,8 +3,13 @@ package com.orbs.cryptosdk;
 public class Address {
     // This is the "handle" to the underlying native instance.
     private long selfPtr;
+    public final String virtualChainId;
+    public final String networkId;
 
     public Address(String publicKey, String virtualChainId, String networkId) {
+        this.virtualChainId = virtualChainId;
+        this.networkId = networkId;
+
         init(publicKey, virtualChainId, networkId);
     }
 

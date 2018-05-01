@@ -22,7 +22,7 @@ chai.use(sinonChai);
 const VIRTUAL_CHAIN_ID = "640ed3";
 const CONTRACT_NAME = "contractName";
 const CONTRACT_METHOD_NAME = "method";
-const CONTRACT_METHOD_ARGS: OrbsContractMethodArgs = [{"foo": "bar"}];
+const CONTRACT_METHOD_ARGS: OrbsContractMethodArgs = ["some-string", 3];
 const HTTP_PORT = 8888;
 const API_ENDPOINT = `http://localhost:${HTTP_PORT}`;
 const TIMEOUT = 20;
@@ -160,15 +160,15 @@ const expectedCallContractRequest: OrbsAPICallContractRequest = {
 };
 
 let httpServer: Server;
-before(() => {
-  httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest).listen(HTTP_PORT);
+before((done) => {
+  httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest).listen(HTTP_PORT, done);
 });
 
 describe("The Javascript SDK", () => {
   testContract(() => new TypeScriptContractAdapter(new OrbsContract(new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT), CONTRACT_NAME)));
 });
 
-describe("The Java SDK", () => {
+describe.only("The Java SDK", () => {
   testContract(() => new JavaContractAdapter(createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT)));
 });
 
@@ -176,8 +176,8 @@ describe("The Python SDK", () => {
   testContract(() => new PythonContractAdapter(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT));
 });
 
-after(async () => {
-  httpServer.close();
+after((done) => {
+  httpServer.close(done);
 });
 
 function testContract(makeContract: () => OrbsContractAdapter) {
