@@ -9,8 +9,9 @@ import * as sinon from "sinon";
 import { createHash } from "crypto";
 import { aDummyTransactionSet } from "../../src/test-kit/transaction-builders";
 import { RaftConsensus, RaftConsensusConfig } from "../../src/consensus/raft-consensus";
-import { FakeGossipClient, generateServiceIPCClient, BlockUtils, Address, JsonBuffer, logger } from "../../src";
+import { FakeGossipClient, generateServiceIPCClient, BlockUtils, Address, JsonBuffer, logger, BlockStorage } from "../../src";
 import { delay } from "bluebird";
+import * as _ from "lodash";
 
 chai.use(sinonChai);
 
@@ -18,32 +19,7 @@ logger.configure({
   level: "DEBUG"
 });
 
-function aGenesisBlock(): types.Block {
-  return BlockUtils.buildBlock({
-    header: {
-      version: 0,
-      prevBlockHash: new Buffer(""),
-      height: 0
-    },
-    body: {
-      transactions: [],
-      transactionReceipts: [],
-      stateDiff: []
-    }
-  });
-}
-
-function aDummyStateDiff(): types.ModifiedStateKey[] {
-  return [
-    {
-      contractAddress: Address.createContractAddress("dummyContract").toBuffer(),
-      key: "dummyKey",
-      value: "dummyValue",
-    }
-  ];
-}
-
-function createRaftConsensus(index: number): [types.ConsensusClient, RaftConsensus, FakeGossipClient] {
+function createRaftConsensus(index: number): [types.ConsensusClient, RaftConsensus, FakeGossipClient, BlockStorageClient] {
   const raftConfig: RaftConsensusConfig = {
     clusterSize: 3,
     electionTimeout: { min: 10, max: 20},
@@ -52,7 +28,8 @@ function createRaftConsensus(index: number): [types.ConsensusClient, RaftConsens
   };
 
   const fakeGossip = new FakeGossipClient(`node${index}`);
-  const consensus = new RaftConsensus(raftConfig, fakeGossip, undefined, undefined, undefined);
+  const fakeBlockStorage = stubInterface<BlockStorageClient>();
+  const consensus = new RaftConsensus(raftConfig, fakeGossip, fakeBlockStorage, undefined, undefined);
 
   const client: types.ConsensusClient = {
     gossipMessageReceived : (req: types.GossipListenerInput): types.GossipListenerOutput => {
@@ -61,19 +38,40 @@ function createRaftConsensus(index: number): [types.ConsensusClient, RaftConsens
       return {};
     }
   };
+
   return [
     client,
     consensus,
-    fakeGossip
+    fakeGossip,
+    fakeBlockStorage
   ];
 }
 
-describe.only("Raft consensus", () => {
-  it("always picks the first block from the two blocks of the same height", async () => {
+function generateEmptyBlock(prevBlockHash: Buffer, height: number) {
+  const block: types.Block = {
+    header: {
+      version: 0,
+      prevBlockHash,
+      height
+    },
+    body: {
+      stateDiff: [],
+      transactionReceipts: [],
+      transactions: []
+    }
+  };
+
+  return block;
+}
+
+describe("Raft consensus", () => {
+  xit("always picks the first block from the two blocks of the same height", async function() {
+    this.timeout(20000);
+
     const fakeGossip = new FakeGossipClient("node1");
-    const [ client1, raft1, gossip1 ] = createRaftConsensus(1);
-    const [ client2, raft2, gossip2 ] = createRaftConsensus(2);
-    const [ client3, raft3, gossip3] = createRaftConsensus(3);
+    const [ client1, raft1, gossip1, blockStorage1 ] = createRaftConsensus(1);
+    const [ client2, raft2, gossip2, blockStorage2 ] = createRaftConsensus(2);
+    const [ client3, raft3, gossip3, blockStorage3 ] = createRaftConsensus(3);
 
     gossip1.addNode("node1", { consensus: client1 } );
     gossip1.addNode("node2", { consensus: client2 } );
@@ -87,8 +85,36 @@ describe.only("Raft consensus", () => {
     gossip3.addNode("node2", { consensus: client2 } );
     gossip3.addNode("node3", { consensus: client3 } );
 
-    await delay(1500);
+    await delay(100);
 
-    return Promise.reject(new Error("NOT IMPLEMENTED"));
+    console.log("Generating blocks...");
+
+    const blockZero = generateEmptyBlock(new Buffer(""), 0);
+    const blockA = generateEmptyBlock(new Buffer(_.repeat("a", 100)), 1);
+    const blockB = generateEmptyBlock(new Buffer(_.repeat("b", 1000000)), 2);
+    const blockC = generateEmptyBlock(new Buffer(_.repeat("c", 120)), 2);
+    const blockD = generateEmptyBlock(new Buffer(_.repeat("d", 100)), 3);
+
+    console.log("Finished generating blocks...");
+
+    const nodes = [ raft1, raft2, raft3 ];
+    const blockStorages = [ blockStorage1, blockStorage2, blockStorage2 ];
+
+    const leader = () => _.find(nodes, n => n.isLeader());
+    const follower = blockStorages[_.findIndex(nodes, n => !n.isLeader())];
+
+    leader().onNewBlockBuild(blockZero);
+    leader().onNewBlockBuild(blockA);
+    leader().onNewBlockBuild(blockB);
+    leader().onNewBlockBuild(blockC);
+    leader().onNewBlockBuild(blockD);
+
+    await delay(15000);
+
+    expect((<sinon.SinonSpy>follower.addBlock).getCall(0).args[0]).to.have.property("block").eql(blockZero);
+    expect((<sinon.SinonSpy>follower.addBlock).getCall(1).args[0]).to.have.property("block").eql(blockA);
+    expect((<sinon.SinonSpy>follower.addBlock).getCall(2).args[0]).to.have.property("block").eql(blockB);
+    expect((<sinon.SinonSpy>follower.addBlock).getCall(3).args[0]).to.have.property("block").eql(blockC);
+    expect((<sinon.SinonSpy>follower.addBlock).getCall(4).args[0]).to.have.property("block").eql(blockD);
   });
 });
