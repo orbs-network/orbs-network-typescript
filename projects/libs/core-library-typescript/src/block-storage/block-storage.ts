@@ -59,6 +59,8 @@ export class BlockStorage {
   //
   // NOTE: this method should be only called serially.
   public async addBlock(block: types.Block) {
+    logger.info(`Adding new block with block height ${block.header.height}`);
+
     this.verifyNewBlock(block);
 
     await this.db.put<number>(BlockStorage.LAST_BLOCK_HEIGHT_KEY, block.header.height);

@@ -5,6 +5,7 @@ export default class BlockBuilder {
   private transactionPool: types.TransactionPoolClient;
   private pollIntervalMs: number;
   private pollInterval: NodeJS.Timer;
+  private lastBlock: types.Block;
   private blockStorage: types.BlockStorageClient;
   private onNewBlockBuild: (block: types.Block) => void;
 
@@ -67,12 +68,15 @@ export default class BlockBuilder {
 
   public async commitBlock(block: types.Block) {
     await this.blockStorage.addBlock({ block });
+    this.lastBlock = block;
   }
 
   private async getOrFetchLastBlock(): Promise<types.Block> {
-    const { block } = await this.blockStorage.getLastBlock({});
-
-    return block;
+    if (this.lastBlock == undefined) {
+      const { block } = await this.blockStorage.getLastBlock({});
+      this.lastBlock = block;
+    }
+    return this.lastBlock;
   }
 
   public async appendNextBlock(): Promise<types.Block> {

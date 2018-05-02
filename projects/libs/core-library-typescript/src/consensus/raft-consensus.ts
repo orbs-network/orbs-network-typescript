@@ -65,6 +65,7 @@ export interface RaftConsensusConfig {
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
+  blockBuilderPollInterval?: number;
 }
 
 
@@ -86,7 +87,9 @@ export class RaftConsensus {
     this.connector = new RPCConnector(config.nodeName, gossip);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
-      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block)
+      virtualMachine, transactionPool, blockStorage,
+      newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
+      pollIntervalMs: config.blockBuilderPollInterval
     });
 
     this.node = gaggle({
@@ -123,9 +126,13 @@ export class RaftConsensus {
 
     // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
     // committed entry.
+    const start = new Date().getTime();
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
+    const end = new Date().getTime();
 
-    logger.debug(`New block to be committed ${JSON.stringify(block)}`);
+    logger.info(`Finished deserializing block with height ${block.header.height} and hash size ${block.header.prevBlockHash.length} in ${end - start} ms`);
+
+    logger.info(`New block to be committed with height ${block.header.height} and hash size ${block.header.prevBlockHash.length}`);
 
     try {
       await this.blockBuilder.commitBlock(block);
@@ -141,7 +148,6 @@ export class RaftConsensus {
 
   private async onLeaderElected() {
     if (this.node.isLeader()) {
-      logger.info(`Node ${this.node.id} was elected as a new leader!`);
       this.blockBuilder.start();
       logger.info(`Node ${this.node.id} was elected as a new leader!`);
     } else {
@@ -157,7 +163,7 @@ export class RaftConsensus {
     }
   }
 
-  private onNewBlockBuild(block: types.Block) {
+  public onNewBlockBuild(block: types.Block) {
     const appendMessage: types.ConsensusMessage = { block };
 
     this.node.append(appendMessage);
@@ -169,5 +175,9 @@ export class RaftConsensus {
 
   async shutdown() {
     await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
+  }
+
+  isLeader() {
+    return this.node.isLeader();
   }
 }

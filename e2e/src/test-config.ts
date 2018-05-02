@@ -31,7 +31,8 @@ export function loadDefaultTestConfig(): TestConfig {
       connectFromHost: nconf.get("CONNECT_FROM_HOST"),
       preExistingPublicSubnet: nconf.get("PREEXISTING_PUBLIC_SUBNET"),
       // left-padding the vchain ID to use it in order create a 32-byte subscription key (temporary workaround..)
-      testSubscriptionKey: "0x0000000000000000000000000000000000000000000000000000000000" + config.virtualChainId
+      testSubscriptionKey: "0x0000000000000000000000000000000000000000000000000000000000" + config.virtualChainId,
+      numOfNodes: Number(nconf.get("NUM_OF_NODES") || 6)
     });
     config.apiEndpoint = config.testEnvironment.discoverApiEndpoint();
   }
