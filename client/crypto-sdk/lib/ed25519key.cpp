@@ -14,7 +14,8 @@ struct key {
     gcry_sexp_t key;
 };
 
-const uint32_t ED25519Key::PUBLIC_KEY_SIZE = 32;
+const uint8_t ED25519Key::PUBLIC_KEY_SIZE = 32;
+const uint8_t ED25519Key::PRIVATE_KEY_SIZE = 64;
 
 static const string ED25519_GENKEY =
     "(genkey"
@@ -34,7 +35,7 @@ static const string ED25519_IMPORT_PUBLIC_KEY =
     ")";
 
 // Generates new public key pair using the ED25519 curve.
-ED25519Key::ED25519Key() : key_(nullptr) {
+ED25519Key::ED25519Key() {
     key_ = new gcry_sexp_t();
 
     gcry_sexp_t parms = nullptr;
@@ -52,6 +53,7 @@ ED25519Key::ED25519Key() : key_(nullptr) {
 
         // Check that the generated key is valid.
         VerifyKeyPair(key_);
+        privateKey_ = true;
     } catch (...) {
         gcry_sexp_release(parms);
 
@@ -61,12 +63,20 @@ ED25519Key::ED25519Key() : key_(nullptr) {
     gcry_sexp_release(parms);
 }
 
-ED25519Key::ED25519Key(const vector<uint8_t> &publicKey) : key_(nullptr) {
+ED25519Key::ED25519Key(const vector<uint8_t> &publicKey) {
     Init(publicKey);
 }
 
-ED25519Key::ED25519Key(const string &publicKey) : key_(nullptr) {
+ED25519Key::ED25519Key(const string &publicKey) {
     Init(Utils::Hex2Vec(publicKey));
+}
+
+ED25519Key::ED25519Key(const vector<uint8_t> &publicKey, const vector<uint8_t> &privateKey) {
+    Init(publicKey, privateKey);
+}
+
+ED25519Key::ED25519Key(const string &publicKey, const string &privateKey) {
+    Init(Utils::Hex2Vec(publicKey), Utils::Hex2Vec(privateKey));
 }
 
 void ED25519Key::Init(const vector<uint8_t> &publicKey) {
@@ -78,6 +88,16 @@ void ED25519Key::Init(const vector<uint8_t> &publicKey) {
     gcry_error_t err = gcry_sexp_build(static_cast<gcry_sexp_t *>(key_), nullptr, ED25519_IMPORT_PUBLIC_KEY.c_str(), publicKey.size(), &publicKey[0]);
     if (err) {
         throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
+    }
+}
+
+void ED25519Key::Init(const vector<uint8_t> &publicKey, const vector<uint8_t> &privateKey) {
+    if (publicKey.size() != ED25519Key::PUBLIC_KEY_SIZE) {
+        throw invalid_argument("Invalid public key length: " + Utils::ToString(publicKey.size()));
+    }
+
+    if (privateKey.size() != ED25519Key::PRIVATE_KEY_SIZE) {
+        throw invalid_argument("Invalid public key length: " + Utils::ToString(privateKey.size()));
     }
 }
 
@@ -173,4 +193,8 @@ const vector<uint8_t> ED25519Key::GetPublicKey() const {
     gcry_sexp_release(publicKey);
 
     return res;
+}
+
+bool ED25519Key::HasPrivateKey() const {
+    return privateKey_;
 }
