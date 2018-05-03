@@ -3,7 +3,9 @@ import * as fse from "fs-extra";
 import * as path from "path";
 import * as os from "os";
 import * as getPort from "get-port";
+import * as chaiAsPromised from "chai-as-promised";
 import { stubInterface } from "ts-sinon";
+import * as _ from "lodash";
 
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
@@ -13,11 +15,36 @@ import TransactionPoolService from "../../consensus-service-typescript/src/trans
 
 const { expect } = chai;
 
+chai.use(chaiAsPromised);
+
 ErrorHandler.setup();
 
 logger.configure({ level: "debug" });
 
-describe("storage server test", function () {
+function generateBigBlock(lastBlock: types.Block): types.Block {
+  const transactions: types.Transaction[] = _.map(_.range(40000), (i: number): types.Transaction => {
+    return {
+      header: {
+        version: 0,
+        sender: new Buffer("sender"),
+        timestamp: new Date().getTime().toString(),
+        contractAddress: new Buffer("contract-address")
+      },
+      payload: JSON.stringify({
+        method: "someMethod",
+        args: [ 1, 2, 3, 4, "some-other-arguments" ]
+      })
+    };
+  });
+
+  return BlockUtils.buildNextBlock({
+    transactions: transactions,
+    transactionReceipts: [],
+    stateDiff: []
+  }, lastBlock);
+}
+
+describe.only("BlockStorage service", function () {
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
@@ -88,6 +115,14 @@ describe("storage server test", function () {
     const contractAddress = Address.createContractAddress("does-not-exist").toBuffer();
     const state = await stateClient.readKeys({ contractAddress, keys: [] });
     return expect(state).to.have.deep.property("values", {});
+  });
+
+  it("should send and receive big blocks", async function () {
+    this.timeout(10000);
+
+    const lastBlock = await blockClient.getLastBlock({});
+    const block = generateBigBlock(undefined);
+    return expect(blockClient.addBlock({ block })).not.to.be.eventually.rejected;
   });
 
   afterEach(() => {
