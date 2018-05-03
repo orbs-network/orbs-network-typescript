@@ -107,12 +107,12 @@ export class BlockStorage {
     }
 
     if (block.header.height !== this.lastBlock.header.height + 1) {
-      throw new Error(`Invalid block height of block: ${JSON.stringify(block)}! Should have been ${this.lastBlock.header.height + 1}`);
+      throw new Error(`Invalid block height of block: ${JSON.stringify(block.header)}! Should have been ${this.lastBlock.header.height + 1}`);
     }
 
     const lastBlockHash = BlockUtils.calculateBlockHash(this.lastBlock);
     if (!block.header.prevBlockHash.equals(lastBlockHash)) {
-      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block)}! Should have been ${JSON.stringify(lastBlockHash)}`);
+      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block.header)}! Should have been ${JSON.stringify(lastBlockHash)}`);
     }
   }
 

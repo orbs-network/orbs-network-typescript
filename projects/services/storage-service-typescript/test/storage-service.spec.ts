@@ -19,9 +19,9 @@ chai.use(chaiAsPromised);
 
 ErrorHandler.setup();
 
-logger.configure({ level: "debug" });
+logger.configure({ level: "info" });
 
-function generateBigBlock(lastBlock: types.Block): types.Block {
+function generateBigBrokenBlock(): types.Block {
   const transactions: types.Transaction[] = _.map(_.range(40000), (i: number): types.Transaction => {
     return {
       header: {
@@ -41,16 +41,17 @@ function generateBigBlock(lastBlock: types.Block): types.Block {
     transactions: transactions,
     transactionReceipts: [],
     stateDiff: []
-  }, lastBlock);
+  });
 }
 
-describe.only("BlockStorage service", function () {
+describe("BlockStorage service", function () {
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
+  let endpoint: string;
 
   beforeEach(async () => {
-    const endpoint = `127.0.0.1:${await getPort()}`;
+    endpoint = `127.0.0.1:${await getPort()}`;
 
     const topology =  {
       peers: [
@@ -117,12 +118,13 @@ describe.only("BlockStorage service", function () {
     return expect(state).to.have.deep.property("values", {});
   });
 
+  // Here we are aiming to eliminate specific GRPC error;
+  // expected result is to receive an error about block height because the block is invalid
   it("should send and receive big blocks", async function () {
     this.timeout(10000);
 
-    const lastBlock = await blockClient.getLastBlock({});
-    const block = generateBigBlock(undefined);
-    return expect(blockClient.addBlock({ block })).not.to.be.eventually.rejected;
+    const block = generateBigBrokenBlock();
+    return expect(blockClient.addBlock({ block })).to.be.eventually.rejectedWith(`Got response [2 UNKNOWN: Invalid block height of block: {"version":0,"prevBlockHash":{"type":"Buffer","data":[]},"height":0}! Should have been 1] trying to call method [addBlock] service [BlockStorage] at endpoint [${endpoint}]`);
   });
 
   afterEach(() => {
