@@ -299,11 +299,11 @@ bool ED25519Key::HasPrivateKey() const {
 
 const vector<uint8_t> ED25519Key::Sign(const vector<uint8_t> &message) const {
     if (message.empty()) {
-        throw new invalid_argument("Invalid message!");
+        throw invalid_argument("Invalid message!");
     }
 
     if (!privateKey_) {
-        throw new logic_error("Private key is missing!");
+        throw logic_error("Private key is missing!");
     }
 
     gcry_sexp_t msg = nullptr;
@@ -389,11 +389,11 @@ const vector<uint8_t> ED25519Key::Sign(const vector<uint8_t> &message) const {
 
 bool ED25519Key::Verify(const vector<uint8_t> &message, const vector<uint8_t> &signature) const {
     if (message.empty()) {
-        throw new invalid_argument("Invalid message!");
+        throw invalid_argument("Invalid message!");
     }
 
     if (signature.size() != SIGNATURE_SIZE) {
-        throw runtime_error("Invalid signature length: " + Utils::ToString(signature.size()));
+        throw invalid_argument("Invalid signature length: " + Utils::ToString(signature.size()));
     }
 
     gcry_sexp_t msg = nullptr;
