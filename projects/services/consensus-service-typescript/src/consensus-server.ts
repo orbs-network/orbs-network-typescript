@@ -15,9 +15,9 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   clusterSize: number;
   blockBuilderPollInterval?: number;
 
-  constructor() {
-    this.electionTimeout = { min: 2000, max: 4000};
-    this.heartbeatInterval = 100;
+  constructor(min?: number, max?: number, heartbeat?: number) {
+    this.electionTimeout = { min: min || 2000, max: max || 4000 };
+    this.heartbeatInterval = heartbeat || 100;
   }
 }
 
@@ -40,7 +40,8 @@ function makeCommittedTransactionPool() {
 }
 
 export default function(nodeTopology: any, env: any) {
-  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL } = env;
+  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL,
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -54,7 +55,7 @@ export default function(nodeTopology: any, env: any) {
     throw new Error("Must provide ETHEREUM_CONTRACT_ADDRESS");
   }
 
-  const consensusConfig = new DefaultConsensusConfig();
+  const consensusConfig = new DefaultConsensusConfig(Number(MIN_ELECTION_TIMEOUT), Number(MAX_ELECTION_TIMEOUT), Number(HEARBEAT_INTERVAL));
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
   consensusConfig.blockBuilderPollInterval = Number(BLOCK_BUILDER_POLL_INTERVAL) || 500;

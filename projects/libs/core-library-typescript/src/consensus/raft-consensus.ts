@@ -36,6 +36,9 @@ class RPCConnector extends EventEmitter {
   }
 
   public broadcast(data: any): void {
+    logger.debug(`Raft message multicast packet size: `, new Buffer(JSON.stringify(data)).length);
+    logger.debug(`Raft broadcast message: ${JSON.stringify(data)}`);
+
     this.gossip.broadcastMessage({
       broadcastGroup: "consensus",
       messageType: "RaftMessage",
@@ -45,6 +48,9 @@ class RPCConnector extends EventEmitter {
   }
 
   public send(nodeId: string, data: any): void {
+    logger.debug(`Raft message unicast packet size: `, new Buffer(JSON.stringify(data)).length);
+    logger.debug(`Raft unicast message: ${JSON.stringify(data)}`);
+
     this.gossip.unicastMessage({
       recipient: nodeId,
       broadcastGroup: "consensus",
@@ -115,13 +121,13 @@ export class RaftConsensus {
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
 
-    this.node.on("committed", async (data: any) => this.onCommitted(data));
+    this.node.on("committed", async (data: any, index: number) => this.onCommitted(data, index));
 
     this.node.on("leaderElected", () => this.onLeaderElected());
 
   }
 
-  private async onCommitted(data: any) {
+  private async onCommitted(data: any, index: number) {
     const msg: types.ConsensusMessage = data.data;
 
     // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
@@ -129,6 +135,8 @@ export class RaftConsensus {
     const start = new Date().getTime();
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
     const end = new Date().getTime();
+
+    logger.debug(`New block with height ${block.header.height} is about to be committed (RAFT index ${index})`);
 
     logger.info(`Finished deserializing block with height ${block.header.height} and hash size ${block.header.prevBlockHash.length} in ${end - start} ms`);
 
@@ -177,7 +185,7 @@ export class RaftConsensus {
     await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
   }
 
-  isLeader() {
+  public isLeader() {
     return this.node.isLeader();
   }
 }

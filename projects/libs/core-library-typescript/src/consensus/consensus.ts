@@ -7,23 +7,42 @@ import { RaftConsensusConfig, RaftConsensus } from "./raft-consensus";
 
 export class Consensus {
   private raftConsensus: RaftConsensus;
+  private pollIntervalMs: number;
+  private pollInterval: NodeJS.Timer;
 
   constructor(
     config: RaftConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
     this.raftConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+    this.pollIntervalMs = 100;
   }
 
   async initialize() {
+    this.reportLeadershipStatus();
     return this.raftConsensus.initialize();
   }
 
   async shutdown() {
+    this.stopReporting();
     return this.raftConsensus.shutdown();
   }
 
   async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
     await this.raftConsensus.onMessageReceived(fromAddress, messageType, message);
   }
+
+  private reportLeadershipStatus() {
+    this.pollInterval = setInterval(async () => {
+      const status = this.raftConsensus.isLeader() ? "the leader" : "not the leader";
+      logger.debug(`Node is ${status}`);
+    }, this.pollIntervalMs);
+  }
+
+  private stopReporting() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+    }
+  }
+
 }

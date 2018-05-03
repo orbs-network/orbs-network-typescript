@@ -81,14 +81,18 @@ describe("test multiple transactions", async function () {
     for (const i of _.range(0, Number(process.env.NUM_OF_ATTEMPTS) || 1)) {
       console.log(`Attempt #${i}`);
 
-      await stress(testConfig.stressTest.accounts);
-      console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);
-
       try {
-        await stress(100);
+        await stress(testConfig.stressTest.accounts);
+        console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);
       } catch (e) {
-        console.log(`Expected to fail to create a block of 100 accounts/transactions`);
+        console.log(`Failed with error ${e}`);
       }
+
+      // try {
+      //   await stress(100);
+      // } catch (e) {
+      //   console.log(`Expected to fail to create a block of 100 accounts/transactions`);
+      // }
 
       // await delay(1000);
     }
