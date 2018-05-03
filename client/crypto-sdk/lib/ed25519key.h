@@ -14,6 +14,7 @@ class CRYPTO_EXPORT ED25519Key {
 public:
     static const uint8_t PUBLIC_KEY_SIZE;
     static const uint8_t PRIVATE_KEY_SIZE;
+    static const uint8_t SIGNATURE_SIZE;
 
     // Generates new public key pair using the ED25519 curve.
     explicit ED25519Key();
@@ -32,6 +33,9 @@ public:
     virtual const std::vector<uint8_t> GetPublicKey() const;
     bool HasPrivateKey() const;
 
+    const std::vector<uint8_t> Sign(const std::vector<uint8_t> &message) const;
+    bool Verify(const std::vector<uint8_t> &digest, const std::vector<uint8_t> &signature) const;
+
     // Disable copy constructor, in order to prevent key_t dereferencing.
     ED25519Key(const ED25519Key &other) = delete;
 
@@ -39,8 +43,11 @@ private:
     void Init(const std::vector<uint8_t> &publicKey);
     void Init(const std::vector<uint8_t> &publicKey, const std::vector<uint8_t> &privateKey);
 
-    // Verifies public key pair and throws on error.
-    static void VerifyKeyPair(key_t key);
+    // Verifies whether the public key pair is consistent and throws on error.
+    void VerifyKeyPairConsistency() const;
+
+    // Verifies whether the public key pair consits from related keys.
+    void VerifyKeyPairRelation() const;
 
 private:
     key_t key_ = nullptr;
