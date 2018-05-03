@@ -139,3 +139,65 @@ TEST(ED25519Key, throws_on_invalid_arguments_imports_ed25519_public_and_private_
     vector<uint8_t> privateKey8(Utils::Hex2Vec("3f81e53116ee3f860c154d03b9cabf8af71d8beec210c535ed300c0aee5fcbe7"));
     EXPECT_THROW(ED25519Key key8(publicKey8, privateKey8), invalid_argument);
 }
+
+TEST(ED25519Key, signs_and_verifies_messages) {
+    uint8_t rawData1[] = "Hello World!";
+    vector<uint8_t> message1(rawData1, rawData1 + sizeof(rawData1) - 1);
+    ED25519Key key1;
+    vector<uint8_t> signature1(key1.Sign(message1));
+
+    EXPECT_THAT(signature1, SizeIs(ED25519Key::SIGNATURE_SIZE));
+    EXPECT_TRUE(key1.Verify(message1, signature1));
+
+    uint8_t rawData2[] = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.";
+    vector<uint8_t> message2(rawData2, rawData2 + sizeof(rawData2) - 1);
+    ED25519Key key2;
+    vector<uint8_t> signature2(key2.Sign(message2));
+
+    EXPECT_THAT(signature2, SizeIs(ED25519Key::SIGNATURE_SIZE));
+    EXPECT_TRUE(key2.Verify(message2, signature2));
+
+    EXPECT_FALSE(key1.Verify(message2, signature1));
+    EXPECT_FALSE(key1.Verify(message1, signature2));
+    EXPECT_FALSE(key1.Verify(message2, signature2));
+    EXPECT_FALSE(key2.Verify(message2, signature1));
+    EXPECT_FALSE(key2.Verify(message1, signature2));
+    EXPECT_FALSE(key2.Verify(message1, signature1));
+}
+
+TEST(ED25519Key, throws_on_invalid_arguments_signs_and_verifies_messages) {
+    // Empty message.
+    vector<uint8_t> message1;
+    ED25519Key key1;
+    EXPECT_THROW(key1.Sign(message1), invalid_argument);
+
+    // No private key.
+    uint8_t rawData2[] = "Hello World!";
+    vector<uint8_t> message2(rawData2, rawData2 + sizeof(rawData2) - 1);
+    vector<uint8_t> publicKey2(Utils::Hex2Vec("b9a91acbf23c22123a8253cfc4325d7b4b7a620465c57f932c7943f60887308b"));
+    ED25519Key key2(publicKey2);
+    EXPECT_THROW(key2.Sign(message2), logic_error);
+
+    // Empty signature.
+    uint8_t rawData3[] = "If I sign myself Jean-Paul Sartre it is not the same thing as if I sign myself Jean-Paul Sartre, Nobel Prize winner.";
+    vector<uint8_t> message3(rawData3, rawData3 + sizeof(rawData3) - 1);
+    ED25519Key key3;
+    vector<uint8_t> signature3;
+    EXPECT_THROW(key3.Verify(message3, signature3), invalid_argument);
+
+    // Signature is too short.
+    uint8_t rawData4[] = "Hello World!";
+    vector<uint8_t> message4(rawData4, rawData4 + sizeof(rawData4) - 1);
+    ED25519Key key4;
+    vector<uint8_t> signature4(key4.Sign(message4));
+    signature4.pop_back();
+    EXPECT_THROW(key4.Verify(message4, signature4), invalid_argument);
+
+    // Signature is too long.
+    uint8_t rawData5[] = "Hello World!";
+    vector<uint8_t> message5(rawData5, rawData5 + sizeof(rawData5) - 1);
+    ED25519Key key5;
+    vector<uint8_t> signature5(key5.Sign(message5));
+    signature5.push_back(12);
+    EXPECT_THROW(key5.Verify(message5, signature5), invalid_argument);
+}
