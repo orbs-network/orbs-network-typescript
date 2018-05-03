@@ -1,5 +1,6 @@
 import * as chai from "chai";
 import * as express from "express";
+import * as morgan from "morgan";
 import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest } from "../src/orbs-api-interface";
 
 
@@ -10,9 +11,10 @@ export default function createMockServer(
   expectedCallContractRequest: OrbsAPICallContractRequest): express.Application {
   const app = express();
 
+  app.use(morgan("dev"));
   app.use(express.json());
 
-  app.use("/public/sendTransaction", (req: express.Request, res: express.Response) => {
+  app.post("/public/sendTransaction", (req: express.Request, res: express.Response) => {
     // TODO: check header
     expect(req.body.payload).to.be.eql(expectedSendTransactionRequest.payload);
     expect(req.body.header.senderAddressBase58).to.be.eql(expectedSendTransactionRequest.header.senderAddressBase58);
@@ -21,11 +23,16 @@ export default function createMockServer(
     res.end();
   });
 
-  app.use("/public/callContract", (req: express.Request, res: express.Response) => {
+  app.post("/public/callContract", (req: express.Request, res: express.Response) => {
     // TODO: check sender
     expect(req.body).to.be.eql(expectedCallContractRequest);
 
     res.json({ result: "some-answer" });
+    res.end();
+  });
+
+  app.get("/test", (req: express.Request, res: express.Response) => {
+    res.json({ result: "ok"});
     res.end();
   });
 

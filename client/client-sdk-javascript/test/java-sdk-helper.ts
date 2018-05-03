@@ -1,6 +1,10 @@
 const java = require("java");
 java.options.push("-Djava.library.path=../crypto-sdk-android/crypto-sdk/build/outputs/jar/");
 java.classpath.push("../crypto-sdk-android/crypto-sdk/build/outputs/jar/crypto-sdk-release.jar");
+java.classpath.push("../crypto-sdk-android/crypto-sdk/build/outputs/jar/libs/okhttp-3.10.0.jar");
+java.classpath.push("../crypto-sdk-android/crypto-sdk/build/outputs/jar/libs/okio-1.14.1.jar");
+
+
 
 export function createJavaOrbsContract(contractName: string, apiEndpoint: string, senderPublicKey: string,
                                        virtualChainId: string, networkId: string, timeout: number) {

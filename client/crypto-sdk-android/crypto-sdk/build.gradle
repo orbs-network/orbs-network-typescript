@@ -81,7 +81,7 @@ android {
             dependsOn "copy${buildTypeName}CryptoSDKLibrary"
             from("build/intermediates/packaged-classes/${buildType}/")
             into(localBuildDir)
-            include('classes.jar')
+            include(['classes.jar','libs/*.jar'])
             rename('classes.jar', "crypto-sdk-${buildType}.jar")
         }
 
@@ -104,9 +104,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'org.json:json:20180130'
-    testImplementation fileTree(dir: 'build/outputs/jar', include: ['*.jar'])
+    testImplementation fileTree(include: ['*.jar'], dir: 'build/outputs/jar')
     testImplementation 'junit:junit:4.12'
+    implementation files('libs/okhttp-3.10.0.jar')
+    implementation files('libs/okio-1.14.1.jar')
 }

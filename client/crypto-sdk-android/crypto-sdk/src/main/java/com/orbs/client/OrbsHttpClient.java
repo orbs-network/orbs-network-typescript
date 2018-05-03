@@ -2,12 +2,14 @@ package com.orbs.client;
 
 import com.orbs.cryptosdk.Address;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class OrbsHttpClient {
   final String apiEndpoint;
@@ -26,33 +28,40 @@ public class OrbsHttpClient {
     this.timeout = timeout;
   }
 
+  private OkHttpClient createClient() {
+    return new OkHttpClient.Builder()
+            .readTimeout(2, TimeUnit.SECONDS)
+            .build();
+  }
+
+  private Request createRequest(String path, String jsonPayload) {
+    MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    RequestBody body = RequestBody.create(JSON, jsonPayload);
+    return new Request.Builder()
+            .url(this.apiEndpoint + path)
+            .post(body)
+            .build();
+  }
+
   public String sendHTTPRequest(String path, String jsonPayload) throws Exception {
-    URL url = new URL(this.apiEndpoint + path);
-    System.out.println("URL:");
-    System.out.println(url.toURI().toASCIIString());
+    System.out.println(this.apiEndpoint + path);
 
+    OkHttpClient client = createClient();
+    Request request = createRequest(path, jsonPayload);
 
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    Response res = client.newCall(request).execute();
+    if (res.isSuccessful()) {
+      return res.body().string();
+    }
+    else {
+      throw new Exception("Request failed " + res.code());
+    }
+  }
 
-    connection.setConnectTimeout(this.timeout);
-    connection.setReadTimeout(this.timeout);
-    connection.setRequestMethod("POST");
-    connection.setRequestProperty("Content-Type", "application/json");
-    connection.setDoOutput(true);
+  public void sendHTTPRequest(String path, String jsonPayload, Callback cb) {
+    OkHttpClient client = createClient();
+    Request request = createRequest(path, jsonPayload);
 
-    DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-    out.writeUTF(jsonPayload);
-    out.flush();
-    out.close();
-
-    int status = connection.getResponseCode();
-    System.out.println(status);
-
-    BufferedReader buffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    String result = buffer.lines().collect(Collectors.joining("\n"));
-
-    connection.disconnect();
-
-    return result;
+    client.newCall(request).enqueue(cb);
   }
 }

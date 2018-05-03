@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 file(GLOB CRYPTO_SDK_ANDROID_SRC
-  "src/main/cpp/*.h"
+  "src/main/cpp/*.h"§
   "src/main/cpp/*.cpp"
 )
 
