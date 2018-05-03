@@ -13,7 +13,7 @@ DEV_HOME=${HOME}/dev/orbs
 NODE_VER="v9.11.1"
 
 CASK_PACKAGES="google-chrome visual-studio-code iterm2 atom slack java8 docker sourcetree spectacle alfred"
-PACKAGES="node@8 typescript yarn"
+PACKAGES="typescript yarn"
 
 FAILED_PACKAGES=""
 ORBS_NETWORK_REPO="https://github.com/orbs-network/orbs-network.git"
@@ -115,29 +115,25 @@ run_build()
 // ==================== START ====================
 
 echo
-echo "Welcome dear ${USER}!"
+echo "Welcome to Orbs, dear ${USER}!"
 echo
-echo "This script installs software that you will use as an Orbs Platform contributor."
-echo "It will occasionally ask for your MacOS password, please stay next to your computer during installation."
-echo "You can run it multiple times with no harm done."
+echo "This script installs software that you will use as a software engineer at Orbs."
+echo "It will first install software, and then ask you if you would like to run build (it takes several minutes to run)."
+echo "During installation, the script you will occasionally be asked for your MacOS password."
+echo "P.S. It is safe to run this script multiple times."
 echo
-echo "The last step is running the MVP build. It is a long process so you can safely ^C it if you don't need it. It's the last step of this script anyway."
+echo "The script will install Node.js version ${NODE_VER}."
+echo "If you need to change that, quit now (^C) and change NODE_VER variable at the top of the script."
 echo
-echo "Node version to install: ${NODE_VER}."
-echo "If you need to change it, quit now (^C) and change NODE_VER variable at the top of the script."
-read -rsn1 -p"Press any key to continue";echo
+read -rsn1 -p"Press any key to begin";echo
 
 echo "Installing Oh My Zsh (alternative shell) ..."
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-# [ -f /tmp/idontexist ] && (exit_with_message "Sorry byebye")
-
 install_nvm_and_node
-
 install_brew_and_cask
-
-install_cask_packages
 install_brew_packages
+install_cask_packages
 
 # Don't install android for now
 # install_android 
@@ -148,7 +144,7 @@ if [ $(grep -c JAVA_HOME ~/.zshrc) -eq 0 ] ; then
   echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ~/.zshrc
 fi
 
-source ~/.zshrc
+# source ~/.zshrc
 
 echo "Node version: $(node -v)"
 echo |"NPM version: $(npm -v)"
@@ -157,12 +153,21 @@ if [ -n ${FAILED_PACKAGES} ] ; then
   echo "The following packages failed to install, try to install them manually: ${FAILED_PACKAGES}"
 fi
 
-echo "Running Orbs MVP build, this will take a while..."
 
-run_build
 
+echo "The script can now run build. If you choose to run it, it will run and then exit. Otherwise it will exit now."
 echo
-echo "Orbs MVP Build complete."
+read -r -p "Would you like to run build now? [y/N] " response
+if [ "${response-}" == "Y" ] || [ "${response-}" == "y" ] ; then
+  echo "Will run build"
+  # run_build
+  echo
+  echo "Orbs MVP Build complete."
+  echo
+else
+  echo "Skipped build"
+fi
+
 echo
 
 echo "Nice tip: if you want to set your key repeat rate faster than System Preferences would let you, run the following, then logout and log back in:"
