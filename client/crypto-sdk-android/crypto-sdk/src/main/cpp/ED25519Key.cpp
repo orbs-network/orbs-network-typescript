@@ -1,7 +1,11 @@
 #include "ED25519Key.h"
 
+#include <stdexcept>
+
 #include "../../../../../crypto-sdk/lib/ed25519key.h"
 #include "../../../../../crypto-sdk/lib/utils.h"
+
+#include "Utilities.h"
 
 using namespace std;
 using namespace Orbs;
@@ -29,18 +33,36 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__Ljava_lang_Strin
     try {
         ED25519Key *self = new ED25519Key(nativePublicKey);
         setSelf(env, thisObj, self);
+    } catch (const exception &e) {
+        env->ReleaseStringUTFChars(publicKey, nativePublicKey);
+
+        Utilities::ThrowException(env, e.what());
+
+        return;
     } catch (...) {
         env->ReleaseStringUTFChars(publicKey, nativePublicKey);
 
-        throw;
+        Utilities::ThrowUnknownException(env);
+
+        return;
     }
 
     env->ReleaseStringUTFChars(publicKey, nativePublicKey);
 }
 
 JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__(JNIEnv *env, jobject thisObj) {
-    ED25519Key *self = new ED25519Key();
-    setSelf(env, thisObj, self);
+    try {
+        ED25519Key *self = new ED25519Key();
+        setSelf(env, thisObj, self);
+    } catch (const exception &e) {
+        Utilities::ThrowException(env, e.what());
+
+        return;
+    } catch (...) {
+        Utilities::ThrowUnknownException(env);
+
+        return;
+    }
 }
 
 JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_finalize(JNIEnv *env, jobject thisObj) {
@@ -53,7 +75,17 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_finalize(JNIEnv *env, 
 }
 
 JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_ED25519Key_getPublicKey(JNIEnv *env, jobject thisObj) {
-    ED25519Key *self = getSelf(env, thisObj);
+    try {
+        ED25519Key *self = getSelf(env, thisObj);
 
-    return env->NewStringUTF(Utils::Vec2Hex(self->GetPublicKey()).c_str());
+        return env->NewStringUTF(Utils::Vec2Hex(self->GetPublicKey()).c_str());
+    } catch (const exception &e) {
+        Utilities::ThrowException(env, e.what());
+
+        return nullptr;
+    } catch (...) {
+        Utilities::ThrowUnknownException(env);
+
+        return nullptr;
+    }
 }
