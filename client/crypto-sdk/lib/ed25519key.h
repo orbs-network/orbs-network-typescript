@@ -33,7 +33,14 @@ public:
     virtual const std::vector<uint8_t> GetPublicKey() const;
     bool HasPrivateKey() const;
 
+    // Returns the EdDSA signature, using SHA512 as the message digest.
+    //
+    // Note: the returned signature is the concatenation of R (32 bytes) with S (32 bytes).
     const std::vector<uint8_t> Sign(const std::vector<uint8_t> &message) const;
+
+    // Verifies the EdDSA signature, using SHA512 as the message digest.
+    //
+    // Note: the signature is expected to be the concatenation of R (32 bytes) with S (32 bytes).
     bool Verify(const std::vector<uint8_t> &digest, const std::vector<uint8_t> &signature) const;
 
     // Disable copy constructor, in order to prevent key_t dereferencing.

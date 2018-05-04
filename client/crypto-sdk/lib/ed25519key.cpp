@@ -297,6 +297,9 @@ bool ED25519Key::HasPrivateKey() const {
     return privateKey_;
 }
 
+// Returns the EdDSA signature, using SHA512 as the message digest.
+//
+// Note: the returned signature is the concatenation of R (32 bytes) with S (32 bytes).
 const vector<uint8_t> ED25519Key::Sign(const vector<uint8_t> &message) const {
     if (message.empty()) {
         throw invalid_argument("Invalid message!");
@@ -387,6 +390,9 @@ const vector<uint8_t> ED25519Key::Sign(const vector<uint8_t> &message) const {
     return res;
 }
 
+// Verifies the EdDSA signature, using SHA512 as the message digest.
+//
+// Note: the signature is expected to be the concatenation of R (32 bytes) with S (32 bytes).
 bool ED25519Key::Verify(const vector<uint8_t> &message, const vector<uint8_t> &signature) const {
     if (message.empty()) {
         throw invalid_argument("Invalid message!");
