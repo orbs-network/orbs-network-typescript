@@ -8,7 +8,7 @@ import mockHttpServer from "./mock-server";
 import { Server } from "http";
 import { stubInterface } from "ts-sinon";
 import * as crypto from "crypto";
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 import { OrbsContract, OrbsContractMethodArgs } from "../src/orbs-contract";
 import { method } from "bluebird";
 
@@ -23,6 +23,7 @@ const API_ENDPOINT = `http://localhost:${HTTP_PORT}`;
 const TIMEOUT = 20;
 const SENDER_PUBLIC_KEY = new ED25519Key().publicKey;
 const SENDER_ADDRESS = new Address(SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+const TXID = "ada0838c9a4c86625d665cc6f2d617efa15a184e434ce1d1ee66f6e057fd0ae8";
 
 function expectedContractAddressBase58(contractName: string) {
   const contractKey = crypto.createHash("sha256").update(contractName).digest("hex");
@@ -55,25 +56,34 @@ const expectedCallContractRequest: OrbsAPICallContractRequest = {
   payload: expectedPayload(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
 };
 
+const expectedGetTransactionStatusRequest: OrbsAPIGetTransactionStatusRequest = {
+  txid: TXID
+};
+
 describe("A client calls the connector interface with the correct inputs when", async function () {
+  let orbsClient: OrbsClient;
   let orbsContract: OrbsContract;
   let httpServer: Server;
 
-  beforeEach(async () => {
-    const orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
+  beforeEach((done) => {
+    orbsClient = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
     orbsContract = new OrbsContract(orbsClient, CONTRACT_NAME);
-    httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest).listen(HTTP_PORT);
+    httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest, expectedGetTransactionStatusRequest).listen(HTTP_PORT, done);
   });
 
   it("sendTransaction() is called", async () => {
-    expect(await orbsContract.sendTransaction(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("ok");
+    return expect(await orbsContract.sendTransaction(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("ok");
   });
 
   it("callContract() is called", async () => {
-    expect(await orbsContract.call(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("some-answer");
+    return expect(await orbsContract.call(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)).to.be.eql("some-answer");
   });
 
-  afterEach(async () => {
-    httpServer.close();
+  it("getTransactionStatus() is called", async () => {
+    return expect(await orbsClient.getTransactionStatus(TXID)).to.be.eql({ status: "COMMITTED", receipt: { success: true} });
+  });
+
+  afterEach((done) => {
+    httpServer.close(done);
   });
 });

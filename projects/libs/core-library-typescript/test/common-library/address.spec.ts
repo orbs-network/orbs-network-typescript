@@ -1,6 +1,7 @@
 import { expect } from "chai";
 
 import { Address } from "../../src/common-library";
+import { isSymbol } from "util";
 
 describe("an address", () => {
   it("is properly initialized by a public key #1", () => {
@@ -31,5 +32,33 @@ describe("an address", () => {
     expect(address2.accountId.toString("hex")).to.equal("44068acc1b9ffc072694b684fc11ff229aff0b28");
     expect(address2.checksum).to.equal(0x258c93e8);
     expect(address2.toBase58()).to.equal("T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR");
+  });
+
+  it("serialization/deserialization works well", () => {
+    const publicKey = "8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65";
+    const virtualChainId = "640ed3";
+    const networkId = Address.MAIN_NETWORK_ID;
+    const address = new Address(Buffer.from(publicKey, "hex"), virtualChainId, networkId);
+
+    // serialize
+    const rawAddress = address.toBuffer();
+
+    // now deserialize
+    const deserializedAddress = Address.fromBuffer(rawAddress);
+
+    expect(deserializedAddress.accountId).to.deep.equal(address.accountId);
+    expect(deserializedAddress.checksum).to.equal(address.checksum);
+    expect(deserializedAddress.version).to.equal(address.version);
+    expect(deserializedAddress.networkId).to.equal(address.networkId);
+    expect(deserializedAddress.virtualChainId).to.equal(address.virtualChainId);
+  });
+  it("deserialization failed if checksum is incorrect", () => {
+    const rawAddressWithBadChecksumHex = "4d00640ed3c13052d8208230a58ab363708c08e78f1125f4880b4af4d1";
+    expect(Address.fromBuffer(Buffer.from(rawAddressWithBadChecksumHex, "hex"), undefined, true)).to.be.undefined;
+  });
+  it("deserialization fails if address doesn't match public key", () => {
+    const rawAddressHex = "4d00640ed3c13052d8208230a58ab363708c08e78f1125f4880b4af4d2";
+    const unmatchedPublicKey = "8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c64";
+    expect(Address.fromBuffer(Buffer.from(rawAddressHex, "hex"), Buffer.from(unmatchedPublicKey, "hex"), true)).to.be.undefined;
   });
 });

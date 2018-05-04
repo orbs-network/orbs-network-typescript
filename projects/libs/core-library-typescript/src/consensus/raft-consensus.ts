@@ -82,6 +82,7 @@ export class RaftConsensus {
     transactionPool: types.TransactionPoolClient,
     virtualMachine: types.VirtualMachineClient
   ) {
+    logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config)}`);
     this.connector = new RPCConnector(config.nodeName, gossip);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
@@ -166,6 +167,6 @@ export class RaftConsensus {
   }
 
   async shutdown() {
-    return this.blockBuilder.shutdown();
+    await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
   }
 }

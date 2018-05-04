@@ -5,9 +5,10 @@ import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
-import { PendingTransactionPool, CommittedTransactionPool } from "../../src/transaction-pool";
+import { PendingTransactionPool } from "../../src/transaction-pool";
 import { aDummyTransaction } from "../../src/test-kit/transaction-builders";
 import { TransactionHelper } from "../../src";
+import { TransactionValidator } from "../../src/transaction-pool/transaction-validator";
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -24,13 +25,28 @@ function anExpiredTransaction() {
 describe("Transaction Pool", () => {
   let gossip: types.GossipClient;
   let transactionPool: PendingTransactionPool;
-  let committedTransactionPool: CommittedTransactionPool;
+  let transactionValidator: TransactionValidator;
 
   beforeEach(() => {
     gossip = stubInterface<types.GossipClient>();
-    committedTransactionPool = stubInterface<CommittedTransactionPool>();
-    (<sinon.SinonStub>committedTransactionPool.hasTransactionWithId).returns(false);
-    transactionPool = new PendingTransactionPool(gossip, committedTransactionPool, { transactionLifespanMs: 30000, cleanupIntervalMs: 1000 });
+    transactionValidator = stubInterface<TransactionValidator>();
+    (<sinon.SinonStub>transactionValidator.validate).returns(true);
+    transactionPool = new PendingTransactionPool(
+      gossip, transactionValidator, {
+        transactionLifespanMs: 30000, cleanupIntervalMs: 1000
+      });
+  });
+
+  it("transaction that is added can be found in the pool", async () => {
+    const tx = aValidTransaction();
+    const txid = await transactionPool.addNewPendingTransaction(tx);
+    const inPool = transactionPool.hasTransactionWithId(txid);
+    expect(inPool).to.be.true;
+  });
+
+  it("transaction that is not added can not be found in the pool", async () => {
+    const inPool = transactionPool.hasTransactionWithId("should-not-be-found");
+    expect(inPool).to.be.false;
   });
 
   it("new broadcast transaction is added to the pool", async () => {
@@ -42,11 +58,20 @@ describe("Transaction Pool", () => {
     expect(gossip.broadcastMessage).to.have.been.called;
   });
 
+  it("if validator rejects a transactions it's not added the pool and an error is thrown", async () => {
+    const tx = aValidTransaction();
+    (<sinon.SinonStub>transactionValidator.validate).returns(false);
+    expect(transactionPool.addNewPendingTransaction(tx)).to.be.rejected;
+    const transactionEntries = await transactionPool.getAllPendingTransactions();
+    expect(transactionEntries).to.have.lengthOf(0);
+  });
+
+
   it("two identical transactions are processed only once", async () => {
     const tx = aValidTransaction();
     const txid = await transactionPool.addNewPendingTransaction(tx);
     await expect(transactionPool.addNewPendingTransaction(tx)).to.eventually.be.rejectedWith(
-      `transaction with id ${txid} already exists in the transaction pool`
+      `Transaction with id ${txid} already exists in the transaction pool`
     );
   });
 
@@ -128,21 +153,6 @@ describe("Transaction Pool", () => {
       expect(transactionPool.getTransactionStatus(txid)).to.be.eql({
         status: types.TransactionStatus.PENDING,
         receipt: undefined
-      });
-    });
-    it("that was recently committed and is still in the pool", () => {
-      const transaction = new TransactionHelper(aValidTransaction());
-      const txHash = transaction.calculateHash();
-      const receipt: types.TransactionReceipt = {
-        txHash,
-        success: true
-      };
-      const txid = transaction.calculateTransactionId();
-      (<sinon.SinonStub>committedTransactionPool.hasTransactionWithId).withArgs(txid).returns(true);
-      (<sinon.SinonStub>committedTransactionPool.getTransactionReceiptWithId).withArgs(txid).returns(receipt);
-      expect(transactionPool.getTransactionStatus(transaction.calculateTransactionId())).to.be.eql({
-        status: types.TransactionStatus.COMMITTED,
-        receipt
       });
     });
   });

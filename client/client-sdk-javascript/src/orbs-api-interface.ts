@@ -13,3 +13,16 @@ export interface OrbsAPICallContractRequest {
   contractAddressBase58: string;
   payload: string;
 }
+
+export interface OrbsAPIGetTransactionStatusRequest {
+  txid: string;
+}
+
+export interface OrbsAPITransactionReceipt {
+  success: boolean;
+}
+
+export interface OrbsAPIGetTransactionStatusResponse {
+  status: string;
+  receipt?: OrbsAPITransactionReceipt;
+}
