@@ -41,7 +41,7 @@ public:
     // Verifies the EdDSA signature, using SHA512 as the message digest.
     //
     // Note: the signature is expected to be the concatenation of R (32 bytes) with S (32 bytes).
-    bool Verify(const std::vector<uint8_t> &digest, const std::vector<uint8_t> &signature) const;
+    bool Verify(const std::vector<uint8_t> &message, const std::vector<uint8_t> &signature) const;
 
     // Disable copy constructor, in order to prevent key_t dereferencing.
     ED25519Key(const ED25519Key &other) = delete;
