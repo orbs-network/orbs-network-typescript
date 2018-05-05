@@ -139,12 +139,31 @@ void ED25519Key::Init(const vector<uint8_t> &publicKey) {
         throw invalid_argument("Invalid public key length: " + Utils::ToString(publicKey.size()));
     }
 
-    key_ = new gcry_sexp_t();
-    gcry_error_t err = gcry_sexp_build(static_cast<gcry_sexp_t *>(key_), nullptr, ED25519_IMPORT_PUBLIC_KEY.c_str(),
-        publicKey.size(), &publicKey[0]);
-    if (err) {
-        throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
+    uint8_t *securePublicKey = nullptr;
+
+    try {
+        securePublicKey = reinterpret_cast<uint8_t *>(gcry_xmalloc_secure(publicKey.size()));
+        memcpy(securePublicKey, &publicKey[0], publicKey.size());
+
+        key_ = new gcry_sexp_t();
+        gcry_sexp_t *gkey = static_cast<gcry_sexp_t *>(key_);
+
+        gcry_error_t err = gcry_sexp_build(gkey, nullptr, ED25519_IMPORT_PUBLIC_KEY.c_str(), publicKey.size(),
+            securePublicKey);
+        if (err) {
+            throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
+        }
+
+        if (!gcry_is_secure(*gkey)) {
+            throw runtime_error("Couldn't secure memory!");
+        }
+    } catch (...) {
+        gcry_free(securePublicKey);
+
+        throw;
     }
+
+    gcry_free(securePublicKey);
 }
 
 void ED25519Key::Init(const vector<uint8_t> &publicKey, const vector<uint8_t> &privateKey) {
@@ -156,17 +175,42 @@ void ED25519Key::Init(const vector<uint8_t> &publicKey, const vector<uint8_t> &p
         throw invalid_argument("Invalid private key length: " + Utils::ToString(privateKey.size()));
     }
 
-    key_ = new gcry_sexp_t();
-    gcry_error_t err = gcry_sexp_build(static_cast<gcry_sexp_t *>(key_), nullptr, ED25519_IMPORT_PRIVATE_KEY.c_str(),
-        publicKey.size(), &publicKey[0], privateKey.size(), &privateKey[0]);
-    if (err) {
-        throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
+    uint8_t *securePublicKey = nullptr;
+    uint8_t *securePrivateKey = nullptr;
+
+    try {
+        securePublicKey = reinterpret_cast<uint8_t *>(gcry_xmalloc_secure(publicKey.size()));
+        memcpy(securePublicKey, &publicKey[0], publicKey.size());
+
+        securePrivateKey = reinterpret_cast<uint8_t *>(gcry_xmalloc_secure(privateKey.size()));
+        memcpy(securePrivateKey, &privateKey[0], privateKey.size());
+
+        key_ = new gcry_sexp_t();
+        gcry_sexp_t *gkey = static_cast<gcry_sexp_t *>(key_);
+
+        gcry_error_t err = gcry_sexp_build(gkey, nullptr, ED25519_IMPORT_PRIVATE_KEY.c_str(), publicKey.size(),
+            securePublicKey, privateKey.size(), securePrivateKey);
+        if (err) {
+            throw runtime_error("gcry_sexp_build failed with: " + string(gcry_strerror(err)));
+        }
+
+        if (!gcry_is_secure(*gkey)) {
+            throw runtime_error("Couldn't secure memory!");
+        }
+
+        privateKey_ = true;
+
+        // Test if the keys are compatible.
+        VerifyKeyPairRelation();
+    } catch (...) {
+        gcry_free(securePublicKey);
+        gcry_free(securePrivateKey);
+
+        throw;
     }
 
-    privateKey_ = true;
-
-    // Test if the keys are compatible.
-    VerifyKeyPairRelation();
+    gcry_free(securePublicKey);
+    gcry_free(securePrivateKey);
 }
 
 ED25519Key::~ED25519Key() {
