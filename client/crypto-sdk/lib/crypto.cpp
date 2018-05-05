@@ -8,7 +8,7 @@
 using namespace std;
 using namespace Orbs;
 
-static const uint SECMEM_SIZE = 16384;
+static const uint SECMEM_SIZE = 32768;
 
 // Initializes the Crypto SDK. This method have to be called before using any of the underlying functions.
 void CryptoSDK::Init() {
@@ -28,7 +28,7 @@ void CryptoSDK::Init() {
         throw runtime_error("Failed to send GCRYCTL_USE_SECURE_RNDPOOL with: " + string(gcry_strerror(err)));
     }
 
-    // Allocate a pool of 16K secure memory. This makes the secure memory available and also drops privileges where
+    // Allocate a pool of 32K secure memory. This makes the secure memory available and also drops privileges where
     // needed. Note that by using functions like gcry_xmalloc_secure and gcry_mpi_snew Libgcrypt may expand the secure
     // memory pool with memory which lacks the property of not being swapped out to disk.
     if ((err = gcry_control(GCRYCTL_INIT_SECMEM, SECMEM_SIZE, 0))) {
