@@ -8,6 +8,10 @@ public class ED25519Key {
         init(publicKey);
     }
 
+    public ED25519Key(String publicKey, String privateKey) {
+        init(publicKey, privateKey);
+    }
+
     public ED25519Key() {
         init();
     }
@@ -17,8 +21,13 @@ public class ED25519Key {
     }
 
     private native void init(String publicKey);
+    private native void init(String publicKey, String privateKey);
     private native void init();
     protected native void finalize();
 
     public native String getPublicKey();
+    public native boolean hasPrivateKey();
+
+    public native byte[] sign(byte[] message);
+    public native boolean verify(byte[] message, byte[] signature);
 }

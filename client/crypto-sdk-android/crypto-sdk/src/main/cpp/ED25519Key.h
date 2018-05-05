@@ -18,6 +18,14 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__Ljava_lang_Strin
 /*
  * Class:     com_orbs_cryptosdk_ED25519Key
  * Method:    init
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__Ljava_lang_String_2Ljava_lang_String_2
+    (JNIEnv *, jobject, jstring, jstring);
+
+/*
+ * Class:     com_orbs_cryptosdk_ED25519Key
+ * Method:    init
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__
@@ -38,6 +46,30 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_finalize
  */
 JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_ED25519Key_getPublicKey
   (JNIEnv *, jobject);
+
+/*
+ * Class:     com_orbs_cryptosdk_ED25519Key
+ * Method:    hasPrivateKey
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_orbs_cryptosdk_ED25519Key_hasPrivateKey
+    (JNIEnv *, jobject);
+
+/*
+ * Class:     com_orbs_cryptosdk_ED25519Key
+ * Method:    sign
+ * Signature: ([B)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_com_orbs_cryptosdk_ED25519Key_sign
+    (JNIEnv *, jobject, jbyteArray);
+
+/*
+ * Class:     com_orbs_cryptosdk_ED25519Key
+ * Method:    verify
+ * Signature: ([B[B)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_orbs_cryptosdk_ED25519Key_verify
+    (JNIEnv *, jobject, jbyteArray, jbyteArray);
 
 #ifdef __cplusplus
 }
