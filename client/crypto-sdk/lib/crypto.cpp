@@ -28,7 +28,7 @@ void CryptoSDK::Init() {
         throw runtime_error("Failed to send GCRYCTL_USE_SECURE_RNDPOOL with: " + string(gcry_strerror(err)));
     }
 
-    // Allocate a pool of 16k secure memory. This makes the secure memory available and also drops privileges where
+    // Allocate a pool of 16K secure memory. This makes the secure memory available and also drops privileges where
     // needed. Note that by using functions like gcry_xmalloc_secure and gcry_mpi_snew Libgcrypt may expand the secure
     // memory pool with memory which lacks the property of not being swapped out to disk.
     if ((err = gcry_control(GCRYCTL_INIT_SECMEM, SECMEM_SIZE, 0))) {
