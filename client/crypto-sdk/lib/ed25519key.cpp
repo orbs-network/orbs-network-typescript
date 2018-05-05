@@ -267,7 +267,7 @@ void ED25519Key::VerifyKeyPairConsistency() const {
     gcry_sexp_release(secretKey);
 }
 
-// Verifies whether the public key pair consits from related keys.
+// Verifies whether the public key pair consists from related keys.
 void ED25519Key::VerifyKeyPairRelation() const {
     if (key_ == nullptr || static_cast<void *>(key_) == nullptr) {
         throw invalid_argument("Invalid key!");

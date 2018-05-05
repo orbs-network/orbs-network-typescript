@@ -23,7 +23,7 @@ public:
     explicit ED25519Key(const std::vector<uint8_t> &publicKey);
     explicit ED25519Key(const std::string &publicKey);
 
-    // Imports exieting public and private key pair.
+    // Imports existing public and private key pair.
     explicit ED25519Key(const std::vector<uint8_t> &publicKey, const std::vector<uint8_t> &privateKey);
     explicit ED25519Key(const std::string &publicKey, const std::string &privateKey);
 
@@ -53,7 +53,7 @@ private:
     // Verifies whether the public key pair is consistent and throws on error.
     void VerifyKeyPairConsistency() const;
 
-    // Verifies whether the public key pair consits from related keys.
+    // Verifies whether the public key pair consists from related keys.
     void VerifyKeyPairRelation() const;
 
 private:
