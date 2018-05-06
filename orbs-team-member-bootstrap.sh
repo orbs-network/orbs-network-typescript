@@ -4,6 +4,7 @@
 # Some of the packages can be substituted for others and some are purely for convenience.
 # It is required that zsh be the default shell - the script will prompt you if this is not the case, and explain what to do.
 
+INIT_FILE="~/.bash_profile"
 NODE_VER="v9.11.1"
 NVM_INSTALL_URL="https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh"
 BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/install"
@@ -146,18 +147,36 @@ read -rsn1 -p"Press any key to begin";echo
 # This is causing trouble and not critical as the moment so not installing it
 #install_oh_my_zsh
 
-touch ~/.bash_profile
+touch ${INIT_FILE}
 
 install_nvm_and_node
 install_brew_and_cask
 install_cask_packages
 install_brew_packages
 
+if [[ $(grep -c JAVA_HOME ${INIT_FILE}) -eq 0 ]] ; then
+  echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ${INIT_FILE}
+else
+  echo "JAVA_HOME already exported in ${INIT_FILE}"
+fi
+
+if [[ $(grep PATH ${INIT_FILE} | grep -c JAVA_HOME) -eq 0 ]] ; then
+  echo "PATH=\$JAVA_HOME:\$PATH" >> ${INIT_FILE}
+else 
+  echo "PATH already contains JAVA_HOME in ${INIT_FILE}"
+fi
+
+source ${INIT_FILE}
+
 if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
   exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
+else
+  echo "Verified java command can be called"  
 fi
 if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
-  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
+  exit_with_message "Docker failed to install, or shell needs to be restarted. Please restart shell and run this script again."
+else
+  echo "Verified docker command can be called"  
 fi
 
 # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
@@ -170,11 +189,6 @@ echo "Installed Docker version: $(docker -v)"
 
 echo "Running post-installation actions ..."
 
-if [[ $(grep -c JAVA_HOME ~/.bash_profile) -eq 0 ]] ; then
-  echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ~/.bash_profile
-fi
-
-source ~/.bash_profile
 
 
 if [[ -n ${FAILED_PACKAGES} ]] ; then
