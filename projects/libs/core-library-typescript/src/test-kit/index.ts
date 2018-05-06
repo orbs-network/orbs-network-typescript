@@ -1,2 +1,2 @@
 export { FakeGossipClient } from "./fake-gossip-client";
-export { generateServiceIPCClient } from "./service-ipc-client";
+export { generateServiceInProcessClient } from "./service-in-process-client";
