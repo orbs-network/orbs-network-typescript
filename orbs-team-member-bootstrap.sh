@@ -146,6 +146,7 @@ read -rsn1 -p"Press any key to begin";echo
 # This is causing trouble and not critical as the moment so not installing it
 #install_oh_my_zsh
 
+touch ~/.bash_profile
 
 install_nvm_and_node
 install_brew_and_cask
@@ -169,11 +170,11 @@ echo "Installed Docker version: $(docker -v)"
 
 echo "Running post-installation actions ..."
 
-if [[ $(grep -c JAVA_HOME ~/.zshrc) -eq 0 ]] ; then
-  echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ~/.zshrc
+if [[ $(grep -c JAVA_HOME ~/.bash_profile) -eq 0 ]] ; then
+  echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ~/.bash_profile
 fi
 
-# source ~/.zshrc
+source ~/.bash_profile
 
 
 if [[ -n ${FAILED_PACKAGES} ]] ; then
@@ -184,7 +185,7 @@ fi
 
 
 echo "The script can now run build. If you choose to run it, it will run and then exit. Otherwise it will exit now."
-ehco "If you wish to run build later, rerun the script and answer 'y'."
+echo "If you wish to run build later, rerun the script and answer 'y'."
 echo
 read -r -p "Would you like to run build now? [y/N] " response
 if [[ "${response-}" == "Y" ]] || [[ "${response-}" == "y" ]] ; then
