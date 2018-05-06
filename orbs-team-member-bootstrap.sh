@@ -4,7 +4,7 @@
 # Some of the packages can be substituted for others and some are purely for convenience.
 # It is required that zsh be the default shell - the script will prompt you if this is not the case, and explain what to do.
 
-INIT_FILE="~/.bash_profile"
+INIT_FILE="${HOME}/.bash_profile"
 NODE_VER="v9.11.1"
 NVM_INSTALL_URL="https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh"
 BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/install"
@@ -63,7 +63,7 @@ install_brew_and_cask()
       exit_with_message "Failed to install brew, cannot continue"
     fi
   else
-    echo "Brew already installed, skipping"
+    echo "Already installed Brew, skipping"
   fi
 
   echo "Installing cask ..."
@@ -96,6 +96,54 @@ install_brew_packages()
       FAILED_PACKAGES="${FAILED_PACKAGES} ${package}"
     fi
   done
+}
+
+post_install()  {
+  echo "Running post-installation actions ..."
+  if [[ $(grep -c JAVA_HOME ${INIT_FILE}) -eq 0 ]] ; then
+    echo "Exporting JAVA_HOME in ${INIT_FILE}"
+    echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ${INIT_FILE}
+  else
+    echo "Already exported JAVA_HOME in ${INIT_FILE}"
+  fi
+
+  if [[ $(grep PATH ${INIT_FILE} | grep -c JAVA_HOME) -eq 0 ]] ; then
+    echo "Adding JAVA_HOME to PATH in ${INIT_FILE}"
+    echo "PATH=\$JAVA_HOME:\$PATH" >> ${INIT_FILE}
+  else 
+    echo "Already added JAVA_HOME to PATH in ${INIT_FILE}"
+  fi
+
+  if [[ $(grep -c "DOCKER_COMPLETIONS" ${INIT_FILE}) -eq 0 ]] ; then
+    echo "Adding docker command completion in ${INIT_FILE}"
+    echo '# DOCKER_COMPLETIONS' >> ${INIT_FILE}
+    echo 'if [ -f $(brew --prefix)/etc/bash_completion ]; then' >> ${INIT_FILE}
+    echo '  . $(brew --prefix)/etc/bash_completion' >> ${INIT_FILE}
+    echo 'fi' >> ${INIT_FILE}
+  else
+    echo "Already added Docker command completion to ${INIT_FILE}"
+  fi  
+  source ${INIT_FILE}
+
+  if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
+    exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
+  else
+    echo "Verified java command can be called"  
+  fi
+  if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
+    exit_with_message "Docker failed to install, or shell needs to be restarted. Please restart shell and run this script again."
+  else
+    echo "Verified docker command can be called"  
+  fi
+
+  # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
+  # install_android 
+
+  echo "Installed Node version: $(node -v)"
+  echo "Installed NPM version: $(npm -v)"
+  echo "Installed Java version: $(java -version 2>&1 | head -1)"
+  echo "Installed Docker version: $(docker -v)"
+
 }
 
 install_android()
@@ -139,65 +187,31 @@ echo "During installation, the script you will occasionally be asked for your Ma
 echo
 echo "It is safe to run this script multiple times."
 echo
+echo "Init file to use: ${INIT_FILE}"
 echo "Node.js version to install: ${NODE_VER}."
 echo "If you need to change that, quit now (^C) and change NODE_VER variable at the top of the script."
 echo
 read -rsn1 -p"Press any key to begin";echo
+echo
 
 # This is causing trouble and not critical as the moment so not installing it
 #install_oh_my_zsh
 
 touch ${INIT_FILE}
 
-install_nvm_and_node
-install_brew_and_cask
-install_cask_packages
-install_brew_packages
-
-if [[ $(grep -c JAVA_HOME ${INIT_FILE}) -eq 0 ]] ; then
-  echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ${INIT_FILE}
-else
-  echo "JAVA_HOME already exported in ${INIT_FILE}"
-fi
-
-if [[ $(grep PATH ${INIT_FILE} | grep -c JAVA_HOME) -eq 0 ]] ; then
-  echo "PATH=\$JAVA_HOME:\$PATH" >> ${INIT_FILE}
-else 
-  echo "PATH already contains JAVA_HOME in ${INIT_FILE}"
-fi
-
-source ${INIT_FILE}
-
-if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
-  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
-else
-  echo "Verified java command can be called"  
-fi
-if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
-  exit_with_message "Docker failed to install, or shell needs to be restarted. Please restart shell and run this script again."
-else
-  echo "Verified docker command can be called"  
-fi
-
-# This is not called by default as not everyone needs it. Uncomment and rerun to install it.
-# install_android 
-
-echo "Installed Node version: $(node -v)"
-echo "Installed NPM version: $(npm -v)"
-echo "Installed Java version: $(java -version 2>&1 | head -1)"
-echo "Installed Docker version: $(docker -v)"
-
-echo "Running post-installation actions ..."
-
-
+# install_nvm_and_node
+# install_brew_and_cask
+# install_cask_packages
+# install_brew_packages
+post_install
 
 if [[ -n ${FAILED_PACKAGES} ]] ; then
   echo "The following packages failed to install: ${FAILED_PACKAGES}"
   echo "Try to install manually or rerun the script."
 fi
 
-
-
+echo
+echo
 echo "The script can now run build. If you choose to run it, it will run and then exit. Otherwise it will exit now."
 echo "If you wish to run build later, rerun the script and answer 'y'."
 echo
