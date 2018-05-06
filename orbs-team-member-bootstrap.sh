@@ -2,13 +2,14 @@
 
 # Prepare a fresh MacOS for Orbs Platform development.
 # Some of the packages can be substituted for others and some are purely for convenience.
+# It is required that zsh be the default shell - the script will prompt you if this is not the case, and explain what to do.
 
 NODE_VER="v9.11.1"
 NVM_INSTALL_URL="https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh"
 BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/install"
 OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
-CASK_PACKAGES="google-chrome visual-studio-code iterm2 slack java8 docker sourcetree spectacle"
+CASK_PACKAGES="java8 google-chrome visual-studio-code iterm2 slack docker sourcetree"
 PACKAGES="typescript yarn"
 
 FAILED_PACKAGES=""
@@ -48,6 +49,7 @@ install_brew_and_cask()
 
   echo "Installing cask..."
   brew tap caskroom/cask
+  brew tap caskroom/versions
   [ $? -ne 0 ] && exit_with_message "Failed to install cask, cannot continue"
 }
 
@@ -129,8 +131,6 @@ fi
 
 echo "Detected zsh as the default shell."
 
-exit 0
-
 echo "Installing Oh My Zsh (alternative shell) ..."
 sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
 
@@ -169,7 +169,7 @@ echo
 read -r -p "Would you like to run build now? [y/N] " response
 if [ "${response-}" == "Y" ] || [ "${response-}" == "y" ] ; then
   echo "Will run build"
-  # run_build
+  run_build
   echo
   echo "Orbs MVP Build complete."
   echo
