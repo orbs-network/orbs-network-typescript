@@ -7,7 +7,7 @@
 NODE_VER="v9.11.1"
 NVM_INSTALL_URL="https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh"
 BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/install"
-OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
+# OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
 CASK_PACKAGES="java8 google-chrome visual-studio-code iterm2 slack docker sourcetree"
 PACKAGES="typescript yarn docker-completion docker-compose-completion docker-machine-completion"
@@ -18,6 +18,22 @@ exit_with_message()
 {  
   echo "Failed: ${1-}";
   exit 1;
+}
+
+install_oh_my_zsh() {
+  if [[ $(echo $SHELL | grep -c zsh) -eq 0 ]] ; then
+    echo "zsh must be the default shell. Please run 'chsh -s /bin/zsh', close and reopen the terminal and rerun the script."
+    exit 1
+  fi
+
+  echo "Detected zsh as the default shell."
+
+  echo "Installing Oh My Zsh ..."
+  sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
+
+  if [[ $? -eq 0 ]] ; then
+    exit_with_message "Oh My Zsh failed to install. Please restart shell and run this script again."
+  fi
 }
 
 install_nvm_and_node()
@@ -127,20 +143,9 @@ echo "If you need to change that, quit now (^C) and change NODE_VER variable at 
 echo
 read -rsn1 -p"Press any key to begin";echo
 
+# This is causing trouble and not critical as the moment so not installing it
+#install_oh_my_zsh
 
-if [[ $(echo $SHELL | grep -c zsh) -eq 0 ]] ; then
-  echo "zsh must be the default shell. Please run 'chsh -s /bin/zsh', close and reopen the terminal and rerun the script."
-  exit 1
-fi
-
-echo "Detected zsh as the default shell."
-
-echo "Installing Oh My Zsh ..."
-sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
-
-if [[ $? -eq 0 ]] ; then
-  exit_with_message "Oh My Zsh failed to install. Please restart shell and run this script again."
-fi
 
 install_nvm_and_node
 install_brew_and_cask
