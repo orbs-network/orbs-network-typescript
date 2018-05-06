@@ -8,8 +8,8 @@ args
 const flags = args.parse(process.argv);
 
 if (flags.port && flags.stubs) {
-  console.log(`Starting mock http server on port ${flags.port}`);
-  createMockServer(JSON.parse(flags.stubs)).listen(flags.port, () => process.send("started"));
+
+  createMockServer(JSON.parse(flags.stubs)).listen(flags.port, () => console.log(`started on port ${flags.port}`));
 } else {
   console.log(args.showHelp());
 }
