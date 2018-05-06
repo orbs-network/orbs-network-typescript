@@ -176,7 +176,7 @@ napi_value ED25519Key::Sign(napi_env env, napi_callback_info info) {
     assert(status == napi_ok);
 
     if (!isValue1Buffer) {
-        napi_throw_type_error(env, nullptr, "Wrong arguments!");
+        napi_throw_type_error(env, nullptr, "Invalid argument type. Should be a Buffer!");
 
         return nullptr;
     }
@@ -224,7 +224,7 @@ napi_value ED25519Key::Verify(napi_env env, napi_callback_info info) {
     assert(status == napi_ok);
 
      if (!isValue1Buffer || !isValue2Buffer) {
-        napi_throw_type_error(env, nullptr, "Wrong arguments!");
+        napi_throw_type_error(env, nullptr, "Invalid argument type. Should be a Buffer!");
 
         return nullptr;
     }
