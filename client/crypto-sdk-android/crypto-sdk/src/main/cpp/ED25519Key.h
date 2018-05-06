@@ -49,6 +49,14 @@ JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_ED25519Key_getPublicKey
 
 /*
  * Class:     com_orbs_cryptosdk_ED25519Key
+ * Method:    getPublicKey
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_ED25519Key_getPrivateKeyUnsafe
+    (JNIEnv *, jobject);
+
+/*
+ * Class:     com_orbs_cryptosdk_ED25519Key
  * Method:    hasPrivateKey
  * Signature: ()Z
  */

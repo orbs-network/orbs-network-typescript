@@ -26,6 +26,7 @@ public class ED25519Key {
     protected native void finalize();
 
     public native String getPublicKey();
+    public native String getPrivateKeyUnsafe();
     public native boolean hasPrivateKey();
 
     public native byte[] sign(byte[] message);
