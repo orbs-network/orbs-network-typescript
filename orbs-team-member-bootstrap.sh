@@ -30,7 +30,7 @@ install_nvm_and_node()
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-  [ "$(command -v nvm)" != "nvm" ] && exit_with_message "NVM failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+  [ "$(command -v nvm)" != "nvm" ] && exit_with_message "NVM failed to install, or shell needs to be restarted. Please restart shell and run this script again."
 
   echo "nvm installed successfully, installing Node version ${NODE_VER} ..."
 
@@ -40,7 +40,7 @@ install_nvm_and_node()
 install_brew_and_cask()
 {
   if [[ ! -f /usr/local/bin/brew ]] ; then
-    echo "Installing brew..."
+    echo "Installing brew ..."
     /usr/bin/ruby -e "$(curl -fsSL ${BREW_INSTALL_URL})"
     if [[ $? -ne 0 ]] ; then
       exit_with_message "Failed to install brew, cannot continue"
@@ -49,7 +49,7 @@ install_brew_and_cask()
     echo "Brew already installed, skipping"
   fi
 
-  echo "Installing cask..."
+  echo "Installing cask ..."
   brew tap caskroom/cask
   brew tap caskroom/versions
   if [[ $? -ne 0 ]] ; then
@@ -59,7 +59,7 @@ install_brew_and_cask()
 
 install_cask_packages()
 {
-  echo "Installing cask packages..."
+  echo "Installing cask packages ..."
   for cask_package in ${CASK_PACKAGES} ; do
     brew cask install ${cask_package}
     if [[ $? -ne 0 ]] ; then
@@ -71,7 +71,7 @@ install_cask_packages()
 
 install_brew_packages()
 {
-  echo "Installing brew packages..."
+  echo "Installing brew packages ..."
   for package in ${PACKAGES} ; do
     brew install ${package}
     if [[ $? -ne 0 ]] ; then
@@ -139,6 +139,8 @@ echo "Installing Oh My Zsh ..."
 sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
 
 if [[ $? -eq 0 ]] ; then
+  exit_with_message "Oh My Zsh failed to install. Please restart shell and run this script again."
+fi
 
 install_nvm_and_node
 install_brew_and_cask
@@ -146,10 +148,10 @@ install_cask_packages
 install_brew_packages
 
 if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
-  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
 fi
 if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
-  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
 fi
 
 # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
@@ -160,7 +162,7 @@ echo "Installed NPM version: $(npm -v)"
 echo "Installed Java version: $(java -version 2>&1 | head -1)"
 echo "Installed Docker version: $(docker -v)"
 
-echo "Running post-installation actions..."
+echo "Running post-installation actions ..."
 
 if [[ $(grep -c JAVA_HOME ~/.zshrc) -eq 0 ]] ; then
   echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ~/.zshrc
