@@ -5,9 +5,10 @@ import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
 import httpServer from "../src/server";
-import mockHttpServer, { RequestStub } from "./mock-server";
+import mockHttpServer, { runMockServer, RequestStub } from "./mock-server";
 import { Server } from "http";
 import "mocha";
+import { ChildProcess } from "child_process";
 
 chai.use(sinonChai);
 
@@ -178,7 +179,7 @@ describe("Public API Service - Component Test", async function () {
   });
 
   describe("Fake HTTP API", () => {
-    let httpService: Server;
+    let httpService: ChildProcess;
 
     beforeEach(async () => {
       const httpPort = await getPort();
@@ -190,13 +191,16 @@ describe("Public API Service - Component Test", async function () {
         { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true }})}
       ];
 
-      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData, getTransactionStatusData, stubs).listen(httpPort);
+      httpService = await runMockServer(httpPort, stubs);
+      httpService.stdout.pipe(process.stdout);
+      httpService.stderr.pipe(process.stderr);
+
     });
 
     runTests();
 
     afterEach(async () => {
-      httpService.close();
+      httpService.kill();
     });
   });
 
