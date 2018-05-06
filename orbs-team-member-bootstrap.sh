@@ -3,15 +3,7 @@
 # Prepare a fresh MacOS for Orbs Platform development.
 # Some of the packages can be substituted for others and some are purely for convenience.
 
-# mkdir -p ${DEV_HOME}
-# cd ${DEV_HOME}
-# git clone ${ORBS_NETWORK_REPO}
-# cd ${ORBS_NETWORK_HOME} || { echo "Failed to create ${DEV_HOME} or failed to clone ${ORBS_NETWORK_REPO}. Cannot continue."; exit 1;}
-
-
-DEV_HOME=${HOME}/dev/orbs
 NODE_VER="v9.11.1"
-
 NVM_INSTALL_URL="https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh"
 BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/install"
 OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
@@ -20,9 +12,6 @@ CASK_PACKAGES="google-chrome visual-studio-code iterm2 slack java8 docker source
 PACKAGES="typescript yarn"
 
 FAILED_PACKAGES=""
-ORBS_NETWORK_REPO="https://github.com/orbs-network/orbs-network.git"
-ORBS_NETWORK_HOME=${DEV_HOME}/orbs-network
-
 
 exit_with_message() 
 {  
@@ -143,6 +132,11 @@ install_cask_packages
 # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
 # install_android 
 
+echo "Installed Node version: $(node -v)"
+echo "Installed NPM version: $(npm -v)"
+
+
+
 echo "Running post-installation actions..."
 
 if [ $(grep -c JAVA_HOME ~/.zshrc) -eq 0 ] ; then
@@ -151,8 +145,6 @@ fi
 
 # source ~/.zshrc
 
-echo "Installed Node version: $(node -v)"
-echo "Installed NPM version: $(npm -v)"
 
 if [ -n ${FAILED_PACKAGES} ] ; then
   echo "The following packages failed to install: ${FAILED_PACKAGES}"
