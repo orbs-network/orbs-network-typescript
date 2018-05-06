@@ -402,8 +402,8 @@ const vector<uint8_t> ED25519Key::Sign(const vector<uint8_t> &message) const {
 
     gcry_sexp_t msg = nullptr;
     gcry_sexp_t sig = nullptr;
-    gcry_sexp_t tmp = nullptr;
-    gcry_sexp_t tmp2 = nullptr;
+    gcry_sexp_t curr = nullptr;
+    gcry_sexp_t prev = nullptr;
 
     vector<uint8_t> res;
 
@@ -421,60 +421,60 @@ const vector<uint8_t> ED25519Key::Sign(const vector<uint8_t> &message) const {
         }
 
         // Retrieve the R and the S from the sexp.
-        tmp = gcry_sexp_find_token(sig, SIG_VAL_TOKEN.c_str(), 0);
-        if (!tmp) {
+        curr = gcry_sexp_find_token(sig, SIG_VAL_TOKEN.c_str(), 0);
+        if (!curr) {
             throw runtime_error("gcry_sexp_find_token failed to find \"" + SIG_VAL_TOKEN + "\"!");
         }
 
-        tmp2 = tmp;
-        tmp = gcry_sexp_find_token(tmp2, EDDSA_TOKEN.c_str(), 0);
-        if (!tmp) {
+        prev = curr;
+        curr = gcry_sexp_find_token(prev, EDDSA_TOKEN.c_str(), 0);
+        if (!curr) {
             throw runtime_error("gcry_sexp_find_token failed to find \"" + EDDSA_TOKEN + "\"!");
         }
 
-        gcry_sexp_release(tmp2);
-        tmp2 = tmp;
-        tmp = gcry_sexp_find_token(tmp2, R_TOKEN.c_str(), 0);
-        if (!tmp) {
+        gcry_sexp_release(prev);
+        prev = curr;
+        curr = gcry_sexp_find_token(prev, R_TOKEN.c_str(), 0);
+        if (!curr) {
             throw runtime_error("gcry_sexp_find_token failed to find \"" + R_TOKEN + "\"!");
         }
 
         size_t rLengh = 0;
-        char *r = reinterpret_cast<char *>(gcry_sexp_nth_buffer(tmp, 1, &rLengh));
+        char *r = reinterpret_cast<char *>(gcry_sexp_nth_buffer(curr, 1, &rLengh));
         if (rLengh != R_SIZE) {
             throw runtime_error("Invalid R length: " + Utils::ToString(rLengh));
         }
 
-        gcry_sexp_release(tmp);
-        tmp = gcry_sexp_find_token(tmp2, S_TOKEN.c_str(), 0);
-        if (!tmp) {
+        gcry_sexp_release(curr);
+        curr = gcry_sexp_find_token(prev, S_TOKEN.c_str(), 0);
+        if (!curr) {
             throw runtime_error("gcry_sexp_find_token failed to find \"" + S_TOKEN + "\"!");
         }
 
         size_t sLengh = 0;
-        char *s = reinterpret_cast<char *>(gcry_sexp_nth_buffer(tmp, 1, &sLengh));
+        char *s = reinterpret_cast<char *>(gcry_sexp_nth_buffer(curr, 1, &sLengh));
         if (sLengh != S_SIZE) {
             throw runtime_error("Invalid S length: " + Utils::ToString(sLengh));
         }
 
-        gcry_sexp_release(tmp);
-        gcry_sexp_release(tmp2);
-        tmp = nullptr;
-        tmp2 = nullptr;
+        gcry_sexp_release(curr);
+        gcry_sexp_release(prev);
+        curr = nullptr;
+        prev = nullptr;
 
         res.insert(res.end(), r, r + rLengh);
         res.insert(res.end(), s, s + sLengh);
     } catch (...) {
-        gcry_sexp_release(tmp2);
-        gcry_sexp_release(tmp);
+        gcry_sexp_release(curr);
+        gcry_sexp_release(prev);
         gcry_sexp_release(sig);
         gcry_sexp_release(msg);
 
         throw;
     }
 
-    gcry_sexp_release(tmp2);
-    gcry_sexp_release(tmp);
+    gcry_sexp_release(curr);
+    gcry_sexp_release(prev);
     gcry_sexp_release(sig);
     gcry_sexp_release(msg);
 
