@@ -5,8 +5,9 @@ import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
 import httpServer from "../src/server";
-import mockHttpServer from "./mock-server";
+import mockHttpServer, { RequestStub } from "./mock-server";
 import { Server } from "http";
+import "mocha";
 
 chai.use(sinonChai);
 
@@ -129,10 +130,10 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
 
 
 describe("Public API Service - Component Test", async function () {
-  let httpService: PublicApiHTTPService;
   let httpEndpoint: string;
 
   let grpcService: GRPCServerBuilder;
+  let httpService: PublicApiHTTPService;
 
   describe("Real HTTP API", () => {
     beforeEach(async () => {
@@ -183,7 +184,13 @@ describe("Public API Service - Component Test", async function () {
       const httpPort = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
-      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData, getTransactionStatusData).listen(httpPort);
+      const stubs: RequestStub[] = [
+        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({result: "ok"})},
+        { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer"})},
+        { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true }})}
+      ];
+
+      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData, getTransactionStatusData, stubs).listen(httpPort);
     });
 
     runTests();

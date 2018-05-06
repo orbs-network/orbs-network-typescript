@@ -66,6 +66,10 @@
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.2.tgz#f1af664769cfb50af805431c407425ed619daa21"
 
+"@types/deep-equal@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/deep-equal/-/deep-equal-1.0.1.tgz#71cfabb247c22bcc16d536111f50c0ed12476b03"
+
 "@types/events@*":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
@@ -585,6 +589,12 @@ cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
+cli-color@~0.1.6:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/cli-color/-/cli-color-0.1.7.tgz#adc3200fa471cc211b0da7f566b71e98b9d67347"
+  dependencies:
+    es5-ext "0.8.x"
+
 cliui@^3.0.3, cliui@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-3.2.0.tgz#120601537a916d29940f934da3b48d585a39213d"
@@ -837,6 +847,10 @@ deep-eql@^3.0.0:
   dependencies:
     type-detect "^4.0.0"
 
+deep-equal@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
+
 deep-extend@~0.4.0:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.4.2.tgz#48b699c27e334bf89f10892be432f6e4c7d34a7f"
@@ -890,6 +904,12 @@ diffie-hellman@^5.0.0:
     miller-rabin "^4.0.0"
     randombytes "^2.0.0"
 
+difflib@~0.2.1:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/difflib/-/difflib-0.2.4.tgz#b5e30361a6db023176d562892db85940a718f47e"
+  dependencies:
+    heap ">= 0.2.0"
+
 dom-walk@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dom-walk/-/dom-walk-0.1.1.tgz#672226dc74c8f799ad35307df936aba11acd6018"
@@ -897,6 +917,12 @@ dom-walk@^0.1.0:
 double-ended-queue@^2.1.0-0:
   version "2.1.0-0"
   resolved "https://registry.yarnpkg.com/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz#103d3527fd31528f40188130c841efdd78264e5c"
+
+dreamopt@~0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/dreamopt/-/dreamopt-0.6.0.tgz#d813ccdac8d39d8ad526775514a13dda664d6b4b"
+  dependencies:
+    wordwrap ">=0.0.2"
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -956,6 +982,10 @@ error@^7.0.1:
   dependencies:
     string-template "~0.2.1"
     xtend "~4.0.0"
+
+es5-ext@0.8.x:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/es5-ext/-/es5-ext-0.8.2.tgz#aba8d9e1943a895ac96837a62a39b3f55ecd94ab"
 
 escape-html@~1.0.3:
   version "1.0.3"
@@ -1251,9 +1281,9 @@ fstream@^1.0.0, fstream@^1.0.10, fstream@^1.0.2, fstream@^1.0.8:
     mkdirp ">=0.5 0"
     rimraf "2"
 
-"gaggle@git+https://github.com/lbeder/gaggle.git":
+"gaggle@git+https://github.com/orbs-network/gaggle.git":
   version "2.2.0"
-  resolved "git+https://github.com/lbeder/gaggle.git#bb2ec65cc4dff833763c98b43601ec1f939dd464"
+  resolved "git+https://github.com/orbs-network/gaggle.git#928f56a95fc31dd08990e9fc90ca46f346a0c163"
   dependencies:
     bluebird "^3.5.1"
     joi "^13.1.1"
@@ -1481,6 +1511,10 @@ he@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
 
+"heap@>= 0.2.0":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/heap/-/heap-0.2.6.tgz#087e1f10b046932fc8594dd9e6d378afc9d1e5ac"
+
 hmac-drbg@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/hmac-drbg/-/hmac-drbg-1.0.1.tgz#d2745701025a6c775a6c545793ed502fc0c649a1"
@@ -1678,6 +1712,14 @@ js-yaml@^3.6.1, js-yaml@^3.7.0:
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
+
+json-diff@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/json-diff/-/json-diff-0.5.2.tgz#e0bc9e434cd2c4c6354487835e01bf3fed335cda"
+  dependencies:
+    cli-color "~0.1.6"
+    difflib "~0.2.1"
+    dreamopt "~0.6.0"
 
 json-schema-traverse@^0.3.0:
   version "0.3.1"
@@ -2172,7 +2214,7 @@ optjs@~3.2.2:
     bind-decorator "^1.0.11"
     bluebird "^3.5.1"
     bs58 "^4.0.1"
-    gaggle "git+https://github.com/lbeder/gaggle.git"
+    gaggle "git+https://github.com/orbs-network/gaggle.git"
     grpc "^1.9.0"
     grpc-caller "https://github.com/electricmonk/grpc-caller"
     json-stable-stringify "^1.0.1"
@@ -2181,7 +2223,7 @@ optjs@~3.2.2:
     lodash "^4.17.4"
     mali "^0.7.1"
     mkdirp "^0.5.1"
-    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
+    orbs-interfaces "file:../../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"
@@ -3557,6 +3599,10 @@ winston@^2.4.0:
 with-callback@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/with-callback/-/with-callback-1.0.2.tgz#a09629b9a920028d721404fb435bdcff5c91bc21"
+
+wordwrap@>=0.0.2:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
 
 wrap-ansi@^2.0.0:
   version "2.1.0"
