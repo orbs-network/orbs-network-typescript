@@ -10,7 +10,7 @@ BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/inst
 OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
 CASK_PACKAGES="java8 google-chrome visual-studio-code iterm2 slack docker sourcetree"
-PACKAGES="typescript yarn"
+PACKAGES="typescript yarn docker-completion docker-compose-completion docker-machine-completion"
 
 FAILED_PACKAGES=""
 
@@ -131,25 +131,28 @@ fi
 
 echo "Detected zsh as the default shell."
 
-echo "Installing Oh My Zsh (alternative shell) ..."
+echo "Installing Oh My Zsh ..."
 sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
 
 install_nvm_and_node
 install_brew_and_cask
-install_brew_packages
 install_cask_packages
+install_brew_packages
+
+if [[ $(command -v java | grep -c java) -eq 0 ]] ; then && exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then && exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
 
 # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
 # install_android 
 
 echo "Installed Node version: $(node -v)"
 echo "Installed NPM version: $(npm -v)"
-
-
+echo "Installed Java version: $(java -version 2>&1 | head -1)"
+echo "Installed Docker version: $(docker -v)"
 
 echo "Running post-installation actions..."
 
-if [ $(grep -c JAVA_HOME ~/.zshrc) -eq 0 ] ; then
+if [[ $(grep -c JAVA_HOME ~/.zshrc) -eq 0 ]] ; then
   echo 'export JAVA_HOME=$(/usr/libexec/java_home)' >> ~/.zshrc
 fi
 
