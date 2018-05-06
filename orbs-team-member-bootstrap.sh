@@ -199,10 +199,10 @@ echo
 
 touch ${INIT_FILE}
 
-# install_nvm_and_node
-# install_brew_and_cask
-# install_cask_packages
-# install_brew_packages
+install_nvm_and_node
+install_brew_and_cask
+install_cask_packages
+install_brew_packages
 post_install
 
 if [[ -n ${FAILED_PACKAGES} ]] ; then
