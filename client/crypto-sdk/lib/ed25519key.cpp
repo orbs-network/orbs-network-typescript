@@ -70,6 +70,8 @@ static const string ED25519_VERIFY_DATA(
 
 static const string PRIVATE_KEY_TOKEN("private-key");
 static const string PUBLIC_KEY_TOKEN("public-key");
+static const string Q_TOKEN("q");
+static const string D_TOKEN("d");
 static const string SIG_VAL_TOKEN("sig-val");
 static const string EDDSA_TOKEN("eddsa");
 static const string R_TOKEN("r");
@@ -311,9 +313,9 @@ const vector<uint8_t> ED25519Key::GetPublicKey() const {
         }
 
         // Extract the Q ECC param. In ECC, the q-point represents the public key Q = dG.
-        qPoint = gcry_sexp_find_token(key, "q", 0);
+        qPoint = gcry_sexp_find_token(key, Q_TOKEN.c_str(), 0);
         if (!qPoint) {
-            throw runtime_error("gcry_sexp_find_token failed to find \"q\"!");
+            throw runtime_error("gcry_sexp_find_token failed to find \"" + Q_TOKEN + "\"!");
         }
 
         size_t length;
@@ -332,6 +334,51 @@ const vector<uint8_t> ED25519Key::GetPublicKey() const {
     }
 
     gcry_sexp_release(qPoint);
+    gcry_sexp_release(key);
+
+    return res;
+}
+
+// Exports the private key as plaintext (unsafe!).
+const vector<uint8_t> ED25519Key::GetPrivateKeyUnsafe() const {
+    if (!privateKey_) {
+        throw logic_error("Private key is missing!");
+    }
+
+    vector<uint8_t> res;
+    gcry_sexp_t key = nullptr;
+    gcry_sexp_t dPoint = nullptr;
+
+    try {
+        gcry_sexp_t gkey = *static_cast<gcry_sexp_t *>(key_);
+        const string token(PRIVATE_KEY_TOKEN);
+        key = gcry_sexp_find_token(gkey, token.c_str(), 0);
+        if (!key) {
+            throw runtime_error("gcry_sexp_find_token failed to find \"" + token + "\"!");
+        }
+
+        // Extract the D ECC param. In ECC, the d-point represents the private key of Q = dG.
+        dPoint = gcry_sexp_find_token(key, D_TOKEN.c_str(), 0);
+        if (!dPoint) {
+            throw runtime_error("gcry_sexp_find_token failed to find \"" + D_TOKEN + "\"!");
+        }
+
+        size_t length;
+        char *value = reinterpret_cast<char *>(gcry_sexp_nth_buffer(dPoint, 1, &length));
+        if (!value) {
+            throw runtime_error("gcry_sexp_nth_buffer failed!");
+        }
+
+        res = vector<uint8_t>(value, value + length);
+        gcry_free(value);
+    } catch (...) {
+        gcry_sexp_release(dPoint);
+        gcry_sexp_release(key);
+
+        throw;
+    }
+
+    gcry_sexp_release(dPoint);
     gcry_sexp_release(key);
 
     return res;
