@@ -35,6 +35,7 @@ napi_value ED25519Key::Init(napi_env env, napi_value exports) {
     napi_property_descriptor properties[] = {
         { "publicKey", 0, 0, GetPublicKey, nullptr, 0, napi_default, 0 },
         { "hasPrivateKey", 0, 0, HasPrivateKey, nullptr, 0, napi_default, 0 },
+        DECLARE_NAPI_METHOD("getPrivateKeyUnsafe", GetPrivateKeyUnsafe),
         DECLARE_NAPI_METHOD("sign", Sign),
         DECLARE_NAPI_METHOD("verify", Verify),
     };
@@ -131,6 +132,25 @@ napi_value ED25519Key::GetPublicKey(napi_env env, napi_callback_info info) {
     assert(status == napi_ok);
 
     const string str(Orbs::Utils::Vec2Hex(obj->key_.GetPublicKey()));
+    napi_value res;
+    status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
+
+    return res;
+}
+
+napi_value ED25519Key::GetPrivateKeyUnsafe(napi_env env, napi_callback_info info) {
+    napi_status status;
+
+    napi_value jsthis;
+    status = napi_get_cb_info(env, info, nullptr, nullptr, &jsthis, nullptr);
+    assert(status == napi_ok);
+
+    ED25519Key *obj;
+    status = napi_unwrap(env, jsthis, reinterpret_cast<void **>(&obj));
+    assert(status == napi_ok);
+
+    const string str(Orbs::Utils::Vec2Hex(obj->key_.GetPrivateKeyUnsafe()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
     assert(status == napi_ok);
