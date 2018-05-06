@@ -93,6 +93,16 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 * ED25519 key pair support
 
+#### Digital Signature Schemes
+
+* EdDSA signature support. As a convention, the signature is encoded as:
+
+| bytes  |       |
+| :----: | :---: |
+| 0 - 32 | R     |
+| 0 - 64 | S     |
+
+
 ### External Dependencies
 
 * Google Test (`gtest`): Google Test is a unit testing library for the C++ programming language, based on the xUnit architecture.

@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "../lib/base58.h"
+#include "../lib/utils.h"
 
 using namespace std;
 using namespace testing;
@@ -43,25 +44,23 @@ TEST(Base58, decodes_base58_encoded_string_to_bytes) {
     EXPECT_THAT(res, IsEmpty());
 
     res = Base58::Decode("2NEpo7TZRRrLZSi2U");
-    EXPECT_THAT(res, ElementsAreArray("\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64\x21", 12));
+    EXPECT_THAT(res, ElementsAreArray(Utils::Hex2Vec("48656c6c6f20576f726c6421")));
 
     res = Base58::Decode("2vbj8nkKYpsGbfshRaXgGKCBo6qRf139grYSvdqv17RxMu2yHB8o1SUcpqV1fU6orCLcwVbQZY5o95u2mqf4M3tWL1TQhCQsRG5i1ydr5ot7CRJdM7Us49yJhHci1opQjmLuT");
-    EXPECT_THAT(res, ElementsAreArray("\x49\x66\x20\x79\x6f\x75\x20\x64\x6f\x6e\x27\x74\x20\x62\x65\x6c\x69\x65\x76\x65\x20\x69\x74\x20\x6f\x72\x20\x64\x6f\x6e\x27\x74\x20\x67\x65"
-        "\x74\x20\x69\x74\x20\x49\x20\x64\x6f\x6e\x27\x74\x20\x68\x61\x76\x65\x20\x74\x68\x65\x20\x74\x69\x6d\x65\x20\x74\x6f\x20\x74\x72\x79\x20\x74\x6f\x20\x63\x6f\x6e\x76\x69"
-        "\x6e\x63\x65\x20\x79\x6f\x75\x2c\x20\x49\x20\x61\x6d\x20\x73\x6f\x72\x72\x79\x2e", 97));
+    EXPECT_THAT(res, ElementsAreArray(Utils::Hex2Vec("496620796f7520646f6e27742062656c69657665206974206f7220646f6e277420676574206974204920646f6e27742068617665207468652074696d6520746f2074727920746f20636f6e76696e636520796f752c204920616d20736f7272792e")));
 
     res = Base58::Decode("11117bo9qr42A5krwASCZ1XegbfsPucae6U9E");
-    EXPECT_THAT(res, ElementsAreArray("\x00\x00\x00\x00\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64\x20\x57\x69\x74\x68\x20\x5a\x65\x72\x6f\x65\x73\x21", 28));
+    EXPECT_THAT(res, ElementsAreArray(Utils::Hex2Vec("0000000048656c6c6f20576f726c642057697468205a65726f657321")));
 }
 
 TEST(Base58, decodes_base58_encoded_string_with_leading_or_trailing_spaces_to_bytes) {
     vector<uint8_t> res;
 
     res = Base58::Decode("    2NEpo7TZRRrLZSi2U");
-    EXPECT_THAT(res, ElementsAreArray("\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64\x21", 12));
+    EXPECT_THAT(res, ElementsAreArray(Utils::Hex2Vec("48656c6c6f20576f726c6421")));
 
     res = Base58::Decode("  11117bo9qr42A5krwASCZ1XegbfsPucae6U9E             ");
-    EXPECT_THAT(res, ElementsAreArray("\x00\x00\x00\x00\x48\x65\x6c\x6c\x6f\x20\x57\x6f\x72\x6c\x64\x20\x57\x69\x74\x68\x20\x5a\x65\x72\x6f\x65\x73\x21", 28));
+    EXPECT_THAT(res, ElementsAreArray(Utils::Hex2Vec("0000000048656c6c6f20576f726c642057697468205a65726f657321")));
 }
 
 TEST(Base58, throws_on_invalid_base58_encoded_strings) {
