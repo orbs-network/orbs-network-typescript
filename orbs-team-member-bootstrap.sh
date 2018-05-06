@@ -39,10 +39,12 @@ install_nvm_and_node()
 
 install_brew_and_cask()
 {
-  if [ ! -f /usr/local/bin/brew ] ; then
+  if [[ ! -f /usr/local/bin/brew ]] ; then
     echo "Installing brew..."
     /usr/bin/ruby -e "$(curl -fsSL ${BREW_INSTALL_URL})"
-    [ $? -ne 0 ] && exit_with_message "Failed to install brew, cannot continue"
+    if [[ $? -ne 0 ]] ; then
+      exit_with_message "Failed to install brew, cannot continue"
+    fi
   else
     echo "Brew already installed, skipping"
   fi
@@ -50,7 +52,9 @@ install_brew_and_cask()
   echo "Installing cask..."
   brew tap caskroom/cask
   brew tap caskroom/versions
-  [ $? -ne 0 ] && exit_with_message "Failed to install cask, cannot continue"
+  if [[ $? -ne 0 ]] ; then
+    exit_with_message "Failed to install cask, cannot continue"
+  fi
 }
 
 install_cask_packages()
@@ -58,7 +62,7 @@ install_cask_packages()
   echo "Installing cask packages..."
   for cask_package in ${CASK_PACKAGES} ; do
     brew cask install ${cask_package}
-    if [ $? -ne 0 ] ; then
+    if [[ $? -ne 0 ]] ; then
       echo "Failed to install package ${cask_package}"
       FAILED_PACKAGES="${FAILED_PACKAGES} ${cask_package}"
     fi
@@ -70,7 +74,7 @@ install_brew_packages()
   echo "Installing brew packages..."
   for package in ${PACKAGES} ; do
     brew install ${package}
-    if [ $? -ne 0 ] ; then
+    if [[ $? -ne 0 ]] ; then
       echo "Failed to install package ${package}"
       FAILED_PACKAGES="${FAILED_PACKAGES} ${package}"
     fi
@@ -85,7 +89,7 @@ install_android()
 
   for package in ${ANDROID_PACKAGES} ; do
   echo "brew install ${package}"
-  if [ $? -ne 0 ] ; then
+  if [[ $? -ne 0 ]] ; then
     echo "Failed to install package ${package}"
     FAILED_PACKAGES="${FAILED_PACKAGES} ${package}"
   fi
@@ -134,13 +138,19 @@ echo "Detected zsh as the default shell."
 echo "Installing Oh My Zsh ..."
 sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
 
+if [[ $? -eq 0 ]] ; then
+
 install_nvm_and_node
 install_brew_and_cask
 install_cask_packages
 install_brew_packages
 
-if [[ $(command -v java | grep -c java) -eq 0 ]] ; then && exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
-if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then && exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
+  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+fi
+if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
+  exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again.."
+fi
 
 # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
 # install_android 
@@ -159,7 +169,7 @@ fi
 # source ~/.zshrc
 
 
-if [ -n ${FAILED_PACKAGES} ] ; then
+if [[ -n ${FAILED_PACKAGES} ]] ; then
   echo "The following packages failed to install: ${FAILED_PACKAGES}"
   echo "Try to install manually or rerun the script."
 fi
@@ -170,7 +180,7 @@ echo "The script can now run build. If you choose to run it, it will run and the
 ehco "If you wish to run build later, rerun the script and answer 'y'."
 echo
 read -r -p "Would you like to run build now? [y/N] " response
-if [ "${response-}" == "Y" ] || [ "${response-}" == "y" ] ; then
+if [[ "${response-}" == "Y" ]] || [[ "${response-}" == "y" ]] ; then
   echo "Will run build"
   run_build
   echo
