@@ -11,7 +11,7 @@ BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/inst
 # OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
 CASK_PACKAGES="java8 google-chrome visual-studio-code iterm2 slack docker sourcetree"
-PACKAGES="typescript yarn docker-completion docker-compose-completion docker-machine-completion"
+PACKAGES="typescript yarn bash-completion docker-completion docker-compose-completion docker-machine-completion"
 
 FAILED_PACKAGES=""
 
@@ -122,7 +122,9 @@ post_install()  {
     echo 'fi' >> ${INIT_FILE}
   else
     echo "Already added Docker command completion to ${INIT_FILE}"
-  fi  
+  fi
+
+  echo "Sourcing ${INIT_FILE}"
   source ${INIT_FILE}
 
   if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
