@@ -121,6 +121,16 @@ echo "If you need to change that, quit now (^C) and change NODE_VER variable at 
 echo
 read -rsn1 -p"Press any key to begin";echo
 
+
+if [[ $(echo $SHELL | grep -c zsh) -eq 0 ]] ; then
+  echo "zsh must be the default shell. Please run 'chsh -s /bin/zsh', close and reopen the terminal and rerun the script."
+  exit 1
+fi
+
+echo "Detected zsh as the default shell."
+
+exit 0
+
 echo "Installing Oh My Zsh (alternative shell) ..."
 sh -c "$(curl -fsSL ${OH_MY_ZSH_URL})"
 
