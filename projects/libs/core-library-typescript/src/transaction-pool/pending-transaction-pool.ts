@@ -82,14 +82,10 @@ export class PendingTransactionPool extends BaseTransactionPool {
     }
 
     if (!this.transactionValidator.validate(transaction)) {
-      throw new Error(`transaction ${JSON.stringify(transaction)} is not valid. not storing in the pool`);
+      throw new Error(`Transaction ${JSON.stringify(transaction)} is not valid. not storing in the pool`);
     }
+
     const txid = new TransactionHelper(transaction).calculateTransactionId();
-
-    if (this.pendingTransactions.has(txid)) {
-      throw new Error(`Transaction with id ${txid} already exists in the transaction pool`);
-    }
-
     this.pendingTransactions.set(txid, transaction);
 
     logger.debug(`Added a new transaction ${JSON.stringify(transaction)} to the pool`);
