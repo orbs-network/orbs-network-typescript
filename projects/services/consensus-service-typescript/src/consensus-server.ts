@@ -30,9 +30,9 @@ function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress
   return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
 }
 
-function makePendingTransactionPool(peers: types.ClientMap) {
+function makePendingTransactionPool(peers: types.ClientMap, transactionLifespanMs: number) {
   const transactionValidator = new TransactionValidator(peers.subscriptionManager);
-  return new PendingTransactionPool(peers.gossip, transactionValidator);
+  return new PendingTransactionPool(peers.gossip, transactionValidator, { transactionLifespanMs });
 }
 
 function makeCommittedTransactionPool() {
@@ -41,7 +41,7 @@ function makeCommittedTransactionPool() {
 
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSATION_EXPIRATION_TIMEOUT } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -55,6 +55,8 @@ export default function(nodeTopology: any, env: any) {
     throw new Error("Must provide ETHEREUM_CONTRACT_ADDRESS");
   }
 
+  const transactionLifespanMs = Number(TRANSATION_EXPIRATION_TIMEOUT) || 30000;
+
   const consensusConfig = new DefaultConsensusConfig(Number(MIN_ELECTION_TIMEOUT), Number(MAX_ELECTION_TIMEOUT), Number(HEARBEAT_INTERVAL));
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
@@ -66,5 +68,5 @@ export default function(nodeTopology: any, env: any) {
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers, consensusConfig), nodeConfig))
     .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers, ETHEREUM_CONTRACT_ADDRESS), nodeConfig))
-    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers), makeCommittedTransactionPool(), nodeConfig));
+    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers, transactionLifespanMs), makeCommittedTransactionPool(), nodeConfig));
 }

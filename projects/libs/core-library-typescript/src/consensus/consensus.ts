@@ -36,6 +36,14 @@ export class Consensus {
     this.pollInterval = setInterval(async () => {
       const status = this.raftConsensus.isLeader() ? "the leader" : "not the leader";
       logger.debug(`Node is ${status}`);
+      logger.debug(`Node state: `, {
+        state: this.raftConsensus.getState(),
+        leader: this.raftConsensus.getLeader(),
+        term: this.raftConsensus.getTerm(),
+        clusterSize: this.raftConsensus.getClusterSize(),
+        votes: this.raftConsensus.getVotes(),
+        timeout: this.raftConsensus.getElectionTimeout()
+      });
     }, this.pollIntervalMs);
   }
 

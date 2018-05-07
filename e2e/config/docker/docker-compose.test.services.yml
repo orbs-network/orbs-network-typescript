@@ -12,9 +12,10 @@ services:
       - NUM_OF_NODES=${NUM_OF_NODES}
       - ETHEREUM_CONTRACT_ADDRESS=${SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS}
       - BLOCK_BUILDER_POLL_INTERVAL=500
-      # - MIN_ELECTION_TIMEOUT=30000
-      # - MAX_ELECTION_TIMEOUT=35000
-      # - HEARBEAT_INTERVAL=100
+      - MIN_ELECTION_TIMEOUT=2000
+      - MAX_ELECTION_TIMEOUT=15000
+      - HEARBEAT_INTERVAL=100
+      - TRANSATION_EXPIRATION_TIMEOUT=120000
     ports:
       - ${DEBUG_PORT}:9229
     networks:
@@ -61,6 +62,8 @@ services:
     working_dir: /opt/orbs/projects/services/storage-service-typescript/
     command: node dist/index.js ${NODE_CONFIG_PATH}/storage.js
     restart: always
+    environment:
+      BLOCK_STORAGE_POLL_INTERVAL: 500
     volumes_from:
       - shared_volumes
     networks:

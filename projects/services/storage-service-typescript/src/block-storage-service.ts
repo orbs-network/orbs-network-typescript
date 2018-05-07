@@ -178,16 +178,6 @@ export default class BlockStorageService extends Service {
   async onSendNewBlocksResponse(fromAddress: string, payload: any) {
     logger.info(`Block storage ${this.config.nodeName} received a new block via sync`);
 
-    if (!this.isSyncing()) {
-      logger.error(`Block storage ${this.config.nodeName} dropped new block received via sync because it is not syncing right now`);
-      return;
-    }
-
-    if (!this.sync.isSyncingWith(fromAddress)) {
-      logger.info(`Block storage ${this.config.nodeName} dropped new block received via sync because it came from ${fromAddress} instead of ${this.sync.getNode()}`);
-      return;
-    }
-
     this.sync.onReceiveBlock(payload.block);
   }
 

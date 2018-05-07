@@ -188,4 +188,28 @@ export class RaftConsensus {
   public isLeader() {
     return this.node.isLeader();
   }
+
+  public getState() {
+    return this.node._state;
+  }
+
+  public getLeader() {
+    return this.node._leader;
+  }
+
+  public getTerm() {
+    return this.node._currentTerm;
+  }
+
+  public getVotes() {
+    return JSON.stringify(this.node._votes);
+  }
+
+  public getClusterSize() {
+    return this.node._clusterSize;
+  }
+
+  public getElectionTimeout() {
+    return this.node._timeout;
+  }
 }
