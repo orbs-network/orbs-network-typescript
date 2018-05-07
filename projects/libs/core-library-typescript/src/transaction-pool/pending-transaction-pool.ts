@@ -1,15 +1,19 @@
 import { logger, types, TransactionHelper, transactionHashToId } from "../common-library";
 import { CommittedTransactionPool } from "./committed-transaction-pool";
 import BaseTransactionPool, { TransactionPoolConfig } from "./base-transaction-pool";
+import { TransactionValidator } from "./transaction-validator";
 import { TransactionStatus } from "orbs-interfaces";
 
 export class PendingTransactionPool extends BaseTransactionPool {
   private pendingTransactions = new Map<string, types.Transaction>();
   private gossip: types.GossipClient;
 
-  constructor(gossip: types.GossipClient, config?: TransactionPoolConfig) {
+  private transactionValidator: TransactionValidator;
+
+  constructor(gossip: types.GossipClient, transactionValidator: TransactionValidator, config?: TransactionPoolConfig) {
     super(config);
     this.gossip = gossip;
+    this.transactionValidator = transactionValidator;
   }
 
   public async addNewPendingTransaction(transaction: types.Transaction): Promise<string> {
@@ -43,7 +47,11 @@ export class PendingTransactionPool extends BaseTransactionPool {
   }
 
   public onNewBroadcastTransaction(transaction: types.Transaction) {
-    this.storePendingTransaction(transaction);
+    try {
+      this.storePendingTransaction(transaction);
+    } catch (err) {
+      logger.info(`failed storing pending transaction: ${JSON.stringify(transaction)}`);
+    }
   }
 
   public clearExpiredTransactions(): number {
@@ -73,11 +81,11 @@ export class PendingTransactionPool extends BaseTransactionPool {
       throw new Error(`Transaction ${JSON.stringify(transaction)} has expired. not storing in the pool`);
     }
 
-    const txid = new TransactionHelper(transaction).calculateTransactionId();
-    if (this.pendingTransactions.has(txid)) {
-      throw new Error(`Transaction with id ${txid} already exists in the transaction pool`);
+    if (!this.transactionValidator.validate(transaction)) {
+      throw new Error(`Transaction ${JSON.stringify(transaction)} is not valid. not storing in the pool`);
     }
 
+    const txid = new TransactionHelper(transaction).calculateTransactionId();
     this.pendingTransactions.set(txid, transaction);
 
     logger.debug(`Added a new transaction ${JSON.stringify(transaction)} to the pool`);

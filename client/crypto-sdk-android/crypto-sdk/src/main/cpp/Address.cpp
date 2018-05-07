@@ -1,7 +1,11 @@
 #include "Address.h"
 
+#include <stdexcept>
+
 #include "../../../../../crypto-sdk/lib/address.h"
 #include "../../../../../crypto-sdk/lib/utils.h"
+
+#include "Utilities.h"
 
 using namespace std;
 using namespace Orbs;
@@ -31,12 +35,22 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_init(JNIEnv *env, jobject
     try {
         Address *self = new Address(nativePublicKey, nativeVirtualChainId, nativeNetworkId);
         setSelf(env, thisObj, self);
+    } catch (const exception &e) {
+        env->ReleaseStringUTFChars(publicKey, nativePublicKey);
+        env->ReleaseStringUTFChars(virtualChainId, nativeVirtualChainId);
+        env->ReleaseStringUTFChars(networkId, nativeNetworkId);
+
+        Utilities::ThrowException(env, e.what());
+
+        return;
     } catch (...) {
         env->ReleaseStringUTFChars(publicKey, nativePublicKey);
         env->ReleaseStringUTFChars(virtualChainId, nativeVirtualChainId);
         env->ReleaseStringUTFChars(networkId, nativeNetworkId);
 
-        throw;
+        Utilities::ThrowUnknownException(env);
+
+        return;
     }
 
     env->ReleaseStringUTFChars(publicKey, nativePublicKey);
@@ -54,13 +68,33 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_finalize(JNIEnv *env, job
 }
 
 JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_Address_getPublicKey(JNIEnv *env, jobject thisObj) {
-    Address *self = getSelf(env, thisObj);
+    try {
+        Address *self = getSelf(env, thisObj);
 
-    return env->NewStringUTF(Utils::Vec2Hex(self->GetPublicKey()).c_str());
+        return env->NewStringUTF(Utils::Vec2Hex(self->GetPublicKey()).c_str());
+    } catch (const exception &e) {
+        Utilities::ThrowException(env, e.what());
+
+        return nullptr;
+    } catch (...) {
+        Utilities::ThrowUnknownException(env);
+
+        return nullptr;
+    }
 }
 
 JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_Address_toString(JNIEnv *env, jobject thisObj) {
-    Address *self = getSelf(env, thisObj);
+    try {
+        Address *self = getSelf(env, thisObj);
 
-    return env->NewStringUTF(self->ToString().c_str());
+        return env->NewStringUTF(self->ToString().c_str());
+    } catch (const exception &e) {
+        Utilities::ThrowException(env, e.what());
+
+        return nullptr;
+    } catch (...) {
+        Utilities::ThrowUnknownException(env);
+
+        return nullptr;
+    }
 }

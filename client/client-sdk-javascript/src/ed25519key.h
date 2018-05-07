@@ -13,11 +13,16 @@ public:
 
 private:
   explicit ED25519Key(const std::string &publicKey);
+  explicit ED25519Key(const std::string &publicKey, const std::string &privateKey);
   explicit ED25519Key();
   ~ED25519Key();
 
   static napi_value New(napi_env env, napi_callback_info info);
   static napi_value GetPublicKey(napi_env env, napi_callback_info info);
+  static napi_value HasPrivateKey(napi_env env, napi_callback_info info);
+
+  static napi_value Sign(napi_env env, napi_callback_info info);
+  static napi_value Verify(napi_env env, napi_callback_info info);
 
 private:
   static napi_ref constructor;

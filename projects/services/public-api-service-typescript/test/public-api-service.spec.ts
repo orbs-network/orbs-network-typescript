@@ -1,4 +1,4 @@
-import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress } from "orbs-core-library";
+import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress, TransactionHelper } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
@@ -17,6 +17,20 @@ const contractAddressBase58 = "T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR";
 const transactionTimestamp = "12345678";
 const payload = JSON.stringify({ foo: "bar" });
 
+const transaction: types.Transaction = {
+  header: {
+    version: 0,
+    timestamp: transactionTimestamp,
+    sender: bs58DecodeRawAddress(senderAddressBase58),
+    contractAddress: bs58DecodeRawAddress(contractAddressBase58)
+  },
+  payload
+};
+
+const tx = new TransactionHelper(transaction);
+const txid = tx.calculateTransactionId();
+const txHash = tx.calculateHash();
+
 const sendTransactionRequestData = {
   header: {
     version: 0,
@@ -33,16 +47,12 @@ const callContractRequestData = {
   payload,
 };
 
+const getTransactionStatusData = {
+  txid
+};
+
 const expectedAddNewPendingTransactionInput: types.AddNewPendingTransactionInput = {
-  transaction: {
-    header: {
-      version: 0,
-      timestamp: transactionTimestamp,
-      sender: bs58DecodeRawAddress(senderAddressBase58),
-      contractAddress: bs58DecodeRawAddress(contractAddressBase58)
-    },
-    payload
-  }
+  transaction
 };
 
 const expectedVirtualMachineCallContractInput: types.CallContractInput = {
@@ -50,6 +60,8 @@ const expectedVirtualMachineCallContractInput: types.CallContractInput = {
   contractAddress: bs58DecodeRawAddress(contractAddressBase58),
   payload
 };
+
+const expectedGetTransactionStatusInput: types.GetTransactionStatusInput = { txid };
 
 class FakeVirtualMachineService extends Service implements types.VirtualMachineServer {
   async initialize(): Promise<void> {
@@ -86,8 +98,16 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
     throw new Error("Method not implemented.");
   }
 
+  @Service.RPCMethod
   getTransactionStatus(rpc: types.GetTransactionStatusContext): void {
-    throw new Error("Method not implemented.");
+    expect(rpc.req).to.be.eql(expectedGetTransactionStatusInput);
+    rpc.res = {
+      status: types.TransactionStatus.COMMITTED,
+      receipt: {
+        success: true,
+        txHash
+      }
+    };
   }
 
   gossipMessageReceived(rpc: types.GossipMessageReceivedContext): void {
@@ -159,7 +179,7 @@ describe("Public API Service - Component Test", async function () {
       const httpPort = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
-      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData).listen(httpPort);
+      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData, getTransactionStatusData).listen(httpPort);
     });
 
     runTests();
@@ -182,6 +202,13 @@ describe("Public API Service - Component Test", async function () {
         .post("/public/callContract")
         .send(callContractRequestData)
         .expect(200, { result: "some-answer" });
+    });
+
+    it("got transaction status through http propagates properly to transaction pool", () => {
+      return request(httpEndpoint)
+        .post("/public/getTransactionStatus")
+        .send(getTransactionStatusData)
+        .expect(200, { status: "COMMITTED", receipt: { success: true }});
     });
   }
 });

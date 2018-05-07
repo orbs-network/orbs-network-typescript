@@ -5,7 +5,7 @@ import * as os from "os";
 import * as getPort from "get-port";
 import { stubInterface } from "ts-sinon";
 
-import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, createContractAddress } from "orbs-core-library";
+import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
 import storageServer from "../src/server";
 import GossipService from "../../gossip-service-typescript/src/service";
@@ -85,7 +85,7 @@ describe("storage server test", function () {
     await blockClient.addBlock({ block: nextBlock });
 
     // this should take around 200 ms waiting for the polling
-    const contractAddress = createContractAddress("does-not-exist").toBuffer();
+    const contractAddress = Address.createContractAddress("does-not-exist").toBuffer();
     const state = await stateClient.readKeys({ contractAddress, keys: [] });
     return expect(state).to.have.deep.property("values", {});
   });

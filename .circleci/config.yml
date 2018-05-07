@@ -51,7 +51,8 @@ jobs:
     steps:
       - checkout
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
-      - run: ./.circleci/docker-pull.sh
+      - run: ./docker/build-sdk-base.sh
+      - run: ./docker/build-e2e.sh
       - run: ./.circleci/e2e-testnet.sh
 
 workflows:

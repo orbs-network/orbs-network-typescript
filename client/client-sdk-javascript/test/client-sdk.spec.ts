@@ -8,7 +8,7 @@ import mockHttpServer from "./mock-server";
 import { Server } from "http";
 import { stubInterface } from "ts-sinon";
 import * as crypto from "crypto";
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 import { OrbsContract, OrbsContractMethodArgs } from "../src/orbs-contract";
 import { method } from "bluebird";
 import { createJavaOrbsContract } from "./java-sdk-helper";
@@ -28,6 +28,7 @@ const API_ENDPOINT = `http://localhost:${HTTP_PORT}`;
 const TIMEOUT = 20;
 const SENDER_PUBLIC_KEY = new ED25519Key().publicKey;
 const SENDER_ADDRESS = new Address(SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+const TXID = "ada0838c9a4c86625d665cc6f2d617efa15a184e434ce1d1ee66f6e057fd0ae8";
 
 interface OrbsContractAdapter {
   sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> ;

@@ -6,7 +6,7 @@ import { stubInterface } from "ts-sinon";
 import * as sinon from "sinon";
 import BigNumber from "bignumber.js";
 
-import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, grpcServer, PendingTransactionPool, CommittedTransactionPool, TransactionHelper } from "orbs-core-library";
+import { types, ErrorHandler, GRPCServerBuilder, grpc, logger, grpcServer, PendingTransactionPool, CommittedTransactionPool, TransactionHelper, TransactionValidator } from "orbs-core-library";
 import { TransactionReceipt, Transaction, TransactionEntry, GossipListenerInput, GossipClient } from "orbs-interfaces";
 import TransactionPoolService from "../src/transaction-pool-service";
 
@@ -46,6 +46,15 @@ function createGossipMessagePayload(transaction?: Transaction): GossipListenerIn
     };
 }
 
+function createTransactionReceipt(transaction: Transaction): TransactionReceipt {
+    const helper = new TransactionHelper(transaction);
+    const txHash = helper.calculateHash();
+    const receipt: types.TransactionReceipt = {
+      txHash,
+      success: true
+    };
+    return receipt;
+}
 
 describe("transaction pool service tests", function() {
     let server: GRPCServerBuilder;
@@ -57,7 +66,9 @@ describe("transaction pool service tests", function() {
         const endpoint = `127.0.0.1:${await getPort()}`;
         const stubGossip = stubInterface<GossipClient>();
         committedTransactionPool = new CommittedTransactionPool({});
-        pendingTransactionPool = new PendingTransactionPool(stubGossip);
+        const transactionValidator = stubInterface<TransactionValidator>();
+        (<sinon.SinonStub>transactionValidator.validate).returns(true);
+        pendingTransactionPool = new PendingTransactionPool(stubGossip, transactionValidator);
 
         server = grpcServer.builder()
             .withService("TransactionPool", new TransactionPoolService(pendingTransactionPool, committedTransactionPool, { nodeName: "tester"}))
@@ -74,7 +85,7 @@ describe("transaction pool service tests", function() {
         expect(res).to.be.empty;
     });
 
-    it("service can mark commited transactions which are invlid / not in pending", async () => {
+    it("service can mark committed transactions which are invlid / not in pending", async () => {
         const transaction = createDummyTransaction();
         const helper = new TransactionHelper(transaction);
         const txid = helper.calculateTransactionId();
@@ -146,7 +157,7 @@ describe("transaction pool service tests", function() {
         expect(transaction).to.have.property("transaction").that.has.property("payload", DUMMY_TRANSACTION_PAYLOAD);
     });
 
-    it("service handles de-duplication of transactions which are already pending", async () => {
+    it("service handles de-duplication of transactions which are already pending (gossip flow)", async () => {
         const transaction = createDummyTransaction();
         const txid = (await client.addNewPendingTransaction({ transaction })).txid;
         await expect(client.gossipMessageReceived(createGossipMessagePayload(transaction))).to.eventually.be.rejectedWith(
@@ -154,18 +165,30 @@ describe("transaction pool service tests", function() {
         );
     });
 
-    it("service handles de-duplication of transactions which are already committed", async () => {
+    it("service handles de-duplication of transactions which are already pending (api flow)", async () => {
         const transaction = createDummyTransaction();
         const txid = (await client.addNewPendingTransaction({ transaction })).txid;
-        const helper = new TransactionHelper(transaction);
-        const txHash = helper.calculateHash();
-        const receipt: types.TransactionReceipt = {
-          txHash,
-          success: true
-        };
+        await expect(client.addNewPendingTransaction({ transaction })).to.eventually.be.rejectedWith(
+            `Transaction with id ${txid} already exists in the pending transaction pool`
+        );
+    });
 
+    it("service handles de-duplication of transactions which are already committed (gossip flow)", async () => {
+        const transaction = createDummyTransaction();
+        const txid = (await client.addNewPendingTransaction({ transaction })).txid;
+        const receipt = createTransactionReceipt(transaction);
         await client.markCommittedTransactions({transactionReceipts: [ receipt ]});
         await expect(client.gossipMessageReceived(createGossipMessagePayload(transaction))).to.eventually.be.rejectedWith(
+            `Transaction with id ${txid} already exists in the committed transaction pool`
+        );
+    });
+
+    it("service handles de-duplication of transactions which are committed and then readded via addNewPending (api flow)", async () => {
+        const transaction = createDummyTransaction();
+        const txid = (await client.addNewPendingTransaction({ transaction })).txid;
+        const receipt = createTransactionReceipt(transaction);
+        await client.markCommittedTransactions({transactionReceipts: [ receipt ]});
+        await expect(client.addNewPendingTransaction({ transaction })).to.eventually.be.rejectedWith(
             `Transaction with id ${txid} already exists in the committed transaction pool`
         );
     });
