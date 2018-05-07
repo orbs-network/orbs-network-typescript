@@ -2,6 +2,30 @@ import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'com.android.library'
 
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'orbs-sdk'
+
+    publishedGroupId = 'com.orbs.sdk'
+    libraryName = 'OrbsSDK'
+    artifact = 'orbs-sdk'
+
+    libraryDescription = 'Orbs Android SDK'
+
+    siteUrl = 'https://github.com/orbs-network/orbs-network'
+    gitUrl = 'https://github.com/orbs-network/orbs-network.git'
+
+    libraryVersion = '0.0.1'
+
+    developerId = 'orbs'
+    developerName = 'Orbs'
+    developerEmail = 'androidsdk@orbs.com'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/orbs-network/orbs-network/blob/master/LICENSE'
+    allLicenses = ["MIT"]
+}
+
 android {
     compileSdkVersion 27
 
@@ -9,7 +33,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 27
         versionCode 1
-        versionName '1.0'
+        versionName '0.0.1'
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -109,6 +133,8 @@ dependencies {
     implementation 'org.json:json:20180130'
     testImplementation fileTree(include: ['*.jar'], dir: 'build/outputs/jar')
     testImplementation 'junit:junit:4.12'
-    implementation files('libs/okhttp-3.10.0.jar')
-    implementation files('libs/okio-1.14.1.jar')
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 }
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
