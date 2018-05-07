@@ -160,9 +160,13 @@ const expectedCallContractRequest: OrbsAPICallContractRequest = {
   payload: expectedPayload(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
 };
 
+const expectedGetTransactionStatusRequest: OrbsAPIGetTransactionStatusRequest = {
+  txid: TXID
+};
+
 let httpServer: Server;
 before((done) => {
-  httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest).listen(HTTP_PORT, done);
+  httpServer = mockHttpServer(expectedSendTransactionRequest, expectedCallContractRequest, expectedGetTransactionStatusRequest).listen(HTTP_PORT, done);
 });
 
 describe("The Javascript SDK", () => {
