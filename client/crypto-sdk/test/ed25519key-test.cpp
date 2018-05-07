@@ -31,7 +31,7 @@ TEST(ED25519Key, generates_ed25519_key_multiple_times) {
     for (int i = 0; i < 100; ++i) {
         ED25519Key key;
         const string publicKey(Utils::Vec2Hex(key.GetPublicKey()));
-        const string privateKey(Utils::Vec2Hex(key2.GetPrivateKeyUnsafe()));
+        const string privateKey(Utils::Vec2Hex(key.GetPrivateKeyUnsafe()));
         EXPECT_EQ(publicKey.length(), ED25519Key::PUBLIC_KEY_SIZE * 2);
         EXPECT_EQ(privateKey.length(), ED25519Key::PRIVATE_KEY_SIZE * 2);
         EXPECT_TRUE(key.HasPrivateKey());
