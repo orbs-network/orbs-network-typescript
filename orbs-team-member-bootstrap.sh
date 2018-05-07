@@ -133,7 +133,9 @@ post_install()  {
     echo "Verified java command can be called"  
   fi
   if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
-    exit_with_message "Docker failed to install, or shell needs to be restarted. Please restart shell and run this script again."
+    echo "Docker command not found - please run the Docker application now, give it your password, and wait till you see the message 'Docker is up and running'. This will install the 'docker' command which is needed for the build process."
+    echo "When done, rerun this script. Don't worry, it won't do any harm to rerun."
+    exit 1
   else
     echo "Verified docker command can be called"  
   fi
