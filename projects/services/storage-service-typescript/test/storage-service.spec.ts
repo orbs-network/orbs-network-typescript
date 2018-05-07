@@ -7,6 +7,10 @@ import * as mocha from "mocha";
 import { stubInterface } from "ts-sinon";
 import * as request from "request-promise";
 
+import * as express from "express";
+import { Request, Response } from "express";
+
+
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
 import storageServer from "../src/server";
@@ -17,6 +21,7 @@ const { expect } = chai;
 
 const SERVER_IP_ADDRESS = "127.0.0.1";
 
+
 ErrorHandler.setup();
 
 logger.configure({ level: "debug" });
@@ -25,6 +30,7 @@ describe("storage server test", function () {
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
+  let managementPort: number;
 
   beforeEach(async () => {
     const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
@@ -59,9 +65,11 @@ describe("storage server test", function () {
     // handle the filesystem for this test, will empty/create the db folder before starting the services
     fse.emptyDirSync(BLOCK_STORAGE_DB_PATH);
 
+    managementPort = await getPort();
     server = storageServer(topology, storageEnv)
       .withService("Gossip", gossipServerStub)
       .withService("TransactionPool", transactionPoolStub)
+      .withManagementPort(managementPort)
       .onEndpoint(endpoint);
 
     blockClient = grpc.blockStorageClient({ endpoint });
@@ -96,27 +104,32 @@ describe("storage server test", function () {
   });
 
   it("should return HTTP 200 when calling GET /test/started on a running storage service", async () => {
-    //const testPort = server.getTestPort();
-    const testPort = 8888;
-    const testEndpoint = `http://${SERVER_IP_ADDRESS}:${testPort}`;
+
+
+    const managementEndpoint = `http://${SERVER_IP_ADDRESS}:${managementPort}`;
+    // const app = express();
+    // app.get("/test/started", (req: Request, res: Response) => {
+    //   return res.send(200).json({status: "ok"});
+    // });
+    // const expressServer = await app.listen(8888);
 
     const options = {
-      method: "GET",
-      uri: `${testEndpoint}/test/started`,
+      uri: `${managementEndpoint}/test/started`,
       resolveWithFullResponse: true,
       json: true
     };
 
     const response: Response = await request.get(options);
 
-    logger.info("Response from /test/started route: ", response);
+    // await new Promise(resolve => {
+    //   expressServer.close(resolve);
+    // });
 
-    return expect(response.status).to.equal(200);
-
-
+    return expect(response.statusCode).to.equal(200);
   });
 
   afterEach(() => {
     return server.stop();
   });
 });
+

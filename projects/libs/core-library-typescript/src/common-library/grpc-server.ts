@@ -1,5 +1,7 @@
 import * as Mali from "mali";
 import * as path from "path";
+import * as express from "express";
+import { Request, Response } from "express";
 
 import { types } from "./types";
 import { Service } from "../base-service/service";
@@ -17,13 +19,20 @@ protos.set("SidechainConnector", "sidechain-connector.proto");
 protos.set("Management", "management.proto");
 
 export class GRPCServerBuilder {
+  managementPort: number;
   endpoint: string;
   mali: Mali;
   services: Service[] = [];
+  managementServer: any;
 
   onEndpoint(endpoint: string): GRPCServerBuilder {
     this.endpoint = endpoint;
 
+    return this;
+  }
+
+  withManagementPort(managementPort: number): GRPCServerBuilder {
+    this.managementPort = managementPort;
     return this;
   }
 
@@ -52,19 +61,32 @@ export class GRPCServerBuilder {
   }
 
   start(): Promise<any> {
-    const all = Promise.all(this.services.map(s => s.start()));
 
-    this.mali.start(this.endpoint);
+    const app = express();
+    app.get("/test/started", (req: Request, res: Response) => {
+      return res.send(200).json({status: "ok"});
+    });
 
-    return all;
+    return new Promise(resolve => {
+      this.managementServer = app.listen(this.managementPort, resolve);
+    })
+    .then(() => {
+      const all = Promise.all(this.services.map(s => s.start()));
+      this.mali.start(this.endpoint);
+      return all;
+    });
   }
 
   stop(): Promise<any> {
-    const all = Promise.all(this.services.map(s => s.stop()));
 
-    this.mali.close(this.endpoint);
-
-    return all;
+    return new Promise(resolve => {
+      return this.managementServer ? this.managementServer.close(resolve) : resolve();
+    })
+    .then(() => {
+      const all = Promise.all(this.services.map(s => s.stop()));
+      this.mali.close(this.endpoint);
+      return all;
+    });
   }
 
 }
