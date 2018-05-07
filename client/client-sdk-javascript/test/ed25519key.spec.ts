@@ -23,12 +23,14 @@ describe("an ed25519 key", () => {
     const privateKey1 = "3f81e53116ee3f860c154d03b9cabf8af71d8beec210c535ed300c0aee5fcbe7";
     const key1 = new ED25519Key(publicKey1, privateKey1);
     expect(key1.publicKey).to.equal(publicKey1);
+    expect(key1.getPrivateKeyUnsafe()).to.equal(privateKey1);
     expect(key1.hasPrivateKey).to.equal(true);
 
     const publicKey2 = "f1e8935355da72309ffdfd4ec62b6f48abf8f690dc29abf77badc4b83596aab3";
     const privateKey2 = "031f72d5fd7a518458f6e4d14fdcc8c28dedccef4b700f6351cd42ca84a7b935";
     const key2 = new ED25519Key(publicKey2, privateKey2);
     expect(key2.publicKey).to.equal(publicKey2);
+    expect(key2.getPrivateKeyUnsafe()).to.equal(privateKey2);
     expect(key2.hasPrivateKey).to.equal(true);
   });
 
