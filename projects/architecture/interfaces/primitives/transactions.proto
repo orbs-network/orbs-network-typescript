@@ -3,6 +3,7 @@ syntax = "proto3";
 message Transaction {
   TransactionHeader header = 1;
   string payload = 2;
+  TransactionSignatureData signatureData = 3;
 }
 
 message TransactionHeader {
@@ -10,6 +11,11 @@ message TransactionHeader {
   bytes sender = 2;
   uint64 timestamp = 3;
   bytes contractAddress = 4;
+}
+
+message TransactionSignatureData {
+  bytes publicKey = 1;
+  bytes signature = 2;
 }
 
 message TransactionReceipt {

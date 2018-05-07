@@ -42,14 +42,9 @@ describe("transaction validation", () => {
         timestamp: "0",
         contractAddress: Address.createContractAddress("dummyContract", "020202").toBuffer()
       },
-      payload: "{}"
+      payload: "{}",
+      signatureData: undefined
     };
     return expect(transactionValidator.validate(tx)).to.eventually.be.false;
-  });
-
-  xit("fails if the transaction signature is invalid", () => {
-  });
-
-  xit("succeeds if the transaction is valid", () => {
   });
 });
