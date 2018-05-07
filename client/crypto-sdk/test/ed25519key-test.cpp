@@ -23,6 +23,15 @@ TEST(ED25519Key, generates_ed25519_key) {
     EXPECT_STRNE(publicKey1.c_str(), publicKey2.c_str());
 }
 
+TEST(ED25519Key, generates_ed25519_key_multiple_times) {
+    for (int i = 0; i < 100; ++i) {
+        ED25519Key key;
+        const string publicKey(Utils::Vec2Hex(key.GetPublicKey()));
+        EXPECT_EQ(publicKey.length(), ED25519Key::PUBLIC_KEY_SIZE * 2);
+        EXPECT_TRUE(key.HasPrivateKey());
+    }
+}
+
 TEST(ED25519Key, imports_ed25519_public_key) {
     vector<uint8_t> publicKey1(Utils::Hex2Vec("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65"));
     ED25519Key key1(publicKey1);

@@ -41,9 +41,10 @@ public class SampleApp extends AppCompatActivity {
     }
 
     private void generateAddress() {
-        ED25519Key key = new ED25519Key();
-        Address address = new Address(key.getPublicKey(), VIRTUAL_CHAIN_ID, this.networkId);
-        TextView text = findViewById(R.id.orbsAddressTextView);
-        text.setText(address.toString());
+        try (ED25519Key key = new ED25519Key();
+            Address address = new Address(key.getPublicKey(), VIRTUAL_CHAIN_ID, this.networkId)) {
+            TextView text = findViewById(R.id.orbsAddressTextView);
+            text.setText(address.toString());
+        }
     }
 }

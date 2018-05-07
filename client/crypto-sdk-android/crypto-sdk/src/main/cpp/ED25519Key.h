@@ -33,10 +33,10 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__
 
 /*
  * Class:     com_orbs_cryptosdk_ED25519Key
- * Method:    finalize
+ * Method:    disposeNative
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_finalize
+JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_disposeNative
   (JNIEnv *, jobject);
 
 /*
