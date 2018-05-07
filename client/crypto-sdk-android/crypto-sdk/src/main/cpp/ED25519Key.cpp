@@ -93,7 +93,7 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__(JNIEnv *env, jo
     }
 }
 
-JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_finalize(JNIEnv *env, jobject thisObj) {
+JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_disposeNative(JNIEnv *env, jobject thisObj) {
     ED25519Key *self = getSelf(env, thisObj);
     if (self != nullptr) {
         delete self;

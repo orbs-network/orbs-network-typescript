@@ -17,10 +17,10 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_init
 
 /*
  * Class:     com_orbs_cryptosdk_Address
- * Method:    finalize
+ * Method:    disposeNative
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_finalize
+JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_disposeNative
     (JNIEnv *, jobject);
 
 /*
