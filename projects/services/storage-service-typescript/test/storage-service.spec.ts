@@ -3,7 +3,9 @@ import * as fse from "fs-extra";
 import * as path from "path";
 import * as os from "os";
 import * as getPort from "get-port";
+import * as mocha from "mocha";
 import { stubInterface } from "ts-sinon";
+import * as request from "request-promise";
 
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
@@ -12,6 +14,8 @@ import GossipService from "../../gossip-service-typescript/src/service";
 import TransactionPoolService from "../../consensus-service-typescript/src/transaction-pool-service";
 
 const { expect } = chai;
+
+const SERVER_IP_ADDRESS = "127.0.0.1";
 
 ErrorHandler.setup();
 
@@ -23,7 +27,7 @@ describe("storage server test", function () {
   let stateClient: StateStorageClient;
 
   beforeEach(async () => {
-    const endpoint = `127.0.0.1:${await getPort()}`;
+    const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
 
     const topology =  {
       peers: [
@@ -63,6 +67,7 @@ describe("storage server test", function () {
     blockClient = grpc.blockStorageClient({ endpoint });
     stateClient = grpc.stateStorageClient({ endpoint });
 
+    logger.debug(`Starting Storage Service on ${endpoint}`);
     // return the start promise to delay execution of the tests until its resolved (=services started) mocha plays nicely like that
     return server.start();
   });
@@ -88,6 +93,27 @@ describe("storage server test", function () {
     const contractAddress = Address.createContractAddress("does-not-exist").toBuffer();
     const state = await stateClient.readKeys({ contractAddress, keys: [] });
     return expect(state).to.have.deep.property("values", {});
+  });
+
+  it("should return HTTP 200 when calling GET /test/started on a running storage service", async () => {
+    //const testPort = server.getTestPort();
+    const testPort = 8888;
+    const testEndpoint = `http://${SERVER_IP_ADDRESS}:${testPort}`;
+
+    const options = {
+      method: "GET",
+      uri: `${testEndpoint}/test/started`,
+      resolveWithFullResponse: true,
+      json: true
+    };
+
+    const response: Response = await request.get(options);
+
+    logger.info("Response from /test/started route: ", response);
+
+    return expect(response.status).to.equal(200);
+
+
   });
 
   afterEach(() => {
