@@ -34,6 +34,7 @@ public class ED25519KeyUnitTest {
 
         try (ED25519Key key = new ED25519Key(publicKey, privateKey)) {
             assertEquals(key.getPublicKey(), publicKey);
+            assertEquals(key.getPrivateKeyUnsafe(), privateKey);
             assertTrue(key.hasPrivateKey());
         }
     }

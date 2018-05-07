@@ -19,6 +19,7 @@ private:
 
   static napi_value New(napi_env env, napi_callback_info info);
   static napi_value GetPublicKey(napi_env env, napi_callback_info info);
+  static napi_value GetPrivateKeyUnsafe(napi_env env, napi_callback_info info);
   static napi_value HasPrivateKey(napi_env env, napi_callback_info info);
 
   static napi_value Sign(napi_env env, napi_callback_info info);

@@ -4,6 +4,7 @@ export interface ED25519Key {
   publicKey: string;
   hasPrivateKey: boolean;
 
+  getPrivateKeyUnsafe(): string;
   sign(message: Buffer): Buffer;
   verify(message: Buffer, signature: Buffer): boolean;
 }

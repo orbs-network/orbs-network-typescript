@@ -12,12 +12,16 @@ using namespace Orbs;
 TEST(ED25519Key, generates_ed25519_key) {
     ED25519Key key1;
     const string publicKey1(Utils::Vec2Hex(key1.GetPublicKey()));
+    const string privateKey1(Utils::Vec2Hex(key1.GetPrivateKeyUnsafe()));
     EXPECT_EQ(publicKey1.length(), ED25519Key::PUBLIC_KEY_SIZE * 2);
+    EXPECT_EQ(privateKey1.length(), ED25519Key::PRIVATE_KEY_SIZE * 2);
     EXPECT_TRUE(key1.HasPrivateKey());
 
     ED25519Key key2;
     const string publicKey2(Utils::Vec2Hex(key2.GetPublicKey()));
+    const string privateKey2(Utils::Vec2Hex(key2.GetPrivateKeyUnsafe()));
     EXPECT_EQ(publicKey2.length(), ED25519Key::PUBLIC_KEY_SIZE * 2);
+    EXPECT_EQ(privateKey1.length(), ED25519Key::PRIVATE_KEY_SIZE * 2);
     EXPECT_TRUE(key2.HasPrivateKey());
 
     EXPECT_STRNE(publicKey1.c_str(), publicKey2.c_str());
@@ -37,10 +41,12 @@ TEST(ED25519Key, imports_ed25519_public_key) {
     ED25519Key key1(publicKey1);
 
     EXPECT_THAT(publicKey1, ElementsAreArray(key1.GetPublicKey()));
+    EXPECT_THROW(key1.GetPrivateKeyUnsafe(), logic_error);
     EXPECT_FALSE(key1.HasPrivateKey());
 
     vector<uint8_t> publicKey2(Utils::Hex2Vec("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6"));
     ED25519Key key2(publicKey2);
+    EXPECT_THROW(key2.GetPrivateKeyUnsafe(), logic_error);
     EXPECT_FALSE(key2.HasPrivateKey());
 
     EXPECT_THAT(publicKey2, ElementsAreArray(key2.GetPublicKey()));
@@ -51,12 +57,14 @@ TEST(ED25519Key, imports_ed25519_public_key_as_string) {
     ED25519Key key1(publicKey1);
 
     EXPECT_THAT(Utils::Hex2Vec(publicKey1), ElementsAreArray(key1.GetPublicKey()));
+    EXPECT_THROW(key1.GetPrivateKeyUnsafe(), logic_error);
     EXPECT_FALSE(key1.HasPrivateKey());
 
     const string publicKey2("7a463487bb0eb584dabccd52398506b4a2dd432503cc6b7b582f87832ad104e6");
     ED25519Key key2(publicKey2);
 
     EXPECT_THAT(Utils::Hex2Vec(publicKey2), ElementsAreArray(key2.GetPublicKey()));
+    EXPECT_THROW(key2.GetPrivateKeyUnsafe(), logic_error);
     EXPECT_FALSE(key2.HasPrivateKey());
 }
 
@@ -81,6 +89,7 @@ TEST(ED25519Key, imports_ed25519_public_and_private_keys) {
     ED25519Key key1(publicKey1, privateKey1);
 
     EXPECT_THAT(publicKey1, ElementsAreArray(key1.GetPublicKey()));
+    EXPECT_THAT(privateKey1, ElementsAreArray(key1.GetPrivateKeyUnsafe()));
     EXPECT_TRUE(key1.HasPrivateKey());
 
     vector<uint8_t> publicKey2(Utils::Hex2Vec("f1e8935355da72309ffdfd4ec62b6f48abf8f690dc29abf77badc4b83596aab3"));
@@ -88,6 +97,7 @@ TEST(ED25519Key, imports_ed25519_public_and_private_keys) {
     ED25519Key key2(publicKey2, privateKey2);
 
     EXPECT_THAT(publicKey2, ElementsAreArray(key2.GetPublicKey()));
+    EXPECT_THAT(privateKey2, ElementsAreArray(key2.GetPrivateKeyUnsafe()));
     EXPECT_TRUE(key2.HasPrivateKey());
 }
 
@@ -97,6 +107,7 @@ TEST(ED25519Key, imports_ed25519_public_and_private_keys_as_strings) {
     ED25519Key key1(publicKey1, privateKey1);
 
     EXPECT_THAT(Utils::Hex2Vec(publicKey1), ElementsAreArray(key1.GetPublicKey()));
+    EXPECT_THAT(Utils::Hex2Vec(privateKey1), ElementsAreArray(key1.GetPrivateKeyUnsafe()));
     EXPECT_TRUE(key1.HasPrivateKey());
 
     const string publicKey2("f1e8935355da72309ffdfd4ec62b6f48abf8f690dc29abf77badc4b83596aab3");
@@ -104,6 +115,7 @@ TEST(ED25519Key, imports_ed25519_public_and_private_keys_as_strings) {
     ED25519Key key2(publicKey2, privateKey2);
 
     EXPECT_THAT(Utils::Hex2Vec(publicKey2), ElementsAreArray(key2.GetPublicKey()));
+    EXPECT_THAT(Utils::Hex2Vec(privateKey2), ElementsAreArray(key2.GetPrivateKeyUnsafe()));
     EXPECT_TRUE(key2.HasPrivateKey());
 }
 
