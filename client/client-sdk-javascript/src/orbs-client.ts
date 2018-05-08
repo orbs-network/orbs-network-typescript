@@ -29,11 +29,7 @@ export class OrbsClient {
   }
 
   async call(contractAddress: Address, payload: string): Promise<any> {
-    const callData: OrbsAPICallContractRequest = {
-      senderAddressBase58: this.senderAddress.toString(),
-      contractAddressBase58: contractAddress.toString(),
-      payload: payload
-    };
+    const callData: OrbsAPICallContractRequest = this.generateCallRequest(contractAddress, payload);
     const body = await request.post({
       url: `${this.endpoint}/public/callContract`,
       body: callData,
@@ -53,6 +49,14 @@ export class OrbsClient {
     });
 
     return body;
+  }
+
+  public generateCallRequest(contractAddress: Address, payload: string): OrbsAPICallContractRequest {
+    return {
+      senderAddressBase58: this.senderAddress.toString(),
+      contractAddressBase58: contractAddress.toString(),
+      payload: payload
+    };
   }
 
   public generateTransactionRequest(contractAddress: Address, payload: string, timestamp: number = Date.now()): OrbsAPISendTransactionRequest {
