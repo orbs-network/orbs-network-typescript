@@ -82,7 +82,11 @@ class JavaContractAdapter implements OrbsContractAdapter {
     return Promise.resolve(sendTransactionObject);
   }
   async getCallObject(): Promise<OrbsAPICallContractRequest> {
-    throw new Error("Method not implemented.");
+    const callPayload = this.javaContract.generateCallPayloadSync(this.contractMethodName, this.contractMethodArgs);
+    const javaClient = this.javaContract.getOrbsClientSync();
+    const callObjectJson = javaClient.generateCallRequestSync(this.javaContract.getContractAddressSync(), callPayload);
+    const callObject = JSON.parse(callObjectJson);
+    return Promise.resolve(callObject);
   }
 }
 

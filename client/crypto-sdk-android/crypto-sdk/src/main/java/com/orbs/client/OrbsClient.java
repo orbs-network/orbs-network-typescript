@@ -46,6 +46,21 @@ public class OrbsClient {
     return gson.toJson(requestPayload);
   }
 
+  public String call(Address contractAddress, String payload) throws Exception {
+    String requestJson = generateCallRequest(contractAddress, payload);
+
+    return this.sendHTTPRequest(this.apiEndpoint + "/public/callContract", requestJson);
+  }
+
+  public String generateCallRequest(Address contractAddress, String payload) {
+    OrbsAPICallContractRequest requestPayload = new OrbsAPICallContractRequest();
+    requestPayload.payload = payload;
+    requestPayload.senderAddressBase58 = this.senderAddress.toString();
+    requestPayload.contractAddressBase58 = contractAddress.toString();
+    Gson gson = new Gson();
+    return gson.toJson(requestPayload);
+  }
+
 
   private OkHttpClient createClient() {
     return new OkHttpClient.Builder()

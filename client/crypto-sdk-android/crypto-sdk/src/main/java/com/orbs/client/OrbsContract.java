@@ -22,6 +22,11 @@ public class OrbsContract {
     return orbsClient.sendTransaction(this.contractAddress, payload);
   }
 
+  public Object call(String methodName, Object[] args) throws Exception {
+    String payload = generateCallPayload(methodName, args);
+    return orbsClient.call(this.contractAddress, payload);
+  }
+
   public String generateSendTransactionPayload(String methodName, Object[] args) {
     OrbsAPISendTransactionPayload payload = new OrbsAPISendTransactionPayload();
     payload.method = methodName;
@@ -30,9 +35,12 @@ public class OrbsContract {
     return gson.toJson(payload);
   }
 
-  public Object call(String methodName, Object[] args) {
-    Object output = new Object();
-    return "some-answer";
+  public String generateCallPayload(String methodName, Object[] args) {
+    OrbsAPICallPayload payload = new OrbsAPICallPayload();
+    payload.method = methodName;
+    payload.args = args;
+    Gson gson = new Gson();
+    return gson.toJson(payload);
   }
 
   public static String hash256(String data) throws NoSuchAlgorithmException {
