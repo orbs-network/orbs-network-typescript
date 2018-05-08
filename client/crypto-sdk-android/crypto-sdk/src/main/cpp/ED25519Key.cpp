@@ -93,7 +93,7 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__(JNIEnv *env, jo
     }
 }
 
-JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_finalize(JNIEnv *env, jobject thisObj) {
+JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_disposeNative(JNIEnv *env, jobject thisObj) {
     ED25519Key *self = getSelf(env, thisObj);
     if (self != nullptr) {
         delete self;
@@ -107,6 +107,22 @@ JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_ED25519Key_getPublicKey(JNIEnv
         ED25519Key *self = getSelf(env, thisObj);
 
         return env->NewStringUTF(Utils::Vec2Hex(self->GetPublicKey()).c_str());
+    } catch (const exception &e) {
+        Utilities::ThrowException(env, e.what());
+
+        return nullptr;
+    } catch (...) {
+        Utilities::ThrowUnknownException(env);
+
+        return nullptr;
+    }
+}
+
+JNIEXPORT jstring JNICALL Java_com_orbs_cryptosdk_ED25519Key_getPrivateKeyUnsafe(JNIEnv *env, jobject thisObj) {
+    try {
+        ED25519Key *self = getSelf(env, thisObj);
+
+        return env->NewStringUTF(Utils::Vec2Hex(self->GetPrivateKeyUnsafe()).c_str());
     } catch (const exception &e) {
         Utilities::ThrowException(env, e.what());
 

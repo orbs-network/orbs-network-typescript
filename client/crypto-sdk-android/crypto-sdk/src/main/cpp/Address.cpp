@@ -31,7 +31,7 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_init(JNIEnv *env, jobject
     const char *nativePublicKey = env->GetStringUTFChars(publicKey, JNI_FALSE);
     const char *nativeVirtualChainId = env->GetStringUTFChars(virtualChainId, JNI_FALSE);
     const char *nativeNetworkId = env->GetStringUTFChars(networkId, JNI_FALSE);
-
+    
     try {
         Address *self = new Address(nativePublicKey, nativeVirtualChainId, nativeNetworkId);
         setSelf(env, thisObj, self);
@@ -58,7 +58,7 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_init(JNIEnv *env, jobject
     env->ReleaseStringUTFChars(networkId, nativeNetworkId);
 }
 
-JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_finalize(JNIEnv *env, jobject thisObj) {
+JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_disposeNative(JNIEnv *env, jobject thisObj) {
     Address *self = getSelf(env, thisObj);
     if (self != nullptr) {
         delete self;

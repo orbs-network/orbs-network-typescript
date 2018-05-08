@@ -1,6 +1,6 @@
 package com.orbs.cryptosdk;
 
-public class ED25519Key {
+public class ED25519Key implements AutoCloseable {
     // This is the "handle" to the underlying native instance.
     private long selfPtr;
 
@@ -20,12 +20,18 @@ public class ED25519Key {
         System.loadLibrary("cryptosdk-android");
     }
 
+    public void close() {
+        disposeNative();
+    }
+
     private native void init(String publicKey);
     private native void init(String publicKey, String privateKey);
     private native void init();
-    protected native void finalize();
+    private native void disposeNative();
+
 
     public native String getPublicKey();
+    public native String getPrivateKeyUnsafe();
     public native boolean hasPrivateKey();
 
     public native byte[] sign(byte[] message);

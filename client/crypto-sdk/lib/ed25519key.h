@@ -30,7 +30,11 @@ public:
     virtual ~ED25519Key();
 
     // Exports the public key.
-    virtual const std::vector<uint8_t> GetPublicKey() const;
+    const std::vector<uint8_t> GetPublicKey() const;
+
+    // Exports the private key as plaintext (unsafe!).
+    const std::vector<uint8_t> GetPrivateKeyUnsafe() const;
+
     bool HasPrivateKey() const;
 
     // Returns the EdDSA signature, using SHA512 as the message digest.
