@@ -32,9 +32,9 @@
   "order": [
     "architecture",
     "crypto-sdk",
-    "client-sdk-javascript",
-    "example-slack-bot",
     "crypto-sdk-android",
-    "example-android-app"
+    "example-android-app",
+    "client-sdk-javascript",
+    "example-slack-bot"
   ]
 }
