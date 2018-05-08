@@ -26,7 +26,7 @@
     "bind-decorator": "^1.0.11",
     "bluebird": "^3.5.1",
     "bs58": "^4.0.1",
-    "gaggle": "git+https://github.com/orbs-network/gaggle.git#2862469604ec02a7ce0bb5843d3c499508109a11",
+    "gaggle": "git+https://github.com/orbs-network/gaggle.git#f335d4f3248ff49563210ebe102412fafd35aa32",
     "grpc": "^1.9.0",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "json-stable-stringify": "^1.0.1",

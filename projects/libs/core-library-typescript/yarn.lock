@@ -1948,9 +1948,9 @@ functional-red-black-tree@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
 
-"gaggle@git+https://github.com/orbs-network/gaggle.git#2862469604ec02a7ce0bb5843d3c499508109a11":
+"gaggle@git+https://github.com/orbs-network/gaggle.git#f335d4f3248ff49563210ebe102412fafd35aa32":
   version "2.2.0"
-  resolved "git+https://github.com/orbs-network/gaggle.git#2862469604ec02a7ce0bb5843d3c499508109a11"
+  resolved "git+https://github.com/orbs-network/gaggle.git#f335d4f3248ff49563210ebe102412fafd35aa32"
   dependencies:
     bluebird "^3.5.1"
     joi "^13.1.1"

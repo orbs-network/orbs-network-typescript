@@ -41,7 +41,7 @@ function makeCommittedTransactionPool() {
 
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSATION_EXPIRATION_TIMEOUT } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -55,7 +55,7 @@ export default function(nodeTopology: any, env: any) {
     throw new Error("Must provide ETHEREUM_CONTRACT_ADDRESS");
   }
 
-  const transactionLifespanMs = Number(TRANSATION_EXPIRATION_TIMEOUT) || 30000;
+  const transactionLifespanMs = Number(TRANSACTION_EXPIRATION_TIMEOUT) || 30000;
 
   const consensusConfig = new DefaultConsensusConfig(Number(MIN_ELECTION_TIMEOUT), Number(MAX_ELECTION_TIMEOUT), Number(HEARBEAT_INTERVAL));
   consensusConfig.nodeName = NODE_NAME;

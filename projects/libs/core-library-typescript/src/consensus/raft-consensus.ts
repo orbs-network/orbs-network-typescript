@@ -7,7 +7,7 @@ import BlockBuilder from "./block-builder";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
-import { JsonBuffer } from "../common-library";
+import { JsonBuffer, BlockUtils } from "../common-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
@@ -136,17 +136,19 @@ export class RaftConsensus {
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
     const end = new Date().getTime();
 
-    logger.debug(`New block with height ${block.header.height} is about to be committed (RAFT index ${index})`);
+    const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.info(`Finished deserializing block with height ${block.header.height} and hash size ${block.header.prevBlockHash.length} in ${end - start} ms`);
+    logger.debug(`New block with height ${block.header.height} and hash ${blockHash} is about to be committed (RAFT index ${index})`);
 
-    logger.info(`New block to be committed with height ${block.header.height} and hash size ${block.header.prevBlockHash.length}`);
+    logger.info(`Finished deserializing block with height ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
+
+    logger.info(`New block to be committed with height ${block.header.height} and hash ${blockHash}`);
 
     try {
       await this.blockBuilder.commitBlock(block);
     } catch (err) {
       logger.error(err);
-      logger.error(`Failed to commit block with height ${block.header.height}`);
+      logger.error(`Failed to commit block with height ${block.header.height} and hash ${blockHash}: ${JSON.stringify(err)}`);
     }
 
     if (this.node.isLeader()) {
