@@ -31,6 +31,9 @@ const SENDER_ADDRESS = new Address(SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.
 const TXID = "ada0838c9a4c86625d665cc6f2d617efa15a184e434ce1d1ee66f6e057fd0ae8";
 
 interface OrbsContractAdapter {
+  contractMethodName: string;
+  contractMethodArgs: OrbsContractMethodArgs;
+
   getSendTranscationObject(): Promise<OrbsAPISendTransactionRequest> ;
   getCallObject(): Promise<OrbsAPICallContractRequest> ;
 }
@@ -60,21 +63,28 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
   }
 }
 
-// class JavaContractAdapter implements OrbsContractAdapter {
-//   javaContract: any;
+class JavaContractAdapter implements OrbsContractAdapter {
+  javaContract: any;
+  contractMethodName: string;
+  contractMethodArgs: OrbsContractMethodArgs;
 
-//   constructor(javaContract: any) {
-//     this.javaContract = javaContract;
-//   }
+  constructor(javaContract: any, contractMethodName: string, contractMethodArgs: OrbsContractMethodArgs) {
+    this.javaContract = javaContract;
+    this.contractMethodArgs = contractMethodArgs;
+    this.contractMethodName = contractMethodName;
+  }
 
-//   async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
-//     return Promise.resolve(this.javaContract.sendTransactionSync(methodName, args));
-//   }
-
-//   async call(methodName: string, args: OrbsContractMethodArgs): Promise<any> {
-//     return Promise.resolve(this.javaContract.callSync(methodName, args));
-//   }
-// }
+  async getSendTranscationObject(): Promise<OrbsAPISendTransactionRequest> {
+    const sendTransactionPayload = this.javaContract.generateSendTransactionPayloadSync(this.contractMethodName, this.contractMethodArgs);
+    const javaClient = this.javaContract.getOrbsClientSync();
+    const sendTransactionObjectJson = javaClient.generateTransactionRequestSync(this.javaContract.getContractAddressSync(), sendTransactionPayload);
+    const sendTransactionObject = JSON.parse(sendTransactionObjectJson);
+    return Promise.resolve(sendTransactionObject);
+  }
+  async getCallObject(): Promise<OrbsAPICallContractRequest> {
+    throw new Error("Method not implemented.");
+  }
+}
 
 // class PythonContractAdapter implements OrbsContractAdapter {
 //   contractName: string;
@@ -187,8 +197,8 @@ describe("The Javascript SDK", () => {
   testContract(() => new TypeScriptContractAdapter(contract, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
 });
 
-describe.skip("The Java SDK", () => {
-  // testContract(() => new JavaContractAdapter(createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT)));
+describe("The Java SDK", () => {
+  testContract(() => new JavaContractAdapter(createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT), CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
 });
 
 describe.skip("The Python SDK", () => {
