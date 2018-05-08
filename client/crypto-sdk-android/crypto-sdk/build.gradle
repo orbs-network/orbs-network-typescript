@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/orbs-network/orbs-network'
     gitUrl = 'https://github.com/orbs-network/orbs-network.git'
 
-    libraryVersion = '0.0.1'
+    libraryVersion = '0.0.2'
 
     developerId = 'orbs'
     developerName = 'Orbs'
@@ -33,7 +33,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName '0.0.1'
+        versionName '0.0.2'
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -130,10 +130,10 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'org.json:json:20180130'
     testImplementation fileTree(include: ['*.jar'], dir: 'build/outputs/jar')
     testImplementation 'junit:junit:4.12'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.google.code.gson:gson:2.8.4'
 }
 
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
