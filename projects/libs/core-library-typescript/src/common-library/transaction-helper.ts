@@ -2,8 +2,6 @@ import { types } from "../common-library/types";
 import { createHash } from "crypto";
 import * as stringify from "json-stable-stringify";
 import { bs58EncodeRawAddress, Address } from ".";
-import { eddsa } from "elliptic";
-const ec = new eddsa("ed25519");
 
 export class TransactionHelper implements types.Transaction {
   header: types.TransactionHeader;
@@ -33,12 +31,6 @@ export class TransactionHelper implements types.Transaction {
   public calculateTransactionId(): string {
     const hash = this.calculateHash();
     return transactionHashToId(hash);
-  }
-
-  public verifySignature() {
-    const hash = this.calculateHash();
-    const key = ec.keyFromPublic(this.signatureData.publicKey.toString("hex"));
-    return key.verify(hash, this.signatureData.signature.toString("hex"));
   }
 }
 
