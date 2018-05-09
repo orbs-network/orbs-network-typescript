@@ -18,7 +18,7 @@ describe("transaction validation", () => {
 
   beforeEach(() => {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
-    transactionValidator = new TransactionValidator(subscriptionManager);
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: false});
   });
 
   it("succeeds for a valid transaction of an active vchain subscription", async () => {
@@ -47,4 +47,33 @@ describe("transaction validation", () => {
     };
     return expect(transactionValidator.validate(tx)).to.eventually.be.false;
   });
+});
+
+describe("transaction validator with enabled signature verification ", () => {
+  let transactionValidator: TransactionValidator;
+  let subscriptionManager: types.SubscriptionManagerClient;
+
+  beforeEach(() => {
+    subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
+    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: true});
+  });
+
+  it("succeeds for a correctly generated signature", () => {
+    const correctlySignedTransaction: types.Transaction = aDummyTransaction();
+
+    return expect(transactionValidator.validate(correctlySignedTransaction)).to.eventually.be.true;
+  });
+
+  it("failed for incorrect signature", () => {
+    const badlySignedTransaction: types.Transaction = aDummyTransaction();
+
+    badlySignedTransaction.signatureData.signature = Buffer.from(
+      "00000000000000000000000000000000000000000000000000000000000000",
+      "hex"
+    );
+    return expect(transactionValidator.validate(badlySignedTransaction)).to.eventually.be.false;
+  });
+
+
 });
