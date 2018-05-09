@@ -2,10 +2,14 @@ import * as Mali from "mali";
 import * as path from "path";
 import * as express from "express";
 import { Request, Response } from "express";
+import { StartupTest } from "./startup-test";
 
 import { types } from "./types";
 import { Service } from "../base-service/service";
 import { getPathToProto } from "orbs-interfaces";
+import { resolve } from "url";
+
+import { filter } from "lodash";
 
 const protos: Map<string, string> = new Map<string, string>();
 protos.set("Consensus", "consensus.proto");
@@ -64,17 +68,22 @@ export class GRPCServerBuilder {
 
     const app = express();
     app.get("/test/started", (req: Request, res: Response) => {
-      return res.send(200).json({status: "ok"});
+
+      const servicesWithStartupTest = filter((s: Service) => s.hasOwnProperty("startupTest"));
+      return Promise.all(servicesWithStartupTest.map(s => s["startupTest"]()))
+        .then(startupTestResults => {
+          return { status: "ok" };
+        });
     });
 
     return new Promise(resolve => {
       this.managementServer = app.listen(this.managementPort, resolve);
     })
-    .then(() => {
-      const all = Promise.all(this.services.map(s => s.start()));
-      this.mali.start(this.endpoint);
-      return all;
-    });
+      .then(() => {
+        const all = Promise.all(this.services.map(s => s.start()));
+        this.mali.start(this.endpoint);
+        return all;
+      });
   }
 
   stop(): Promise<any> {
@@ -82,13 +91,12 @@ export class GRPCServerBuilder {
     return new Promise(resolve => {
       return this.managementServer ? this.managementServer.close(resolve) : resolve();
     })
-    .then(() => {
-      const all = Promise.all(this.services.map(s => s.stop()));
-      this.mali.close(this.endpoint);
-      return all;
-    });
+      .then(() => {
+        const all = Promise.all(this.services.map(s => s.stop()));
+        this.mali.close(this.endpoint);
+        return all;
+      });
   }
-
 }
 
 export namespace grpcServer {

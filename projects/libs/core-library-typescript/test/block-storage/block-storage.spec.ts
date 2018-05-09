@@ -7,6 +7,7 @@ import * as fsExtra from "fs-extra";
 import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockUtils } from "../../src/common-library";
+import { TransactionPool } from "orbs-interfaces";
 
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
@@ -116,5 +117,35 @@ describe("Block storage", () => {
 
       await expect(blockStorage.getBlocks(lastBlock.header.height)).to.eventually.be.eql([exampleBlock]);
     });
+  });
+
+  describe("run startupTest", () => {
+    it("should return {status: 'ok'} when startup test passes", async () => {
+      const startupTestResult = await blockStorage.startupTest();
+      return expect(startupTestResult).to.deep.equal({ status: "ok" });
+    });
+  });
+});
+
+describe("Block storage - Bad setup", () => {
+  let blockStorage: BlockStorage;
+  // let lastBlock: types.Block;
+
+  beforeEach(async () => {
+    try {
+      fsExtra.removeSync(LEVELDB_PATH);
+    } catch (e) { }
+    blockStorage = await initBlockStorage(undefined);
+    // lastBlock = await blockStorage.getLastBlock();
+  });
+
+  it("should return {status: 'err'} when startup test passes", async () => {
+    const startupTestResult = await blockStorage.startupTest();
+    return expect(startupTestResult).to.deep.equal({ status: "err" });
+  });
+
+  afterEach(async () => {
+    await blockStorage.shutdown();
+    blockStorage = undefined;
   });
 });

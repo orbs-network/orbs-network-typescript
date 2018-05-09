@@ -1,9 +1,10 @@
 import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
-import { BlockUtils , logger, types, JsonBuffer } from "../common-library";
+import { BlockUtils, logger, types, JsonBuffer } from "../common-library";
+import { StartupTestStatus, StartupTest } from "../common-library/startup-test";
 
-export class BlockStorage {
+export class BlockStorage implements StartupTest {
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
   private lastBlock: types.Block;
@@ -120,5 +121,12 @@ export class BlockStorage {
 
   private async putBlock(block: types.Block): Promise<void> {
     await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
+  }
+
+  public async startupTest(): Promise<StartupTestStatus> {
+
+    // TODO implement me!
+
+    return this.transactionPool ? <StartupTestStatus>{ status: "ok" } : <StartupTestStatus>{ status: "err" };
   }
 }
