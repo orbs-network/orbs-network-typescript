@@ -19,6 +19,8 @@ export default function createMockServer(
     expect(req.body.payload).to.be.eql(expectedSendTransactionRequest.payload);
     expect(req.body.header.senderAddressBase58).to.be.eql(expectedSendTransactionRequest.header.senderAddressBase58);
     expect(req.body.header.contractAddressBase58).to.be.eql(expectedSendTransactionRequest.header.contractAddressBase58);
+    expect(req.body.signatureData.publicKeyHex).to.be.eql(expectedSendTransactionRequest.signatureData.publicKeyHex);
+    expect(req.body.signatureData.signatureHex).to.be.eql(expectedSendTransactionRequest.signatureData.signatureHex);
     res.json({ result: "ok" });
     res.end();
   });

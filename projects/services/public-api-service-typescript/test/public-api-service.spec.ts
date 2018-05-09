@@ -16,6 +16,8 @@ const { expect } = chai;
 
 const senderAddressBase58 = "T00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp";
 const contractAddressBase58 = "T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR";
+const publicKeyHex = "0101010101010101010101010101010101010101010101010101010101010101";
+const signatureHex = "0202020202020202020202020202020202020202020202020202020202020202";
 const transactionTimestamp = "12345678";
 const payload = JSON.stringify({ foo: "bar" });
 
@@ -28,8 +30,8 @@ const transaction: types.Transaction = {
   },
   payload,
   signatureData: {
-    publicKey: new Buffer(""),
-    signature: new Buffer("")
+    publicKey: Buffer.from(publicKeyHex, "hex"),
+    signature: Buffer.from(signatureHex, "hex")
   }
 };
 
@@ -45,6 +47,10 @@ const sendTransactionRequestData = {
     contractAddressBase58
   },
   payload,
+  signatureData: {
+    publicKeyHex,
+    signatureHex
+  }
 };
 
 const callContractRequestData = {

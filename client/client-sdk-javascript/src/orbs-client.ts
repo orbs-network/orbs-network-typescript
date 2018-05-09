@@ -2,16 +2,21 @@ import { delay } from "bluebird";
 import * as request from "request-promise";
 import { Address } from "./address";
 import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest, OrbsAPIGetTransactionStatusResponse } from "./orbs-api-interface";
+import { ED25519Key } from ".";
+import { createHash } from "crypto";
+import * as stringify from "json-stable-stringify";
 
 export class OrbsClient {
   private endpoint: string;
   readonly senderAddress: Address;
   private sendTransactionTimeoutMs: number;
+  private keyPair: ED25519Key;
 
-  constructor(endpoint: string, senderAddress: Address, sendTransactionTimeoutMs = 5000) {
+  constructor(endpoint: string, senderAddress: Address, keyPair: ED25519Key, sendTransactionTimeoutMs = 5000) {
     this.senderAddress = senderAddress;
     this.endpoint = endpoint;
     this.sendTransactionTimeoutMs = sendTransactionTimeoutMs;
+    this.keyPair = keyPair;
   }
 
   async sendTransaction(contractAddress: Address, payload: string): Promise<any> {
@@ -60,14 +65,27 @@ export class OrbsClient {
   }
 
   public generateTransactionRequest(contractAddress: Address, payload: string, timestamp: number = Date.now()): OrbsAPISendTransactionRequest {
-    return {
-      header: {
-        version: 0,
-        senderAddressBase58: this.senderAddress.toString(),
-        timestamp: timestamp.toString(),
-        contractAddressBase58: contractAddress.toString()
-      },
-      payload
+    // build transaction without signatute data
+    const header = {
+      version: 0,
+      senderAddressBase58: this.senderAddress.toString(),
+      timestamp: timestamp.toString(),
+      contractAddressBase58: contractAddress.toString()
     };
+
+    const hasher = createHash("sha256");
+    hasher.update(stringify({header, payload}));
+    const txHash = hasher.digest();
+    const signatureHex =  this.keyPair.sign(txHash).toString("hex");
+
+    const req: OrbsAPISendTransactionRequest = {
+      header,
+      payload,
+      signatureData: {
+        publicKeyHex: this.keyPair.publicKey,
+        signatureHex
+      }
+    };
+    return req;
   }
 }

@@ -3,16 +3,16 @@ import  * as chai from "chai";
 import { OrbsContractAdapter } from "../src";
 import * as sinonChai from "sinon-chai";
 import { Server } from "http";
-import { stubInterface } from "ts-sinon";
+import { stubInterface, stubObject } from "ts-sinon";
 import * as crypto from "crypto";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
 import { createJavaOrbsContract } from "./java-sdk-helper";
 import * as mocha from "mocha";
 import { pythonBridge, PythonBridge } from "python-bridge";
 import * as path from "path";
-import { OrbsClient, OrbsContract, Address } from "../../client-sdk-javascript/src";
+import { OrbsClient, OrbsContract, Address, ED25519Key } from "../../client-sdk-javascript/src";
 import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
-import { expectedCallContractRequest, expectedSendTransactionRequest, SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID } from "../src/expected-results";
+import { expectedCallContractRequest, expectedSendTransactionRequest, SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, SIGNATURE } from "../src/expected-results";
 import { testContract } from "../src/contract-adapter";
 
 chai.use(sinonChai);
@@ -143,9 +143,12 @@ before((done) => {
 });
 
 describe("The Javascript SDK", () => {
-  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
-  const contract = new OrbsContract(client, CONTRACT_NAME);
+  const keyPairStub = stubObject<ED25519Key>(new ED25519Key(), ["sign"]);
+  keyPairStub.publicKey = SENDER_PUBLIC_KEY;
+  (<sinon.SinonStub>keyPairStub.sign).returns(Buffer.from(SIGNATURE, "hex"));
 
+  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, keyPairStub, TIMEOUT);
+  const contract = new OrbsContract(client, CONTRACT_NAME);
   testContract(() => new TypeScriptContractAdapter(contract, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
 });
 
