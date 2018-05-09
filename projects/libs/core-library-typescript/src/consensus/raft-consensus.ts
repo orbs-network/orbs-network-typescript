@@ -176,6 +176,10 @@ export class RaftConsensus {
   public onNewBlockBuild(block: types.Block) {
     const appendMessage: types.ConsensusMessage = { block };
 
+    const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
+
+    logger.debug(`New block with height ${block.header.height} and hash ${blockHash} is about to be committed to RAFT log`);
+
     this.node.append(appendMessage);
   }
 

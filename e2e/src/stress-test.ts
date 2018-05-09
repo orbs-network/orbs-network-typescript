@@ -36,10 +36,10 @@ async function createAccounts(input: { seed: number, numberOfAccounts: number })
   }));
 }
 
-async function stress(numberOfAccounts: number) {
+async function stress(numberOfAccounts: number, seed: number) {
   console.log("Creating accounts...");
 
-  const seed = new Date().getTime();
+  // const seed = new Date().getTime();
   console.log(`Seed: ${seed}`);
 
   const accounts = await createAccounts({ seed: seed, numberOfAccounts });
@@ -82,7 +82,7 @@ describe("test multiple transactions", async function () {
       console.log(`Attempt #${i}`);
 
       try {
-        await stress(testConfig.stressTest.accounts);
+        await stress(testConfig.stressTest.accounts, i);
         console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);
       } catch (e) {
         console.log(`Failed with error ${e}`);

@@ -59,6 +59,8 @@ export class BlockStorage {
   //
   // NOTE: this method should be only called serially.
   public async addBlock(block: types.Block) {
+    const start = new Date().getTime();
+
     const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
     logger.info(`Adding new block with block height ${block.header.height} and hash ${blockHash}`);
@@ -73,7 +75,9 @@ export class BlockStorage {
 
     this.lastBlock = block;
 
-    logger.info(`Added new block with block height: ${block.header.height} and hash ${blockHash}`);
+    const end = new Date().getTime();
+
+    logger.info(`Added new block with block height: ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
   }
 
   private async reportBlockTransactionToPool(block: types.Block) {

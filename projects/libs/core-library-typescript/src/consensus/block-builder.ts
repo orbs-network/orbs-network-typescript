@@ -80,16 +80,22 @@ export default class BlockBuilder {
   }
 
   public async appendNextBlock(): Promise<types.Block> {
-    const lastBlock = await this.getOrFetchLastBlock();
-    const block = await this.buildBlockFromPendingTransactions(lastBlock);
+    this.stop();
 
-    this.onNewBlockBuild(block);
+    try {
+      const lastBlock = await this.getOrFetchLastBlock();
+      const block = await this.buildBlockFromPendingTransactions(lastBlock);
 
-    logger.debug(`Appended new block ${JSON.stringify(block)}`);
+      this.onNewBlockBuild(block);
 
-    this.stopPolling();
+      const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
+      logger.info(`Appended new block with block height ${block.header.height} and hash ${blockHash}`);
 
-    return block;
+      return block;
+    } catch (e) {
+      this.start();
+      throw e;
+    }
   }
 
 
