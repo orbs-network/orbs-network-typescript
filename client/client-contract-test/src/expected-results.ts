@@ -9,7 +9,8 @@ export const VIRTUAL_CHAIN_ID = "640ed3";
 export const CONTRACT_NAME = "contractName";
 export const CONTRACT_METHOD_NAME = "method";
 export const CONTRACT_METHOD_ARGS: OrbsContractMethodArgs = ["some-string", 3];
-export const SENDER_PUBLIC_KEY = new ED25519Key().publicKey;
+export const SIGNATURE = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+export const SENDER_PUBLIC_KEY = "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210";
 export const SENDER_ADDRESS = new Address(SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
 export const TXID = "ada0838c9a4c86625d665cc6f2d617efa15a184e434ce1d1ee66f6e057fd0ae8";
 
@@ -35,7 +36,11 @@ export const expectedSendTransactionRequest: OrbsAPISendTransactionRequest = {
         timestamp: Date.now().toString(),
         contractAddressBase58: expectedContractAddressBase58(CONTRACT_NAME)
     },
-    payload: expectedPayload(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
+    payload: expectedPayload(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS),
+    signatureData: {
+      publicKeyHex: SENDER_PUBLIC_KEY,
+      signatureHex: SIGNATURE
+    }
 };
 
 

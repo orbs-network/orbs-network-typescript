@@ -4,20 +4,21 @@ import { Address } from "../src/address";
 import { ED25519Key } from "../src/ed25519key";
 import { OrbsClient } from "../src";
 import * as sinonChai from "sinon-chai";
-import { stubInterface } from "ts-sinon";
+import { stubInterface, stubObject } from "ts-sinon";
 import * as crypto from "crypto";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 import { OrbsContract, OrbsContractMethodArgs } from "../src/orbs-contract";
-import "mocha";
 import { SendTransactionOutput } from "orbs-interfaces";
 import * as path from "path";
 import { testContract, OrbsContractAdapter } from "../../client-contract-test/src";
-import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS } from "../../client-contract-test/src/expected-results";
+import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, SIGNATURE } from "../../client-contract-test/src/expected-results";
 
 chai.use(sinonChai);
 
 const API_ENDPOINT = "";
 const TIMEOUT = 20;
+
+
 
 class TypeScriptContractAdapter implements OrbsContractAdapter {
   orbsContract: OrbsContract;
@@ -45,7 +46,11 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
 }
 
 describe("The Javascript SDK", () => {
-  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
+  const keyPairStub = stubObject<ED25519Key>(new ED25519Key(), ["sign"]);
+  keyPairStub.publicKey = SENDER_PUBLIC_KEY;
+  (<sinon.SinonStub>keyPairStub.sign).returns(Buffer.from(SIGNATURE, "hex"));
+
+  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, keyPairStub, TIMEOUT);
   const contract = new OrbsContract(client, CONTRACT_NAME);
 
   testContract(() => new TypeScriptContractAdapter(contract, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
