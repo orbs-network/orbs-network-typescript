@@ -174,17 +174,27 @@ artifacts {
 version = libraryVersion
 
 Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
+String bintrayUser = ""
+String bintrayApikey = ""
+String bintrayUserOrg = ""
+String bintrayGpgPassword = ""
+if (project.rootProject.file('local.properties').canRead()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    bintrayUser = properties.getProperty("bintray.user")
+    bintrayApikey = properties.getProperty("bintray.apikey")
+    bintrayUserOrg = properties.getProperty("bintray.userOrg")
+    bintrayGpgPassword = properties.getProperty("bintray.gpg.password")
+}
 
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = bintrayUser
+    key = bintrayApikey
 
     configurations = ['archives']
     pkg {
         repo = bintrayRepo
         name = bintrayName
-        userOrg = properties.getProperty("bintray.userOrg")
+        userOrg = bintrayUserOrg
         desc = libraryDescription
         websiteUrl = siteUrl
         vcsUrl = gitUrl
@@ -195,7 +205,7 @@ bintray {
             desc = libraryDescription
             gpg {
                 sign = true //Determines whether to GPG sign the files. The default is false
-                passphrase = properties.getProperty("bintray.gpg.password")
+                passphrase = bintrayGpgPassword
                 //Optional. The passphrase for GPG signing'
             }
         }
