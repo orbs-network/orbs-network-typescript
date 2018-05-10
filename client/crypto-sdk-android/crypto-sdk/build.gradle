@@ -17,7 +17,7 @@ ext {
     siteUrl = 'https://github.com/orbs-network/orbs-network'
     gitUrl = 'https://github.com/orbs-network/orbs-network.git'
 
-    libraryVersion = '0.0.3'
+    libraryVersion = '0.0.4'
 
     developerId = 'orbs'
     developerName = 'Orbs'
@@ -35,7 +35,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
-        versionName '0.0.3'
+        versionName '0.0.4'
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
 
         externalNativeBuild {
@@ -45,6 +45,8 @@ android {
                 cppFlags '-fexceptions -std=c++11'
             }
         }
+
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {

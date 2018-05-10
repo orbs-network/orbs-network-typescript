@@ -2,9 +2,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven {
-            url "https://dl.bintray.com/orbs/orbs-network"
-        }
     }
 
     dependencies {
@@ -16,9 +13,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven {
-            url "https://dl.bintray.com/orbs/orbs-network"
-        }
     }
 }
 

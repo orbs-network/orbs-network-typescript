@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword '123456'
+            storeFile file('/Users/levison/work/orbs-network/client/examples/android-sample-app/keyforrelease')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
-
     defaultConfig {
         applicationId 'com.orbs.sampleapp'
         minSdkVersion 19
@@ -11,14 +18,13 @@ android {
         versionCode 1
         versionName "1.0"
     }
-
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
-
     flavorDimensions 'cpuArch'
     productFlavors {
         arm7 {
@@ -58,5 +64,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     // implementation project(':crypto-sdk')
-    implementation 'com.orbs.sdk:crypto-sdk:0.0.3'
+    // implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    // implementation 'com.google.code.gson:gson:2.8.4'
+    implementation 'com.orbs.sdk:crypto-sdk:0.0.4'
 }
