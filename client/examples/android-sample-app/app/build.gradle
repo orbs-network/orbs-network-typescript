@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'key0'
             keyPassword '123456'
-            storeFile file('/Users/levison/work/orbs-network/client/examples/android-sample-app/keyforrelease')
+            storeFile file('../keyforrelease')
             storePassword '123456'
         }
     }
