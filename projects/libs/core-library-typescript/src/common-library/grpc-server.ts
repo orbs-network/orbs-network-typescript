@@ -1,15 +1,14 @@
 import * as Mali from "mali";
-import * as path from "path";
 import * as express from "express";
 import { Request, Response } from "express";
-import { StartupTest } from "./startup-test";
+import { StartupCheckResult } from "./startup-check-result";
 
 import { types } from "./types";
-import { Service } from "../base-service/service";
+import { Service } from "../base-service";
 import { getPathToProto } from "orbs-interfaces";
-import { resolve } from "url";
 
 import { filter } from "lodash";
+import { logger } from ".";
 
 const protos: Map<string, string> = new Map<string, string>();
 protos.set("Consensus", "consensus.proto");
@@ -64,16 +63,24 @@ export class GRPCServerBuilder {
     return this;
   }
 
+
+
   start(): Promise<any> {
 
-    const app = express();
-    app.get("/test/started", (req: Request, res: Response) => {
 
-      const servicesWithStartupTest = filter((s: Service) => s.hasOwnProperty("startupTest"));
-      return Promise.all(servicesWithStartupTest.map(s => s["startupTest"]()))
-        .then(startupTestResults => {
-          return { status: "ok" };
-        });
+
+    // check if no endpoint...
+    if (!this.mali) {
+      return Promise.reject("Mali was not set up correctly. did you forget to call withService()?");
+    }
+
+    const app = express();
+    logger.info("Management server is starting");
+    app.get("/admin/startupCheck", (req: Request, res: Response) => {
+
+
+
+      return res.json({ status: "ok" });
     });
 
     return new Promise(resolve => {
@@ -83,19 +90,27 @@ export class GRPCServerBuilder {
         const all = Promise.all(this.services.map(s => s.start()));
         this.mali.start(this.endpoint);
         return all;
+
+
       });
   }
 
   stop(): Promise<any> {
 
-    return new Promise(resolve => {
-      return this.managementServer ? this.managementServer.close(resolve) : resolve();
-    })
-      .then(() => {
-        const all = Promise.all(this.services.map(s => s.stop()));
-        this.mali.close(this.endpoint);
-        return all;
-      });
+    // return new Promise(resolve => {
+    //   return this.managementServer ? this.managementServer.close(resolve) : resolve();
+    // })
+    //   .then(() => {
+    const all = Promise.all(this.services.map(s => s.stop()));
+    if (this.mali) {
+      this.mali.close(this.endpoint);
+    }
+    if (this.managementServer) {
+      logger.info("Management server is stopping");
+      this.managementServer.close();
+    }
+    return all;
+    // });
   }
 }
 
