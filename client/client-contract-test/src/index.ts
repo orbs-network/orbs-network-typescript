@@ -1,2 +1,2 @@
-export { OrbsContractAdapter } from "./contract-adapter";
+export { testContract, OrbsContractAdapter } from "./contract-adapter";
 
