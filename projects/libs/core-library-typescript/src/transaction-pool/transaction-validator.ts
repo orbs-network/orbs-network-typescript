@@ -17,25 +17,25 @@ export class TransactionValidator {
     }
 
     if ((this.options.verifySignature) && (!this.verifySignature(tx))) {
-      logger.info(`signature of ${JSON.stringify(tx)} is invalid`);
+      logger.info(`Signature of ${JSON.stringify(tx)} is invalid`);
       return false;
     }
 
     // deserializes addresses and validate checksums
     const senderAddress = Address.fromBuffer(tx.header.sender, undefined, true);
     if (senderAddress == undefined) {
-      logger.info(`address validation ${tx.header.sender} failed on deserialization (fromBuffer())`);
+      logger.info(`Address validation ${tx.header.sender} failed on deserialization (fromBuffer())`);
       return false;
     }
     const contractAddress = Address.fromBuffer(tx.header.contractAddress, undefined, true);
     if (contractAddress == undefined) {
-      logger.info(`address validation ${tx.header.contractAddress} failed on deserialization (fromBuffer())`);
+      logger.info(`Address validation ${tx.header.contractAddress} failed on deserialization (fromBuffer())`);
       return false;
     }
 
     // check that virtual chains of sender and contract match
     if (senderAddress.virtualChainId != contractAddress.virtualChainId) {
-      logger.info(`virtual chain of address and contract address should match ${senderAddress.virtualChainId} != ${contractAddress.virtualChainId}`);
+      logger.info(`Virtual chain of address and contract address should match ${senderAddress.virtualChainId} != ${contractAddress.virtualChainId}`);
       return false;
     }
 
@@ -44,7 +44,7 @@ export class TransactionValidator {
     const status = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
 
     if (!status.active) {
-      logger.info(`subscription ${subscriptionKey} not active`);
+      logger.info(`Subscription ${subscriptionKey} not active`);
     }
 
     return status.active;
