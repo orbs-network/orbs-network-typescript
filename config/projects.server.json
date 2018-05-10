@@ -41,17 +41,12 @@
   },
   "order": [
     "architecture",
-    "crypto-sdk",
     "core-library-typescript",
     "gossip-service-typescript",
     "consensus-service-typescript",
     "public-api-service-typescript",
     "sidechain-connector-service-typescript",
     "storage-service-typescript",
-    "virtual-machine-service-typescript",
-    "example-slack-bot",
-    "crypto-sdk-android",
-    "client-sdk-javascript",
-    "example-android-app"
+    "virtual-machine-service-typescript"
   ]
 }
