@@ -178,7 +178,7 @@ export class RaftConsensus {
 
     const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.debug(`New block with height ${block.header.height} and hash ${blockHash} is about to be committed to RAFT log`);
+    logger.debug(`New block with height ${block.header.height} and hash ${blockHash} is about to be appended to RAFT log`);
 
     this.node.append(appendMessage);
   }
