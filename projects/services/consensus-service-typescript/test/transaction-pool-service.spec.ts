@@ -30,7 +30,8 @@ function createDummyTransaction(): Transaction {
             timestamp: Date.now().toString(),
             version: 1
         },
-        payload: DUMMY_TRANSACTION_PAYLOAD
+        payload: DUMMY_TRANSACTION_PAYLOAD,
+        signatureData: undefined
     };
 }
 

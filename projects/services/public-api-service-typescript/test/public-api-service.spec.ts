@@ -24,7 +24,11 @@ const transaction: types.Transaction = {
     sender: bs58DecodeRawAddress(senderAddressBase58),
     contractAddress: bs58DecodeRawAddress(contractAddressBase58)
   },
-  payload
+  payload,
+  signatureData: {
+    publicKey: new Buffer(""),
+    signature: new Buffer("")
+  }
 };
 
 const tx = new TransactionHelper(transaction);

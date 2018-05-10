@@ -61,7 +61,11 @@ export default class PublicApiHTTPService extends Service {
             timestamp: _.get(body, "header.timestamp"),
             contractAddress: bs58DecodeRawAddress(_.get(body, "header.contractAddressBase58")),
           },
-          payload: _.get(body, "payload")
+          payload: _.get(body, "payload"),
+          signatureData: { // TEMPORARY PLACEHOLDER
+            publicKey: new Buffer(""),
+            signature: new Buffer("")
+          }
         }
       };
 
