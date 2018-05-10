@@ -1,6 +1,5 @@
 import * as chai from "chai";
 import * as express from "express";
-import * as morgan from "morgan";
 import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 
 
@@ -13,7 +12,6 @@ export default function createMockServer(
 ): express.Application {
   const app = express();
 
-  app.use(morgan("dev"));
   app.use(express.json());
 
   app.post("/public/sendTransaction", (req: express.Request, res: express.Response) => {
