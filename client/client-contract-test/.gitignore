@@ -44,6 +44,7 @@ CTestTestfile.cmake
 
 build/
 deps/
+.gradle
 
 # Ignore built ts files
 dist/**/*
