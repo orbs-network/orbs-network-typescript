@@ -10,8 +10,7 @@ import { createJavaOrbsContract } from "./java-sdk-helper";
 import * as mocha from "mocha";
 import { pythonBridge, PythonBridge } from "python-bridge";
 import * as path from "path";
-import { OrbsClient, OrbsContract, Address, ED25519Key } from "../../client-sdk-javascript/src";
-import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
+import { OrbsClient, OrbsContract, Address, ED25519Key, OrbsContractMethodArgs } from "orbs-client-sdk";
 import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, SIGNATURE } from "../src/expected-results";
 import { testContract } from "../src/contract-adapter";
 
@@ -153,7 +152,10 @@ describe("The Javascript SDK", () => {
 });
 
 describe("The Java SDK", () => {
-  testContract(() => new JavaContractAdapter(createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT), CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
+  testContract(() => new JavaContractAdapter(
+    createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT), CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS),
+    { disableSignatureTest: true } // TODO: re-enable as soon as it's implemented
+  );
 });
 
 describe.skip("The Python SDK", () => {
