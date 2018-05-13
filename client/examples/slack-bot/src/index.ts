@@ -1,6 +1,6 @@
 import { FooBarAccount } from "./foobar-account";
 import { RTMClient } from "@slack/client";
-import { OrbsClient, OrbsContract, Address } from "orbs-client-sdk";
+import { OrbsClient, OrbsContract, Address, ED25519Key } from "orbs-client-sdk";
 import * as crypto from "crypto";
 
 interface Config {
@@ -24,18 +24,18 @@ const config = {
 };
 
 
-function generateAddress(username: string): string {
+function generateAddress(): [string, ED25519Key] {
   const virtualChainId = "640ed3";
-  const publicKey = crypto.createHash("sha256").update(username).digest("hex");
-  const address = new Address(publicKey, virtualChainId, Address.TEST_NETWORK_ID);
+  const keyPair = new ED25519Key();
+  const address = new Address(keyPair.publicKey, virtualChainId, Address.TEST_NETWORK_ID);
 
-  return address.toString();
+  return [address.toString(), keyPair];
 }
 
 
 async function getAccount(username: string, config: Config): Promise<FooBarAccount> {
-  const address = generateAddress(username);
-  const orbsClient = new OrbsClient(address, undefined, config.timeout);
+  const [address, keyPair] = generateAddress();
+  const orbsClient = new OrbsClient(address, undefined, keyPair, config.timeout);
   const contract = new OrbsContract(orbsClient, "foobar");
   const account = new FooBarAccount(username, address, contract);
 
