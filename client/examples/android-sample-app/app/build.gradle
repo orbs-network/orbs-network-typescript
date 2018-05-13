@@ -63,8 +63,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-//  implementation project(':crypto-sdk')
-//  implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-//  implementation 'com.google.code.gson:gson:2.8.4'
-    implementation 'com.orbs.sdk:crypto-sdk:0.0.5'
+    implementation project(':crypto-sdk')
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.google.code.gson:gson:2.8.4'
+//  implementation 'com.orbs.sdk:crypto-sdk:+'
 }

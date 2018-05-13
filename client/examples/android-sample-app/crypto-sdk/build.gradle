@@ -1,2 +1,2 @@
-// configurations.maybeCreate("default")
-// artifacts.add("default", file('../../../crypto-sdk-android/crypto-sdk/build/outputs/aar/crypto-sdk-release.aar'))
+configurations.maybeCreate("default")
+artifacts.add("default", file('../../../crypto-sdk-android/crypto-sdk/build/outputs/aar/crypto-sdk-release.aar'))
