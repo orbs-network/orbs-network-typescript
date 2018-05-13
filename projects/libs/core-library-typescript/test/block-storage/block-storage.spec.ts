@@ -8,6 +8,7 @@ import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockUtils } from "../../src/common-library";
 import { TransactionPool } from "orbs-interfaces";
+import { StartupCheckResult, STARTUP_CHECK_STATUS } from "../../src/common-library/startup-check-result";
 
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
@@ -119,15 +120,15 @@ describe("Block storage", () => {
     });
   });
 
-  describe("run startupTest", () => {
-    it("should return {status: 'ok'} when startup test passes", async () => {
-      const startupTestResult = await blockStorage.startupTest();
-      return expect(startupTestResult).to.deep.equal({ status: "ok" });
+  describe("run startupCheck", () => {
+    it("startupCheck should succeed", async () => {
+      const startupCheckResult = await blockStorage.startupCheck();
+      return expect(startupCheckResult).to.deep.equal(<StartupCheckResult>{ status: STARTUP_CHECK_STATUS.OK });
     });
   });
 });
 
-describe("Block storage - Bad setup", () => {
+describe("Block storage - Bad setup (no transaction pool)", () => {
   let blockStorage: BlockStorage;
   // let lastBlock: types.Block;
 
@@ -139,9 +140,9 @@ describe("Block storage - Bad setup", () => {
     // lastBlock = await blockStorage.getLastBlock();
   });
 
-  it("should return {status: 'err'} when startup test passes", async () => {
-    const startupTestResult = await blockStorage.startupTest();
-    return expect(startupTestResult).to.deep.equal({ status: "err" });
+  it("startupCheck should fail", async () => {
+    const startupCheckResult = await blockStorage.startupCheck();
+    return expect(startupCheckResult).to.deep.equal({ status: STARTUP_CHECK_STATUS.FAIL });
   });
 
   afterEach(async () => {

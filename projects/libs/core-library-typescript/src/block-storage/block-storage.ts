@@ -2,9 +2,10 @@ import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
 import { BlockUtils, logger, types, JsonBuffer } from "../common-library";
-import { StartupTestStatus, StartupTest } from "../common-library/startup-test";
+import { StartupCheck } from "../common-library/startup-check";
+import { StartupCheckResult, STARTUP_CHECK_STATUS } from "../common-library/startup-check-result";
 
-export class BlockStorage implements StartupTest {
+export class BlockStorage implements StartupCheck {
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
   private lastBlock: types.Block;
@@ -123,10 +124,13 @@ export class BlockStorage implements StartupTest {
     await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
   }
 
-  public async startupTest(): Promise<StartupTestStatus> {
+  public async startupCheck(): Promise<StartupCheckResult> {
 
-    // TODO implement me!
+    if (!this.transactionPool) {
+      return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL };
+    }
 
-    return this.transactionPool ? <StartupTestStatus>{ status: "ok" } : <StartupTestStatus>{ status: "err" };
+    const lastBlock = await this.getLastBlock();
+    return lastBlock ? <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.OK } : <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL };
   }
 }

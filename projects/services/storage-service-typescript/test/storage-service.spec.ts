@@ -3,12 +3,10 @@ import * as fse from "fs-extra";
 import * as path from "path";
 import * as os from "os";
 import * as getPort from "get-port";
-import * as mocha from "mocha";
 import { stubInterface } from "ts-sinon";
 import * as request from "request-promise";
 
-import * as express from "express";
-import { Request, Response } from "express";
+import { Response } from "express";
 
 
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
@@ -35,7 +33,7 @@ describe("storage server test", function () {
   beforeEach(async () => {
     const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
 
-    const topology =  {
+    const topology = {
       peers: [
         {
           service: "storage",
@@ -103,32 +101,20 @@ describe("storage server test", function () {
     return expect(state).to.have.deep.property("values", {});
   });
 
-  it("should return HTTP 200 when calling GET /test/started on a running storage service", async () => {
-
-
-    const managementEndpoint = `http://${SERVER_IP_ADDRESS}:${managementPort}`;
-    // const app = express();
-    // app.get("/test/started", (req: Request, res: Response) => {
-    //   return res.send(200).json({status: "ok"});
-    // });
-    // const expressServer = await app.listen(8888);
-
+  it("should return HTTP 200 when calling GET /admin/startupCheck (regardless of what the startup checks actually returned)", async () => {
     const options = {
-      uri: `${managementEndpoint}/test/started`,
+      uri: `http://${SERVER_IP_ADDRESS}:${managementPort}/admin/startupCheck`,
       resolveWithFullResponse: true,
       json: true
     };
 
     const response: Response = await request.get(options);
 
-    // await new Promise(resolve => {
-    //   expressServer.close(resolve);
-    // });
-
     return expect(response.statusCode).to.equal(200);
   });
 
   afterEach(() => {
+    logger.debug(`Stopping Storage Service`);
     return server.stop();
   });
 });
