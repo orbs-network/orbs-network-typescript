@@ -30,17 +30,17 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
     this.contractMethodName = contractMethodName;
   }
 
-  getSendTranscationObject(): Promise<OrbsAPISendTransactionRequest> {
+  getSendTranscationObject(): OrbsAPISendTransactionRequest {
     const sendTransactionPayload = this.orbsContract.generateSendTransactionPayload(this.contractMethodName, this.contractMethodArgs);
     const sendTranscationObject = this.orbsContract.orbsClient.generateTransactionRequest(this.orbsContract.contractAddress, sendTransactionPayload, Date.now());
 
-    return Promise.resolve(sendTranscationObject);
+    return sendTranscationObject;
   }
-  getCallObject(): Promise<OrbsAPICallContractRequest> {
+  getCallObject(): OrbsAPICallContractRequest {
     const callPayload = this.orbsContract.generateCallPayload(this.contractMethodName, this.contractMethodArgs);
     const callObject = this.orbsContract.orbsClient.generateCallRequest(this.orbsContract.contractAddress, callPayload);
 
-    return Promise.resolve(callObject);
+    return callObject;
   }
 }
 

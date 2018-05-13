@@ -7,8 +7,8 @@ export interface OrbsContractAdapter {
     contractMethodName: string;
     contractMethodArgs: OrbsContractMethodArgs;
 
-    getSendTranscationObject(): Promise<OrbsAPISendTransactionRequest> ;
-    getCallObject(): Promise<OrbsAPICallContractRequest> ;
+    getSendTranscationObject(): OrbsAPISendTransactionRequest;
+    getCallObject(): OrbsAPICallContractRequest;
 }
 
 export function testContract(makeContract: () => OrbsContractAdapter) {
