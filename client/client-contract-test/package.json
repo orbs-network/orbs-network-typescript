@@ -35,9 +35,8 @@
   },
   "dependencies": {
     "bindings": "^1.3.0",
-    "chai": "^4.1.2",    
-    "mocha": "^5.0.1",    
-    "orbs-interfaces": "file:../../projects/architecture",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.1",
     "path": "^0.12.7",
     "python-bridge": "^1.0.3",
     "sinon": "^4.5.0",

@@ -1065,9 +1065,6 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
-"orbs-interfaces@file:../../projects/architecture":
-  version "0.1.0"
-
 os-homedir@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/os-homedir/-/os-homedir-1.0.2.tgz#ffbc4988336e0e833de0c168c7ef152121aa7fb3"
