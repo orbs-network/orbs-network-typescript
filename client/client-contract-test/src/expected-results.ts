@@ -1,4 +1,4 @@
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "./orbs-api-interface";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
 import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
 import { Address } from "../../client-sdk-javascript/src/address";
 import { ED25519Key } from "../../client-sdk-javascript/src/ed25519key";

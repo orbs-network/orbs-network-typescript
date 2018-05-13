@@ -6,14 +6,14 @@ import mockHttpServer from "./mock-server";
 import { Server } from "http";
 import { stubInterface } from "ts-sinon";
 import * as crypto from "crypto";
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
 import { createJavaOrbsContract } from "./java-sdk-helper";
 import * as mocha from "mocha";
 import { pythonBridge, PythonBridge } from "python-bridge";
 import * as path from "path";
 import { OrbsClient, OrbsContract, Address } from "../../client-sdk-javascript/src";
 import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
-import { expectedCallContractRequest, expectedSendTransactionRequest, SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID } from "../src/expected-results"
+import { expectedCallContractRequest, expectedSendTransactionRequest, SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID } from "../src/expected-results";
 import { testContract } from "../src/contract-adapter";
 
 chai.use(sinonChai);
