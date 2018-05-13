@@ -4,30 +4,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-ext {
-    bintrayRepo = 'orbs-network'
-    bintrayName = 'orbs-network'
-
-    publishedGroupId = 'com.orbs.sdk'
-    libraryName = 'OrbsSDK'
-    artifact = 'crypto-sdk'
-
-    libraryDescription = 'Orbs Android SDK'
-
-    siteUrl = 'https://github.com/orbs-network/orbs-network'
-    gitUrl = 'https://github.com/orbs-network/orbs-network.git'
-
-    libraryVersion = '0.0.5'
-
-    developerId = 'orbs'
-    developerName = 'Orbs'
-    developerEmail = 'androidsdk@orbs.com'
-
-    licenseName = 'MIT'
-    licenseUrl = 'https://github.com/orbs-network/orbs-network/blob/master/LICENSE'
-    allLicenses = ["MIT"]
-}
-
 android {
     compileSdkVersion 27
 
@@ -141,6 +117,29 @@ dependencies {
 }
 
 
+ext {
+    bintrayRepo = 'orbs-network'
+    bintrayName = 'orbs-network'
+
+    publishedGroupId = 'com.orbs.sdk'
+    libraryName = 'OrbsSDK'
+    artifact = 'crypto-sdk'
+
+    libraryDescription = 'Orbs Android SDK'
+
+    siteUrl = 'https://github.com/orbs-network/orbs-network'
+    gitUrl = 'https://github.com/orbs-network/orbs-network.git'
+
+    libraryVersion = android.defaultConfig.versionName
+
+    developerId = 'orbs'
+    developerName = 'Orbs'
+    developerEmail = 'androidsdk@orbs.com'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://github.com/orbs-network/orbs-network/blob/master/LICENSE'
+    allLicenses = ["MIT"]
+}
 
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 
