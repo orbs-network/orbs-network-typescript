@@ -115,8 +115,8 @@ describe("storage server test", function () {
   it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
 
     const expected: StartupCheckResult[] = [
-      { serviceName: "block", status: STARTUP_CHECK_STATUS.OK },
-      { serviceName: "state", status: STARTUP_CHECK_STATUS.OK },
+      <StartupCheckResult>{ serviceName: "block", status: STARTUP_CHECK_STATUS.OK },
+      <StartupCheckResult>{ serviceName: "state", status: STARTUP_CHECK_STATUS.OK },
     ];
 
     return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)

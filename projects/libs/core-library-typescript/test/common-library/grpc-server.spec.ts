@@ -21,3 +21,15 @@ describe("GRPCServer cannot start if no services are attached to it", () => {
 
   });
 });
+
+// TODO Move this logic to dedicated handler
+
+describe("Filter out non-ServiceStatusChecker services", () => {
+
+  it("should filter out non-statusCheck services", () => { });
+
+
+  it("should return 200 if all services are ok", () => { });
+
+  it("should return 503 if not all services are ok", () => { });
+});

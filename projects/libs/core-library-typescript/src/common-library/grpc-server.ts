@@ -1,7 +1,8 @@
 import * as Mali from "mali";
 import * as express from "express";
 import { Request, Response } from "express";
-import { StartupCheckResult } from "./startup-check-result";
+import { ServiceStatusChecker } from "./service-status-check";
+import { StartupCheckResult, STARTUP_CHECK_STATUS } from "./startup-check-result";
 
 import { types } from "./types";
 import { Service } from "../base-service";
@@ -9,6 +10,7 @@ import { getPathToProto } from "orbs-interfaces";
 
 import { filter } from "lodash";
 import { logger } from ".";
+import { StartupCheckComposite } from "./startup-check-composite";
 
 const protos: Map<string, string> = new Map<string, string>();
 protos.set("Consensus", "consensus.proto");
@@ -27,7 +29,7 @@ export class GRPCServerBuilder {
   mali: Mali;
   services: Service[] = [];
   managementServer: any;
-  startupChecker: any;
+  startupCheckComposite: StartupCheckComposite;
 
   onEndpoint(endpoint: string): GRPCServerBuilder {
     this.endpoint = endpoint;
@@ -64,9 +66,9 @@ export class GRPCServerBuilder {
     return this;
   }
 
-  withStartupChecker(startupChecker: any) {
-    this.startupChecker = startupChecker;
-  }
+  // withStartupChecker(startupChecker: StartupChecker) {
+  //   this.startupChecker = startupChecker;
+  // }
 
 
 
@@ -79,14 +81,25 @@ export class GRPCServerBuilder {
       return Promise.reject("Mali was not set up correctly. did you forget to call withService()?");
     }
 
+    const serviceStatusCheckers: ServiceStatusChecker[] = [];
+    this.services.forEach(s => {
+      if (this.instanceOfServiceStatusChecker(s)) {
+        serviceStatusCheckers.push(<ServiceStatusChecker>s);
+      }
+    });
+    this.startupCheckComposite = new StartupCheckComposite(serviceStatusCheckers);
+
     const app = express();
     logger.info("Management server is starting");
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
 
-      const result = { status: "ok" };
-      logger.info("Healthcheck status", result);
+      // TODO startupCheckComposite needs to handle this 200/503 logic
 
-      return res.json(result);
+      return this.startupCheckComposite.startupCheck()
+        .then((result: StartupCheckResult) => {
+          const httpCode = result.status === STARTUP_CHECK_STATUS.OK ? 200 : 503;
+          return res.send(httpCode).json(result);
+        });
     });
 
     return new Promise(resolve => {
@@ -112,6 +125,10 @@ export class GRPCServerBuilder {
       this.managementServer.close();
     }
     return all;
+  }
+
+  private instanceOfServiceStatusChecker(item: any): item is ServiceStatusChecker {
+    return item.hasOwnProperty("checkStatus");
   }
 }
 

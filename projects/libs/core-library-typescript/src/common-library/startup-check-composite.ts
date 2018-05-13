@@ -3,7 +3,7 @@ import { StartupCheckResult, ServiceStatus, STARTUP_CHECK_STATUS } from "./start
 import { ServiceStatusChecker } from "./service-status-check";
 import { logger } from "../common-library";
 
-export class StartupCheckComposite {
+export class StartupCheckComposite implements StartupChecker {
   serviceStatusCheckers: ServiceStatusChecker[] = [];
 
   constructor(serviceStatusCheckers: ServiceStatusChecker[]) {
@@ -39,19 +39,14 @@ export class StartupCheckComposite {
       } else {
         hasNotOk = true;
       }
-
-      logger.info(`Service ${item.name} status is ${item.status}`);
     }
 
     if (!hasNotOk) {
-      logger.info('Return OK');
       return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.OK, services: serviceStatuses };
     }
     if (hasOk) {
-      logger.info('Return PARTIAL');
       return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.PARTIALLY_OPERATIONAL, services: serviceStatuses };
     }
-    logger.info('Return FAIL');
     return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL, services: serviceStatuses };
 
   }
