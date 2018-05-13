@@ -8,7 +8,6 @@ import { stubInterface, stubObject } from "ts-sinon";
 import * as crypto from "crypto";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 import { OrbsContract, OrbsContractMethodArgs } from "../src/orbs-contract";
-import { SendTransactionOutput } from "orbs-interfaces";
 import * as path from "path";
 import { testContract, OrbsContractAdapter } from "../../client-contract-test/src";
 import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, SIGNATURE } from "../../client-contract-test/src/expected-results";
