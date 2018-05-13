@@ -16,16 +16,16 @@ import okhttp3.Response;
 public class OrbsClient {
   final String apiEndpoint;
   final Address senderAddress;
-  final int timeout;
+  final int timeoutInMs;
 
   public OrbsClient(String apiEndpoint, Address senderAddress) {
     this(apiEndpoint, senderAddress, 2000);
   }
 
-  public OrbsClient(String apiEndpoint, Address senderAddress, Integer timeout) {
+  public OrbsClient(String apiEndpoint, Address senderAddress, Integer timeoutInMs) {
     this.apiEndpoint = apiEndpoint;
     this.senderAddress = senderAddress;
-    this.timeout = timeout;
+    this.timeoutInMs = timeoutInMs;
   }
 
   public String sendTransaction(Address contractAddress, String payload) throws Exception {
@@ -64,7 +64,7 @@ public class OrbsClient {
 
   private OkHttpClient createClient() {
     return new OkHttpClient.Builder()
-            .readTimeout(2, TimeUnit.SECONDS)
+            .readTimeout(this.timeoutInMs, TimeUnit.MILLISECONDS)
             .build();
   }
 
