@@ -85,7 +85,7 @@ android {
             dependsOn "copy${buildTypeName}CryptoSDKLibrary"
             from("build/intermediates/packaged-classes/${buildType}/")
             into(localBuildDir)
-            include(['classes.jar','libs/*.jar'])
+            include(['classes.jar'])
             rename('classes.jar', "crypto-sdk-${buildType}.jar")
         }
 
