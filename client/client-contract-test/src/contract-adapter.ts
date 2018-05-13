@@ -29,7 +29,7 @@ export function testContract(makeContract: () => OrbsContractAdapter, testSignat
         expect(timestamp).to.be.below(now + (10 * 1000));
       });
 
-      ifit("getSendTranscationObject() is called", async () => {
+      ifit("getSendTransactionObject() is called with the correct signature", async () => {
         const sendTransactionObject = await makeContract().getSendTranscationObject();
         expect(sendTransactionObject).to.have.property("signatureData").that.has.property("publicKeyHex").that.is.eql(expectedSendTransactionRequest.signatureData.publicKeyHex);
         expect(sendTransactionObject).to.have.property("signatureData").that.has.property("signatureHex").that.is.eql(expectedSendTransactionRequest.signatureData.signatureHex);
