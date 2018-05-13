@@ -2,7 +2,6 @@ import { expect, assert } from "chai";
 import  * as chai from "chai";
 import { OrbsContractAdapter } from "../src";
 import * as sinonChai from "sinon-chai";
-import mockHttpServer from "./mock-server";
 import { Server } from "http";
 import { stubInterface } from "ts-sinon";
 import * as crypto from "crypto";
