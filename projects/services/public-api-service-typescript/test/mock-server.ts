@@ -1,74 +1,42 @@
 import * as chai from "chai";
 import * as express from "express";
-import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest } from "../../../../client/client-sdk-javascript/src/orbs-api-interface";
-import * as _ from "lodash";
-import { diffString } from "json-diff";
+import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest } from "../src/orbs-api-interface";
 
-import * as cp from "child_process";
-import * as path from "path";
-
-const deepEquals = require("deep-equal");
 
 const { expect } = chai;
 
-function failWith(message: string, status: number) {
-  const err: any = new Error(message);
-  err["status"] = status;
-  return err;
-}
-
-export default function createMockServer(requestStubs: RequestStub[]): express.Application {
+export default function createMockServer(
+  expectedSendTransactionRequest: OrbsAPISendTransactionRequest,
+  expectedCallContractRequest: OrbsAPICallContractRequest,
+  expectedGetTransactionStatusRequest: OrbsAPIGetTransactionStatusRequest,
+): express.Application {
   const app = express();
 
   app.use(express.json());
 
-  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const matchingStub = _.find(requestStubs, (stub: RequestStub) => req.path == stub.path);
-    if (matchingStub) {
-      const expectedJson = JSON.parse(matchingStub.requestBody);
-      if (deepEquals(req.body, expectedJson)) {
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).send(matchingStub.responseBody);
-      } else {
-        next(failWith(`Path ${matchingStub.path} mismatch: [${diffString(expectedJson, req.body)}]`, 400));
-      }
-    } else {
-      next(failWith(`No stub found for path ${req.path}`, 404));
-    }
+  app.use("/public/sendTransaction", (req: express.Request, res: express.Response) => {
+    // TODO: check header
+    expect(req.body.payload).to.be.eql(expectedSendTransactionRequest.payload);
+    expect(req.body.header.senderAddressBase58).to.be.eql(expectedSendTransactionRequest.header.senderAddressBase58);
+    expect(req.body.header.contractAddressBase58).to.be.eql(expectedSendTransactionRequest.header.contractAddressBase58);
+    expect(req.body.signatureData.publicKeyHex).to.be.eql(expectedSendTransactionRequest.signatureData.publicKeyHex);
+    expect(req.body.signatureData.signatureHex).to.be.eql(expectedSendTransactionRequest.signatureData.signatureHex);
+
+    res.json({ result: "ok" });
   });
 
-  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err);
-    res.status(err["status"] || 500);
-    res.render("error", {
-      message: err.message,
-      error: err
-    });
+  app.use("/public/callContract", (req: express.Request, res: express.Response) => {
+    // TODO: check sender
+    expect(req.body).to.be.eql(expectedCallContractRequest);
+
+    res.json({ result: "some-answer" });
+  });
+
+  app.use("/public/getTransactionStatus", (req: express.Request, res: express.Response) => {
+    expect(req.body).to.be.eql(expectedGetTransactionStatusRequest);
+
+    res.json({ status: "COMMITTED", receipt: { success: true} });
   });
 
   return app;
-}
-
-export class RequestStub {
-  path: string;
-  requestBody: string;
-  responseBody: string;
-
-  constructor(path: string, request: string, response: string) {
-    this.path = path;
-    this.requestBody = request;
-    this.responseBody = response;
-  }
-
-}
-
-export function runMockServer(port: number, stubs: RequestStub[]): Promise<cp.ChildProcess> {
-  const child = cp.fork(path.resolve(__dirname, "run-mock-server.js"), ["--port", port.toString(), "--stubs", JSON.stringify(stubs)], {stdio: ["ipc"]});
-  return new Promise((resolve) => {
-    child.stdout.on("data", (data) => {
-      if (!!data.toString().indexOf(port.toString())) {
-        resolve(child);
-      }
-    });
-  });
 }
