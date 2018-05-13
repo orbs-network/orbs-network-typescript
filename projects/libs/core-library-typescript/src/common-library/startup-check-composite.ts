@@ -1,45 +1,58 @@
-import { StartupCheck } from "./startup-check";
-import { StartupCheckResult, STARTUP_CHECK_STATUS } from "./startup-check-result";
+import { StartupChecker } from "./startup-check";
+import { StartupCheckResult, ServiceStatus, STARTUP_CHECK_STATUS } from "./startup-check-result";
+import { ServiceStatusChecker } from "./service-status-check";
+import { logger } from "../common-library";
 
 export class StartupCheckComposite {
-  startupChecks: Set<StartupCheck> = new Set();
+  serviceStatusCheckers: ServiceStatusChecker[] = [];
 
-  constructor(newStartupChecks: StartupCheck[]) {
-
-    for (const item of newStartupChecks) {
-      this.startupChecks.add(item);
-    }
+  constructor(serviceStatusCheckers: ServiceStatusChecker[]) {
+    this.serviceStatusCheckers = serviceStatusCheckers;
   }
 
-  addStartupCheck(startupCheck: StartupCheck) {
-    this.startupChecks.add(startupCheck);
+  addServiceStatusChecker(serviceStatusChecker: ServiceStatusChecker) {
+    this.serviceStatusCheckers.push(serviceStatusChecker);
   }
 
   startupCheck(): Promise<StartupCheckResult> {
 
-    const startupChecks = Array.from(this.startupChecks).map(s => s.startupCheck());
-    return Promise.all(startupChecks)
-      .then(startupCheckResults => {
+    const serviceStatusPromises = this.serviceStatusCheckers.map((s: ServiceStatusChecker) => s.checkServiceStatus());
+    return Promise.all(serviceStatusPromises)
+      .then((serviceStatuses: ServiceStatus[]) => {
 
-        const combinedStartupCheckResult: StartupCheckResult = this.combineStartupChecks(startupCheckResults);
-
-        return combinedStartupCheckResult;
+        const startupCheckResult: StartupCheckResult = this.createStartupCheckResultFromServiceStatuses(serviceStatuses);
+        return startupCheckResult;
       })
       .catch(err => {
         return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL, message: err.message };
       });
   }
 
-  private combineStartupChecks(startupCheckResults: StartupCheckResult[]): StartupCheckResult {
+  private createStartupCheckResultFromServiceStatuses(serviceStatuses: ServiceStatus[]): StartupCheckResult {
 
-    const combinedServiceNames = startupCheckResults.map(s => s.serviceName).join(", ");
+    let hasOk = false;
+    let hasNotOk = false;
 
-    for (const item of startupCheckResults) {
-      if (item.status !== STARTUP_CHECK_STATUS.OK) {
-        return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL, serviceName: combinedServiceNames };
+    for (const item of serviceStatuses) {
+      if (item.status === STARTUP_CHECK_STATUS.OK) {
+        hasOk = true;
+      } else {
+        hasNotOk = true;
       }
+
+      logger.info(`Service ${item.name} status is ${item.status}`);
     }
-    return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.OK, serviceName: combinedServiceNames };
+
+    if (!hasNotOk) {
+      logger.info('Return OK');
+      return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.OK, services: serviceStatuses };
+    }
+    if (hasOk) {
+      logger.info('Return PARTIAL');
+      return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.PARTIALLY_OPERATIONAL, services: serviceStatuses };
+    }
+    logger.info('Return FAIL');
+    return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL, services: serviceStatuses };
 
   }
 

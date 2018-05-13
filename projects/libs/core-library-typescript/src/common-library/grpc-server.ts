@@ -27,6 +27,7 @@ export class GRPCServerBuilder {
   mali: Mali;
   services: Service[] = [];
   managementServer: any;
+  startupChecker: any;
 
   onEndpoint(endpoint: string): GRPCServerBuilder {
     this.endpoint = endpoint;
@@ -63,6 +64,10 @@ export class GRPCServerBuilder {
     return this;
   }
 
+  withStartupChecker(startupChecker: any) {
+    this.startupChecker = startupChecker;
+  }
+
 
 
   start(): Promise<any> {
@@ -78,9 +83,10 @@ export class GRPCServerBuilder {
     logger.info("Management server is starting");
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
 
+      const result = { status: "ok" };
+      logger.info("Healthcheck status", result);
 
-
-      return res.json({ status: "ok" });
+      return res.json(result);
     });
 
     return new Promise(resolve => {
@@ -97,10 +103,6 @@ export class GRPCServerBuilder {
 
   stop(): Promise<any> {
 
-    // return new Promise(resolve => {
-    //   return this.managementServer ? this.managementServer.close(resolve) : resolve();
-    // })
-    //   .then(() => {
     const all = Promise.all(this.services.map(s => s.stop()));
     if (this.mali) {
       this.mali.close(this.endpoint);
@@ -110,7 +112,6 @@ export class GRPCServerBuilder {
       this.managementServer.close();
     }
     return all;
-    // });
   }
 }
 

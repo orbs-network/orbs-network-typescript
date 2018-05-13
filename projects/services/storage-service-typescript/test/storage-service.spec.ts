@@ -1,10 +1,11 @@
+import * as mocha from "mocha";
 import * as chai from "chai";
 import * as fse from "fs-extra";
 import * as path from "path";
 import * as os from "os";
 import * as getPort from "get-port";
 import { stubInterface } from "ts-sinon";
-import * as request from "request-promise";
+import * as request from "supertest";
 
 import { Response } from "express";
 
@@ -14,6 +15,8 @@ import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
 import storageServer from "../src/server";
 import GossipService from "../../gossip-service-typescript/src/service";
 import TransactionPoolService from "../../consensus-service-typescript/src/transaction-pool-service";
+import { StartupCheckResult } from "../../../libs/core-library-typescript/dist/common-library/startup-check-result";
+import { STARTUP_CHECK_STATUS } from "../../../libs/core-library-typescript/src/common-library/startup-check-result";
 
 const { expect } = chai;
 
@@ -29,6 +32,8 @@ describe("storage server test", function () {
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
   let managementPort: number;
+
+  // const startupChecker =
 
   beforeEach(async () => {
     const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
@@ -101,16 +106,23 @@ describe("storage server test", function () {
     return expect(state).to.have.deep.property("values", {});
   });
 
-  it("should return HTTP 200 when calling GET /admin/startupCheck (regardless of what the startup checks actually returned)", async () => {
-    const options = {
-      uri: `http://${SERVER_IP_ADDRESS}:${managementPort}/admin/startupCheck`,
-      resolveWithFullResponse: true,
-      json: true
-    };
+  // it("should return HTTP 200 when calling GET /admin/startupCheck (regardless of what the startup checks actually returned.)", async () => {
+  // return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
+  //   .get("/admin/startupCheck")
+  //   .expect(200, { status: "ok" });
+  // });
 
-    const response: Response = await request.get(options);
+  it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
 
-    return expect(response.statusCode).to.equal(200);
+    const expected: StartupCheckResult[] = [
+      { serviceName: "block", status: STARTUP_CHECK_STATUS.OK },
+      { serviceName: "state", status: STARTUP_CHECK_STATUS.OK },
+    ];
+
+    return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
+      .get("/admin/startupCheck")
+      .expect(200, expected);
+
   });
 
   afterEach(() => {

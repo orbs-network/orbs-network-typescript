@@ -1,5 +1,5 @@
 import { StartupCheckResult } from "./startup-check-result";
 
-export interface StartupCheck {
+export interface StartupChecker {
   startupCheck(): Promise<StartupCheckResult>;
 }

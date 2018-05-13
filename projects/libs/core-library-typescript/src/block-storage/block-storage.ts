@@ -2,10 +2,13 @@ import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
 import { BlockUtils, logger, types, JsonBuffer } from "../common-library";
-import { StartupCheck } from "../common-library/startup-check";
-import { StartupCheckResult, STARTUP_CHECK_STATUS } from "../common-library/startup-check-result";
+import { STARTUP_CHECK_STATUS, ServiceStatus } from "../common-library/startup-check-result";
+import { ServiceStatusChecker } from "../common-library/service-status-check";
 
-export class BlockStorage implements StartupCheck {
+export class BlockStorage implements ServiceStatusChecker {
+
+  private SERVICE_NAME = "block";
+
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
   private lastBlock: types.Block;
@@ -124,13 +127,13 @@ export class BlockStorage implements StartupCheck {
     await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
   }
 
-  public async startupCheck(): Promise<StartupCheckResult> {
+  public async checkServiceStatus(): Promise<ServiceStatus> {
 
     if (!this.transactionPool) {
-      return <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL };
+      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL };
     }
 
     const lastBlock = await this.getLastBlock();
-    return lastBlock ? <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.OK } : <StartupCheckResult>{ status: STARTUP_CHECK_STATUS.FAIL };
+    return <ServiceStatus>{ name: this.SERVICE_NAME, status: lastBlock ? STARTUP_CHECK_STATUS.OK : STARTUP_CHECK_STATUS.FAIL };
   }
 }
