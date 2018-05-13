@@ -20,6 +20,8 @@ export function testContract(makeContract: () => OrbsContractAdapter) {
         expect(sendTransactionObject).to.have.property("payload").that.is.eql(expectedSendTransactionRequest.payload);
         expect(sendTransactionObject).to.have.property("header").that.has.property("senderAddressBase58").that.is.eql(expectedSendTransactionRequest.header.senderAddressBase58);
         expect(sendTransactionObject).to.have.property("header").that.has.property("contractAddressBase58").that.is.eql(expectedSendTransactionRequest.header.contractAddressBase58);
+        expect(sendTransactionObject).to.have.property("signatureData").that.has.property("publicKeyHex").that.is.eql(expectedSendTransactionRequest.signatureData.publicKeyHex);
+        expect(sendTransactionObject).to.have.property("signatureData").that.has.property("signatureHex").that.is.eql(expectedSendTransactionRequest.signatureData.signatureHex);
         expect(sendTransactionObject).to.have.property("header").that.has.property("timestamp").that.is.a("string");
         const now = Date.now();
         // testing that timestamp is less than a couple of seconds old and not in the future
