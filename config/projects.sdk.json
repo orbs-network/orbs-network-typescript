@@ -29,12 +29,18 @@
     "type": "android-app",
     "path": "client/examples/android-sample-app"
   },
+  "client-contract-test": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/client-contract-test"
+  },
   "order": [
     "architecture",
     "crypto-sdk",
     "crypto-sdk-android",
     "example-android-app",
     "client-sdk-javascript",
-    "example-slack-bot"
+    "example-slack-bot",
+    "client-contract-test"
   ]
 }
