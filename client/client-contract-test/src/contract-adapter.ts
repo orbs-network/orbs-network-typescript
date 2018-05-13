@@ -11,8 +11,8 @@ export interface OrbsContractAdapter {
     getCallObject(): OrbsAPICallContractRequest;
 }
 
-export function testContract(makeContract: () => OrbsContractAdapter, testSignature = true) {
-    const ifit = testSignature ? it : xit;
+export function testContract(makeContract: () => OrbsContractAdapter, options: {disableSignatureTest: boolean} = {disableSignatureTest : false}) {
+    const ifit = options.disableSignatureTest ? xit : it;
 
     describe("calls the connector interface with the correct inputs when", async function () {
 
