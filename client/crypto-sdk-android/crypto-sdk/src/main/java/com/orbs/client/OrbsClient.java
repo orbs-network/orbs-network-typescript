@@ -2,6 +2,7 @@ package com.orbs.client;
 
 import com.google.gson.Gson;
 import com.orbs.cryptosdk.Address;
+import com.orbs.cryptosdk.ED25519Key;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -17,14 +18,16 @@ public class OrbsClient {
   final String apiEndpoint;
   final Address senderAddress;
   final int timeoutInMs;
+  final ED25519Key keyPair;
 
-  public OrbsClient(String apiEndpoint, Address senderAddress) {
-    this(apiEndpoint, senderAddress, 2000);
+  public OrbsClient(String apiEndpoint, Address senderAddress, ED25519Key keyPair) {
+    this(apiEndpoint, senderAddress, keyPair,2000);
   }
 
-  public OrbsClient(String apiEndpoint, Address senderAddress, Integer timeoutInMs) {
+  public OrbsClient(String apiEndpoint, Address senderAddress, ED25519Key keyPair, Integer timeoutInMs) {
     this.apiEndpoint = apiEndpoint;
     this.senderAddress = senderAddress;
+    this.keyPair = keyPair;
     this.timeoutInMs = timeoutInMs;
   }
 
@@ -45,6 +48,7 @@ public class OrbsClient {
     requestPayload.header.senderAddressBase58 = this.senderAddress.toString();
     requestPayload.header.timestamp = String.valueOf(new Date().getTime());
     requestPayload.header.contractAddressBase58 = contractAddress.toString();
+
     Gson gson = new Gson();
     return gson.toJson(requestPayload);
   }
