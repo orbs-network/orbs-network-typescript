@@ -87,11 +87,11 @@ export default class BlockBuilder {
     const lastBlock = await this.getOrFetchLastBlock();
     const block = await this.buildBlockFromPendingTransactions(lastBlock);
 
+    this.stopPolling();
+
     this.onNewBlockBuild(block);
 
     logger.debug(`Appended new block ${JSON.stringify(block)}`);
-
-    this.stopPolling();
 
     return block;
   }
