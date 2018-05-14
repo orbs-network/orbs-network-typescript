@@ -6,8 +6,11 @@ import { types } from "../common-library/types";
 import { InMemoryKVStore } from "./kvstore";
 
 import { delay } from "bluebird";
+import { STARTUP_CHECK_STATUS, ServiceStatus } from "../common-library/startup-check-result";
+import { ServiceStatusChecker } from "../common-library/service-status-check";
 
-export class StateStorage {
+export class StateStorage implements ServiceStatusChecker {
+  private SERVICE_NAME = "state";
   private blockStorage: types.BlockStorageClient;
 
   private kvstore = new InMemoryKVStore();
@@ -94,12 +97,30 @@ export class StateStorage {
     if ((this.lastBlockHeight == undefined) || (block.header.height == this.lastBlockHeight + 1)) {
       logger.debug("Processing block:", block.header.height);
 
-      for (const { contractAddress, key, value} of block.body.stateDiff) {
+      for (const { contractAddress, key, value } of block.body.stateDiff) {
         this.kvstore.set(contractAddress, key, value);
       }
       this.lastBlockHeight = block.header.height;
     } else {
-      throw new Error(`Unexpected block Height: ${block.header.height}. Expected ${ this.lastBlockHeight + 1 }, Out of sync?`);
+      throw new Error(`Unexpected block Height: ${block.header.height}. Expected ${this.lastBlockHeight + 1}, Out of sync?`);
     }
   }
+
+  public async checkServiceStatus(): Promise<ServiceStatus> {
+
+    if (!this.kvstore) {
+      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL, message: "Missing kvstore" };
+    }
+
+    if (!this.pollIntervalMs) {
+      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL, message: "Missing pollIntervalMs" };
+    }
+
+    if (!this.blockStorage) {
+      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL, message: "Missing blockStorage" };
+    }
+
+    return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.OK };
+  }
+
 }

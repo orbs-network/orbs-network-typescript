@@ -2,7 +2,9 @@ import * as Mali from "mali";
 import * as express from "express";
 import { Request, Response } from "express";
 import { ServiceStatusChecker } from "./service-status-check";
-import { StartupCheckResult, STARTUP_CHECK_STATUS } from "./startup-check-result";
+import { StartupCheckResult, STARTUP_CHECK_STATUS, ServiceStatus } from "./startup-check-result";
+
+import { StartupCheckComposite } from "./startup-check-composite";
 
 import { types } from "./types";
 import { Service } from "../base-service";
@@ -10,7 +12,7 @@ import { getPathToProto } from "orbs-interfaces";
 
 import { filter } from "lodash";
 import { logger } from ".";
-import { StartupCheckComposite } from "./startup-check-composite";
+
 
 const protos: Map<string, string> = new Map<string, string>();
 protos.set("Consensus", "consensus.proto");
@@ -75,6 +77,9 @@ export class GRPCServerBuilder {
   start(): Promise<any> {
 
 
+    if (!this.endpoint) {
+      return Promise.reject("No endpoint defined, you must call onEndpoint() before starting");
+    }
 
     // check if no endpoint...
     if (!this.mali) {
@@ -83,11 +88,18 @@ export class GRPCServerBuilder {
 
     const serviceStatusCheckers: ServiceStatusChecker[] = [];
     this.services.forEach(s => {
+
       if (this.instanceOfServiceStatusChecker(s)) {
+        logger.info(`GRPCServer: Adding service: ${s.name} because it has a status checker`);
+
         serviceStatusCheckers.push(<ServiceStatusChecker>s);
       }
     });
-    this.startupCheckComposite = new StartupCheckComposite(serviceStatusCheckers);
+
+    logger.info(`GRPCServer: found ${this.services.length} services, of which ${serviceStatusCheckers.length} can return status`);
+
+    this.startupCheckComposite = new StartupCheckComposite();
+    serviceStatusCheckers.forEach(s => this.startupCheckComposite.addServiceStatusChecker(s));
 
     const app = express();
     logger.info("Management server is starting");
@@ -95,10 +107,12 @@ export class GRPCServerBuilder {
 
       // TODO startupCheckComposite needs to handle this 200/503 logic
 
-      return this.startupCheckComposite.startupCheck()
+      this.startupCheckComposite.startupCheck()
         .then((result: StartupCheckResult) => {
           const httpCode = result.status === STARTUP_CHECK_STATUS.OK ? 200 : 503;
-          return res.send(httpCode).json(result);
+          logger.info(`>>> GRPC startupCheck: ${httpCode} ${JSON.stringify(result)}`);
+
+          return res.status(httpCode).send(result);
         });
     });
 
@@ -128,7 +142,8 @@ export class GRPCServerBuilder {
   }
 
   private instanceOfServiceStatusChecker(item: any): item is ServiceStatusChecker {
-    return item.hasOwnProperty("checkStatus");
+    logger.info(`instanceOfServiceStatusChecker(): ${item.name}: ${item["checkServiceStatus"]} has? ${item.hasOwnProperty("checkServiceStatus")}`);
+    return "checkServiceStatus" in item;
   }
 }
 

@@ -10,6 +10,18 @@ export interface ServiceConfig {
   nodeName: string;
 }
 
+export enum STARTUP_CHECK_STATUS { OK, FAIL, PARTIALLY_OPERATIONAL }
+
+export interface ServiceStatus {
+  name: string;
+  status: STARTUP_CHECK_STATUS;
+  message?: string;
+}
+
+export interface ServiceStatusChecker {
+  checkServiceStatus(): Promise<ServiceStatus>;
+}
+
 export abstract class Service {
   public config: ServiceConfig;
   public name: string;
@@ -22,7 +34,7 @@ export abstract class Service {
 
     if (!silent) {
       const originalMethod = descriptor.value;
-      descriptor.value = function(rpc: any) {
+      descriptor.value = function (rpc: any) {
         logger.debug(`${this.config.nodeName}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
 
         return originalMethod.apply(this, [rpc]);

@@ -2,14 +2,14 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service, ServiceConfig } from "orbs-core-library";
+import { Service, ServiceConfig, ServiceStatusChecker, ServiceStatus } from "orbs-core-library";
 import { StateStorage } from "orbs-core-library";
 
 export interface StateStorageServiceConfig extends ServiceConfig {
   pollInterval: number;
 }
 
-export default class StateStorageService extends Service {
+export default class StateStorageService extends Service implements ServiceStatusChecker {
   private stateStorage: StateStorage;
 
   private blockStorage: types.BlockStorageClient;
@@ -38,4 +38,9 @@ export default class StateStorageService extends Service {
     const keys = await this.stateStorage.readKeys(rpc.req.contractAddress, rpc.req.keys);
     rpc.res = { values: _.fromPairs([...keys]) };
   }
+
+  public async checkServiceStatus(): Promise<ServiceStatus> {
+    return this.stateStorage.checkServiceStatus();
+  }
+
 }

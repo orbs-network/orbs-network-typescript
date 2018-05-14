@@ -38,7 +38,8 @@ describe("StartupCheckComposite", () => {
 
   it("should return ok if all service status chekcs are ok", async () => {
 
-    const composite = new StartupCheckComposite([serviceOk1, serviceOk2]);
+    const composite = new StartupCheckComposite();
+    [serviceOk1, serviceOk2].forEach(s => composite.addServiceStatusChecker(s));
     const expected = {
       status: STARTUP_CHECK_STATUS.OK, services: [
         { name: "okService1", status: STARTUP_CHECK_STATUS.OK },
@@ -52,7 +53,8 @@ describe("StartupCheckComposite", () => {
   });
 
   it("should return partially operational if at least one service status check is ok and at least one is not ok", async () => {
-    const composite = new StartupCheckComposite([serviceOk1, serviceFail1]);
+    const composite = new StartupCheckComposite();
+    [serviceOk1, serviceFail1].forEach(s => composite.addServiceStatusChecker(s));
     const expected = {
       status: STARTUP_CHECK_STATUS.PARTIALLY_OPERATIONAL, services: [
         { name: "okService1", status: STARTUP_CHECK_STATUS.OK },
@@ -66,7 +68,8 @@ describe("StartupCheckComposite", () => {
   });
 
   it("should return fail if all service status checks failed", async () => {
-    const composite = new StartupCheckComposite([serviceFail1, serviceFail2]);
+    const composite = new StartupCheckComposite();
+    [serviceFail1, serviceFail2].forEach(s => composite.addServiceStatusChecker(s));
     const expected = {
       status: STARTUP_CHECK_STATUS.FAIL, services: [
         { name: "failService1", status: STARTUP_CHECK_STATUS.FAIL },
@@ -81,7 +84,7 @@ describe("StartupCheckComposite", () => {
 
 
   it("should return ok if no service status checks", async () => {
-    const composite = new StartupCheckComposite([]);
+    const composite = new StartupCheckComposite();
     const expected = { status: STARTUP_CHECK_STATUS.OK, services: <StartupChecker[]>[] };
     const actual = await composite.startupCheck();
 

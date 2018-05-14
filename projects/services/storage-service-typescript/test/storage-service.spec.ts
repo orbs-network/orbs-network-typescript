@@ -16,7 +16,7 @@ import storageServer from "../src/server";
 import GossipService from "../../gossip-service-typescript/src/service";
 import TransactionPoolService from "../../consensus-service-typescript/src/transaction-pool-service";
 import { StartupCheckResult } from "../../../libs/core-library-typescript/dist/common-library/startup-check-result";
-import { STARTUP_CHECK_STATUS } from "../../../libs/core-library-typescript/src/common-library/startup-check-result";
+import { STARTUP_CHECK_STATUS, ServiceStatus } from "../../../libs/core-library-typescript/src/common-library/startup-check-result";
 
 const { expect } = chai;
 
@@ -60,8 +60,8 @@ describe("storage server test", function () {
     const STATE_STORAGE_POLL_INTERVAL = 200;
     const BLOCK_STORAGE_DB_PATH = path.join(os.tmpdir(), "orbsdbtest");
     const storageEnv = { NODE_NAME, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH, STATE_STORAGE_POLL_INTERVAL };
-    const gossipServerStub = stubInterface<GossipService>();
-    const transactionPoolStub = stubInterface<TransactionPoolService>();
+    const gossipServerStub = stubInterface<GossipService>({ checkServiceStatus: <ServiceStatus>{ name: "gossip", status: STARTUP_CHECK_STATUS.OK, message: "mockGossip" } });
+    const transactionPoolStub = stubInterface<TransactionPoolService>({ checkServiceStatus: <ServiceStatus>{ name: "transactionPool", status: STARTUP_CHECK_STATUS.OK, message: "mockTransactionPool" } });
 
     logger.info(`Folder used for db in tests is ${BLOCK_STORAGE_DB_PATH}`);
 
@@ -114,10 +114,15 @@ describe("storage server test", function () {
 
   it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
 
-    const expected: StartupCheckResult[] = [
-      <StartupCheckResult>{ serviceName: "block", status: STARTUP_CHECK_STATUS.OK },
-      <StartupCheckResult>{ serviceName: "state", status: STARTUP_CHECK_STATUS.OK },
-    ];
+    const expected: StartupCheckResult = {
+      status: STARTUP_CHECK_STATUS.OK,
+      services: [
+        <ServiceStatus>{ name: "block", status: STARTUP_CHECK_STATUS.OK },
+        <ServiceStatus>{ name: "state", status: STARTUP_CHECK_STATUS.OK },
+        <ServiceStatus>{ name: "gossip", status: STARTUP_CHECK_STATUS.OK, message: "mockGossip" },
+        <ServiceStatus>{ name: "transactionPool", status: STARTUP_CHECK_STATUS.OK, message: "mockTransactionPool" }
+      ]
+    };
 
     return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
       .get("/admin/startupCheck")

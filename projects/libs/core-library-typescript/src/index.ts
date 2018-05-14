@@ -8,5 +8,5 @@ export { StateStorage } from "./state-storage";
 export { SubscriptionManager } from "./subscription-manager";
 export { PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "./transaction-pool";
 export { VirtualMachine } from "./virtual-machine";
-export { Service, ServiceRunner, ServiceConfig } from "./base-service";
-export { FakeGossipClient, generateServiceInProcessClient } from "./test-kit";
+export { Service, ServiceRunner, ServiceConfig, ServiceStatus, ServiceStatusChecker } from "./base-service";
+export { FakeGossipClient, generateServiceIPCClient } from "./test-kit";
