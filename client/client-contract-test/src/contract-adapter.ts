@@ -1,7 +1,7 @@
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
-import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
+import { OrbsContractMethodArgs } from "orbs-client-sdk";
 import { expect } from "chai";
 import { expectedSendTransactionRequest, expectedCallContractRequest } from "./expected-results";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "./orbs-api-interface";
 
 export interface OrbsContractAdapter {
     contractMethodName: string;

@@ -5,7 +5,6 @@ import * as sinonChai from "sinon-chai";
 import { Server } from "http";
 import { stubInterface, stubObject } from "ts-sinon";
 import * as crypto from "crypto";
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
 import { createJavaOrbsContract } from "./java-sdk-helper";
 import * as mocha from "mocha";
 import { pythonBridge, PythonBridge } from "python-bridge";
@@ -13,6 +12,7 @@ import * as path from "path";
 import { OrbsClient, OrbsContract, Address, ED25519Key, OrbsContractMethodArgs } from "orbs-client-sdk";
 import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, SIGNATURE } from "../src/expected-results";
 import { testContract } from "../src/contract-adapter";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
 
 chai.use(sinonChai);
 
