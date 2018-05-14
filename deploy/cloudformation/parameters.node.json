@@ -34,5 +34,17 @@
     {
         "ParameterKey": "NodeEnv",
         "ParameterValue": "staging"
+    },
+    {
+        "ParameterKey": "EbsVolumeSize",
+        "ParameterValue": "20"
+    },
+    {
+        "ParameterKey": "EbsVolumeType",
+        "ParameterValue": "gp2"
+    },
+    {
+        "ParameterKey": "DeviceName",
+        "ParameterValue": "/dev/xvdc"
     }
 ]
