@@ -8,6 +8,7 @@ export interface RaftConsensusConfig {
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
+  algorithm: string;
 }
 
 export abstract class BaseConsensus {

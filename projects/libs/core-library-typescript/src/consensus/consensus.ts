@@ -13,6 +13,7 @@ export class Consensus {
     config: RaftConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
+    logger.info("Consensus algorithm: RAFT");
     this.actualConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
   }
 
