@@ -70,6 +70,8 @@ private String generateAddress() {
 
 Key generation time should take around 20-30ms but may sometime spike as the PRNG is waiting to collect enough entropy.
 
+More information about the addressing scheme is available at the [client documentation](https://github.com/orbs-network/orbs-network/tree/feature/android-sdk-docs/client).
+
 ## The OrbsClient class
 
 You can create an `OrbsClient` class to call the contract methods with some client (Address). The client will accept:
