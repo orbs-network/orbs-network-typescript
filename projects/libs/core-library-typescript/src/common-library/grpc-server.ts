@@ -102,7 +102,7 @@ export class GRPCServerBuilder {
     serviceStatusCheckers.forEach(s => this.startupCheckComposite.addServiceStatusChecker(s));
 
     const app = express();
-    logger.info("Management server is starting");
+    // logger.info("Management server is starting");
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
 
       // TODO startupCheckComposite needs to handle this 200/503 logic
@@ -142,7 +142,7 @@ export class GRPCServerBuilder {
   }
 
   private instanceOfServiceStatusChecker(item: any): item is ServiceStatusChecker {
-    logger.info(`instanceOfServiceStatusChecker(): ${item.name}: ${item["checkServiceStatus"]} has? ${item.hasOwnProperty("checkServiceStatus")}`);
+    // logger.info(`instanceOfServiceStatusChecker(): ${item.name}: ${item["checkServiceStatus"]} has? ${item.hasOwnProperty("checkServiceStatus")}`);
     return "checkServiceStatus" in item;
   }
 }

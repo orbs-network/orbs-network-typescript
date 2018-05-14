@@ -25,5 +25,6 @@ export default function (nodeTopology: any, env: any) {
   return grpcServer.builder()
     .withService("BlockStorage", new BlockStorageService(peers.gossip, peers.transactionPool, blockStorageConfig))
     .withService("StateStorage", new StateStorageService(peers.blockStorage, stateStorageConfig))
-    .withManagementPort(8080);
+  // .withStartupChecker(checker([block, state]))
+  // .withManagementPort(8080);
 }
