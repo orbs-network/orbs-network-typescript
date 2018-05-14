@@ -23,9 +23,6 @@ On a fresh MacOS, run the following:
 5. chmod u+x orbs-team-member-bootstrap.sh
 6. ./orbs-team-member-bootstrap.sh
 
-
-
-
 ## Installation
 
 > Run when you want a fresh start. This will git clone all sub projects into `./projects`:
