@@ -2,6 +2,30 @@
 
 This is a monorepo that contains all Orbs projects, including both server implementation and client SDK.
 
+## Preparing your system
+You are encouraged to run the script `orbs-team-member-bootstrap.sh`, it will install all necessary software on your MacOS and then run the full build.
+
+Not all installed software is strictly necessary for the build to run. Rather, it is our opinionated view of a useful development environment.
+
+During the installation process, you will occasionally be asked for your credentials, please stay next to your machine at least until the build begins.
+> Note: if Docker is not already installed, the script will install it and then exit so you can run the Docker app manually. This is required for creating the `docker` shell command.
+You should then rerun the script (don't worry, it is safe to do so).
+
+The entire installation takes about 5 minutes. At the end of the installation, and before the build begins, you will be asked to either proceed with the build, or exit. Build time is about 15 minutes or more, depending on connection speed.
+
+### Running the script
+On a fresh MacOS, run the following:
+1. `mkdir -p ~/dev/orbs`
+2. `cd ~/dev/orbs`
+3. `git clone https://github.com/orbs-network/orbs-network.git`
+     > If you are prompted that `git` is not found, click "Install", then repeat step 3.
+4. cd ~/dev/orbs/orbs-network
+5. chmod u+x orbs-team-member-bootstrap.sh
+6. ./orbs-team-member-bootstrap.sh
+
+
+
+
 ## Installation
 
 > Run when you want a fresh start. This will git clone all sub projects into `./projects`:
@@ -35,7 +59,7 @@ Please refer to [documentation](deploy/bootstrap/README.md) in `deploy/bootstrap
 
 ## Run Inside of Docker
 
-Build process is separated between 3 parts:
+Build process is divided into 3 parts:
 
 * build server: `./docker/build-server-base.sh && ./docker-build.sh`
 * build sdk: `./docker/build-sdk-base.sh && ./docker/build-sdk.sh`
