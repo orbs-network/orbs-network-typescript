@@ -10,7 +10,7 @@ import * as mocha from "mocha";
 import { pythonBridge, PythonBridge } from "python-bridge";
 import * as path from "path";
 import { OrbsClient, OrbsContract, Address, ED25519Key, OrbsContractMethodArgs } from "orbs-client-sdk";
-import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, SIGNATURE } from "../src/expected-results";
+import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, SENDER_PRIVATE_KEY } from "../src/expected-results";
 import { testContract } from "../src/contract-adapter";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
 
@@ -31,7 +31,7 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
     this.contractMethodName = contractMethodName;
   }
 
-  getSendTranscationObject(): OrbsAPISendTransactionRequest {
+  getSendTransactionObject(): OrbsAPISendTransactionRequest {
     const sendTransactionPayload = this.orbsContract.generateSendTransactionPayload(this.contractMethodName, this.contractMethodArgs);
     const sendTranscationObject = this.orbsContract.orbsClient.generateTransactionRequest(this.orbsContract.contractAddress, sendTransactionPayload, Date.now());
 
@@ -56,7 +56,7 @@ class JavaContractAdapter implements OrbsContractAdapter {
     this.contractMethodName = contractMethodName;
   }
 
-  getSendTranscationObject(): OrbsAPISendTransactionRequest {
+  getSendTransactionObject(): OrbsAPISendTransactionRequest {
     const sendTransactionPayload = this.javaContract.generateSendTransactionPayloadSync(this.contractMethodName, this.contractMethodArgs);
     const javaClient = this.javaContract.getOrbsClientSync();
     const sendTransactionObjectJson = javaClient.generateTransactionRequestSync(this.javaContract.getContractAddressSync(), sendTransactionPayload);
@@ -142,11 +142,8 @@ before((done) => {
 });
 
 describe("The Javascript SDK", () => {
-  const keyPairStub = stubObject<ED25519Key>(new ED25519Key(), ["sign"]);
-  keyPairStub.publicKey = SENDER_PUBLIC_KEY;
-  (<sinon.SinonStub>keyPairStub.sign).returns(Buffer.from(SIGNATURE, "hex"));
-
-  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, keyPairStub, TIMEOUT);
+  const keyPair = new ED25519Key(SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY);
+  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, keyPair, TIMEOUT);
   const contract = new OrbsContract(client, CONTRACT_NAME);
   testContract(() => new TypeScriptContractAdapter(contract, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
 });
