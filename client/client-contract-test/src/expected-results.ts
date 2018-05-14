@@ -1,7 +1,6 @@
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
-import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
-import { Address } from "../../client-sdk-javascript/src/address";
+import { OrbsContractMethodArgs, Address } from "orbs-client-sdk";
 import * as crypto from "crypto";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "./orbs-api-interface";
 
 
 export const VIRTUAL_CHAIN_ID = "640ed3";
