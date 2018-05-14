@@ -1,3 +1,3 @@
 export { Consensus } from "./consensus";
-export { RaftConsensusConfig } from "./raft-consensus";
-export { ElectionTimeoutConfig } from "./raft-consensus";
+export { RaftConsensusConfig } from "./base-consensus";
+export { ElectionTimeoutConfig } from "./base-consensus";
