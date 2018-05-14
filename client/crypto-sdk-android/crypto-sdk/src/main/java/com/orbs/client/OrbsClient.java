@@ -28,10 +28,13 @@ public class OrbsClient {
     this.timeoutInMs = timeoutInMs;
   }
 
-  public String sendTransaction(Address contractAddress, String payload) throws Exception {
+  public OrbsAPISendTransactionResponse sendTransaction(Address contractAddress, String payload) throws Exception {
     String requestJson = generateTransactionRequest(contractAddress, payload);
 
-    return this.sendHTTPRequest(this.apiEndpoint + "/public/sendTransaction", requestJson);
+    String rawRetVal = this.sendHTTPRequest(this.apiEndpoint + "/public/sendTransaction", requestJson);
+    Gson gson = new Gson();
+    OrbsAPISendTransactionResponse res = gson.fromJson(rawRetVal, OrbsAPISendTransactionResponse.class);
+    return res;
   }
 
   public String generateTransactionRequest(Address contractAddress, String payload) {
@@ -78,8 +81,6 @@ public class OrbsClient {
   }
 
   private String sendHTTPRequest(String path, String jsonPayload) throws Exception {
-    System.out.println(this.apiEndpoint + path);
-
     OkHttpClient client = createClient();
     Request request = createRequest(path, jsonPayload);
 

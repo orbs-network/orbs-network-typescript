@@ -17,7 +17,7 @@ public class OrbsContract {
     this.contractAddress = new Address(contractHash, client.senderAddress.virtualChainId, client.senderAddress.networkId);
   }
 
-  public Object sendTransaction(String methodName, Object[] args) throws Exception {
+  public OrbsAPISendTransactionResponse sendTransaction(String methodName, Object[] args) throws Exception {
     String payload = generateSendTransactionPayload(methodName, args);
     return orbsClient.sendTransaction(this.contractAddress, payload);
   }
