@@ -8,6 +8,12 @@ message BlockHeader {
   uint32 height = 3;
 }
 
+message BlockSignatureData {
+  bytes publicKey = 1;
+  bytes signature = 2;
+  string signatory = 3;
+}
+
 message BlockBody {
   repeated Transaction transactions = 1;
   repeated TransactionReceipt transactionReceipts = 2;
@@ -23,4 +29,5 @@ message ModifiedStateKey {
 message Block {
   BlockHeader header = 1;
   BlockBody body = 2;
+  BlockSignatureData signatureData = 3;
 }

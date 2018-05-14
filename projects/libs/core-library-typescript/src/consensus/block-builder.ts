@@ -1,5 +1,12 @@
-import { types, logger, BlockUtils } from "../common-library";
+import { types, logger, BlockUtils, KeyManager } from "../common-library";
 
+
+export interface BlockBuilderConfig {
+  pollIntervalMs?: number;
+  sign?: boolean;
+  keyManager?: KeyManager;
+  nodeName?: string;
+}
 export default class BlockBuilder {
   private virtualMachine: types.VirtualMachineClient;
   private transactionPool: types.TransactionPoolClient;
@@ -8,19 +15,21 @@ export default class BlockBuilder {
   private lastBlock: types.Block;
   private blockStorage: types.BlockStorageClient;
   private onNewBlockBuild: (block: types.Block) => void;
+  private config: BlockBuilderConfig;
 
   constructor(input: {
     virtualMachine: types.VirtualMachineClient,
     transactionPool: types.TransactionPoolClient,
     blockStorage: types.BlockStorageClient,
     newBlockBuildCallback: (block: types.Block) => void,
-    pollIntervalMs?: number
+    config: BlockBuilderConfig
   }) {
       this.virtualMachine = input.virtualMachine;
       this.transactionPool = input.transactionPool;
       this.blockStorage = input.blockStorage;
       this.onNewBlockBuild = input.newBlockBuildCallback;
-      this.pollIntervalMs = input.pollIntervalMs || 500;
+      this.pollIntervalMs = input.config.pollIntervalMs || 500;
+      this.config = input.config;
   }
 
   private pollForPendingTransactions() {

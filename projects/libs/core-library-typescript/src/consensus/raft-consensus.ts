@@ -86,7 +86,7 @@ export class RaftConsensus {
     this.connector = new RPCConnector(config.nodeName, gossip);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
-      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block)
+      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block), config: {}
     });
 
     this.node = gaggle({
