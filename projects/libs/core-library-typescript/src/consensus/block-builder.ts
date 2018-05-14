@@ -24,6 +24,9 @@ export default class BlockBuilder {
   }
 
   private pollForPendingTransactions() {
+    if (this.pollInterval) {
+      return;
+    }
     this.pollInterval = setInterval(async () => {
       try {
         logger.debug("blockBuilder tick");
@@ -37,6 +40,7 @@ export default class BlockBuilder {
   private stopPolling() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
+      delete this.pollInterval;
     }
   }
 
