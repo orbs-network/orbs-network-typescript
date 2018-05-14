@@ -38,7 +38,8 @@ services:
 
   public-api:
     image: ${DOCKER_IMAGE}:${DOCKER_TAG}
-    working_dir: /opt/orbs/projects/services/public-api-service-typescript/
+    # working_dir: /opt/orbs/projects/services/public-api-service-typescript/
+    # command: ./entrypoint.sh public-api
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/public-api.js
     ports:
       - 80:80
