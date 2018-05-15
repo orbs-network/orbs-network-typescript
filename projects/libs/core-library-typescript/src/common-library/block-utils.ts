@@ -27,14 +27,12 @@ export namespace BlockUtils {
 
     // FIXME: enable back "no-null-keyword" rule
     let signature = null,
-      publicKey = null,
       signatory = null;
 
     const block: types.Block = {
       header: blockComponents.header,
       body: blockComponents.body,
       signatureData: {
-        publicKey: null,
         signature: null,
         signatory: null
       }
@@ -42,11 +40,9 @@ export namespace BlockUtils {
 
     if (options.sign) {
       signature = Buffer.from(keyManager.sign(BlockUtils.calculateBlockHash(block)), keyManager.SIGNATURE_ENCODING);
-      publicKey = new Buffer(keyManager.getPublicKey(nodeName));
       signatory = nodeName;
 
       block.signatureData = {
-        publicKey,
         signature,
         signatory
       };
@@ -69,10 +65,6 @@ export namespace BlockUtils {
   export function verifyBlockSignature(block: types.Block, keyManager: KeyManager) {
     const signature = block.signatureData.signature.toString(keyManager.SIGNATURE_ENCODING);
     const publicKeyName = block.signatureData.signatory;
-
-    if (block.signatureData.publicKey.toString() !== keyManager.getPublicKey(publicKeyName)) {
-      throw new Error(`Key mismatch while verifying signature for public key ${this.signatory}`);
-    }
 
     return keyManager.verify(BlockUtils.calculateBlockHash(block), signature, publicKeyName);
   }

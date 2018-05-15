@@ -9,9 +9,8 @@ message BlockHeader {
 }
 
 message BlockSignatureData {
-  bytes publicKey = 1;
-  bytes signature = 2;
-  string signatory = 3;
+  bytes signature = 1;
+  string signatory = 2;
 }
 
 message BlockBody {

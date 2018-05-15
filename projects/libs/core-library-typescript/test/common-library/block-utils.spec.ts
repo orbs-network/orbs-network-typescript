@@ -40,9 +40,6 @@ describe("Block utils", () => {
     expect(block.signatureData).to.have.property("signature");
     expect(block.signatureData.signature).not.to.be.empty;
 
-    expect(block.signatureData).to.have.property("publicKey");
-    expect(block.signatureData.publicKey).not.to.be.empty;
-
     expect(BlockUtils.verifyBlockSignature(block, keyManager)).to.be.true;
   });
 });
