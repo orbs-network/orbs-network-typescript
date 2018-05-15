@@ -102,7 +102,7 @@ Both of these actions will accept two variables:
 
 ### sendTransaction
 
-Use `sendTransaction()` to perform an action (method of the orbs contract) which changes the state such as transfer action
+Use `sendTransaction()` to perform an action (method of the smart contract) which changes the state such as transfer action
 
 ### call
 
