@@ -22,7 +22,7 @@ public class OrbsContract {
     return orbsClient.sendTransaction(this.contractAddress, payload);
   }
 
-  public Object call(String methodName, Object[] args) throws Exception {
+  public String call(String methodName, Object[] args) throws Exception {
     String payload = generateCallPayload(methodName, args);
     return orbsClient.call(this.contractAddress, payload);
   }
