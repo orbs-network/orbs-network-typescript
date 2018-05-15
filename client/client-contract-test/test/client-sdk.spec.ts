@@ -3,17 +3,16 @@ import  * as chai from "chai";
 import { OrbsContractAdapter } from "../src";
 import * as sinonChai from "sinon-chai";
 import { Server } from "http";
-import { stubInterface } from "ts-sinon";
+import { stubInterface, stubObject } from "ts-sinon";
 import * as crypto from "crypto";
-import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "../../client-sdk-javascript/src/orbs-api-interface";
 import { createJavaOrbsContract } from "./java-sdk-helper";
 import * as mocha from "mocha";
 import { pythonBridge, PythonBridge } from "python-bridge";
 import * as path from "path";
-import { OrbsClient, OrbsContract, Address } from "../../client-sdk-javascript/src";
-import { OrbsContractMethodArgs } from "../../client-sdk-javascript/src/orbs-contract";
-import { expectedCallContractRequest, expectedSendTransactionRequest, SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID } from "../src/expected-results";
+import { OrbsClient, OrbsContract, Address, ED25519Key, OrbsContractMethodArgs } from "orbs-client-sdk";
+import { SENDER_ADDRESS, CONTRACT_NAME, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, SENDER_PRIVATE_KEY } from "../src/expected-results";
 import { testContract } from "../src/contract-adapter";
+import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "../src/orbs-api-interface";
 
 chai.use(sinonChai);
 
@@ -32,7 +31,7 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
     this.contractMethodName = contractMethodName;
   }
 
-  getSendTranscationObject(): OrbsAPISendTransactionRequest {
+  getSendTransactionObject(): OrbsAPISendTransactionRequest {
     const sendTransactionPayload = this.orbsContract.generateSendTransactionPayload(this.contractMethodName, this.contractMethodArgs);
     const sendTranscationObject = this.orbsContract.orbsClient.generateTransactionRequest(this.orbsContract.contractAddress, sendTransactionPayload, Date.now());
 
@@ -57,7 +56,7 @@ class JavaContractAdapter implements OrbsContractAdapter {
     this.contractMethodName = contractMethodName;
   }
 
-  getSendTranscationObject(): OrbsAPISendTransactionRequest {
+  getSendTransactionObject(): OrbsAPISendTransactionRequest {
     const sendTransactionPayload = this.javaContract.generateSendTransactionPayloadSync(this.contractMethodName, this.contractMethodArgs);
     const javaClient = this.javaContract.getOrbsClientSync();
     const sendTransactionObjectJson = javaClient.generateTransactionRequestSync(this.javaContract.getContractAddressSync(), sendTransactionPayload);
@@ -143,14 +142,17 @@ before((done) => {
 });
 
 describe("The Javascript SDK", () => {
-  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, TIMEOUT);
+  const keyPair = new ED25519Key(SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY);
+  const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, keyPair, TIMEOUT);
   const contract = new OrbsContract(client, CONTRACT_NAME);
-
   testContract(() => new TypeScriptContractAdapter(contract, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
 });
 
 describe("The Java SDK", () => {
-  testContract(() => new JavaContractAdapter(createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT), CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
+  testContract(() => new JavaContractAdapter(
+    createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT), CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS),
+    { disableSignatureTest: true } // TODO: re-enable as soon as it's implemented
+  );
 });
 
 describe.skip("The Python SDK", () => {

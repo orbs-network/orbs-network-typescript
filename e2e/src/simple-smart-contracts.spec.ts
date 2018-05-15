@@ -13,9 +13,8 @@ const expect = chai.expect;
 chai.should();
 chai.use(ChaiBarsPlugin);
 
-const generateAddress = (): Address => {
-  const key = new ED25519Key();
-  const address = new Address(key.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
+const generateAddress = (keyPair: ED25519Key): Address => {
+  const address = new Address(keyPair.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
 
   return address;
 };
@@ -23,8 +22,9 @@ const generateAddress = (): Address => {
 const testConfig = loadDefaultTestConfig();
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
-  const senderAddress = generateAddress();
-  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress);
+  const keyPair = new ED25519Key();
+  const senderAddress = generateAddress(keyPair);
+  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
   const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
 
@@ -34,8 +34,9 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 }
 
 async function aTextMessageAccount() {
-  const senderAddress = generateAddress();
-  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress);
+  const keyPair = new ED25519Key();
+  const senderAddress = generateAddress(keyPair);
+  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "text-message");
   const account = new TextMessageAccount(senderAddress.toString(), contractAdapter);
 
