@@ -12,11 +12,15 @@ export class OrbsClient {
   private sendTransactionTimeoutMs: number;
   private keyPair: ED25519Key;
 
-  constructor(endpoint: string, senderAddress: Address, keyPair: ED25519Key, sendTransactionTimeoutMs = 5000) {
+  constructor(endpoint: string, senderAddress: Address, senderKeyPair: ED25519Key, sendTransactionTimeoutMs = 5000) {
     this.senderAddress = senderAddress;
     this.endpoint = endpoint;
     this.sendTransactionTimeoutMs = sendTransactionTimeoutMs;
-    this.keyPair = keyPair;
+    this.keyPair = senderKeyPair;
+
+    if (this.senderAddress.publicKey != senderKeyPair.publicKey) {
+      throw new Error("Public key of the sender address should match the public key of the sender key-pair");
+    }
   }
 
   async sendTransaction(contractAddress: Address, payload: string): Promise<any> {

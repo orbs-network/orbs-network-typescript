@@ -14,7 +14,6 @@ chai.should();
 chai.use(ChaiBarsPlugin);
 
 const generateAddress = (keyPair: ED25519Key): Address => {
-  const key = new ED25519Key();
   const address = new Address(keyPair.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
 
   return address;

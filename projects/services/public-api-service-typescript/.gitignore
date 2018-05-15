@@ -1,3 +1,2 @@
 # Ignore built ts files
 dist/**/*
-src/orbs-api-interface.ts
