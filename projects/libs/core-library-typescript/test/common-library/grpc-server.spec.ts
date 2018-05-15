@@ -9,7 +9,7 @@ import { Service } from "../../src/base-service/service";
 const { expect } = chai;
 chai.use(chaiAsPromised);
 
-describe("GRPCServer cannot start if no services are attached to it", () => {
+describe("GRPCServer cannot start if no services or no endpoint are attached to it", () => {
 
   it("should Promise.reject() if trying to start with no endpoint", async () => {
     // This endpoint is not used, it's just so GRPCserver will not fail on missing endpoint

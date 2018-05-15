@@ -24,8 +24,10 @@ protos.set("VirtualMachine", "virtual-machine.proto");
 protos.set("SidechainConnector", "sidechain-connector.proto");
 protos.set("Management", "management.proto");
 
+const DEFAULT_MANAGEMENT_PORT = 8081;
+
 export class GRPCServerBuilder {
-  managementPort: number;
+  managementPort: number = DEFAULT_MANAGEMENT_PORT;
   endpoint: string;
   mali: Mali;
   services: Service[] = [];
@@ -85,7 +87,6 @@ export class GRPCServerBuilder {
       return Promise.reject("No management port defined, you must call withManagementPort() before starting");
     }
 
-    // check if no endpoint...
     if (!this.mali) {
       return Promise.reject("Mali was not set up correctly. did you forget to call withService()?");
     }
@@ -94,25 +95,15 @@ export class GRPCServerBuilder {
     this.services.forEach(s => {
 
       if (this.instanceOfStartupChecker(s)) {
-        logger.info(`GRPCServer: Adding component: ${s.name} because it has a status checker`);
-
         startupCheckers.push(<StartupCheck>s);
       }
     });
 
-    logger.info(`GRPCServer: found ${this.services.length} services, of which ${startupCheckers.length} can return status`);
-
     const app = express();
-    logger.info(`Management server is starting on port ${this.managementPort}`);
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
-
-      // TODO startupCheckComposite needs to handle this 200/503 logic
-
       this.startupCheckRunner.run()
         .then((result: StartupStatus) => {
           const httpCode = result.status === STARTUP_STATUS.OK ? 200 : 503;
-          logger.info(`>>> GRPC startupCheck: ${httpCode} ${JSON.stringify(result)}`);
-
           return res.status(httpCode).send(result);
         });
     });
@@ -136,7 +127,6 @@ export class GRPCServerBuilder {
       this.mali.close(this.endpoint);
     }
     if (this.managementServer) {
-      logger.info("Management server is stopping");
       this.managementServer.close();
     }
     return all;
