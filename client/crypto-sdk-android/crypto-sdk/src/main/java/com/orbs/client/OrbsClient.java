@@ -1,6 +1,7 @@
 package com.orbs.client;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.orbs.cryptosdk.Address;
 import com.orbs.cryptosdk.ED25519Key;
 
@@ -35,19 +36,33 @@ public class OrbsClient {
     String requestJson = generateTransactionRequest(contractAddress, payload);
 
     String rawRetVal = this.sendHTTPRequest(this.apiEndpoint + "/public/sendTransaction", requestJson);
+    return parseSendTransactionResponse(rawRetVal);
+  }
+
+  public OrbsAPISendTransactionResponse parseSendTransactionResponse(String jsonResult) {
     Gson gson = new Gson();
-    OrbsAPISendTransactionResponse res = gson.fromJson(rawRetVal, OrbsAPISendTransactionResponse.class);
+    OrbsAPISendTransactionResponse res = gson.fromJson(jsonResult, OrbsAPISendTransactionResponse.class);
     return res;
   }
 
-  public String generateTransactionRequest(Address contractAddress, String payload) {
+  public String generateTransactionRequest(Address contractAddress, String payload) throws Exception {
     OrbsAPISendTransactionRequest requestPayload = new OrbsAPISendTransactionRequest();
     requestPayload.payload = payload;
     requestPayload.header = new OrbsAPISendTransactionHeader();
-    requestPayload.header.Version = 0;
+    requestPayload.header.version = 0;
     requestPayload.header.senderAddressBase58 = this.senderAddress.toString();
     requestPayload.header.timestamp = String.valueOf(new Date().getTime());
     requestPayload.header.contractAddressBase58 = contractAddress.toString();
+
+    Gson gsonForHash = new GsonBuilder().registerTypeAdapter(OrbsAPISendTransactionRequest.class, new OrbsStableTransactionRequestSerializer()).create();
+    String requestForHash = gsonForHash.toJson(requestPayload);
+    byte[] hashBytes = OrbsHashUtils.hash256(requestForHash);
+    byte[] signatureBytes = this.keyPair.sign(hashBytes);
+    String signatureHex = OrbsHashUtils.bytesToHex(signatureBytes);
+
+    requestPayload.signatureData = new OrbsAPISendTransactionSignature();
+    requestPayload.signatureData.publicKeyHex = this.keyPair.getPublicKey();
+    requestPayload.signatureData.signatureHex = signatureHex;
 
     Gson gson = new Gson();
     return gson.toJson(requestPayload);
