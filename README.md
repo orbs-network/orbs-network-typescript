@@ -3,6 +3,7 @@
 This is a monorepo that contains all Orbs projects, including both server implementation and client SDK.
 
 ## Preparing your system
+
 You are encouraged to run the script `orbs-team-member-bootstrap.sh`, it will install all necessary software on your MacOS and then run the full build.
 
 Not all installed software is strictly necessary for the build to run. Rather, it is our opinionated view of a useful development environment.
@@ -14,14 +15,18 @@ You should then rerun the script (don't worry, it is safe to do so).
 The entire installation takes about 5 minutes. At the end of the installation, and before the build begins, you will be asked to either proceed with the build, or exit. Build time is about 15 minutes or more, depending on connection speed.
 
 ### Running the script
+
 On a fresh MacOS, run the following:
-1. `mkdir -p ~/dev/orbs`
-2. `cd ~/dev/orbs`
-3. `git clone https://github.com/orbs-network/orbs-network.git`
+
+1. `xcrun --version`
+    > This tests if XCode Command Line Tools are installed. If `xcrun` is not found, run `xcode-select --install`. This will also install `git`.
+2. `mkdir -p ~/dev/orbs`
+3. `cd ~/dev/orbs`
+4. `git clone https://github.com/orbs-network/orbs-network.git`
      > If you are prompted that `git` is not found, click "Install", then repeat step 3.
-4. cd ~/dev/orbs/orbs-network
-5. chmod u+x orbs-team-member-bootstrap.sh
-6. ./orbs-team-member-bootstrap.sh
+5. cd ~/dev/orbs/orbs-network
+6. chmod u+x orbs-team-member-bootstrap.sh
+7. ./orbs-team-member-bootstrap.sh
 
 ## Installation
 

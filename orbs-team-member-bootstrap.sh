@@ -172,6 +172,8 @@ run_build()
 {
   ./install.sh
   ./build.sh
+  ./build-sdk.sh
+  ./build-e2e.sh
 
   ./docker/build-server-base.sh && ./docker-build.sh
   ./docker/build-sdk-base.sh && ./docker/build-sdk.sh
