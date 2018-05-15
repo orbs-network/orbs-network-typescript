@@ -50,6 +50,20 @@ The following parameters (passed as environment variables) are supported:
 
 ### Stress test
 
-Can run with `yarn run stress-test` or `TEST=stress-test ./run-from-host.sh`. Takes a parameter `E2E_ACCOUNTS_TOTAL` (default: `10`).
+Can run with `yarn run stress-test` or `TEST=stress-test ./test-from-host.sh`. Takes a parameter `E2E_ACCOUNTS_TOTAL` (default: `10`).
 
 This number of accounts will be initialized and then transfers between them will be initiated in certain order: from N to N+1 and in case of N+1 to 0.
+
+### Stub consensus tests
+
+To enable the stub consensus instead of the default one, you need a couple of additional environment variables on nodes. You can pass additional variables using an additional `ENV_FILE=stub-consensus.env` environment variable on your machine, which pulls the variables from `/e2e/config/env/=stub-consensus.env`.
+
+To run the basic test run `ENV_FILE=stub-consensus.env ./test-from-host.sh`
+
+To run a stress test run `ENV_FILE=stub-consensus.env TEST=stress-test ./test-from-host.sh`
+
+## Development
+
+When you make changes to the codebase, don't forget to run `./docker-build.sh` to create fresh docker images for the e2e.
+
+If you get connection problems due to lingering docker connections, run `docker kill $(docker ps -q)`

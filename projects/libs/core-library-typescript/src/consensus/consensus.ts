@@ -5,6 +5,7 @@ import { Gossip } from "../gossip";
 
 import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
 import { RaftConsensus } from "./raft-consensus";
+import { StubConsensus } from "./stub-consensus";
 
 export class Consensus {
   private actualConsensus: BaseConsensus;
@@ -13,8 +14,11 @@ export class Consensus {
     config: RaftConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
-    logger.info("Consensus algorithm: RAFT");
-    this.actualConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+    if (config.algorithm.toLowerCase() === "stub") {
+      this.actualConsensus = new StubConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+    } else {
+      this.actualConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+    }
   }
 
   async initialize() {

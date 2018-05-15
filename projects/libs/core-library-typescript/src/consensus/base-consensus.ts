@@ -9,6 +9,7 @@ export interface RaftConsensusConfig {
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
   algorithm: string;
+  leaderNodeName?: string; // only if known (required for stub algorithm)
 }
 
 export abstract class BaseConsensus {
