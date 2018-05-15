@@ -31,7 +31,6 @@ function testTransactionObjectSignature(sendTransactionObject: OrbsAPISendTransa
   hasher.update(message);
   const hash = hasher.digest();
   const key = ec.keyFromPublic(sendTransactionObject.signatureData.publicKeyHex);
-  console.log(sendTransactionObject.signatureData.signatureHex);
   expect(key.verify([...hash], [...signature])).to.be.true;
 }
 
