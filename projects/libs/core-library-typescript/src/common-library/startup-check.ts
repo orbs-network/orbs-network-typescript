@@ -1,5 +1,5 @@
-import { StartupCheckResult } from "./startup-check-result";
+import { StartupStatus } from "./startup-status";
 
-export interface StartupChecker {
-  startupCheck(): Promise<StartupCheckResult>;
+export interface StartupCheck {
+  startupCheck(): Promise<StartupStatus>;
 }

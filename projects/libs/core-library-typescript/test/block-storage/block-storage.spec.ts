@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import * as mocha from "mocha";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
@@ -8,7 +9,8 @@ import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
 import { BlockUtils } from "../../src/common-library";
 import { TransactionPool } from "orbs-interfaces";
-import { StartupCheckResult, STARTUP_CHECK_STATUS, ServiceStatus } from "../../src/common-library/startup-check-result";
+import { STARTUP_STATUS, StartupStatus } from "../../src/common-library/startup-status";
+import { StartupCheck } from "../../src/common-library/startup-check";
 
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
@@ -120,10 +122,10 @@ describe("Block storage", () => {
     });
   });
 
-  describe("run checkServiceStatus", () => {
-    it("checkServiceStatus should succeed", async () => {
-      const serviceStatus = await blockStorage.checkServiceStatus();
-      return expect(serviceStatus).to.deep.equal(<ServiceStatus>{ name: "block", status: STARTUP_CHECK_STATUS.OK });
+  describe("run checkStartupStatus", () => {
+    it("checkStartupStatus should succeed", async () => {
+      const startupStatus = await blockStorage.startupCheck();
+      return expect(startupStatus).to.deep.equal(<StartupStatus>{ name: "block", status: STARTUP_STATUS.OK });
     });
   });
 });
@@ -139,10 +141,9 @@ describe("Block storage - Bad setup (no transaction pool)", () => {
     blockStorage = await initBlockStorage(undefined);
     // lastBlock = await blockStorage.getLastBlock();
   });
-
-  it("checkServiceStatus should fail", async () => {
-    const serviceStatus = await blockStorage.checkServiceStatus();
-    return expect(serviceStatus).to.deep.equal(<ServiceStatus>{ name: "block", status: STARTUP_CHECK_STATUS.FAIL });
+  it("checkStartupStatus should fail", async () => {
+    const startupStatus = await blockStorage.startupCheck();
+    return expect(startupStatus).to.deep.equal(<StartupStatus>{ name: "block", status: STARTUP_STATUS.FAIL });
   });
 
   afterEach(async () => {

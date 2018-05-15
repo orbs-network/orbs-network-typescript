@@ -3,7 +3,9 @@ import * as path from "path";
 
 import { logger, types, JsonBuffer } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
-import { Service, ServiceConfig, ServiceStatusChecker, ServiceStatus } from "orbs-core-library";
+import { Service, ServiceConfig } from "orbs-core-library";
+import { StartupCheck } from "orbs-core-library/dist/common-library/startup-check";
+import { StartupStatus } from "orbs-core-library/dist/common-library/startup-status";
 
 
 
@@ -12,7 +14,7 @@ export interface BlockStorageServiceConfig extends ServiceConfig {
   pollInterval: number;
 }
 
-export default class BlockStorageService extends Service implements ServiceStatusChecker {
+export default class BlockStorageService extends Service implements StartupCheck {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
@@ -197,7 +199,7 @@ export default class BlockStorageService extends Service implements ServiceStatu
     return this.sync.isSyncing();
   }
 
-  public async checkServiceStatus(): Promise<ServiceStatus> {
-    return this.blockStorage.checkServiceStatus();
+  public async startupCheck(): Promise<StartupStatus> {
+    return this.blockStorage.startupCheck();
   }
 }

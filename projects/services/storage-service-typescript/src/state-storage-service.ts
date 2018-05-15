@@ -2,14 +2,14 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service, ServiceConfig, ServiceStatusChecker, ServiceStatus } from "orbs-core-library";
+import { Service, ServiceConfig, StartupStatus, StartupCheck } from "orbs-core-library";
 import { StateStorage } from "orbs-core-library";
 
 export interface StateStorageServiceConfig extends ServiceConfig {
   pollInterval: number;
 }
 
-export default class StateStorageService extends Service implements ServiceStatusChecker {
+export default class StateStorageService extends Service implements StartupCheck {
   private stateStorage: StateStorage;
 
   private blockStorage: types.BlockStorageClient;
@@ -39,8 +39,8 @@ export default class StateStorageService extends Service implements ServiceStatu
     rpc.res = { values: _.fromPairs([...keys]) };
   }
 
-  public async checkServiceStatus(): Promise<ServiceStatus> {
-    return this.stateStorage.checkServiceStatus();
+  public async startupCheck(): Promise<StartupStatus> {
+    return this.stateStorage.startupCheck();
   }
 
 }

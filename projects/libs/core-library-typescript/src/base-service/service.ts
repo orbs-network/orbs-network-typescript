@@ -10,18 +10,6 @@ export interface ServiceConfig {
   nodeName: string;
 }
 
-export enum STARTUP_CHECK_STATUS { OK, FAIL, PARTIALLY_OPERATIONAL }
-
-export interface ServiceStatus {
-  name: string;
-  status: STARTUP_CHECK_STATUS;
-  message?: string;
-}
-
-export interface ServiceStatusChecker {
-  checkServiceStatus(): Promise<ServiceStatus>;
-}
-
 export abstract class Service {
   public config: ServiceConfig;
   public name: string;

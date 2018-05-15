@@ -6,7 +6,6 @@ import * as os from "os";
 import * as getPort from "get-port";
 import { stubInterface } from "ts-sinon";
 import * as request from "supertest";
-import * as _ from "lodash";
 
 import { Response } from "express";
 
@@ -16,8 +15,7 @@ import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
 import storageServer from "../src/server";
 import GossipService from "../../gossip-service-typescript/src/service";
 import TransactionPoolService from "../../consensus-service-typescript/src/transaction-pool-service";
-import { StartupCheckResult } from "../../../libs/core-library-typescript/dist/common-library/startup-check-result";
-import { STARTUP_CHECK_STATUS, ServiceStatus } from "../../../libs/core-library-typescript/src/common-library/startup-check-result";
+import { STARTUP_STATUS, StartupStatus } from "../../../libs/core-library-typescript/src/common-library/startup-status";
 
 const { expect } = chai;
 
@@ -61,8 +59,8 @@ describe("storage server test", function () {
     const STATE_STORAGE_POLL_INTERVAL = 200;
     const BLOCK_STORAGE_DB_PATH = path.join(os.tmpdir(), "orbsdbtest");
     const storageEnv = { NODE_NAME, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH, STATE_STORAGE_POLL_INTERVAL };
-    const gossipServerStub = stubInterface<GossipService>({ checkServiceStatus: <ServiceStatus>{ name: "gossip", status: STARTUP_CHECK_STATUS.OK, message: "mockGossip" } });
-    const transactionPoolStub = stubInterface<TransactionPoolService>({ checkServiceStatus: <ServiceStatus>{ name: "transactionPool", status: STARTUP_CHECK_STATUS.OK, message: "mockTransactionPool" } });
+    const gossipServerStub = stubInterface<GossipService>();
+    const transactionPoolStub = stubInterface<TransactionPoolService>();
 
     logger.info(`Folder used for db in tests is ${BLOCK_STORAGE_DB_PATH}`);
 
@@ -70,10 +68,11 @@ describe("storage server test", function () {
     fse.emptyDirSync(BLOCK_STORAGE_DB_PATH);
 
     managementPort = await getPort();
+
     server = storageServer(topology, storageEnv)
       .withService("Gossip", gossipServerStub)
       .withService("TransactionPool", transactionPoolStub)
-      // .withManagementPort(managementPort)
+      .withManagementPort(managementPort)
       .onEndpoint(endpoint);
 
     blockClient = grpc.blockStorageClient({ endpoint });
@@ -107,22 +106,20 @@ describe("storage server test", function () {
     return expect(state).to.have.deep.property("values", {});
   });
 
-  // it("should return HTTP 200 when calling GET /admin/startupCheck (regardless of what the startup checks actually returned.)", async () => {
-  // return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
-  //   .get("/admin/startupCheck")
-  //   .expect(200, { status: "ok" });
-  // });
-
   it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
+
+    const expected: StartupStatus = {
+      name: "storage",
+      status: STARTUP_STATUS.OK,
+      childStartupStatuses: [
+        <StartupStatus>{ name: "block", status: STARTUP_STATUS.OK },
+        <StartupStatus>{ name: "state", status: STARTUP_STATUS.OK }
+      ]
+    };
 
     return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
       .get("/admin/startupCheck")
-      .expect(200, res => {
-        return res.status === STARTUP_CHECK_STATUS.OK
-          && res.services
-          && (_.find(res.services, s => s.name === "block") || {}).status === STARTUP_CHECK_STATUS.OK
-          && (_.find(res.services, s => s.name === "state") || {}).status === STARTUP_CHECK_STATUS.OK;
-      });
+      .expect(200, expected);
 
   });
 

@@ -6,10 +6,10 @@ import { types } from "../common-library/types";
 import { InMemoryKVStore } from "./kvstore";
 
 import { delay } from "bluebird";
-import { STARTUP_CHECK_STATUS, ServiceStatus } from "../common-library/startup-check-result";
-import { ServiceStatusChecker } from "../common-library/service-status-check";
+import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status";
+import { StartupCheck } from "../common-library/startup-check";
 
-export class StateStorage implements ServiceStatusChecker {
+export class StateStorage implements StartupCheck {
   private SERVICE_NAME = "state";
   private blockStorage: types.BlockStorageClient;
 
@@ -106,21 +106,21 @@ export class StateStorage implements ServiceStatusChecker {
     }
   }
 
-  public async checkServiceStatus(): Promise<ServiceStatus> {
+  public async startupCheck(): Promise<StartupStatus> {
 
     if (!this.kvstore) {
-      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL, message: "Missing kvstore" };
+      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing kvstore" };
     }
 
     if (!this.pollIntervalMs) {
-      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL, message: "Missing pollIntervalMs" };
+      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing pollIntervalMs" };
     }
 
     if (!this.blockStorage) {
-      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL, message: "Missing blockStorage" };
+      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing blockStorage" };
     }
 
-    return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.OK };
+    return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
   }
 
 }

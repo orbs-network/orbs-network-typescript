@@ -2,10 +2,10 @@ import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
 import { BlockUtils, logger, types, JsonBuffer } from "../common-library";
-import { STARTUP_CHECK_STATUS, ServiceStatus } from "../common-library/startup-check-result";
-import { ServiceStatusChecker } from "../common-library/service-status-check";
+import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status";
+import { StartupCheck } from "../common-library/startup-check";
 
-export class BlockStorage implements ServiceStatusChecker {
+export class BlockStorage implements StartupCheck {
 
   private SERVICE_NAME = "block";
 
@@ -127,13 +127,13 @@ export class BlockStorage implements ServiceStatusChecker {
     await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
   }
 
-  public async checkServiceStatus(): Promise<ServiceStatus> {
+  public async startupCheck(): Promise<StartupStatus> {
 
     if (!this.transactionPool) {
-      return <ServiceStatus>{ name: this.SERVICE_NAME, status: STARTUP_CHECK_STATUS.FAIL };
+      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL };
     }
 
     const lastBlock = await this.getLastBlock();
-    return <ServiceStatus>{ name: this.SERVICE_NAME, status: lastBlock ? STARTUP_CHECK_STATUS.OK : STARTUP_CHECK_STATUS.FAIL };
+    return <StartupStatus>{ name: this.SERVICE_NAME, status: lastBlock ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL };
   }
 }

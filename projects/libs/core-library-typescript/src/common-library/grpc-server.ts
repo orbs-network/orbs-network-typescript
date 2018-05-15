@@ -1,10 +1,9 @@
 import * as Mali from "mali";
 import * as express from "express";
 import { Request, Response } from "express";
-import { ServiceStatusChecker } from "./service-status-check";
-import { StartupCheckResult, STARTUP_CHECK_STATUS, ServiceStatus } from "./startup-check-result";
-
-import { StartupCheckComposite } from "./startup-check-composite";
+import { StartupCheck } from "./startup-check";
+import { STARTUP_STATUS, StartupStatus } from "./startup-status";
+import { StartupCheckRunner } from "./startup-check-runner";
 
 import { types } from "./types";
 import { Service } from "../base-service";
@@ -31,7 +30,7 @@ export class GRPCServerBuilder {
   mali: Mali;
   services: Service[] = [];
   managementServer: any;
-  startupCheckComposite: StartupCheckComposite;
+  startupCheckRunner: StartupCheckRunner;
 
   onEndpoint(endpoint: string): GRPCServerBuilder {
     this.endpoint = endpoint;
@@ -68,9 +67,10 @@ export class GRPCServerBuilder {
     return this;
   }
 
-  // withStartupChecker(startupChecker: StartupChecker) {
-  //   this.startupChecker = startupChecker;
-  // }
+  withStartupCheckRunner(startupCheckRunner: StartupCheckRunner) {
+    this.startupCheckRunner = startupCheckRunner;
+    return this;
+  }
 
 
 
@@ -81,35 +81,36 @@ export class GRPCServerBuilder {
       return Promise.reject("No endpoint defined, you must call onEndpoint() before starting");
     }
 
+    if (!this.managementPort) {
+      return Promise.reject("No management port defined, you must call withManagementPort() before starting");
+    }
+
     // check if no endpoint...
     if (!this.mali) {
       return Promise.reject("Mali was not set up correctly. did you forget to call withService()?");
     }
 
-    const serviceStatusCheckers: ServiceStatusChecker[] = [];
+    const startupCheckers: StartupCheck[] = [];
     this.services.forEach(s => {
 
-      if (this.instanceOfServiceStatusChecker(s)) {
-        logger.info(`GRPCServer: Adding service: ${s.name} because it has a status checker`);
+      if (this.instanceOfStartupChecker(s)) {
+        logger.info(`GRPCServer: Adding component: ${s.name} because it has a status checker`);
 
-        serviceStatusCheckers.push(<ServiceStatusChecker>s);
+        startupCheckers.push(<StartupCheck>s);
       }
     });
 
-    logger.info(`GRPCServer: found ${this.services.length} services, of which ${serviceStatusCheckers.length} can return status`);
-
-    this.startupCheckComposite = new StartupCheckComposite();
-    serviceStatusCheckers.forEach(s => this.startupCheckComposite.addServiceStatusChecker(s));
+    logger.info(`GRPCServer: found ${this.services.length} services, of which ${startupCheckers.length} can return status`);
 
     const app = express();
-    // logger.info("Management server is starting");
+    logger.info(`Management server is starting on port ${this.managementPort}`);
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
 
       // TODO startupCheckComposite needs to handle this 200/503 logic
 
-      this.startupCheckComposite.startupCheck()
-        .then((result: StartupCheckResult) => {
-          const httpCode = result.status === STARTUP_CHECK_STATUS.OK ? 200 : 503;
+      this.startupCheckRunner.run()
+        .then((result: StartupStatus) => {
+          const httpCode = result.status === STARTUP_STATUS.OK ? 200 : 503;
           logger.info(`>>> GRPC startupCheck: ${httpCode} ${JSON.stringify(result)}`);
 
           return res.status(httpCode).send(result);
@@ -141,9 +142,8 @@ export class GRPCServerBuilder {
     return all;
   }
 
-  private instanceOfServiceStatusChecker(item: any): item is ServiceStatusChecker {
-    // logger.info(`instanceOfServiceStatusChecker(): ${item.name}: ${item["checkServiceStatus"]} has? ${item.hasOwnProperty("checkServiceStatus")}`);
-    return "checkServiceStatus" in item;
+  private instanceOfStartupChecker(item: any): item is StartupCheck {
+    return "checkStartupStatus" in item;
   }
 }
 
