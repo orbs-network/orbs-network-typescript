@@ -22,7 +22,7 @@ public class OrbsClient {
   final ED25519Key keyPair;
 
   public OrbsClient(String apiEndpoint, Address senderAddress, ED25519Key keyPair) {
-    this(apiEndpoint, senderAddress, keyPair,2000);
+    this(apiEndpoint, senderAddress, keyPair, 2000);
   }
 
   public OrbsClient(String apiEndpoint, Address senderAddress, ED25519Key keyPair, Integer timeoutInMs) {
