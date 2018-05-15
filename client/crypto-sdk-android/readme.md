@@ -83,7 +83,8 @@ You can create an `OrbsClient` class to call the contract methods with some clie
 
 * `apiEndpoint` - the orbs-network node
 * `senderAddress` - the address of the entity 'acting' right now
-* `timeoutInMs` - optional network timeout, the default is 2000mstimeoutInMs
+* `keyPair` - the public and private key for the current sender (`ED25519Key` object)
+* `timeoutInMs` - optional network timeout, the default is 2000ms
 
 Creating the client will enable you to perform two main operation, `sendTransaction()` and `call()`.
 
