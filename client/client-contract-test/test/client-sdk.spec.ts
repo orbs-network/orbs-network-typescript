@@ -150,8 +150,8 @@ describe("The Javascript SDK", () => {
 
 describe("The Java SDK", () => {
   testContract(() => new JavaContractAdapter(
-    createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT), CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS),
-    { disableSignatureTest: true } // TODO: re-enable as soon as it's implemented
+    createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT),
+    CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
   );
 });
 
