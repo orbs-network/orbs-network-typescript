@@ -7,7 +7,7 @@ import BlockBuilder from "./block-builder";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
-import { JsonBuffer } from "../common-library";
+import { JsonBuffer, KeyManager } from "../common-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
@@ -65,6 +65,8 @@ export interface RaftConsensusConfig {
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
+  signBlocks: boolean;
+  keyManager?: KeyManager;
 }
 
 
@@ -86,7 +88,11 @@ export class RaftConsensus {
     this.connector = new RPCConnector(config.nodeName, gossip);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
-      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block), config: {}
+      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block), config: {
+        sign: config.signBlocks,
+        keyManager: config.keyManager,
+        nodeName: config.nodeName
+      }
     });
 
     this.node = gaggle({

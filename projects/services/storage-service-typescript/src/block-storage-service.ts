@@ -1,13 +1,15 @@
 import * as _ from "lodash";
 import * as path from "path";
 
-import { logger, types, JsonBuffer } from "orbs-core-library";
+import { logger, types, JsonBuffer, KeyManager } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 
 export interface BlockStorageServiceConfig extends ServiceConfig {
   dbPath: string;
   pollInterval: number;
+  verifySignature: boolean;
+  keyManager?: KeyManager;
 }
 
 export default class BlockStorageService extends Service {
@@ -35,7 +37,11 @@ export default class BlockStorageService extends Service {
 
   async initBlockStorage(): Promise<void> {
     const blockStorageConfig = <BlockStorageServiceConfig>this.config;
-    this.blockStorage = new BlockStorage(blockStorageConfig.dbPath, this.transactionPool);
+    this.blockStorage = new BlockStorage({
+      dbPath: blockStorageConfig.dbPath,
+      verifySignature: blockStorageConfig.verifySignature,
+      keyManager: blockStorageConfig.keyManager
+    }, this.transactionPool);
     await this.blockStorage.load();
     this.sync = new BlockStorageSync(this.blockStorage);
   }

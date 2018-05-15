@@ -1,7 +1,8 @@
 import { defaults } from "lodash";
 
-import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig } from "orbs-core-library";
+import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig, KeyManager } from "orbs-core-library";
 import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "orbs-core-library";
+import * as _ from "lodash";
 
 
 import ConsensusService from "./consensus-service";
@@ -13,6 +14,8 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   heartbeatInterval: number;
   nodeName: string;
   clusterSize: number;
+  signBlocks: boolean;
+  keyManager?: KeyManager;
 
   constructor() {
     this.electionTimeout = { min: 2000, max: 4000};
@@ -39,7 +42,7 @@ function makeCommittedTransactionPool() {
 }
 
 export default function(nodeTopology: any, env: any) {
-  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS } = env;
+  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, CONSENSUS_SIGN_BLOCKS } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -56,6 +59,11 @@ export default function(nodeTopology: any, env: any) {
   const consensusConfig = new DefaultConsensusConfig();
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
+  consensusConfig.signBlocks = _.lowerCase(CONSENSUS_SIGN_BLOCKS) === "true";
+  consensusConfig.keyManager = consensusConfig.signBlocks ? new KeyManager({
+    privateKeyPath: "/opt/orbs/private-keys/block/secret-key",
+    publicKeysPath: "/opt/orbs/public-keys/block"
+  }) : undefined;
 
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);

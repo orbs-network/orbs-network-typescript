@@ -111,7 +111,7 @@ export class BlockStorage {
     if (this.config.verifySignature) {
       let verified = false;
       try {
-        verified = BlockUtils.verifyBlockSignature(block, this.config.keyManager)
+        verified = BlockUtils.verifyBlockSignature(block, this.config.keyManager);
       } catch (e) {
         throw new Error(`Invalid block signature: ${e.toString()}`);
       }

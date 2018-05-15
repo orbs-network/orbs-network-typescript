@@ -33,6 +33,7 @@ services:
       ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
+      - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
     networks:
       default:
 
@@ -65,6 +66,7 @@ services:
     volumes:
       - /opt/orbs/db:/opt/orbs/db
       - /opt/orbs/logs:/opt/orbs/logs
+      - /opt/orbs/public-keys/block:/opt/orbs/public-keys/block
     networks:
       default:
 

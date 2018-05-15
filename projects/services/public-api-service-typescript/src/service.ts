@@ -74,7 +74,7 @@ export default class PublicApiHTTPService extends Service {
         // placeholder value instead of transaction receipt
         res.json({ result: "ok" });
       } catch (err) {
-        logger.error(`HTTP API could not send a transcation: ${err.toString()}`);
+        logger.error(`HTTP API could not send a transaction: ${err.toString()}`);
         res.sendStatus(500);
       }
     };

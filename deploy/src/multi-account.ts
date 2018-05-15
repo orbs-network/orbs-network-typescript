@@ -31,6 +31,7 @@ async function main() {
   for (const region of regions) {
     // TODO: fix staging
     const secretMessageKey = `${__dirname}/../temp-keys/private-keys/message/orbs-global-${accountId}-staging-${region}`;
+    const secretBlockKey = `${__dirname}/../temp-keys/private-keys/block/orbs-global-${accountId}-staging-${region}`;
 
     const regionalConfig = _.extend({}, getBaseConfig(), {
       credentials,
