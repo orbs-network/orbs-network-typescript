@@ -1,5 +1,5 @@
 package com.orbs.client;
 
 public class OrbsAPISendTransactionResponse {
-  public String transcationId;
+  public String transactionId;
 }
