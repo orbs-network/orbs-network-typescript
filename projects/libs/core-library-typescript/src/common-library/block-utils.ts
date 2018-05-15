@@ -33,8 +33,8 @@ export namespace BlockUtils {
       header: blockComponents.header,
       body: blockComponents.body,
       signatureData: {
-        signature: null,
-        signatory: null
+        signature: new Buffer(""),
+        signatory: "none"
       }
     };
 

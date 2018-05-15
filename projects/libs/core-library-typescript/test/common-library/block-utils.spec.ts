@@ -38,7 +38,7 @@ describe("Block utils", () => {
     expect(block.signatureData).to.have.property("signatory", nodeName);
 
     expect(block.signatureData).to.have.property("signature");
-    expect(block.signatureData.signature).not.to.be.empty;
+    expect(block.signatureData.signature.length).to.be.eql(512);
 
     expect(BlockUtils.verifyBlockSignature(block, keyManager)).to.be.true;
   });
