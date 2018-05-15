@@ -30,25 +30,27 @@ export namespace BlockUtils {
       publicKey = null,
       signatory = null;
 
-    if (options.sign) {
-      signature = Buffer.from(keyManager.sign(stringify({
-        header: blockComponents.header,
-        payload: blockComponents.body
-      })), keyManager.SIGNATURE_ENCODING);
-
-      publicKey = new Buffer(keyManager.getPublicKey(nodeName));
-      signatory = nodeName;
-    }
-
     const block: types.Block = {
       header: blockComponents.header,
       body: blockComponents.body,
       signatureData: {
+        publicKey: null,
+        signature: null,
+        signatory: null
+      }
+    };
+
+    if (options.sign) {
+      signature = Buffer.from(keyManager.sign(BlockUtils.calculateBlockHash(block)), keyManager.SIGNATURE_ENCODING);
+      publicKey = new Buffer(keyManager.getPublicKey(nodeName));
+      signatory = nodeName;
+
+      block.signatureData = {
         publicKey,
         signature,
         signatory
-      }
-    };
+      };
+    }
 
     return block;
   }
@@ -72,9 +74,6 @@ export namespace BlockUtils {
       throw new Error(`Key mismatch while verifying signature for public key ${this.signatory}`);
     }
 
-    return keyManager.verify(stringify({
-      header: block.header,
-      payload: block.body
-    }), signature, publicKeyName);
+    return keyManager.verify(BlockUtils.calculateBlockHash(block), signature, publicKeyName);
   }
 }

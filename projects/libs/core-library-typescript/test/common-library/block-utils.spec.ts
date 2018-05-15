@@ -3,7 +3,7 @@ import generateKeyPairs from "../../src/test-kit/generate-key-pairs";
 import { BlockHeader, BlockBody, Block } from "orbs-interfaces";
 import { expect } from "chai";
 
-describe.only("Block utils", () => {
+describe("Block utils", () => {
   let keyManagerConfig: KeyManagerConfig;
   let keyManager: KeyManager;
 
