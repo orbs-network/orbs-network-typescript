@@ -17,36 +17,71 @@ function failWith(message: string, status: number) {
   return err;
 }
 
-export default function createMockServer(requestStubs: RequestStub[]): express.Application {
-  const app = express();
+const KnownEndpoints: string[] = [
+  "/public/sendTransaction",
+  "/public/callContract",
+  "/public/getTransactionStatus"
+];
+function validateStubEndpoints(requestStubs: RequestStub[]) {
+  return new Promise((resolve, reject) => {
+    requestStubs.forEach(stub => {
+      if (!stub || !stub.path || KnownEndpoints.indexOf(stub.path) === -1) {
+        reject(new Error(
+        `**************************** DANGER WILL ROBINSON *********************************
+         The Mock HTTP API server was stubbed with an unknown endpoint ${stub.path}
+         This might indicate that the client code under test is trying to access an endpoint unsupported by the Orbs Public API
+         If you're attempting to change an endpoint in the HTTP API, don't - there are probably clients out there using this endpoint!
+         The process to introduce a new endpoint is as follows:
+         1) Add new endpoint to the HTTP API test, retaining tests for the old endpoint
+         2) Add it to the HTTP API implementation
+         3) Add it to KnownEndpoints in the Mock HTTP API
+         4) Change new client versions to use the new endpoint
+         5) Add deprecation warnings on usages of the old endpoint
+         6) Wait until it's safe to assume theere are no clients accessing the old endpoint before removing it
 
-  app.use(express.json());
-
-  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const matchingStub = _.find(requestStubs, (stub: RequestStub) => req.path == stub.path);
-    if (matchingStub) {
-      const expectedJson = JSON.parse(matchingStub.requestBody);
-      if (deepEquals(req.body, expectedJson)) {
-        res.setHeader("Content-Type", "application/json");
-        res.status(200).send(matchingStub.responseBody);
-      } else {
-        next(failWith(`Path ${matchingStub.path} mismatch: [${diffString(expectedJson, req.body)}]`, 400));
+         Known endpoints are:
+         ${KnownEndpoints.map(endpoint => " * " + endpoint).join("\n")}
+        `));
       }
-    } else {
-      next(failWith(`No stub found for path ${req.path}`, 404));
-    }
-  });
-
-  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err);
-    res.status(err["status"] || 500);
-    res.render("error", {
-      message: err.message,
-      error: err
     });
+
+    resolve(requestStubs);
   });
 
-  return app;
+}
+
+export default function createMockServer(requestStubs: RequestStub[]): Promise<express.Application> {
+  return validateStubEndpoints(requestStubs).then(validStubs => {
+    const app = express();
+
+    app.use(express.json());
+
+    app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const matchingStub = _.find(requestStubs, (stub: RequestStub) => req.path == stub.path);
+      if (matchingStub) {
+        const expectedJson = JSON.parse(matchingStub.requestBody);
+        if (deepEquals(req.body, expectedJson)) {
+          res.setHeader("Content-Type", "application/json");
+          res.status(200).send(matchingStub.responseBody);
+        } else {
+          next(failWith(`Path ${matchingStub.path} mismatch: [${diffString(expectedJson, req.body)}]`, 400));
+        }
+      } else {
+        next(failWith(`No stub found for path ${req.path}`, 404));
+      }
+    });
+
+    app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      console.error(err);
+      res.status(err["status"] || 500);
+      res.render("error", {
+        message: err.message,
+        error: err
+      });
+    });
+
+    return app;
+  });
 }
 
 export class RequestStub {
@@ -63,11 +98,15 @@ export class RequestStub {
 }
 
 export function runMockServer(port: number, stubs: RequestStub[]): Promise<cp.ChildProcess> {
+  const hasEchoedRunningPort = (data: any) => data.toString().indexOf(port.toString()) !== -1;
+
   const child = cp.fork(path.resolve(__dirname, "run-mock-server.js"), ["--port", port.toString(), "--stubs", JSON.stringify(stubs)], {stdio: ["ipc"]});
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     child.stdout.on("data", (data) => {
-      if (!!data.toString().indexOf(port.toString())) {
+      if (hasEchoedRunningPort(data)) {
         resolve(child);
+      } else {
+        reject(new Error(data.toString()));
       }
     });
   });
