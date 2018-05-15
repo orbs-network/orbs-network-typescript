@@ -18,7 +18,7 @@ dependencies {
 }
 ```
 
-Currently the latest release version is `0.0.5`
+Currently the latest release version is `0.0.6`
 
 ### Other dependencies
 
@@ -29,13 +29,20 @@ The SDK uses `okhttp` for network access and `gson` for serialization.
 Below you will find specific instructions on how to use the SDK, for each different function you will see there is also a sample implementaion in the orbs sample app that can be found here:
 https://github.com/orbs-network/orbs-network/tree/master/client/examples/android-sample-app
 
-## Using the SDK 
+Using the SDK 
+---
 
 The SDK exposes two main packages:
 
 * `com.orbs.cryptosdk` - containing the native implementation of the cryptography related functions around address creation.
-* `com.orbs.client` - containing the java implementation of the `OrbsContract` and `OrbsClient` to be used to call contract methods and run code over the orbs-network.
+* `com.orbs.client` - containing the java implementation of the `OrbsContract` and `OrbsClient` to be used to call smart contract methods and run code over the orbs-network.
 
+### OrbsContract and OrbsClient Explained
+The Client gives you low level access to perform actions on the network - letting you call the orbs smart contract interface directly either run a contract method that would create a transaction, or query for information ('call').
+
+The Contract wraps the client and gives another level of abstraction above the client, letting you using the methods of your contract directly. The Contract implementation is very abstract in nature, and in most cases you will be writing your own 'Contract' class according to your application needs.
+
+## Initialization
 At first, you are require to initialize the crypto engine by calling `CryptoSDK.initialize()`
 
 ```java
@@ -52,13 +59,11 @@ public class SampleApp extends AppCompatActivity {
 
 Not calling initialize may cause the SDK to become unstable and may cause issues with generating addresses and working with them.
 
-The client classes `OrbsContract` and `OrbsClient` are used to access and manipulate data on the orbs-network.
-
-**You will create a *'Contract'* that will use the *'Client'* to access the network.**
+The client classes `OrbsContract` and `OrbsClient` are used to access and manipulate data on the orbs-network as explained above.
 
 ### Addresses
 
-Next, to generate a new address you should call the following:
+Next, to generate a new address you should call the following (using the `AutoCloseble` interface):
 ```java
 private String generateAddress() {
         try (ED25519Key key = new ED25519Key();
@@ -70,7 +75,7 @@ private String generateAddress() {
 
 Key generation time should take around 20-30ms but may sometime spike as the PRNG is waiting to collect enough entropy.
 
-More information about the addressing scheme is available at the [client documentation](https://github.com/orbs-network/orbs-network/tree/feature/android-sdk-docs/client).
+More information about the addressing scheme is available at the [client documentation](https://github.com/orbs-network/orbs-network/tree/master/client).
 
 ## The OrbsClient class
 
@@ -97,7 +102,7 @@ Both of these actions will accept two variables:
 
 ### sendTransaction
 
-Use `sendTransaction()` to perform an action (method of the smart contract) which changes the state such as transfer action
+Use `sendTransaction()` to perform an action (method of the orbs contract) which changes the state such as transfer action
 
 ### call
 
@@ -110,11 +115,11 @@ This class is used to wrap the client and simplify accessing the `sendTransactio
 * `client` - the client used to access the network
 * `contractName` - the contract name in the orbs-network to work with
 
-With the contract, the `sendTransaction` and `call` functions are exposed, and accept the following arguments:
+With the contract class, the `sendTransaction` and `call` functions are exposed, and accept the following arguments:
 
 * `methodName` - a string value of the method to call
 * `args` - an object array that is expected to have string or int values.
 
 Using the contract functions, it will automatically prepare the payload json and call the client as expected.
 
-As the underlying network client utilizes `okhttp`, it is possible to use the `Callback` object exposes in `okhttp`
+The OrbsContract class is very abstract in nature, it really just wraps the client for easier access to a specific smart contract name. In most use cases, it would make sense to either inherit from or copy the class and implement your application specific interface to simplify your work.
