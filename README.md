@@ -23,7 +23,7 @@ On a fresh MacOS, run the following:
 2. `mkdir -p ~/dev/orbs`
 3. `cd ~/dev/orbs`
 4. `git clone https://github.com/orbs-network/orbs-network.git`
-     > If you are prompted that `git` is not found, click "Install", then repeat step 3.
+     > If you are prompted that `git` is not found, click "Install", then repeat step 4.
 5. cd ~/dev/orbs/orbs-network
 6. chmod u+x orbs-team-member-bootstrap.sh
 7. ./orbs-team-member-bootstrap.sh
