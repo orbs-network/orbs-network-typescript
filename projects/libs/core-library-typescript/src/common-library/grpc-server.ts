@@ -75,7 +75,6 @@ export class GRPCServerBuilder {
   }
 
 
-
   start(): Promise<any> {
 
 
@@ -91,13 +90,7 @@ export class GRPCServerBuilder {
       return Promise.reject("Mali was not set up correctly. did you forget to call withService()?");
     }
 
-    const startupCheckers: StartupCheck[] = [];
-    this.services.forEach(s => {
-
-      if (this.instanceOfStartupChecker(s)) {
-        startupCheckers.push(<StartupCheck>s);
-      }
-    });
+    // TODO extract to method
 
     const app = express();
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
@@ -121,20 +114,12 @@ export class GRPCServerBuilder {
   }
 
   stop(): Promise<any> {
-
     const all = Promise.all(this.services.map(s => s.stop()));
-    if (this.mali) {
-      this.mali.close(this.endpoint);
-    }
-    if (this.managementServer) {
-      this.managementServer.close();
-    }
+    this.mali && this.mali.close(this.endpoint);
+    this.managementServer && this.managementServer.close();
     return all;
   }
 
-  private instanceOfStartupChecker(item: any): item is StartupCheck {
-    return "checkStartupStatus" in item;
-  }
 }
 
 export namespace grpcServer {

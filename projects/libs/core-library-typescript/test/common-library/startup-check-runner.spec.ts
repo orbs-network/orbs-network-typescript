@@ -9,7 +9,7 @@ const { expect } = chai;
 
 const ROOT_COMPONENT = "ROOT";
 
-describe("StartupCheckComposite", () => {
+describe("StartupCheckRunner", () => {
 
   class CheckerOk1 implements StartupCheck {
     startupCheck(): Promise<StartupStatus> {
@@ -40,7 +40,6 @@ describe("StartupCheckComposite", () => {
   it("should return ok if all startup checks are ok", async () => {
 
     const startupCheckRunner = new StartupCheckRunner(ROOT_COMPONENT, [ok1, ok2]);
-    // [ok1, ok2].forEach(s => composite.addStartupChecker(s));
     const expected = <StartupStatus>{
       name: ROOT_COMPONENT,
       status: STARTUP_STATUS.OK, childStartupStatuses: [

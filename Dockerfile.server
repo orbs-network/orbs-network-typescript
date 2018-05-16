@@ -5,6 +5,6 @@ ADD . /opt/orbs
 RUN ./build-server.sh && yarn cache clean
 
 HEALTHCHECK --interval=10s --timeout=10s --retries=12 \
-    CMD curl -q http://localhost:8080/admin/startupCheck
+    CMD curl -q http://localhost:8081/admin/startupCheck
 
 #CMD ./entrypoint.sh
