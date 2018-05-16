@@ -6,7 +6,6 @@ import * as getPort from "get-port";
 import * as request from "supertest";
 import httpServer from "../src/server";
 import mockHttpServer, { runMockServer, RequestStub } from "./mock-server";
-import { Server } from "http";
 import "mocha";
 import { ChildProcess } from "child_process";
 
@@ -100,6 +99,7 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
   @Service.RPCMethod
   addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext): void {
     expect(rpc.req).to.be.eql(expectedAddNewPendingTransactionInput);
+    rpc.res = { txid };
   }
 
   getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext): void {
@@ -192,7 +192,7 @@ describe("Public API Service - Component Test", async function () {
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
       const stubs: RequestStub[] = [
-        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({result: "ok"})},
+        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({transactionId: txid})},
         { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer"})},
         { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true }})}
       ];
@@ -215,21 +215,34 @@ describe("Public API Service - Component Test", async function () {
       return request(httpEndpoint)
         .post("/public/sendTransaction")
         .send(sendTransactionRequestData)
-        .expect(200, { result: "ok" });
+        .expect(200)
+        .then((response) => {
+          const res = JSON.parse(response.text);
+          expect(res).to.have.property("transactionId", txid);
+        });
     });
 
     it("called contract through http propagates properly to the virtual machine", () => {
       return request(httpEndpoint)
         .post("/public/callContract")
         .send(callContractRequestData)
-        .expect(200, { result: "some-answer" });
+        .expect(200)
+        .then((response) => {
+          const res = JSON.parse(response.text);
+          expect(res).to.have.property("result").that.is.eql("some-answer");
+        });
     });
 
     it("got transaction status through http propagates properly to transaction pool", () => {
       return request(httpEndpoint)
         .post("/public/getTransactionStatus")
         .send(getTransactionStatusData)
-        .expect(200, { status: "COMMITTED", receipt: { success: true }});
+        .expect(200)
+        .then((response) => {
+          const res = JSON.parse(response.text);
+          expect(res).to.have.property("status", "COMMITTED");
+          expect(res).to.have.property("receipt").that.has.property("success", true);
+        });
     });
   }
 });
