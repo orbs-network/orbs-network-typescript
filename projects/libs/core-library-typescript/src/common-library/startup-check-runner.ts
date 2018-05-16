@@ -13,7 +13,6 @@ export class StartupCheckRunner {
 
   run(): Promise<StartupStatus> {
 
-    logger.info(`There are ${this.startupCheckers.length} status checkers`);
     const startupCheckPromises = this.startupCheckers.map((s: StartupCheck) => s.startupCheck());
     return Promise.all(startupCheckPromises)
       .then(this.mergeStartupStatuses)
@@ -29,7 +28,6 @@ export class StartupCheckRunner {
     let hasAtLeastOneFailure = false;
 
     for (const item of startupStatuses) {
-      logger.info(`MERGE: ${JSON.stringify(item)}`);
       if (item.status === STARTUP_STATUS.OK) {
         hasAtLeastOneOk = true;
       } else {
