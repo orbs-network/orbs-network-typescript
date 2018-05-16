@@ -1,4 +1,4 @@
-import { OrbsClient, OrbsContract, Address } from "orbs-client-sdk";
+import { OrbsClient, OrbsContract, Address, ED25519Key } from "orbs-client-sdk";
 import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
@@ -14,10 +14,11 @@ chai.use(ChaiBarsPlugin);
 const testConfig = loadDefaultTestConfig();
 const { API_ENDPOINT } = process.env;
 
-async function aFooBarAccountWith(input: { senderAddress: Address, amountOfBars: number }) {
-  const orbsClient = new OrbsClient(API_ENDPOINT, input.senderAddress);
+async function aFooBarAccountWith(input: { keyPair: ED25519Key, amountOfBars: number }) {
+  const senderAddress = new Address(input.keyPair.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
+  const orbsClient = new OrbsClient(API_ENDPOINT, senderAddress, input.keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
-  const account = new FooBarAccount(input.senderAddress.toString(), contractAdapter);
+  const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
 
   await account.initBalance(input.amountOfBars);
 
@@ -27,11 +28,8 @@ async function aFooBarAccountWith(input: { senderAddress: Address, amountOfBars:
 async function createAccounts(input: { seed: number, numberOfAccounts: number }): Promise<FooBarAccount[]> {
   return Promise.all(_.range(input.numberOfAccounts).map((num) => {
     const amountOfBars = num + 10;
-    // Note: these are deterministic addresses for testing purposes. Addresses shouldn't be generated this way in production!!
-    const senderPublicKey = crypto.createHash("sha256").update(`addr_${input.seed}_${amountOfBars}`).digest("hex");
-    const senderAddress = new Address(senderPublicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
-
-    return aFooBarAccountWith({ senderAddress, amountOfBars });
+    const keyPair = new ED25519Key();
+    return aFooBarAccountWith({ keyPair, amountOfBars });
   }));
 }
 
