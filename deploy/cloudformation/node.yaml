@@ -359,6 +359,9 @@ Resources:
             - install
             - provision_keys
             - bootstrap
+          bootstrap:
+            - provision_keys
+            - bootstrap
         install:
           packages:
             yum:
@@ -393,10 +396,24 @@ Resources:
                   [cfn-auto-reloader-hook]
                   triggers=post.update
                   path=Resources.InstanceLaunchConfiguration.Metadata.AWS::CloudFormation::Init
-                  action=/opt/aws/bin/cfn-init -v --stack ${AWS_STACK_NAME} --resource InstanceLaunchConfiguration --configsets install_and_bootstrap --region ${AWS_REGION}
+                  action=/opt/aws/bin/cfn-init -v --stack ${AWS_STACK_NAME} --resource InstanceLaunchConfiguration --configsets bootstrap --region ${AWS_REGION}
                   runas=root
                 - AWS_REGION: !Ref "AWS::Region"
                   AWS_STACK_NAME: !Ref "AWS::StackId"
+            /opt/scripts/format.sh:
+              content: |
+                #!/bin/bash
+                export DATA_PATH=/mnt/data/
+                mkdir -p $DATA_PATH
+
+                mkfs.ext3 -F /dev/xvdc
+                mount /dev/xvdc $DATA_PATH
+
+                service docker restart
+          commands:
+            001_format_disk:
+              command: bash -x /opt/scripts/format.sh
+              ignoreErrors: true
         provision_keys:
           files:
             /opt/orbs/private-keys/message/secret-key:
