@@ -50,7 +50,7 @@ The following parameters (passed as environment variables) are supported:
 
 ### Stress test
 
-Can run with `yarn run stress-test` or `TEST=stress-test ./test-from-host.sh`. Takes a parameter `E2E_ACCOUNTS_TOTAL` (default: `10`).
+Can run with `yarn run stress-test` or `API_ENDPOINT=http://localhost:30003 TEST=stress-test ./test-from-host.sh`. Takes a parameter `E2E_ACCOUNTS_TOTAL` (default: `10`).
 
 This number of accounts will be initialized and then transfers between them will be initiated in certain order: from N to N+1 and in case of N+1 to 0.
 
@@ -66,4 +66,4 @@ To run a stress test run `ENV_FILE=stub-consensus.env TEST=stress-test ./test-fr
 
 When you make changes to the codebase, don't forget to run `./docker-build.sh` to create fresh docker images for the e2e.
 
-If you get connection problems due to lingering docker connections, run `docker kill $(docker ps -q)`
+If you get connection problems due to lingering docker connections, run `docker rm -f $(docker ps -a -q)`
