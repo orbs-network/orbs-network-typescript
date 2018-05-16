@@ -13,8 +13,9 @@ export class PublicApi {
     this.transactionPool = transactionPool;
   }
 
-  public async sendTransaction(transactionContext: types.SendTransactionInput) {
-    await this.transactionHandler.handle(transactionContext);
+  public async sendTransaction(transactionContext: types.SendTransactionInput): Promise<string> {
+    const txid = await this.transactionHandler.handle(transactionContext);
+    return txid;
   }
 
   public async callContract(input: types.CallContractInput) {
