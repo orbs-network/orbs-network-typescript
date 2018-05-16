@@ -81,7 +81,9 @@ export class PendingTransactionPool extends BaseTransactionPool {
       throw new Error(`Transaction ${JSON.stringify(transaction)} has expired. not storing in the pool`);
     }
 
-    if (!this.transactionValidator.validate(transaction)) {
+    const isValid = await this.transactionValidator.validate(transaction);
+
+    if (!isValid) {
       throw new Error(`Transaction ${JSON.stringify(transaction)} is not valid. not storing in the pool`);
     }
 
