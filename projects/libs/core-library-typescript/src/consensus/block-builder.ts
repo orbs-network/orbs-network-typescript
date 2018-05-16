@@ -62,7 +62,7 @@ export default class BlockBuilder {
       transactions: transactionEntries.map(entry => entry.transaction),
       transactionReceipts,
       stateDiff
-    }, lastBlock);
+    }, lastBlock, { sign: this.config.sign, keyManager: this.config.keyManager });
   }
 
   public start() {

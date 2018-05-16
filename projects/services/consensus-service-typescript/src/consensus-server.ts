@@ -61,8 +61,7 @@ export default function(nodeTopology: any, env: any) {
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
   consensusConfig.signBlocks = _.lowerCase(CONSENSUS_SIGN_BLOCKS) === "true";
   consensusConfig.keyManager = consensusConfig.signBlocks ? new KeyManager({
-    privateKeyPath: "/opt/orbs/private-keys/block/secret-key",
-    publicKeysPath: "/opt/orbs/public-keys/block"
+    privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
   }) : undefined;
 
   const nodeConfig = { nodeName: NODE_NAME };

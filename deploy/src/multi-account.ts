@@ -38,7 +38,8 @@ async function main() {
       accountId,
       region,
       bucketName,
-      secretMessageKey
+      secretMessageKey,
+      secretBlockKey
     });
 
     await execute(regionalConfig);

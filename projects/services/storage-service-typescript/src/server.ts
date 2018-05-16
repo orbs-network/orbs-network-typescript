@@ -19,7 +19,6 @@ export default function(nodeTopology: any, env: any) {
 
     const verifySignature = _.lowerCase(BLOCK_STORAGE_VERIFY_SIGNATURES) === "true";
     const keyManager = verifySignature ? new KeyManager({
-      privateKeyPath: "/opt/orbs/private-keys/block/secret-key",
       publicKeysPath: "/opt/orbs/public-keys/block"
     }) : undefined;
 

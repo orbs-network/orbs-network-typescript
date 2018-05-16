@@ -31,6 +31,7 @@ services:
     environment:
       SERVICE_NAME: consensus
       ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
+      CONSENSUS_SIGN_BLOCKS: 'true'
     volumes:
       - /opt/orbs/logs:/opt/orbs/logs
       - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
@@ -63,6 +64,7 @@ services:
     environment:
       SERVICE_NAME: storage
       BLOCK_STORAGE_DB_PATH: /opt/orbs/db
+      BLOCK_STORAGE_VERIFY_SIGNATURES: 'true'
     volumes:
       - /opt/orbs/db:/opt/orbs/db
       - /opt/orbs/logs:/opt/orbs/logs
