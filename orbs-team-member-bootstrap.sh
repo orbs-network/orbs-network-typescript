@@ -2,7 +2,6 @@
 
 # Prepare a fresh MacOS for Orbs Platform development.
 # Some of the packages can be substituted for others and some are purely for convenience.
-# It is required that zsh be the default shell - the script will prompt you if this is not the case, and explain what to do.
 
 INIT_FILE="${HOME}/.bash_profile"
 NODE_VER="v9.11.1"
@@ -15,8 +14,8 @@ PACKAGES="typescript yarn bash-completion docker-completion docker-compose-compl
 
 FAILED_PACKAGES=""
 
-exit_with_message() 
-{  
+exit_with_message()
+{
   echo "Failed: ${1-}";
   exit 1;
 }
@@ -110,7 +109,7 @@ post_install()  {
   if [[ $(grep PATH ${INIT_FILE} | grep -c JAVA_HOME) -eq 0 ]] ; then
     echo "Adding JAVA_HOME to PATH in ${INIT_FILE}"
     echo "PATH=\$JAVA_HOME:\$PATH" >> ${INIT_FILE}
-  else 
+  else
     echo "Already added JAVA_HOME to PATH in ${INIT_FILE}"
   fi
 
@@ -130,18 +129,18 @@ post_install()  {
   if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
     exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
   else
-    echo "Verified java command can be called"  
+    echo "Verified java command can be called"
   fi
   if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
     echo "Docker command not found - please run the Docker application now, give it your password, and wait till you see the message 'Docker is up and running'. This will install the 'docker' command which is needed for the build process."
     echo "When done, rerun this script. Don't worry, it won't do any harm to rerun."
     exit 1
   else
-    echo "Verified docker command can be called"  
+    echo "Verified docker command can be called"
   fi
 
   # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
-  # install_android 
+  # install_android
 
   echo "Installed Node version: $(node -v)"
   echo "Installed NPM version: $(npm -v)"

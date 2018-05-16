@@ -1,6 +1,6 @@
 import * as chai from "chai";
 import * as express from "express";
-import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest } from "../../../../client/client-sdk-javascript/src/orbs-api-interface";
+import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest } from "../../../../client/client-contract-test/src/orbs-api-interface";
 import * as _ from "lodash";
 import { diffString } from "json-diff";
 
