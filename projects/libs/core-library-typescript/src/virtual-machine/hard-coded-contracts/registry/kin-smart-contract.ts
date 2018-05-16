@@ -5,28 +5,29 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   static readonly ONE_MILLION = 1000000;
   static readonly ONE_BILLION = KinAtnSmartContract.ONE_MILLION * 1000;
   static readonly DEFAULT_BALANCE = 10000;
+  static readonly POOL_INITIAL_VALUE = KinAtnSmartContract.ONE_BILLION * 20;
 
   public async transfer(recipient: string, amount: number) {
     if (amount <= 0) {
       throw this.validationError("Transaction amount must be > 0");
     }
 
-    const senderBalance: number = await this.getBalanceForAccount(this.senderAddressBase58);
+    let senderBalance: number = await this.getBalanceForAccount(this.senderAddressBase58);
     // auto-fund accounts
     if (senderBalance == 0) {
-      this.financeAccount(this.senderAddressBase58);
+      senderBalance = await this.financeAccount(this.senderAddressBase58);
     }
 
     if (senderBalance < amount) {
-      throw this.validationError(`Balance is not sufficient ${senderBalance} < ${amount}`);
+      throw this.validationError(`Insufficient balance ${senderBalance} < ${amount}`);
     }
 
     // TODO: no integer overflow protection
     // TODO: conversion of float to string is lossy
-    const recipientBalance: number = await this.getBalanceForAccount(recipient);
+    let recipientBalance: number = await this.getBalanceForAccount(recipient);
     if (recipientBalance == 0) {
       // this is to finance a new account that is receiving money for the first time
-      this.financeAccount(recipient);
+      recipientBalance = await this.financeAccount(recipient);
     }
 
     await this.setBalance(this.senderAddressBase58, senderBalance - amount);
@@ -41,15 +42,17 @@ export default class KinAtnSmartContract extends BaseSmartContract {
     let allocatedBalance = await this.getBalanceForAccount(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME);
     if (allocatedBalance == 0) {
       // reset/init the pool
-      this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, KinAtnSmartContract.ONE_BILLION * 20);
-      allocatedBalance = KinAtnSmartContract.ONE_BILLION * 20;
+      await this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, KinAtnSmartContract.POOL_INITIAL_VALUE);
+      allocatedBalance = await this.getBalanceForAccount(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME);
     }
-    this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, allocatedBalance - amount);
+    await this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, allocatedBalance - amount);
   }
 
-  private async financeAccount(accountToFinance: string) {
-    this.setBalance(accountToFinance, KinAtnSmartContract.DEFAULT_BALANCE);
-    this.reduceFromPool(KinAtnSmartContract.DEFAULT_BALANCE);
+  private async financeAccount(accountToFinance: string): Promise<number> {
+    await this.setBalance(accountToFinance, KinAtnSmartContract.DEFAULT_BALANCE);
+    await this.reduceFromPool(KinAtnSmartContract.DEFAULT_BALANCE);
+
+    return KinAtnSmartContract.DEFAULT_BALANCE;
   }
 
   private async getBalanceForAccount(account: string): Promise<number> {
@@ -58,7 +61,7 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   }
 
   private async setBalance(account: string, amount: number) {
-    return this.state.store(this.getAccountBalanceKey(account), JSON.stringify(amount));
+    this.state.store(this.getAccountBalanceKey(account), JSON.stringify(amount));
   }
 
   private getAccountBalanceKey(account: string) {
