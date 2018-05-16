@@ -9,6 +9,7 @@ interface TestEnvironmentConfig {
     connectFromHost: boolean;
     preExistingPublicSubnet: string;
     testSubscriptionKey: string;
+    envFile: string;
 }
 
 export class TestEnvironment extends TestStack {
@@ -59,7 +60,8 @@ export class TestEnvironment extends TestStack {
             numOfNodes: 6,
             orbsNetwork: this.orbsNetwork,
             publicApiNetwork: this.publicNetwork,
-            ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false)
+            ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false),
+            envFile: config.envFile
         });
     }
 }

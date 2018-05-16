@@ -101,6 +101,26 @@ describe("a block", () => {
       }, 100);
     });
 
+    it("restarts successfully after being stopped", (done) => {
+      blockBuilder.start();
+      blockBuilder.stop();
+      blockBuilder.start();
+
+      setTimeout(() => {
+        try {
+          const bodyMatch = sinon.match.has("transactions", dummyTransactionSet)
+          .and(sinon.match.has("stateDiff", dummyStateDiff))
+          .and(sinon.match.has("transactionReceipts"));
+          expect(newBlockBuildCallback).to.have.been.calledWith(sinon.match.has("body", bodyMatch));
+          done();
+        } catch (e) {
+          done(e);
+        } finally {
+          blockBuilder.stop();
+        }
+      }, 100);
+    });
+
     afterEach(async () => {
       await blockBuilder.shutdown();
     });

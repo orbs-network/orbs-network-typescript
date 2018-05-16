@@ -27,6 +27,7 @@ export interface OrbsNodeConfig {
   ethereumNodeHttpAddress: string;
   ethereumSubscriptionContractAddress?: string;
   debugPort: number;
+  envFile: string;
 }
 
 export class OrbsNode implements TestComponent {
@@ -82,7 +83,8 @@ export class OrbsNode implements TestComponent {
             SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
             SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS: this.config.ethereumSubscriptionContractAddress,
             VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD: JSON.stringify(TEST_SMART_CONTRACTS),
-            DEBUG_PORT: this.config.debugPort
+            DEBUG_PORT: this.config.debugPort,
+            ENV_FILE: this.config.envFile
           }
         }
       }, (code: any, stdout: any, stderr: any) => {
@@ -101,6 +103,7 @@ interface OrbsNodeClusterConfig {
   orbsNetwork: TestSubnet;
   publicApiNetwork: TestSubnet;
   ethereumNodeHttpAddress: string;
+  envFile: string;
 }
 
 export class OrbsNodeCluster implements TestComponent {
@@ -126,7 +129,8 @@ export class OrbsNodeCluster implements TestComponent {
         ethereumNodeHttpAddress: this.config.ethereumNodeHttpAddress,
         publicApiHostPort: 20000 + i,
         publicApiHostHTTPPort: 30000 + i,
-        debugPort: 9229 + i
+        debugPort: 9229 + i,
+        envFile: this.config.envFile
       }));
     }
     return nodes;
