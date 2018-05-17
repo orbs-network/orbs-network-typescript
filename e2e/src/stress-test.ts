@@ -20,8 +20,15 @@ const generateAddress = (keyPair: ED25519Key): Address => {
   return address;
 };
 
+export function generateKey(input: string) {
+  return crypto.createHash("sha256").update(input).digest("hex");
+}
+
+
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
-  const keyPair = new ED25519Key();
+  const prebuiltKeyPair = new ED25519Key();
+
+  const keyPair = new ED25519Key(prebuiltKeyPair.publicKey, prebuiltKeyPair.getPrivateKeyUnsafe());
   const senderAddress = generateAddress(keyPair);
   const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
