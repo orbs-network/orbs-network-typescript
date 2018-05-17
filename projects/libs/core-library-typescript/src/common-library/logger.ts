@@ -41,7 +41,7 @@ export class Logger {
 
   public static readonly DEFAULT_FILE_OPTIONS: FileOptions = {
     fileName: undefined,
-    maxSize: 10 * 1024 * 1024,
+    maxSize: 100 * 1024 * 1024, // 100 Mb, up to 2 Gb of logs per process
     maxFiles: 20,
     json: !Logger.isTest()
   };
