@@ -28,14 +28,28 @@ public class ED25519KeyUnitTest {
     }
 
     @Test
-    public void is_properly_initialized_by_a_public_and_private_keys() {
+    public void throws_on_invalid_arguments_is_properly_initialized_by_a_public_key() {
+        try (ED25519Key key = new ED25519Key(null)) {
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Invalid argument!");
+        }
+
         String publicKey = "b9a91acbf23c22123a8253cfc4325d7b4b7a620465c57f932c7943f60887308b";
         String privateKey = "3f81e53116ee3f860c154d03b9cabf8af71d8beec210c535ed300c0aee5fcbe7";
 
-        try (ED25519Key key = new ED25519Key(publicKey, privateKey)) {
-            assertEquals(key.getPublicKey(), publicKey);
-            assertEquals(key.getPrivateKeyUnsafe(), privateKey);
-            assertTrue(key.hasPrivateKey());
+        try (ED25519Key key = new ED25519Key(null, privateKey)) {
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Invalid arguments!");
+        }
+
+        try (ED25519Key key = new ED25519Key(publicKey, null)) {
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Invalid arguments!");
+        }
+
+        try (ED25519Key key = new ED25519Key(null, null)) {
+        } catch (Exception e) {
+            assertEquals(e.getMessage(), "Invalid arguments!");
         }
     }
 
@@ -83,6 +97,33 @@ public class ED25519KeyUnitTest {
             assertFalse(key2.verify(message2, signature1));
             assertFalse(key2.verify(message1, signature2));
             assertFalse(key2.verify(message1, signature1));
+        }
+    }
+
+    @Test
+    public void throws_on_invalid_arguments_signs_and_verifies_messages() {
+        try (ED25519Key key1 = new ED25519Key();
+             ED25519Key key2 = new ED25519Key()) {
+            byte[] message1 = "Hello World!".getBytes(StandardCharsets.UTF_8);
+
+             try {
+                key1.sign(null);
+            } catch (Exception e) {
+                assertEquals(e.getMessage(), "Invalid argument!");
+            }
+
+            byte[] signature1 = key1.sign(message1);
+
+            try {
+                key1.verify(null, signature1);
+            } catch (Exception e) {
+                assertEquals(e.getMessage(), "Invalid arguments!");
+            }
+            try {
+                key1.verify(message1, null);
+            } catch (Exception e) {
+                assertEquals(e.getMessage(), "Invalid arguments!");
+            }
         }
     }
 }
