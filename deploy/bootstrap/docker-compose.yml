@@ -6,13 +6,20 @@ services:
     working_dir: /opt/orbs/projects/services/gossip-service-typescript/
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/gossip.js
     ports:
-      - 60001:60008
+      - 60001:60001
     env_file:
       - .env
       - .env-secrets
     environment:
       SERVICE_NAME: gossip
       SIGN_MESSAGES: 'true'
+      BLOCK_BUILDER_POLL_INTERVAL: 500
+      MIN_ELECTION_TIMEOUT: 2000
+      MAX_ELECTION_TIMEOUT: 4000
+      HEARBEAT_INTERVAL: 100
+      TRANSACTION_EXPIRATION_TIMEOUT: 240000
+      MSG_LIMIT: 4000000
+      BLOCK_SIZE_LIMIT: 2000
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
