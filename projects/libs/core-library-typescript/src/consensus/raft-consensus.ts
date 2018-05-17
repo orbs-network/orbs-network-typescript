@@ -126,8 +126,6 @@ export class RaftConsensus extends BaseConsensus {
   private async onCommitted(data: any, index: number) {
     const msg: types.ConsensusMessage = data.data;
 
-    // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
-    // committed entry.
     const start = new Date().getTime();
     const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
     const end = new Date().getTime();
@@ -161,15 +159,7 @@ export class RaftConsensus extends BaseConsensus {
   private async onLeaderElected() {
     if (this.node.isLeader()) {
       logger.info(`Node ${this.node.id} was elected as a new leader!`);
-      // const emptyBlock = BlockUtils.buildNextBlock(
-      //   {
-      //     transactions: [],
-      //     transactionReceipts: [],
-      //     stateDiff: []
-      //   });
 
-      // const appendMessage: types.ConsensusMessage = { block: emptyBlock };
-      // this.node.append(appendMessage);
       this.blockBuilder.appendNextBlock();
     }
   }
