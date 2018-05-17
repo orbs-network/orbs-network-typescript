@@ -7,10 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ED25519KeyUnitTest {
     static {
@@ -30,6 +27,7 @@ public class ED25519KeyUnitTest {
     @Test
     public void throws_on_invalid_arguments_is_properly_initialized_by_a_public_key() {
         try (ED25519Key key = new ED25519Key(null)) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid argument!");
         }
@@ -38,16 +36,19 @@ public class ED25519KeyUnitTest {
         String privateKey = "3f81e53116ee3f860c154d03b9cabf8af71d8beec210c535ed300c0aee5fcbe7";
 
         try (ED25519Key key = new ED25519Key(null, privateKey)) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid arguments!");
         }
 
         try (ED25519Key key = new ED25519Key(publicKey, null)) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid arguments!");
         }
 
         try (ED25519Key key = new ED25519Key(null, null)) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid arguments!");
         }
@@ -106,8 +107,9 @@ public class ED25519KeyUnitTest {
              ED25519Key key2 = new ED25519Key()) {
             byte[] message1 = "Hello World!".getBytes(StandardCharsets.UTF_8);
 
-             try {
+            try {
                 key1.sign(null);
+                fail("expected Exception!");
             } catch (Exception e) {
                 assertEquals(e.getMessage(), "Invalid argument!");
             }
@@ -116,11 +118,13 @@ public class ED25519KeyUnitTest {
 
             try {
                 key1.verify(null, signature1);
+                fail("expected Exception!");
             } catch (Exception e) {
                 assertEquals(e.getMessage(), "Invalid arguments!");
             }
             try {
                 key1.verify(message1, null);
+                fail("expected Exception!");
             } catch (Exception e) {
                 assertEquals(e.getMessage(), "Invalid arguments!");
             }

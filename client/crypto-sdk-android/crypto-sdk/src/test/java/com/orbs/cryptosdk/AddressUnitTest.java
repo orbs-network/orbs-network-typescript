@@ -22,16 +22,19 @@ public class AddressUnitTest {
     @Test
     public void throws_on_invalid_arguments_converts_address_to_string() {
         try (Address address = new Address(null, "640ed3", "M")) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid arguments!");
         }
 
         try (Address address = new Address("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65", null, "M")) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid arguments!");
         }
 
         try (Address address = new Address("8d41d055d00459be37f749da2caf87bd4ced6fafa335b1f2142e0f44501b2c65", "640ed3", null)) {
+            fail("expected Exception!");
         } catch (Exception e) {
             assertEquals(e.getMessage(), "Invalid arguments!");
         }
