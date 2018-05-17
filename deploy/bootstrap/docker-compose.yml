@@ -13,8 +13,15 @@ services:
     environment:
       SERVICE_NAME: gossip
       SIGN_MESSAGES: 'true'
+      BLOCK_BUILDER_POLL_INTERVAL: 500
+      MIN_ELECTION_TIMEOUT: 2000
+      MAX_ELECTION_TIMEOUT: 4000
+      HEARBEAT_INTERVAL: 100
+      TRANSACTION_EXPIRATION_TIMEOUT: 240000
+      MSG_LIMIT: 4000000
+      BLOCK_SIZE_LIMIT: 2000
     volumes:
-      - /opt/orbs/logs:/opt/orbs/logs
+      - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
       - /opt/orbs/private-keys/message:/opt/orbs/private-keys/message
     networks:
@@ -30,9 +37,9 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: consensus
-      ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
+      ETHEREUM_CONTRACT_ADDRESS: '0x0836C6b91e68A6Ca30086d196e998f75346c2c72'
     volumes:
-      - /opt/orbs/logs:/opt/orbs/logs
+      - /mnt/data/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -49,7 +56,7 @@ services:
     environment:
       SERVICE_NAME: public-api
     volumes:
-      - /opt/orbs/logs:/opt/orbs/logs
+      - /mnt/data/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -64,8 +71,8 @@ services:
       SERVICE_NAME: storage
       BLOCK_STORAGE_DB_PATH: /opt/orbs/db
     volumes:
-      - /opt/orbs/db:/opt/orbs/db
-      - /opt/orbs/logs:/opt/orbs/logs
+      - /mnt/data/db:/opt/orbs/db
+      - /mnt/data/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -79,7 +86,7 @@ services:
     environment:
       SERVICE_NAME: virtual-machine
     volumes:
-      - /opt/orbs/logs:/opt/orbs/logs
+      - /mnt/data/logs:/opt/orbs/logs
     networks:
       default:
 
@@ -95,7 +102,7 @@ services:
     environment:
       SERVICE_NAME: sidechain-connector
     volumes:
-      - /opt/orbs/logs:/opt/orbs/logs
+      - /mnt/data/logs:/opt/orbs/logs
     networks:
       default:
 

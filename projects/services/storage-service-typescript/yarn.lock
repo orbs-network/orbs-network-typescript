@@ -66,6 +66,16 @@
   version "0.12.1"
   resolved "https://registry.yarnpkg.com/@types/caseless/-/caseless-0.12.1.tgz#9794c69c8385d0192acc471a540d1f8e0d16218a"
 
+"@types/chai-as-promised@^7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@types/chai-as-promised/-/chai-as-promised-7.1.0.tgz#010b04cde78eacfb6e72bfddb3e58fe23c2e78b9"
+  dependencies:
+    "@types/chai" "*"
+
+"@types/chai@*":
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.3.tgz#b8a74352977a23b604c01aa784f5b793443fb7dc"
+
 "@types/chai@^4.1.2":
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.2.tgz#f1af664769cfb50af805431c407425ed619daa21"
@@ -1250,13 +1260,13 @@ fstream@^1.0.0, fstream@^1.0.10, fstream@^1.0.2, fstream@^1.0.8:
     mkdirp ">=0.5 0"
     rimraf "2"
 
-"gaggle@git+https://github.com/orbs-network/gaggle.git":
+"gaggle@git+https://github.com/orbs-network/gaggle.git#dfebd2866024c1d0f98171ba37cdd50a5c645fac":
   version "2.2.0"
-  resolved "git+https://github.com/orbs-network/gaggle.git#928f56a95fc31dd08990e9fc90ca46f346a0c163"
+  resolved "git+https://github.com/orbs-network/gaggle.git#dfebd2866024c1d0f98171ba37cdd50a5c645fac"
   dependencies:
     bluebird "^3.5.1"
-    joi "^13.1.1"
-    lodash "^4.17.4"
+    joi "^13.3.0"
+    lodash "^4.17.10"
     once "^1.4.0"
     redis "^2.8.0"
     uuid "^3.2.1"
@@ -1651,9 +1661,9 @@ isurl@^1.0.0-alpha5:
     has-to-string-tag-x "^1.2.0"
     is-object "^1.0.1"
 
-joi@^13.1.1:
-  version "13.1.2"
-  resolved "https://registry.yarnpkg.com/joi/-/joi-13.1.2.tgz#b2db260323cc7f919fafa51e09e2275bd089a97e"
+joi@^13.3.0:
+  version "13.3.0"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-13.3.0.tgz#4defd4333b539c5d10e444ab44f5a5583480f17c"
   dependencies:
     hoek "5.x.x"
     isemail "3.x.x"
@@ -1839,7 +1849,7 @@ lodash.values@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/lodash.values/-/lodash.values-4.3.0.tgz#a3a6c2b0ebecc5c2cba1c17e6e620fe81b53d347"
 
-lodash@^4.13.1:
+lodash@^4.13.1, lodash@^4.17.10:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
@@ -2181,8 +2191,9 @@ optjs@~3.2.2:
     bind-decorator "^1.0.11"
     bluebird "^3.5.1"
     bs58 "^4.0.1"
+    elliptic "^6.4.0"
     express "^4.16.3"
-    gaggle "git+https://github.com/orbs-network/gaggle.git"
+    gaggle "git+https://github.com/orbs-network/gaggle.git#dfebd2866024c1d0f98171ba37cdd50a5c645fac"
     grpc "^1.9.0"
     grpc-caller "https://github.com/electricmonk/grpc-caller"
     json-stable-stringify "^1.0.1"

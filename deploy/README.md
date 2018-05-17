@@ -20,7 +20,7 @@ export S3_BUCKET_NAME=orbs-network-config
 
 # build docker image (in the root of the project)
 
-./docker-build.sh
+./docker/build-server-base.sh && ./docker-build.sh
 
 # install packages for deployment script to work
 
@@ -35,7 +35,7 @@ touch bootstrap/.env-secrets
 
 # create basic infrastructure
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --ssh-public-key $PUBLIC_KEY_PATH \
     --dns-zone $DNS_ZONE \
@@ -46,7 +46,7 @@ node src/deploy.js \
 
 # deploy node
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -56,7 +56,7 @@ node src/deploy.js \
 
 # find out ip allocations of reserved ips (value of NodeElasticIP)
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -68,7 +68,7 @@ node src/deploy.js \
 
 # update node configuration
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -80,7 +80,7 @@ Cron pulls bootstrap configuration automatically every five minutes to recreate 
 
 # update node stack configuration
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -99,7 +99,7 @@ ssh -t -o StrictHostKeyChecking=no ec2-user@$REGION.global.nodes.$NODE_ENV.$DNS_
 
 # replace old node
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -110,7 +110,7 @@ node src/deploy.js \
 
 # deploy parity node
 
-node src/deploy.js \
+node dist/deploy.js \
     --region $REGION \
     --dns-zone $DNS_ZONE \
     --account-id $AWS_ACCOUNT_ID \
@@ -202,5 +202,7 @@ To enable signing Gossip messages, set `SIGN_MESSAGES` to `true` in `docker-comp
 Public keys and private keys are delivered through different methods. Public keys, like the rest of the `bootstrap`, are uploaded to S3.
 
 Private keys are being embedded into CloudFormation template as so-called no-echo params, which means no one can retrieve them through CLI call or Amazon Console.
+
+To deploy private keys, use `--secret-block-key` and `--secret-message-key` parameters of the deploy script.
 
 On the instance, private keys are being placed to `/opt/keys/private-keys/` and should be mounted inside the container (see `docker-compose.yml`).

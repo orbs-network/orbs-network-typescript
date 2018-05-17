@@ -2,7 +2,6 @@
 
 # Prepare a fresh MacOS for Orbs Platform development.
 # Some of the packages can be substituted for others and some are purely for convenience.
-# It is required that zsh be the default shell - the script will prompt you if this is not the case, and explain what to do.
 
 INIT_FILE="${HOME}/.bash_profile"
 NODE_VER="v9.11.1"
@@ -11,12 +10,12 @@ BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/inst
 # OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
 CASK_PACKAGES="java8 google-chrome visual-studio-code iterm2 slack docker sourcetree"
-PACKAGES="typescript yarn bash-completion docker-completion docker-compose-completion docker-machine-completion"
+PACKAGES="cmake typescript yarn bash-completion docker-completion docker-compose-completion docker-machine-completion"
 
 FAILED_PACKAGES=""
 
-exit_with_message() 
-{  
+exit_with_message()
+{
   echo "Failed: ${1-}";
   exit 1;
 }
@@ -110,7 +109,7 @@ post_install()  {
   if [[ $(grep PATH ${INIT_FILE} | grep -c JAVA_HOME) -eq 0 ]] ; then
     echo "Adding JAVA_HOME to PATH in ${INIT_FILE}"
     echo "PATH=\$JAVA_HOME:\$PATH" >> ${INIT_FILE}
-  else 
+  else
     echo "Already added JAVA_HOME to PATH in ${INIT_FILE}"
   fi
 
@@ -130,23 +129,22 @@ post_install()  {
   if [[ $(command -v java | grep -c java) -eq 0 ]] ; then
     exit_with_message "Java failed to install, or shell needs to be restarted. Please restart shell and run this script again."
   else
-    echo "Verified java command can be called"  
+    echo "Verified java command can be called"
   fi
   if [[ $(command -v docker | grep -c docker) -eq 0 ]] ; then
     echo "Docker command not found - please run the Docker application now, give it your password, and wait till you see the message 'Docker is up and running'. This will install the 'docker' command which is needed for the build process."
     echo "When done, rerun this script. Don't worry, it won't do any harm to rerun."
     exit 1
   else
-    echo "Verified docker command can be called"  
+    echo "Verified docker command can be called"
   fi
 
-  # This is not called by default as not everyone needs it. Uncomment and rerun to install it.
-  # install_android 
 
   echo "Installed Node version: $(node -v)"
   echo "Installed NPM version: $(npm -v)"
   echo "Installed Java version: $(java -version 2>&1 | head -1)"
   echo "Installed Docker version: $(docker -v)"
+
 
 }
 
@@ -156,15 +154,11 @@ install_android()
 
   echo "Installing Android SDK packages ..."
 
-  for package in ${ANDROID_PACKAGES} ; do
-  echo "brew install ${package}"
-  if [[ $? -ne 0 ]] ; then
-    echo "Failed to install package ${package}"
-    FAILED_PACKAGES="${FAILED_PACKAGES} ${package}"
-  fi
-  done
-
-  android update --no-ui
+  brew install gradle
+  brew cask install android-sdk
+  yes | sdkmanager --licenses
+  sdkmanager "ndk-bundle" --verbose
+  sdkmanager --update --verbose
 
   echo "Android SDK installed."
 }
@@ -173,10 +167,14 @@ run_build()
 {
   ./install.sh
   ./build.sh
+  # This presently doesn't work, see https://orbs.leankit.com/card/667381910
+  #./build-sdk.sh
+  #./build-e2e.sh
 
-  ./docker/build-server-base.sh && ./docker-build.sh
-  ./docker/build-sdk-base.sh && ./docker/build-sdk.sh
-  ./docker/build-sdk-base.sh && ./docker/build-e2e.sh
+
+#  ./docker/build-server-base.sh && ./docker-build.sh
+#  ./docker/build-sdk-base.sh && ./docker/build-sdk.sh
+#  ./docker/build-sdk-base.sh && ./docker/build-e2e.sh
 }
 
 # ==================== START ====================
@@ -208,6 +206,11 @@ install_brew_and_cask
 install_cask_packages
 install_brew_packages
 post_install
+
+echo
+# echo "Installing Android packages ..."
+# install_android
+# echo "Android installation complete."
 
 if [[ -n ${FAILED_PACKAGES} ]] ; then
   echo "The following packages failed to install: ${FAILED_PACKAGES}"
