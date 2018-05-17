@@ -35,12 +35,20 @@ export default class ContractStateMemCacheAccessor extends BaseContractStateAcce
 const CONTRACT_ADDRESS = Address.createContractAddress("kin").toBuffer();
 const SENDER_ADDRESS = new Address(createHash("sha256").update("sender").digest()).toBase58();
 const RECIPIENT_ADDRESS = new Address(createHash("sha256").update("recipient").digest()).toBase58();
-const adapter = new ContractStateMemCacheAccessor(CONTRACT_ADDRESS, new StateCache());
-const senderContract = new KinAtnSmartContract(SENDER_ADDRESS, adapter);
-const recipientContract = new KinAtnSmartContract(RECIPIENT_ADDRESS, adapter);
+
 // const superuserContract = new KinAtnSmartContract(BarSmartContract.SUPERUSER, adapter);
 
 describe("kin atn contract - transfer tests", () => {
+  let adapter: ContractStateMemCacheAccessor;
+  let senderContract: KinAtnSmartContract;
+  let recipientContract: KinAtnSmartContract;
+
+  beforeEach(() => {
+    adapter = new ContractStateMemCacheAccessor(CONTRACT_ADDRESS, new StateCache());
+    senderContract = new KinAtnSmartContract(SENDER_ADDRESS, adapter);
+    recipientContract = new KinAtnSmartContract(RECIPIENT_ADDRESS, adapter);
+  });
+
   it("init token balances and transfer tokens", async () => {
     await senderContract.transfer(RECIPIENT_ADDRESS, 1);
     expect(await senderContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE - 1);
@@ -50,5 +58,17 @@ describe("kin atn contract - transfer tests", () => {
 
   it("cannot transfer negative amount", async () => {
     await expect(senderContract.transfer(RECIPIENT_ADDRESS, -1)).to.eventually.be.rejectedWith("Transaction amount must be > 0");
+  });
+
+  it("can transfer float values", async () => {
+    await senderContract.transfer(RECIPIENT_ADDRESS, 1.5);
+    expect(await senderContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE - 1.5);
+    expect(await recipientContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE + 1.5);
+  });
+
+  it("can transfer float values #2", async () => {
+    await senderContract.transfer(RECIPIENT_ADDRESS, 1.56354725);
+    expect(await senderContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE - 1.56354725);
+    expect(await recipientContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE + 1.56354725);
   });
 });

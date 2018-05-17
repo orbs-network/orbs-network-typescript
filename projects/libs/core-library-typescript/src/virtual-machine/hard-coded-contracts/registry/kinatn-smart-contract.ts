@@ -22,8 +22,6 @@ export default class KinAtnSmartContract extends BaseSmartContract {
       throw this.validationError(`Insufficient balance ${senderBalance} < ${amount}`);
     }
 
-    // TODO: no integer overflow protection
-    // TODO: conversion of float to string is lossy
     let recipientBalance: number = await this.getBalanceForAccount(recipient);
     if (recipientBalance == 0) {
       // this is to finance a new account that is receiving money for the first time
