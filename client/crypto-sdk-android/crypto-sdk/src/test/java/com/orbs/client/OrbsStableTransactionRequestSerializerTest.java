@@ -14,15 +14,15 @@ public class OrbsStableTransactionRequestSerializerTest {
 
   @Test
   public void serialize_request_for_hash() {
-    OrbsAPISendTransactionRequest req = new OrbsAPISendTransactionRequest();
-    req.header = new OrbsAPISendTransactionHeader();
+    SendTransactionRequest req = new SendTransactionRequest();
+    req.header = new SendTransactionHeader();
     req.header.version = 0;
     req.header.contractAddressBase58 = "abc";
     req.header.timestamp = "123";
     req.header.senderAddressBase58 = "zxc";
     req.payload = "{some: json}";
 
-    Gson gson = new GsonBuilder().registerTypeAdapter(OrbsAPISendTransactionRequest.class, new OrbsStableTransactionRequestSerializer()).create();
+    Gson gson = new GsonBuilder().registerTypeAdapter(SendTransactionRequest.class, new OrbsStableTransactionRequestSerializer()).create();
 
     String res = gson.toJson(req);
     assertEquals(res, EXPECTED_REQUEST_JSON);

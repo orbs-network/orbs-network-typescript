@@ -7,9 +7,9 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-public class OrbsStableTransactionRequestSerializer implements JsonSerializer<OrbsAPISendTransactionRequest> {
+public class OrbsStableTransactionRequestSerializer implements JsonSerializer<SendTransactionRequest> {
   @Override
-  public JsonElement serialize(OrbsAPISendTransactionRequest src, Type typeOfSrc, JsonSerializationContext context) {
+  public JsonElement serialize(SendTransactionRequest src, Type typeOfSrc, JsonSerializationContext context) {
     JsonObject headerObject = new JsonObject();
     headerObject.add("contractAddressBase58", context.serialize(src.header.contractAddressBase58));
     headerObject.add("senderAddressBase58", context.serialize(src.header.senderAddressBase58));

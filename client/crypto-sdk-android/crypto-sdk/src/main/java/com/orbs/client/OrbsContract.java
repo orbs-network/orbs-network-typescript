@@ -4,9 +4,6 @@ package com.orbs.client;
 import com.google.gson.Gson;
 import com.orbs.cryptosdk.Address;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 public class OrbsContract {
   private final OrbsClient orbsClient;
   private final Address contractAddress;
@@ -17,7 +14,7 @@ public class OrbsContract {
     this.contractAddress = new Address(contractHash, client.senderAddress.virtualChainId, client.senderAddress.networkId);
   }
 
-  public OrbsAPISendTransactionResponse sendTransaction(String methodName, Object[] args) throws Exception {
+  public SendTransactionResponse sendTransaction(String methodName, Object[] args) throws Exception {
     String payload = generateSendTransactionPayload(methodName, args);
     return orbsClient.sendTransaction(this.contractAddress, payload);
   }
@@ -28,7 +25,7 @@ public class OrbsContract {
   }
 
   public String generateSendTransactionPayload(String methodName, Object[] args) {
-    OrbsAPISendTransactionPayload payload = new OrbsAPISendTransactionPayload();
+    SendTransactionPayload payload = new SendTransactionPayload();
     payload.method = methodName;
     payload.args = args;
     Gson gson = new Gson();
@@ -36,7 +33,7 @@ public class OrbsContract {
   }
 
   public String generateCallPayload(String methodName, Object[] args) {
-    OrbsAPICallPayload payload = new OrbsAPICallPayload();
+    CallPayload payload = new CallPayload();
     payload.method = methodName;
     payload.args = args;
     Gson gson = new Gson();
