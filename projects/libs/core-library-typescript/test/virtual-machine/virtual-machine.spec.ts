@@ -35,6 +35,7 @@ function aTransactionEntry(builder: { from: Address, to: Address, amount: number
       method: "transfer",
       args: [builder.to.toBase58(), builder.amount]
     }),
+    signatureData: undefined
   };
   return {
     transaction,

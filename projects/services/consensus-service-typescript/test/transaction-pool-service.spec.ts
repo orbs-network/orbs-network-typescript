@@ -30,7 +30,8 @@ function createDummyTransaction(): Transaction {
             timestamp: Date.now().toString(),
             version: 1
         },
-        payload: DUMMY_TRANSACTION_PAYLOAD
+        payload: DUMMY_TRANSACTION_PAYLOAD,
+        signatureData: undefined
     };
 }
 
@@ -46,6 +47,15 @@ function createGossipMessagePayload(transaction?: Transaction): GossipListenerIn
     };
 }
 
+function createTransactionReceipt(transaction: Transaction): TransactionReceipt {
+    const helper = new TransactionHelper(transaction);
+    const txHash = helper.calculateHash();
+    const receipt: types.TransactionReceipt = {
+      txHash,
+      success: true
+    };
+    return receipt;
+}
 
 describe("transaction pool service tests", function() {
     let server: GRPCServerBuilder;
@@ -148,7 +158,7 @@ describe("transaction pool service tests", function() {
         expect(transaction).to.have.property("transaction").that.has.property("payload", DUMMY_TRANSACTION_PAYLOAD);
     });
 
-    it("service handles de-duplication of transactions which are already pending", async () => {
+    it("service handles de-duplication of transactions which are already pending (gossip flow)", async () => {
         const transaction = createDummyTransaction();
         const txid = (await client.addNewPendingTransaction({ transaction })).txid;
         await expect(client.gossipMessageReceived(createGossipMessagePayload(transaction))).to.eventually.be.rejectedWith(
@@ -156,18 +166,30 @@ describe("transaction pool service tests", function() {
         );
     });
 
-    it("service handles de-duplication of transactions which are already committed", async () => {
+    it("service handles de-duplication of transactions which are already pending (api flow)", async () => {
         const transaction = createDummyTransaction();
         const txid = (await client.addNewPendingTransaction({ transaction })).txid;
-        const helper = new TransactionHelper(transaction);
-        const txHash = helper.calculateHash();
-        const receipt: types.TransactionReceipt = {
-          txHash,
-          success: true
-        };
+        await expect(client.addNewPendingTransaction({ transaction })).to.eventually.be.rejectedWith(
+            `Transaction with id ${txid} already exists in the pending transaction pool`
+        );
+    });
 
+    it("service handles de-duplication of transactions which are already committed (gossip flow)", async () => {
+        const transaction = createDummyTransaction();
+        const txid = (await client.addNewPendingTransaction({ transaction })).txid;
+        const receipt = createTransactionReceipt(transaction);
         await client.markCommittedTransactions({transactionReceipts: [ receipt ]});
         await expect(client.gossipMessageReceived(createGossipMessagePayload(transaction))).to.eventually.be.rejectedWith(
+            `Transaction with id ${txid} already exists in the committed transaction pool`
+        );
+    });
+
+    it("service handles de-duplication of transactions which are committed and then readded via addNewPending (api flow)", async () => {
+        const transaction = createDummyTransaction();
+        const txid = (await client.addNewPendingTransaction({ transaction })).txid;
+        const receipt = createTransactionReceipt(transaction);
+        await client.markCommittedTransactions({transactionReceipts: [ receipt ]});
+        await expect(client.addNewPendingTransaction({ transaction })).to.eventually.be.rejectedWith(
             `Transaction with id ${txid} already exists in the committed transaction pool`
         );
     });

@@ -13,9 +13,8 @@ const expect = chai.expect;
 chai.should();
 chai.use(ChaiBarsPlugin);
 
-const generateAddress = (): Address => {
-  const key = new ED25519Key();
-  const address = new Address(key.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
+const generateAddress = (keyPair: ED25519Key): Address => {
+  const address = new Address(keyPair.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
 
   return address;
 };
@@ -23,8 +22,9 @@ const generateAddress = (): Address => {
 const testConfig = loadDefaultTestConfig();
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
-  const senderAddress = generateAddress();
-  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress);
+  const keyPair = new ED25519Key();
+  const senderAddress = generateAddress(keyPair);
+  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
   const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
 
@@ -34,8 +34,9 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 }
 
 async function aTextMessageAccount() {
-  const senderAddress = generateAddress();
-  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress);
+  const keyPair = new ED25519Key();
+  const senderAddress = generateAddress(keyPair);
+  const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "text-message");
   const account = new TextMessageAccount(senderAddress.toString(), contractAdapter);
 
@@ -77,6 +78,7 @@ describe("simple message", async function () {
     }
   });
 
+
   it("sends text messages between accounts", async () => {
     console.log("Initiating account for Alice");
     const alice = await aTextMessageAccount();
@@ -86,11 +88,9 @@ describe("simple message", async function () {
 
     console.log("Sending messages from Alice to Bob and from Bob to Alice");
 
-    await Promise.all([
-      alice.sendMessage(bob.address, "hello"),
-      alice.sendMessage(bob.address, "sup"),
-      bob.sendMessage(alice.address, "is anybody in here?")
-    ]);
+    await alice.sendMessage(bob.address, "hello");
+    await alice.sendMessage(bob.address, "sup");
+    await bob.sendMessage(alice.address, "is anybody in here?");
 
     const [bobMessages, aliceMessages] = await Promise.all([bob.getMyMessages(), alice.getMyMessages()]);
     const [bobMessage1, bobMessage2] = _.sortBy(bobMessages, "timestamp");
@@ -102,6 +102,8 @@ describe("simple message", async function () {
     expect(aliceMessages.length).to.equal(1);
     expect(aliceMessages[0].message).to.equal("is anybody in here?");
   });
+
+
 
   after(async () => {
     if (testConfig.testEnvironment) {

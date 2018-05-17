@@ -5,8 +5,8 @@ import * as crypto from "crypto";
 export type OrbsContractMethodArgs = [string | number] | any[];
 
 export class OrbsContract {
-  orbsClient: OrbsClient;
-  private contractAddress: Address;
+  public orbsClient: OrbsClient;
+  public contractAddress: Address;
 
   constructor(orbsClient: OrbsClient, contractName: string) {
     this.orbsClient = orbsClient;
@@ -19,18 +19,26 @@ export class OrbsContract {
   }
 
   public async sendTransaction(methodName: string, args: OrbsContractMethodArgs) {
-    const payload = JSON.stringify({
-      method: methodName,
-      args: args
-    });
+    const payload = this.generateSendTransactionPayload(methodName, args);
     return await this.orbsClient.sendTransaction(this.contractAddress, payload);
   }
 
-  public async call(methodName: string, args: OrbsContractMethodArgs) {
-    const payload = JSON.stringify({
+  public generateSendTransactionPayload(methodName: string, args: OrbsContractMethodArgs) {
+    return JSON.stringify({
       method: methodName,
       args: args
     });
+  }
+
+  public async call(methodName: string, args: OrbsContractMethodArgs) {
+    const payload = this.generateCallPayload(methodName, args);
     return this.orbsClient.call(this.contractAddress, payload);
+  }
+
+  public generateCallPayload(methodName: string, args: OrbsContractMethodArgs) {
+    return JSON.stringify({
+      method: methodName,
+      args: args
+    });
   }
 }

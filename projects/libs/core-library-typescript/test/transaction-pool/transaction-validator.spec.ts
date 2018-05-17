@@ -18,7 +18,7 @@ describe("transaction validation", () => {
 
   beforeEach(() => {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
-    transactionValidator = new TransactionValidator(subscriptionManager);
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: false});
   });
 
   it("succeeds for a valid transaction of an active vchain subscription", async () => {
@@ -42,14 +42,38 @@ describe("transaction validation", () => {
         timestamp: "0",
         contractAddress: Address.createContractAddress("dummyContract", "020202").toBuffer()
       },
-      payload: "{}"
+      payload: "{}",
+      signatureData: undefined
     };
     return expect(transactionValidator.validate(tx)).to.eventually.be.false;
   });
+});
 
-  xit("fails if the transaction signature is invalid", () => {
+describe("transaction validator with enabled signature verification ", () => {
+  let transactionValidator: TransactionValidator;
+  let subscriptionManager: types.SubscriptionManagerClient;
+
+  beforeEach(() => {
+    subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
+    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: true});
   });
 
-  xit("succeeds if the transaction is valid", () => {
+  it("succeeds for a correctly generated signature", () => {
+    const correctlySignedTransaction: types.Transaction = aDummyTransaction();
+
+    return expect(transactionValidator.validate(correctlySignedTransaction)).to.eventually.be.true;
   });
+
+  it("failed for incorrect signature", () => {
+    const badlySignedTransaction: types.Transaction = aDummyTransaction();
+
+    badlySignedTransaction.signatureData.signature = Buffer.from(
+      "00000000000000000000000000000000000000000000000000000000000000",
+      "hex"
+    );
+    return expect(transactionValidator.validate(badlySignedTransaction)).to.eventually.be.false;
+  });
+
+
 });

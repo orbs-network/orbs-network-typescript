@@ -9,4 +9,4 @@ export { SubscriptionManager } from "./subscription-manager";
 export { PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "./transaction-pool";
 export { VirtualMachine } from "./virtual-machine";
 export { Service, ServiceRunner, ServiceConfig } from "./base-service";
-export { FakeGossipClient, generateServiceIPCClient } from "./test-kit";
+export { FakeGossipClient, generateServiceInProcessClient } from "./test-kit";

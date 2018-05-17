@@ -72,19 +72,19 @@ napi_value Address::New(napi_env env, napi_callback_info info) {
         status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &publicKeyLength);
         assert(status == napi_ok);
         char publicKey[publicKeyLength + 1];
-        napi_get_value_string_utf8(env, args[0], publicKey, publicKeyLength + 1, 0);
+        napi_get_value_string_utf8(env, args[0], publicKey, publicKeyLength + 1, nullptr);
 
         size_t virtualChainIdLength;
         status = napi_get_value_string_utf8(env, args[1], nullptr, 0, &virtualChainIdLength);
         assert(status == napi_ok);
         char virtualChainId[virtualChainIdLength + 1];
-        napi_get_value_string_utf8(env, args[1], virtualChainId, virtualChainIdLength + 1, 0);
+        napi_get_value_string_utf8(env, args[1], virtualChainId, virtualChainIdLength + 1, nullptr);
 
         size_t networkIdLength;
         status = napi_get_value_string_utf8(env, args[2], nullptr, 0, &networkIdLength);
         assert(status == napi_ok);
         char networkId[networkIdLength + 1];
-        napi_get_value_string_utf8(env, args[2], networkId, networkIdLength + 1, 0);
+        napi_get_value_string_utf8(env, args[2], networkId, networkIdLength + 1, nullptr);
 
         Address *obj = new Address(publicKey, virtualChainId, networkId);
 
@@ -129,6 +129,7 @@ napi_value Address::GetPublicKey(napi_env env, napi_callback_info info) {
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetPublicKey()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
 
     return res;
 }
@@ -147,6 +148,7 @@ napi_value Address::GetNetworkId(napi_env env, napi_callback_info info) {
     const string str(Orbs::Utils::ToString(obj->address_.GetNetworkId()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
 
     return res;
 }
@@ -183,6 +185,7 @@ napi_value Address::GetVirtualChainId(napi_env env, napi_callback_info info) {
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetVirtualChainId()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
 
     return res;
 }
@@ -201,6 +204,7 @@ napi_value Address::GetAccountId(napi_env env, napi_callback_info info) {
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetAccountId()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
 
     return res;
 }
@@ -219,6 +223,7 @@ napi_value Address::GetChecksum(napi_env env, napi_callback_info info) {
     const string str(Orbs::Utils::Vec2Hex(obj->address_.GetChecksum()));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
 
     return res;
 }
@@ -233,6 +238,7 @@ static napi_value GetNetworkId(napi_env env, napi_callback_info info, uint8_t ne
     const string str(Orbs::Utils::ToString(networkId));
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
+    assert(status == napi_ok);
 
     return res;
 }
@@ -259,7 +265,6 @@ napi_value Address::ToString(napi_env env, napi_callback_info info) {
     const string str(obj->address_.ToString());
     napi_value res;
     status = napi_create_string_utf8(env, str.c_str(), str.length(), &res);
-
     assert(status == napi_ok);
 
     return res;

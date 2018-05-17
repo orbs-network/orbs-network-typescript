@@ -18,7 +18,7 @@ services:
       - TRANSACTION_EXPIRATION_TIMEOUT=240000
       - MSG_LIMIT=4000000
       - BLOCK_SIZE_LIMIT=2000
-
+    env_file: ${ENV_FILE}
     ports:
       - ${DEBUG_PORT}:9229
     networks:

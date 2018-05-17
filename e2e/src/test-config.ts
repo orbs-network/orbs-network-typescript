@@ -20,6 +20,8 @@ export function loadDefaultTestConfig(): TestConfig {
     }
   };
 
+  const envFile = `${__dirname}/../config/env/${nconf.get("ENV_FILE") || "default.env"}`;
+
   if (nconf.get("E2E_NO_DEPLOY")) {
     const publicApiEndpoint = nconf.get("E2E_PUBLIC_API_ENDPOINT");
     if (!publicApiEndpoint) {
@@ -32,7 +34,8 @@ export function loadDefaultTestConfig(): TestConfig {
       preExistingPublicSubnet: nconf.get("PREEXISTING_PUBLIC_SUBNET"),
       // left-padding the vchain ID to use it in order create a 32-byte subscription key (temporary workaround..)
       testSubscriptionKey: "0x0000000000000000000000000000000000000000000000000000000000" + config.virtualChainId,
-      numOfNodes: Number(nconf.get("NUM_OF_NODES") || 6)
+      numOfNodes: Number(nconf.get("NUM_OF_NODES") || 6),
+      envFile
     });
     config.apiEndpoint = config.testEnvironment.discoverApiEndpoint();
   }

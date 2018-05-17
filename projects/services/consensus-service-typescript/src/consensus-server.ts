@@ -16,10 +16,14 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
+  algorithm: string;
+  leaderNodeName?: string;
+
 
   constructor(min?: number, max?: number, heartbeat?: number) {
     this.electionTimeout = { min: min || 2000, max: max || 4000 };
     this.heartbeatInterval = heartbeat || 100;
+    this.algorithm = "raft";
   }
 }
 
@@ -43,7 +47,7 @@ function makeCommittedTransactionPool() {
 
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -66,6 +70,17 @@ export default function(nodeTopology: any, env: any) {
   consensusConfig.msgLimit = Number(MSG_LIMIT) || 4000000;
   consensusConfig.blockSizeLimit = Number(BLOCK_SIZE_LIMIT) || Math.floor(consensusConfig.msgLimit / (2 * 250));
 
+
+  if (CONSENSUS_ALGORITHM) {
+    consensusConfig.algorithm = CONSENSUS_ALGORITHM;
+  }
+  if (consensusConfig.algorithm.toLowerCase() === "stub") {
+    if (!CONSENSUS_LEADER_NODE_NAME) {
+      throw new Error("CONSENSUS_LEADER_NODE_NAME can't be missing from stub consensus!");
+    }
+    consensusConfig.leaderNodeName = CONSENSUS_LEADER_NODE_NAME;
+    consensusConfig.heartbeatInterval = 1000; // this is the block interval
+  }
 
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);

@@ -61,14 +61,18 @@ export default class PublicApiHTTPService extends Service {
             timestamp: _.get(body, "header.timestamp"),
             contractAddress: bs58DecodeRawAddress(_.get(body, "header.contractAddressBase58")),
           },
-          payload: _.get(body, "payload")
+          payload: _.get(body, "payload"),
+          signatureData: body.signatureData && {
+            publicKey: Buffer.from(_.get(body, "signatureData.publicKeyHex"), "hex"),
+            signature: Buffer.from(_.get(body, "signatureData.signatureHex"), "hex")
+          }
         }
       };
 
       try {
-        await this.publicApi.sendTransaction(input);
+        const txid = await this.publicApi.sendTransaction(input);
         // placeholder value instead of transaction receipt
-        res.json({ result: "ok" });
+        res.json({ transactionId: txid });
       } catch (err) {
         logger.error(`HTTP API could not send a transcation: ${err.toString()}`);
         res.sendStatus(500);

@@ -1,0 +1,14 @@
+  repositories {
+    jcenter()
+}
+  configurations {
+    libs
+}
+  dependencies {
+    libs "com.google.code.gson:gson:2.8.4"
+    libs "com.squareup.okhttp3:okhttp:3.10.0"
+}
+  task acquireLibs(type: Copy) {
+    from configurations.libs
+    into "$buildDir/javaLibs"
+}
