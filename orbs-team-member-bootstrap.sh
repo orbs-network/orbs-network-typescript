@@ -140,7 +140,6 @@ post_install()  {
   fi
 
 
-
   echo "Installed Node version: $(node -v)"
   echo "Installed NPM version: $(npm -v)"
   echo "Installed Java version: $(java -version 2>&1 | head -1)"

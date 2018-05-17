@@ -3,7 +3,6 @@
 This is a monorepo that contains all Orbs projects, including both server implementation and client SDK.
 
 ## Preparing your system
-
 You are encouraged to run the script `orbs-team-member-bootstrap.sh`, it will install all necessary software on your MacOS and then run the full build.
 
 Not all installed software is strictly necessary for the build to run. Rather, it is our opinionated view of a useful development environment.
@@ -15,7 +14,6 @@ You should then rerun the script (don't worry, it is safe to do so).
 The entire installation takes about 5 minutes. At the end of the installation, and before the build begins, you will be asked to either proceed with the build, or exit. Build time is about 15 minutes or more, depending on connection speed.
 
 ### Running the script
-
 On a fresh MacOS, run the following:
 
 1. `xcrun --version`
