@@ -13,11 +13,11 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   heartbeatInterval: number;
   nodeName: string;
   clusterSize: number;
+  algorithm: string;
+  leaderNodeName?: string;
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
-  algorithm: string;
-  leaderNodeName?: string;
 
 
   constructor(min?: number, max?: number, heartbeat?: number) {

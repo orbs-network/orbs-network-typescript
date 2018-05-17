@@ -48,7 +48,7 @@ export class Consensus {
     }
 
     this.pollInterval = setInterval(async () => {
-      const RaftConsensus = <RaftConsensus>this.actualConsensus;
+      const raftConsensus = <RaftConsensus>this.actualConsensus;
 
       const status = raftConsensus.isLeader() ? "the leader" : "not the leader";
       logger.debug(`Node is ${status}`);

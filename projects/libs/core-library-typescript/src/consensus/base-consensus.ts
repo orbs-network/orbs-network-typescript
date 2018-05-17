@@ -10,6 +10,9 @@ export interface RaftConsensusConfig {
   heartbeatInterval: number;
   algorithm: string;
   leaderNodeName?: string; // only if known (required for stub algorithm)
+  blockBuilderPollInterval?: number;
+  msgLimit?: number;
+  blockSizeLimit?: number;
 }
 
 export abstract class BaseConsensus {

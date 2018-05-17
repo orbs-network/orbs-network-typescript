@@ -8,8 +8,8 @@ import { TransactionPoolClient, VirtualMachineClient, BlockStorageClient } from 
 import * as sinon from "sinon";
 import { createHash } from "crypto";
 import { aDummyTransactionSet } from "../../src/test-kit/transaction-builders";
-import { RaftConsensus, RaftConsensusConfig } from "../../src/consensus/raft-consensus";
-import { FakeGossipClient, generateServiceIPCClient, BlockUtils, Address, JsonBuffer, logger, BlockStorage } from "../../src";
+import { RaftConsensus } from "../../src/consensus/raft-consensus";
+import { FakeGossipClient, BlockUtils, Address, JsonBuffer, logger, BlockStorage, RaftConsensusConfig } from "../../src";
 import { delay } from "bluebird";
 import * as _ from "lodash";
 
@@ -24,7 +24,8 @@ function createRaftConsensus(index: number): [types.ConsensusClient, RaftConsens
     clusterSize: 3,
     electionTimeout: { min: 10, max: 20},
     heartbeatInterval: 5,
-    nodeName: `node${index}`
+    nodeName: `node${index}`,
+    algorithm: "raft"
   };
 
   const fakeGossip = new FakeGossipClient(`node${index}`);

@@ -33,7 +33,11 @@ function generateBigBrokenBlock(): types.Block {
       payload: JSON.stringify({
         method: "someMethod",
         args: [ 1, 2, 3, 4, "some-other-arguments" ]
-      })
+      }),
+      signatureData: {
+        publicKey: undefined,
+        signature: undefined
+      }
     };
   });
 

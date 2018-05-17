@@ -62,22 +62,10 @@ class RPCConnector extends EventEmitter {
   }
 }
 
-<<<<<<< HEAD
 export interface ElectionTimeoutConfig {
   min: number;
   max: number;
 }
-
-export interface RaftConsensusConfig {
-  nodeName: string;
-  clusterSize: number;
-  electionTimeout: ElectionTimeoutConfig;
-  heartbeatInterval: number;
-  blockBuilderPollInterval?: number;
-  msgLimit?: number;
-  blockSizeLimit?: number;
-}
-
 
 export class RaftConsensus extends BaseConsensus {
   private transactionPool: types.TransactionPoolClient;
