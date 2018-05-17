@@ -54,13 +54,13 @@ export default class BlockStorageService extends Service {
   public async addBlock(rpc: types.AddBlockContext) {
     const block = rpc.req.block;
 
-    if (this.isSyncing()) {
-      logger.info(`Block storage ${this.config.nodeName} is adding new block with height ${block.header.height} while syncing`);
+    logger.info(`Block storage ${this.config.nodeName} is adding new block with height ${block.header.height}`);
 
-      this.sync.onReceiveBlock(rpc.req.block);
+    if (this.isSyncing()) {
+      this.sync.onReceiveBlock(block);
       await this.sync.appendBlocks();
     } else {
-      await this.blockStorage.addBlock(rpc.req.block);
+      await this.blockStorage.addBlock(block);
     }
 
     rpc.res = {};
@@ -177,16 +177,6 @@ export default class BlockStorageService extends Service {
 
   async onSendNewBlocksResponse(fromAddress: string, payload: any) {
     logger.info(`Block storage ${this.config.nodeName} received a new block via sync`);
-
-    if (!this.isSyncing()) {
-      logger.error(`Block storage ${this.config.nodeName} dropped new block received via sync because it is not syncing right now`);
-      return;
-    }
-
-    if (!this.sync.isSyncingWith(fromAddress)) {
-      logger.info(`Block storage ${this.config.nodeName} dropped new block received via sync because it came from ${fromAddress} instead of ${this.sync.getNode()}`);
-      return;
-    }
 
     this.sync.onReceiveBlock(payload.block);
   }

@@ -4,6 +4,8 @@ import { createHash } from "crypto";
 import * as stringify from "json-stable-stringify";
 
 export namespace BlockUtils {
+  // TODO: add method parseBlockFromJSON
+
   export function calculateBlockHash(block: types.Block): Buffer {
     const hash = createHash("sha256");
 

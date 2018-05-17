@@ -13,6 +13,13 @@ services:
     environment:
       SERVICE_NAME: gossip
       SIGN_MESSAGES: 'true'
+      BLOCK_BUILDER_POLL_INTERVAL: 500
+      MIN_ELECTION_TIMEOUT: 2000
+      MAX_ELECTION_TIMEOUT: 4000
+      HEARBEAT_INTERVAL: 100
+      TRANSACTION_EXPIRATION_TIMEOUT: 240000
+      MSG_LIMIT: 4000000
+      BLOCK_SIZE_LIMIT: 2000
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
@@ -30,7 +37,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: consensus
-      ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
+      ETHEREUM_CONTRACT_ADDRESS: '0x0836C6b91e68A6Ca30086d196e998f75346c2c72'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
     networks:
