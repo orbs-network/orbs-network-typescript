@@ -5,7 +5,7 @@ import "mocha";
 
 import { StateCache } from "../../src/virtual-machine/state-cache";
 import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-state-accessor";
-import KinAtnSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/kin-smart-contract";
+import KinAtnSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/kinatn-smart-contract";
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
 import { types } from "../../src";
 import { Address } from "../../src/common-library/address";

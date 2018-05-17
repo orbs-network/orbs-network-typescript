@@ -48,7 +48,7 @@ export default class KinAtnSmartContract extends BaseSmartContract {
     await this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, allocatedBalance - amount);
   }
 
-  private async financeAccount(accountToFinance: string): Promise<number> {
+  public async financeAccount(accountToFinance: string): Promise<number> {
     await this.setBalance(accountToFinance, KinAtnSmartContract.DEFAULT_BALANCE);
     await this.reduceFromPool(KinAtnSmartContract.DEFAULT_BALANCE);
 
