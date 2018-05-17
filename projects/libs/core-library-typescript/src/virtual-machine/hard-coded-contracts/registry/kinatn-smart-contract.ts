@@ -1,8 +1,8 @@
 import BaseSmartContract from "../base-smart-contact";
 
 export default class KinAtnSmartContract extends BaseSmartContract {
-  static readonly ALLOCATED_ACCOUNT_NAME = "repository_source";
-  static readonly ONE_MILLION = 1000000;
+  static readonly ALLOCATED_POOL_STATE_VARIABLE = "atn_pool";
+  static readonly ONE_MILLION = 1_000_000;
   static readonly ONE_BILLION = KinAtnSmartContract.ONE_MILLION * 1000;
   static readonly DEFAULT_BALANCE = 10000;
   static readonly POOL_INITIAL_VALUE = KinAtnSmartContract.ONE_BILLION * 20;
@@ -39,13 +39,13 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   }
 
   private async reduceFromPool(amount: number) {
-    let allocatedBalance = await this.getBalanceForAccount(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME);
+    let allocatedBalance = await this.getPoolBalance();
     if (allocatedBalance == 0) {
       // reset/init the pool
-      await this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, KinAtnSmartContract.POOL_INITIAL_VALUE);
-      allocatedBalance = await this.getBalanceForAccount(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME);
+      await this.setPoolBalance(KinAtnSmartContract.POOL_INITIAL_VALUE);
+      allocatedBalance = await this.getPoolBalance();
     }
-    await this.setBalance(KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME, allocatedBalance - amount);
+    await this.setPoolBalance(allocatedBalance - amount);
   }
 
   public async financeAccount(accountToFinance: string): Promise<number> {
@@ -62,6 +62,15 @@ export default class KinAtnSmartContract extends BaseSmartContract {
 
   private async setBalance(account: string, amount: number) {
     this.state.store(this.getAccountBalanceKey(account), JSON.stringify(amount));
+  }
+
+  private async getPoolBalance() {
+    const balance = await this.state.load(KinAtnSmartContract.ALLOCATED_POOL_STATE_VARIABLE);
+    return balance != undefined ? JSON.parse(balance) : 0;
+  }
+
+  private async setPoolBalance(amount: number) {
+    this.state.store(KinAtnSmartContract.ALLOCATED_POOL_STATE_VARIABLE, JSON.stringify(amount));
   }
 
   private getAccountBalanceKey(account: string) {

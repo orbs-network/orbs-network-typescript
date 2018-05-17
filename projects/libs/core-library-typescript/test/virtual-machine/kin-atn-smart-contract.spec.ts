@@ -45,7 +45,7 @@ describe("kin atn contract - transfer tests", () => {
     await senderContract.transfer(RECIPIENT_ADDRESS, 1);
     expect(await senderContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE - 1);
     expect(await recipientContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE + 1);
-    expect(Number.parseFloat(await adapter.load(`balances.${KinAtnSmartContract.ALLOCATED_ACCOUNT_NAME}`))).to.be.equal(KinAtnSmartContract.POOL_INITIAL_VALUE - (2 * KinAtnSmartContract.DEFAULT_BALANCE));
+    expect(Number.parseFloat(await adapter.load(KinAtnSmartContract.ALLOCATED_POOL_STATE_VARIABLE))).to.be.equal(KinAtnSmartContract.POOL_INITIAL_VALUE - (2 * KinAtnSmartContract.DEFAULT_BALANCE));
   });
 
   it("cannot transfer negative amount", async () => {
