@@ -32,35 +32,35 @@ public class OrbsClient {
     this.timeoutInMs = timeoutInMs;
   }
 
-  public OrbsAPISendTransactionResponse sendTransaction(Address contractAddress, String payload) throws Exception {
+  public SendTransactionResponse sendTransaction(Address contractAddress, String payload) throws Exception {
     String requestJson = generateTransactionRequest(contractAddress, payload);
 
     String rawRetVal = this.sendHTTPRequest(this.apiEndpoint + "/public/sendTransaction", requestJson);
     return parseSendTransactionResponse(rawRetVal);
   }
 
-  public OrbsAPISendTransactionResponse parseSendTransactionResponse(String jsonResult) {
+  public SendTransactionResponse parseSendTransactionResponse(String jsonResult) {
     Gson gson = new Gson();
-    OrbsAPISendTransactionResponse res = gson.fromJson(jsonResult, OrbsAPISendTransactionResponse.class);
+    SendTransactionResponse res = gson.fromJson(jsonResult, SendTransactionResponse.class);
     return res;
   }
 
   public String generateTransactionRequest(Address contractAddress, String payload) throws Exception {
-    OrbsAPISendTransactionRequest requestPayload = new OrbsAPISendTransactionRequest();
+    SendTransactionRequest requestPayload = new SendTransactionRequest();
     requestPayload.payload = payload;
-    requestPayload.header = new OrbsAPISendTransactionHeader();
+    requestPayload.header = new SendTransactionHeader();
     requestPayload.header.version = 0;
     requestPayload.header.senderAddressBase58 = this.senderAddress.toString();
     requestPayload.header.timestamp = String.valueOf(new Date().getTime());
     requestPayload.header.contractAddressBase58 = contractAddress.toString();
 
-    Gson gsonForHash = new GsonBuilder().registerTypeAdapter(OrbsAPISendTransactionRequest.class, new OrbsStableTransactionRequestSerializer()).create();
+    Gson gsonForHash = new GsonBuilder().registerTypeAdapter(SendTransactionRequest.class, new OrbsStableTransactionRequestSerializer()).create();
     String requestForHash = gsonForHash.toJson(requestPayload);
     byte[] hashBytes = OrbsHashUtils.hash256(requestForHash);
     byte[] signatureBytes = this.keyPair.sign(hashBytes);
     String signatureHex = OrbsHashUtils.bytesToHex(signatureBytes);
 
-    requestPayload.signatureData = new OrbsAPISendTransactionSignature();
+    requestPayload.signatureData = new SendTransactionSignature();
     requestPayload.signatureData.publicKeyHex = this.keyPair.getPublicKey();
     requestPayload.signatureData.signatureHex = signatureHex;
 
@@ -75,7 +75,7 @@ public class OrbsClient {
   }
 
   public String generateCallRequest(Address contractAddress, String payload) {
-    OrbsAPICallContractRequest requestPayload = new OrbsAPICallContractRequest();
+    CallContractRequest requestPayload = new CallContractRequest();
     requestPayload.payload = payload;
     requestPayload.senderAddressBase58 = this.senderAddress.toString();
     requestPayload.contractAddressBase58 = contractAddress.toString();
