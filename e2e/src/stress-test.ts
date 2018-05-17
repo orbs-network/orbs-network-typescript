@@ -80,7 +80,7 @@ describe("test multiple transactions", async function () {
   it("transfers tokens between accounts", async function () {
     for (const i of _.range(0, Number(process.env.NUM_OF_ATTEMPTS) || 1)) {
       console.log(`Attempt #${i}`);
-
+      await delay(1000);
       try {
         await stress(testConfig.stressTest.accounts, i);
         console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);

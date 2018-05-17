@@ -72,6 +72,8 @@ export interface RaftConsensusConfig {
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
   blockBuilderPollInterval?: number;
+  msgLimit?: number;
+  blockSizeLimit?: number;
 }
 
 
@@ -81,6 +83,7 @@ export class RaftConsensus {
 
   private connector: RPCConnector;
   private node: any;
+  private nextBlockChainIndex: number; // maintain consistency between gaggle log and storage
 
   public constructor(
     config: RaftConsensusConfig,
@@ -95,9 +98,10 @@ export class RaftConsensus {
     this.blockBuilder = new BlockBuilder({
       virtualMachine, transactionPool, blockStorage,
       newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
-      pollIntervalMs: config.blockBuilderPollInterval
+      pollIntervalMs: config.blockBuilderPollInterval,
+      blockSizeLimit: config.blockSizeLimit
     });
-
+    this.nextBlockChainIndex = 0;
     this.node = gaggle({
       id: config.nodeName,
       clusterSize: config.clusterSize,
@@ -105,6 +109,7 @@ export class RaftConsensus {
         name: "custom",
         connector: this.connector
       },
+      msgLimit: config.msgLimit,
 
       // How long to wait before declaring the leader dead?
       electionTimeout: {
@@ -138,7 +143,7 @@ export class RaftConsensus {
 
     const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.debug(`New block with height ${block.header.height} and hash ${blockHash} is about to be committed (RAFT index ${index})`);
+    logger.debug(`onCommitted ${this.node.id}: New block with height ${block.header.height} and hash ${blockHash} is about to be committed (RAFT index ${index})`);
 
     logger.info(`Finished deserializing block with height ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
 
@@ -146,22 +151,35 @@ export class RaftConsensus {
 
     try {
       await this.blockBuilder.commitBlock(block);
+      if (this.node.isLeader()) {
+        if (this.node.getCommitIndex() == index)
+            this.blockBuilder.appendNextBlock();
+      }
     } catch (err) {
+      // Gad: if for any reason the commit flow (block storage + transaction pool) failed
+      //  TODO: note: we maintain a sync routine with the raft log to try and update the storage state...
       logger.error(err);
       logger.error(`Failed to commit block with height ${block.header.height} and hash ${blockHash}: ${JSON.stringify(err)}`);
+      // this.node.stepDown(); // -leader steps down (election time out will occur)
     }
 
-    if (this.node.isLeader()) {
-      this.blockBuilder.start();
-    }
+
   }
+
 
   private async onLeaderElected() {
     if (this.node.isLeader()) {
-      this.blockBuilder.start();
       logger.info(`Node ${this.node.id} was elected as a new leader!`);
-    } else {
-      this.blockBuilder.stop();
+      // const emptyBlock = BlockUtils.buildNextBlock(
+      //   {
+      //     transactions: [],
+      //     transactionReceipts: [],
+      //     stateDiff: []
+      //   });
+
+      // const appendMessage: types.ConsensusMessage = { block: emptyBlock };
+      // this.node.append(appendMessage);
+      this.blockBuilder.appendNextBlock();
     }
   }
 
@@ -178,7 +196,7 @@ export class RaftConsensus {
 
     const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.debug(`New block with height ${block.header.height} and hash ${blockHash} is about to be appended to RAFT log`);
+    logger.debug(`onNewBlockBuilds ${this.node.id}:  New block with height ${block.header.height} and hash ${blockHash} is about to be appended to RAFT log`);
 
     this.node.append(appendMessage);
   }

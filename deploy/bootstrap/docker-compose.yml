@@ -6,7 +6,7 @@ services:
     working_dir: /opt/orbs/projects/services/gossip-service-typescript/
     command: node dist/index.js /opt/orbs/config/topologies/discovery/node1/gossip.js
     ports:
-      - 60001:60001
+      - 60001:60008
     env_file:
       - .env
       - .env-secrets
