@@ -4,6 +4,7 @@ import { EventEmitter } from "events";
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import BlockBuilder from "./block-builder";
+import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
@@ -55,20 +56,7 @@ class RPCConnector extends EventEmitter {
   }
 }
 
-export interface ElectionTimeoutConfig {
-  min: number;
-  max: number;
-}
-
-export interface RaftConsensusConfig {
-  nodeName: string;
-  clusterSize: number;
-  electionTimeout: ElectionTimeoutConfig;
-  heartbeatInterval: number;
-}
-
-
-export class RaftConsensus {
+export class RaftConsensus extends BaseConsensus {
   private transactionPool: types.TransactionPoolClient;
   private blockBuilder: BlockBuilder;
 
@@ -82,6 +70,7 @@ export class RaftConsensus {
     transactionPool: types.TransactionPoolClient,
     virtualMachine: types.VirtualMachineClient
   ) {
+    super();
     logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config)}`);
     this.connector = new RPCConnector(config.nodeName, gossip);
     this.transactionPool = transactionPool;
@@ -148,7 +137,7 @@ export class RaftConsensus {
     }
   }
 
-  async onMessageReceived(fromAddress: string, messageType: string, message: any) {
+  async onMessageReceived(fromAddress: string, messageType: string, message: any): Promise<any> {
     switch (messageType) {
       case "RaftMessage": {
         this.connector.received(message.from, message.data);
@@ -162,11 +151,11 @@ export class RaftConsensus {
     this.node.append(appendMessage);
   }
 
-  async initialize() {
+  async initialize(): Promise<any> {
     return this.blockBuilder.initialize();
   }
 
-  async shutdown() {
+  async shutdown(): Promise<any> {
     await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
   }
 }

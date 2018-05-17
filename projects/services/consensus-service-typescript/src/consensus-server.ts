@@ -13,10 +13,13 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   heartbeatInterval: number;
   nodeName: string;
   clusterSize: number;
+  algorithm: string;
+  leaderNodeName?: string;
 
   constructor() {
     this.electionTimeout = { min: 2000, max: 4000};
     this.heartbeatInterval = 100;
+    this.algorithm = "raft";
   }
 }
 
@@ -39,7 +42,7 @@ function makeCommittedTransactionPool() {
 }
 
 export default function(nodeTopology: any, env: any) {
-  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS } = env;
+  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -56,6 +59,17 @@ export default function(nodeTopology: any, env: any) {
   const consensusConfig = new DefaultConsensusConfig();
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
+
+  if (CONSENSUS_ALGORITHM) {
+    consensusConfig.algorithm = CONSENSUS_ALGORITHM;
+  }
+  if (consensusConfig.algorithm.toLowerCase() === "stub") {
+    if (!CONSENSUS_LEADER_NODE_NAME) {
+      throw new Error("CONSENSUS_LEADER_NODE_NAME can't be missing from stub consensus!");
+    }
+    consensusConfig.leaderNodeName = CONSENSUS_LEADER_NODE_NAME;
+    consensusConfig.heartbeatInterval = 1000; // this is the block interval
+  }
 
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);

@@ -137,10 +137,10 @@ describe("Transaction Pool", () => {
         receipt: undefined
       });
     });
-    it("that is in the pending pool", () => {
+    it("that is in the pending pool", async () => {
       const transaction = aValidTransaction();
       const txid = new TransactionHelper(transaction).calculateTransactionId();
-      transactionPool.addNewPendingTransaction(transaction);
+      await transactionPool.addNewPendingTransaction(transaction);
       expect(transactionPool.getTransactionStatus(txid)).to.be.eql({
         status: types.TransactionStatus.PENDING,
         receipt: undefined
