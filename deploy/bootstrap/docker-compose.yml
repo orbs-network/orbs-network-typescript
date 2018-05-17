@@ -37,7 +37,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: consensus
-      ETHEREUM_CONTRACT_ADDRESS: '0x67121034220a01b004171ae4a5e60992b879863d'
+      ETHEREUM_CONTRACT_ADDRESS: '0x0836C6b91e68A6Ca30086d196e998f75346c2c72'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
     networks:
