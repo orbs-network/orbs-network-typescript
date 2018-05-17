@@ -98,14 +98,7 @@ export default class BlockBuilder {
       const block = await this.buildBlockFromPendingTransactions(lastBlock);
 
       if (block == undefined) {
-        this.pollInterval = setInterval(async () => {
-          try {
-            logger.debug("blockBuilder tick");
-            this.appendNextBlock();
-          } catch (err) {
-            logger.error(`buildBlockFromPendingTransactions error: ${JSON.stringify(err)}`);
-          }
-        }, this.pollIntervalMs);
+        this.start();
       }
       else {
         const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
@@ -114,6 +107,7 @@ export default class BlockBuilder {
         return block;
       }
     } catch (e) {
+      this.start();
       throw e;
     }
   }
