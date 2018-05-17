@@ -28,6 +28,10 @@ export default class KinAtnSmartContract extends BaseSmartContract {
       recipientBalance = await this.financeAccount(recipient);
     }
 
+    if (recipientBalance > (Number.MAX_SAFE_INTEGER - amount)) {
+      throw this.validationError(`Recipient account of ${recipient} is at balance ${recipientBalance} and will overflow if ${amount} is added`);
+    }
+
     await this.setBalance(this.senderAddressBase58, senderBalance - amount);
     await this.setBalance(recipient, recipientBalance + amount);
   }
