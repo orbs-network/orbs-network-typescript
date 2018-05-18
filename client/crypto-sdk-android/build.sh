@@ -20,12 +20,12 @@ cp -f ${CRYPTO_SDK_ANDROID_BUILD_DIR}/westmere/lib/libcryptosdk.so ${JNILIBS_DIR
 
 case "$(uname -s)" in
     Darwin)
-        LOCAL_PLATFORM="mac"
+        LOCAL_PLATFORM="Mac"
         LOCAL_LIBRARY="${LOCAL_PLATFORM}/lib/libcryptosdk.dylib"
 
         ;;
     Linux)
-        LOCAL_PLATFORM="linux"
+        LOCAL_PLATFORM="Linux"
         LOCAL_LIBRARY="${LOCAL_PLATFORM}/lib/libcryptosdk.so"
 
         ;;
