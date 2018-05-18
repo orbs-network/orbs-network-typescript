@@ -10,7 +10,7 @@ BREW_INSTALL_URL="https://raw.githubusercontent.com/Homebrew/install/master/inst
 # OH_MY_ZSH_URL="https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh"
 
 CASK_PACKAGES="java8 google-chrome visual-studio-code iterm2 slack docker sourcetree"
-PACKAGES="cmake typescript yarn bash-completion docker-completion docker-compose-completion docker-machine-completion"
+PACKAGES="cmake typescript yarn bash-completion docker-completion docker-compose-completion docker-machine-completion boost-python"
 
 FAILED_PACKAGES=""
 

@@ -143,7 +143,7 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 Note: in order to build using Android Studio, please make sure to have `local.properties` files (next to `build.gradle`), specifying both `sdk.dir` and `ndk.dir` (usually, these are generated automatically for you).
 
 ```bash
-brew install cmake
+brew install cmake boost-python
 ```
 
 ## Build
