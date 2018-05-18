@@ -155,7 +155,6 @@ case ${PLATFORM} in
         cp -rf -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
 
         ;;
-
     Android)
         # Fix compilation errors by:
         #   1. Patching src/logging.c to avoid passing NULL as va_list.

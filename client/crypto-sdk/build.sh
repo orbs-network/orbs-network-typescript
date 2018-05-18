@@ -84,7 +84,6 @@ case ${PLATFORM} in
         build_ios
 
         ;;
-
     Android)
         ANDROID_ABI="armeabi-v7a"
         build_android

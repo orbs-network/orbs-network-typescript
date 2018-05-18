@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-# pushd ../crypto-sdk
-#     ./build.sh
-# popd
+pushd ../crypto-sdk
+    ./build.sh
+popd
 
 if [ -n "${DEBUG}" ] ; then
     BUILD_TYPE=Debug

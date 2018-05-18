@@ -165,8 +165,7 @@ case ${PLATFORM} in
         mv -f -- "${IOS64_PREFIX}/include" "$PREFIX/"
 
         ;;
-
-    ANDROID_NDK_HOME)
+    Android)
         # Fix compilation errors by:
         #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
         #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.
