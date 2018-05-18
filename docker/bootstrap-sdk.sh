@@ -1,6 +1,6 @@
 #!/bin/bash -e
 apt-get update
-apt-get install -y git-core build-essential curl pkg-config file unzip default-jdk
+apt-get install -y git-core build-essential curl pkg-config file unzip default-jdk libboost-python-dev
 apt-get clean
 
 # Install CMake
