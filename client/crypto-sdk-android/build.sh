@@ -11,7 +11,7 @@ fi
 # Copy external crypto-sdk dependencies to jniLibs.
 JNILIBS_DIR=crypto-sdk/src/main/jniLibs
 CRYPTO_SDK_BUILD_DIR=../crypto-sdk/build
-CRYPTO_SDK_ANDROID_BUILD_DIR=${CRYPTO_SDK_BUILD_DIR}/android
+CRYPTO_SDK_ANDROID_BUILD_DIR=${CRYPTO_SDK_BUILD_DIR}/Android
 mkdir -p ${JNILIBS_DIR}/armeabi-v7a/ ${JNILIBS_DIR}/arm64-v8a/ ${JNILIBS_DIR}/x86/ ${JNILIBS_DIR}/x86_64/
 cp -f ${CRYPTO_SDK_ANDROID_BUILD_DIR}/armv7-a/lib/libcryptosdk.so ${JNILIBS_DIR}/armeabi-v7a/
 cp -f ${CRYPTO_SDK_ANDROID_BUILD_DIR}/armv8-a/lib/libcryptosdk.so ${JNILIBS_DIR}/arm64-v8a/

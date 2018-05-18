@@ -34,7 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		146F0C992077E0E1008BD55E /* libcryptosdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptosdk.dylib; path = "../../crypto-sdk/build/ios/lib/libcryptosdk.dylib"; sourceTree = "<group>"; };
+		146F0C992077E0E1008BD55E /* libcryptosdk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptosdk.dylib; path = "../../crypto-sdk/build/iOS/lib/libcryptosdk.dylib"; sourceTree = "<group>"; };
 		14706BE12067CCA5008C6154 /* ios-sample-app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-sample-app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		14706BE42067CCA5008C6154 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		14706BE52067CCA5008C6154 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
@@ -259,7 +259,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "codesign -f -s \"${CODE_SIGN_IDENTITY}\" ../../crypto-sdk/build/ios/lib/libcryptosdk.dylib";
+			shellScript = "codesign -f -s \"${CODE_SIGN_IDENTITY}\" ../../crypto-sdk/build/iOS/lib/libcryptosdk.dylib";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -439,7 +439,7 @@
 				DEVELOPMENT_TEAM = ZU9RBNHA75;
 				INFOPLIST_FILE = "ios-sample-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "../../crypto-sdk/build/ios/lib/";
+				LIBRARY_SEARCH_PATHS = "../../crypto-sdk/build/iOS/lib/";
 				PRODUCT_BUNDLE_IDENTIFIER = "orbs.ios-sample-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -458,7 +458,7 @@
 				DEVELOPMENT_TEAM = ZU9RBNHA75;
 				INFOPLIST_FILE = "ios-sample-app/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "../../crypto-sdk/build/ios/lib/";
+				LIBRARY_SEARCH_PATHS = "../../crypto-sdk/build/iOS/lib/";
 				PRODUCT_BUNDLE_IDENTIFIER = "orbs.ios-sample-app";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
