@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 pushd ../crypto-sdk
-    PLATFORM=ANDROID ./build.sh
+    PLATFORM=Android ./build.sh
 popd
 
 if [ -z "${PLATFORM}" ]; then

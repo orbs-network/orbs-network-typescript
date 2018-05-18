@@ -173,22 +173,6 @@ DEBUG=1 ./build.sh
 ```bash
 CMAKE_ONLY=1 ./clean.sh
 ```
-
-### Building for iOS
-
-The following iOS builds are currently supported:
-
-1. iPhone Simulator 64bit.
-2. iOS 64bit.
-
-> In order to build for iOS, you'd need to provide the `PLATFORM=IOS` environment variable. Please note that:
-> 1. You'd need to have both **Xcode** and **iPhone Simulator** installed.
-> 2. You'd need to run `./clean.sh` before switching to build for another architecture.
-
-```bash
-PLATFORM=IOS ./build.sh
-```
-
 ## Test
 
 > In order to run the tests, you'd need to run the `test.sh` script:

@@ -7,7 +7,7 @@ function readlink() {
 
 function build_ios() {
     INSTALL_PREFIX="${PREFIX}/${TARGET_ARCH}"
-    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/${TARGET_ARCH}"
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM}/libgpg-error/${TARGET_ARCH}"
 
     make distclean > /dev/null || true
 
@@ -48,7 +48,7 @@ function build_android() {
 
     "$MAKE_TOOLCHAIN" --force --api="$NDK_API_VERSION_COMPAT" --arch="$ARCH" --install-dir="$TOOLCHAIN_DIR" || exit 1
 
-    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM_PREFIX}/libgpg-error/${TARGET_ARCH}"
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${PLATFORM}/libgpg-error/${TARGET_ARCH}"
 
     ./configure \
         --host="${HOST_COMPILER}" \
@@ -67,7 +67,7 @@ function build_android() {
 }
 
 function build_current() {
-    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${LOCAL_PLATFORM_PREFIX}/libgpg-error/"
+    LIBGPG_ERROR_PREFIX="$(pwd)/../../../build/${LOCAL_PLATFORM}/libgpg-error/"
 
     make distclean > /dev/null || true
 
@@ -110,10 +110,8 @@ PROCESSORS=${NPROCESSORS:-3}
 LIBGCRYPT_VERSION=1.8.2
 LIBGCRYPT_PACKAGE="libgcrypt-${LIBGCRYPT_VERSION}"
 
-PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
-LOCAL_PLATFORM_PREFIX=$(echo "${LOCAL_PLATFORM}" | awk '{print tolower($0)}')
-PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgcrypt/"
-LOCAL_PREFIX="$(pwd)/../../build/${LOCAL_PLATFORM_PREFIX}/libgcrypt/"
+PREFIX="$(pwd)/../../build/${PLATFORM}/libgcrypt/"
+LOCAL_PREFIX="$(pwd)/../../build/${LOCAL_PLATFORM}/libgcrypt/"
 
 mkdir -p ${PREFIX} ${LOCAL_PREFIX}
 
@@ -123,7 +121,7 @@ LOCAL_PREFIX=$(readlink "${LOCAL_PREFIX}")
 cd ${LIBGCRYPT_PACKAGE}
 
 case ${PLATFORM} in
-    IOS)
+    iOS)
         # Fix compilation errors by:
         #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
         #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.
@@ -167,7 +165,8 @@ case ${PLATFORM} in
         mv -f -- "${IOS64_PREFIX}/include" "$PREFIX/"
 
         ;;
-    ANDROID)
+
+    ANDROID_NDK_HOME)
         # Fix compilation errors by:
         #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
         #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.

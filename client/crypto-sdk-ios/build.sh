@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
 pushd ../crypto-sdk
-    PLATFORM=IOS ./build.sh
+    PLATFORM=iOS ./build.sh
 popd
