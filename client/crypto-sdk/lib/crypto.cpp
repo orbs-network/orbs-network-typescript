@@ -8,7 +8,7 @@
 using namespace std;
 using namespace Orbs;
 
-static const uint SECMEM_SIZE = 256 * 1024; // 256KB
+static const uint SECMEM_SIZE = 64 * 1024; // 64KB
 
 static bool initialized = false;
 
