@@ -10,8 +10,14 @@ using namespace Orbs;
 
 static const uint SECMEM_SIZE = 1024000; // 1MB
 
+static bool initialized = false;
+
 // Initializes the Crypto SDK. This method have to be called before using any of the underlying functions.
 void CryptoSDK::Init() {
+    if (CryptoSDK::IsInitialized()) {
+        return;
+    }
+
     if (!gcry_check_version(GCRYPT_VERSION)) {
         throw runtime_error("libgcrypt version mismatch!");
     }
@@ -44,4 +50,10 @@ void CryptoSDK::Init() {
     if ((err = gcry_control(GCRYCTL_INITIALIZATION_FINISHED, 0))) {
         throw runtime_error("Failed to send GCRYCTL_INITIALIZATION_FINISHED with: " + string(gcry_strerror(err)));
     }
+
+    initialized = true;
+}
+
+bool CryptoSDK::IsInitialized() {
+    return initialized;
 }
