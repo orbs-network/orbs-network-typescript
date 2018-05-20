@@ -6,6 +6,7 @@ import * as chai from "chai";
 import ChaiBarsPlugin from "./chai-bars-plugin";
 import * as _ from "lodash";
 import * as crypto from "crypto";
+import { delay } from "bluebird";
 
 const expect = chai.expect;
 
@@ -20,7 +21,9 @@ const generateAddress = (keyPair: ED25519Key): Address => {
 };
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
-  const keyPair = new ED25519Key();
+  const prebuiltKeyPair = new ED25519Key();
+
+  const keyPair = new ED25519Key(prebuiltKeyPair.publicKey, prebuiltKeyPair.getPrivateKeyUnsafe());
   const senderAddress = generateAddress(keyPair);
   const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
@@ -39,6 +42,38 @@ async function createAccounts(input: { seed: number, numberOfAccounts: number })
   }));
 }
 
+async function stress(numberOfAccounts: number, seed: number) {
+  console.log("Creating accounts...");
+
+  // const seed = new Date().getTime();
+  console.log(`Seed: ${seed}`);
+
+  const accounts = await createAccounts({ seed: seed, numberOfAccounts });
+
+  await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(10 + num)));
+
+  await delay(1000);
+
+  await Promise.all(accounts.map((account, num) => {
+    const isLast = num + 1 === testConfig.stressTest.accounts;
+    const recipient = accounts[isLast ? 0 : num + 1];
+    const amount = num + 1;
+
+    console.log(`Sending ${amount} bar from ${account.address} to ${recipient.address}`);
+
+    return account.transfer({ to: recipient.address, amountOfBars: amount });
+  }));
+
+  return Promise.all(accounts.map(async (account, num) => {
+    const isFirst = num === 0;
+    const amount = 10 + (isFirst ? testConfig.stressTest.accounts : num) - 1;
+
+    console.log(`Account ${account.address} has balance ${await account.getBalance()} (supposed to be ${amount})`);
+
+    return expect(account).to.have.bars(amount);
+  }));
+}
+
 describe("test multiple transactions", async function () {
   this.timeout(800000);
   before(async function () {
@@ -49,61 +84,24 @@ describe("test multiple transactions", async function () {
   });
 
   it("transfers tokens between accounts", async function () {
-    console.log("Creating accounts...");
+    for (const i of _.range(0, Number(process.env.NUM_OF_ATTEMPTS) || 1)) {
+      console.log(`Attempt #${i}`);
+      await delay(1000);
+      try {
+        await stress(testConfig.stressTest.accounts, i);
+        console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);
+      } catch (e) {
+        console.log(`Failed with error ${e}`);
+      }
 
-    const seed = new Date().getTime();
-    console.log(`Seed: ${seed}`);
+      // try {
+      //   await stress(100);
+      // } catch (e) {
+      //   console.log(`Expected to fail to create a block of 100 accounts/transactions`);
+      // }
 
-    const accounts = await createAccounts({ seed: seed, numberOfAccounts: testConfig.stressTest.accounts });
-
-    await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(10 + num)));
-
-    await Promise.all(accounts.map(async (account, num) => {
-      console.log(`Account ${account.address} has balance ${await account.getBalance()}`);
-    }));
-
-    for (let index = 0; index < 10; index++) {
-      await Promise.all(accounts.map((account, num) => {
-        const isLast = num + 1 === testConfig.stressTest.accounts;
-        const recipient = accounts[isLast ? 0 : num + 1];
-        const amount = num + 1;
-
-        console.log(`Sending ${amount} bar from ${account.address} to ${recipient.address}`);
-
-        return account.transfer({ to: recipient.address, amountOfBars: amount });
-      }));
-
-      await Promise.all(accounts.map((account, num) => {
-        const isFirst = num === 0;
-        const recipient = accounts[isFirst ? testConfig.stressTest.accounts - 1 : num - 1];
-        const amount = isFirst ? testConfig.stressTest.accounts - 1 : num - 1;
-
-        console.log(`Sending ${amount} bar from ${account.address} to ${recipient.address}`);
-
-        return account.transfer({ to: recipient.address, amountOfBars: amount });
-      }));
+      // await delay(1000);
     }
-
-
-
-
-    await Promise.all(accounts.map((account, num) => {
-      const isLast = num + 1 === testConfig.stressTest.accounts;
-      const recipient = accounts[isLast ? 0 : num + 1];
-      const amount = num + 1;
-
-      console.log(`Sending ${amount} bar from ${account.address} to ${recipient.address}`);
-
-      return account.transfer({ to: recipient.address, amountOfBars: amount });
-    }));
-
-    await Promise.all(accounts.map(async (account, num) => {
-      console.log(`Account ${account.address} has balance ${await account.getBalance()}`);
-      const isFirst = num === 0;
-      const amount = 10 + (isFirst ? testConfig.stressTest.accounts : num) - 1;
-
-      return expect(account).to.have.bars(amount);
-    }));
   });
 
   after(async function () {

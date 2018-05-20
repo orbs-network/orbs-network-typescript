@@ -3,7 +3,9 @@ import * as fse from "fs-extra";
 import * as path from "path";
 import * as os from "os";
 import * as getPort from "get-port";
+import * as chaiAsPromised from "chai-as-promised";
 import { stubInterface } from "ts-sinon";
+import * as _ from "lodash";
 
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
@@ -13,17 +15,47 @@ import TransactionPoolService from "../../consensus-service-typescript/src/trans
 
 const { expect } = chai;
 
+chai.use(chaiAsPromised);
+
 ErrorHandler.setup();
 
-logger.configure({ level: "debug" });
+logger.configure({ level: "info" });
 
-describe("storage server test", function () {
+function generateBigBrokenBlock(): types.Block {
+  const transactions: types.Transaction[] = _.map(_.range(40000), (i: number): types.Transaction => {
+    return {
+      header: {
+        version: 0,
+        sender: new Buffer("sender"),
+        timestamp: new Date().getTime().toString(),
+        contractAddress: new Buffer("contract-address")
+      },
+      payload: JSON.stringify({
+        method: "someMethod",
+        args: [ 1, 2, 3, 4, "some-other-arguments" ]
+      }),
+      signatureData: {
+        publicKey: undefined,
+        signature: undefined
+      }
+    };
+  });
+
+  return BlockUtils.buildNextBlock({
+    transactions: transactions,
+    transactionReceipts: [],
+    stateDiff: []
+  });
+}
+
+describe("BlockStorage service", function () {
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
+  let endpoint: string;
 
   beforeEach(async () => {
-    const endpoint = `127.0.0.1:${await getPort()}`;
+    endpoint = `127.0.0.1:${await getPort()}`;
 
     const topology =  {
       peers: [
@@ -88,6 +120,15 @@ describe("storage server test", function () {
     const contractAddress = Address.createContractAddress("does-not-exist").toBuffer();
     const state = await stateClient.readKeys({ contractAddress, keys: [] });
     return expect(state).to.have.deep.property("values", {});
+  });
+
+  // Here we are aiming to eliminate specific GRPC error;
+  // expected result is to receive an error about block height because the block is invalid
+  it("should send and receive big blocks", async function () {
+    this.timeout(10000);
+
+    const block = generateBigBrokenBlock();
+    return expect(blockClient.addBlock({ block })).to.be.eventually.rejectedWith(`Got response [2 UNKNOWN: Invalid block height of block: {"version":0,"prevBlockHash":{"type":"Buffer","data":[]},"height":0}! Should have been 1] trying to call method [addBlock] service [BlockStorage] at endpoint [${endpoint}]`);
   });
 
   afterEach(() => {

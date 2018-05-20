@@ -28,6 +28,12 @@ static void setSelf(JNIEnv *env, jobject thisObj, ED25519Key *self) {
 }
 
 JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__Ljava_lang_String_2(JNIEnv *env, jobject thisObj, jstring publicKey) {
+    if (publicKey == nullptr) {
+        Utilities::ThrowException(env, "Invalid argument!");
+
+        return;
+    }
+
     const char *nativePublicKey = env->GetStringUTFChars(publicKey, JNI_FALSE);
 
     try {
@@ -52,6 +58,12 @@ JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__Ljava_lang_Strin
 
 JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_ED25519Key_init__Ljava_lang_String_2Ljava_lang_String_2(JNIEnv *env, jobject thisObj,
     jstring publicKey, jstring privateKey) {
+    if (publicKey == nullptr || privateKey == nullptr) {
+        Utilities::ThrowException(env, "Invalid arguments!");
+
+        return;
+    }
+
     const char *nativePublicKey = env->GetStringUTFChars(publicKey, JNI_FALSE);
     const char *nativePrivateKey = env->GetStringUTFChars(privateKey, JNI_FALSE);
 
@@ -151,6 +163,12 @@ JNIEXPORT jboolean JNICALL Java_com_orbs_cryptosdk_ED25519Key_hasPrivateKey(JNIE
 }
 
 JNIEXPORT jbyteArray JNICALL Java_com_orbs_cryptosdk_ED25519Key_sign(JNIEnv *env, jobject thisObj, jbyteArray message) {
+    if (message == nullptr) {
+        Utilities::ThrowException(env, "Invalid argument!");
+
+        return nullptr;
+    }
+
     jbyte *messageBytes = nullptr;
     jbyteArray signature = nullptr;
 
@@ -184,6 +202,12 @@ JNIEXPORT jbyteArray JNICALL Java_com_orbs_cryptosdk_ED25519Key_sign(JNIEnv *env
 }
 
 JNIEXPORT jboolean JNICALL Java_com_orbs_cryptosdk_ED25519Key_verify(JNIEnv *env, jobject thisObj, jbyteArray message, jbyteArray signature) {
+    if (message == nullptr || signature == nullptr) {
+        Utilities::ThrowException(env, "Invalid arguments!");
+
+        return false;
+    }
+
     jboolean res;
 
     jbyte *messageBytes = nullptr;

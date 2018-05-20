@@ -28,10 +28,16 @@ static void setSelf(JNIEnv *env, jobject thisObj, Address *self) {
 }
 
 JNIEXPORT void JNICALL Java_com_orbs_cryptosdk_Address_init(JNIEnv *env, jobject thisObj, jstring publicKey, jstring virtualChainId, jstring networkId) {
+    if (publicKey == nullptr || virtualChainId == nullptr || networkId == nullptr) {
+        Utilities::ThrowException(env, "Invalid arguments!");
+
+        return;
+    }
+
     const char *nativePublicKey = env->GetStringUTFChars(publicKey, JNI_FALSE);
     const char *nativeVirtualChainId = env->GetStringUTFChars(virtualChainId, JNI_FALSE);
     const char *nativeNetworkId = env->GetStringUTFChars(networkId, JNI_FALSE);
-    
+
     try {
         Address *self = new Address(nativePublicKey, nativeVirtualChainId, nativeNetworkId);
         setSelf(env, thisObj, self);
