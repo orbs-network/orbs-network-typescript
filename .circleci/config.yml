@@ -82,4 +82,5 @@ workflows:
             - deploy
           filters:
             branches:
-              only: master
+              only: feature/block-signature
+              # FIXME: revert
