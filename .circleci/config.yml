@@ -71,16 +71,13 @@ workflows:
             - e2e
       - deploy:
           requires:
-            - build-server
-            # FIXME: revert
+            - success
           filters:
             branches:
-              only: feature/block-signature
-              # FIXME: revert
+              only: master
       - e2e-testnet:
           requires:
             - deploy
           filters:
             branches:
-              only: feature/block-signature
-              # FIXME: revert
+              only: master
