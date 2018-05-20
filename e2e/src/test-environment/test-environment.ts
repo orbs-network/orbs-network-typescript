@@ -9,6 +9,8 @@ interface TestEnvironmentConfig {
     connectFromHost: boolean;
     preExistingPublicSubnet: string;
     testSubscriptionKey: string;
+    numOfNodes: number;
+    envFile: string;
 }
 
 export class TestEnvironment extends TestStack {
@@ -56,10 +58,11 @@ export class TestEnvironment extends TestStack {
         this.publicNetwork = new TestSubnet("public-network", config.preExistingPublicSubnet || "172.2.2");
         this.ethereumSimulationNode = new EthereumSimulationNode({publicIp: this.publicNetwork.allocateAddress()});
         this.nodeCluster = new OrbsNodeCluster({
-            numOfNodes: 6,
+            numOfNodes: config.numOfNodes,
             orbsNetwork: this.orbsNetwork,
             publicApiNetwork: this.publicNetwork,
-            ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false)
+            ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false),
+            envFile: config.envFile
         });
     }
 }

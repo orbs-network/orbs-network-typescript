@@ -10,6 +10,8 @@ export interface BlockUtilsConfig {
 }
 
 export namespace BlockUtils {
+  // TODO: add method parseBlockFromJSON
+
   export function calculateBlockHash(block: types.Block): Buffer {
     const hash = createHash("sha256");
 
