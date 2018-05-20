@@ -3,12 +3,6 @@ import { types, logger, KeyManager } from ".";
 import { createHash } from "crypto";
 import * as stringify from "json-stable-stringify";
 
-export interface BlockUtilsConfig {
-  sign?: boolean;
-  keyManager?: KeyManager;
-  nodeName?: string;
-}
-
 export namespace BlockUtils {
   // TODO: add method parseBlockFromJSON
 
@@ -22,15 +16,7 @@ export namespace BlockUtils {
     return hash.digest();
   }
 
-  export function buildBlock(blockComponents: {header: types.BlockHeader, body: types.BlockBody}, options?: BlockUtilsConfig): types.Block {
-    options = options || {};
-
-    const { keyManager, nodeName, sign } = options;
-
-    // FIXME: enable back "no-null-keyword" rule
-    let signature = null,
-      signatory = null;
-
+  export function buildBlock(blockComponents: {header: types.BlockHeader, body: types.BlockBody}): types.Block {
     const block: types.Block = {
       header: blockComponents.header,
       body: blockComponents.body,
@@ -40,20 +26,10 @@ export namespace BlockUtils {
       }
     };
 
-    if (options.sign) {
-      signature = Buffer.from(keyManager.sign(BlockUtils.calculateBlockHash(block)), keyManager.SIGNATURE_ENCODING);
-      signatory = nodeName;
-
-      block.signatureData = {
-        signature,
-        signatory
-      };
-    }
-
     return block;
   }
 
-  export function buildNextBlock(body: types.BlockBody, prevBlock?: types.Block, options?: BlockUtilsConfig): types.Block {
+  export function buildNextBlock(body: types.BlockBody, prevBlock?: types.Block): types.Block {
     return buildBlock({
       header: {
         version: 0,
@@ -61,7 +37,19 @@ export namespace BlockUtils {
         height: prevBlock ? prevBlock.header.height + 1 : 0
       },
       body
-    }, options);
+    });
+  }
+
+  export function signBlock(block: types.Block, keyManager: KeyManager, nodeName: string) {
+    const  signature = Buffer.from(keyManager.sign(BlockUtils.calculateBlockHash(block)), keyManager.SIGNATURE_ENCODING);
+    const signatory = nodeName;
+
+    block.signatureData = {
+      signature,
+      signatory
+    };
+
+    return block;
   }
 
   export function verifyBlockSignature(block: types.Block, keyManager: KeyManager) {

@@ -27,11 +27,7 @@ describe("Block utils", () => {
 
     const nodeName = "secret-message-key";
 
-    const block: Block = BlockUtils.buildBlock({ header, body }, {
-      sign: true,
-      keyManager,
-      nodeName
-    });
+    const block: Block = BlockUtils.signBlock(BlockUtils.buildBlock({ header, body }), keyManager, nodeName);
 
     expect(block).to.have.property("signatureData");
 

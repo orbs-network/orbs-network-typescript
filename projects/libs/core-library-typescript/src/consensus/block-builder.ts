@@ -69,11 +69,17 @@ export default class BlockBuilder {
 
     const { transactionReceipts, stateDiff } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactionEntriesCap });
 
-    return BlockUtils.buildNextBlock({
+    const block = BlockUtils.buildNextBlock({
       transactions: transactionEntriesCap.map(entry => entry.transaction),
       transactionReceipts,
       stateDiff
-    }, lastBlock, { sign: this.config.sign, keyManager: this.config.keyManager });
+    }, lastBlock);
+
+    if (this.config.sign) {
+      return BlockUtils.signBlock(block, this.config.keyManager, this.config.nodeName);
+    }
+
+    return block;
   }
 
   public start() {

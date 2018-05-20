@@ -20,11 +20,11 @@ async function initBlockStorage(keyManager: KeyManager, transactionPool: types.T
 }
 
 function generateEmptyBlock(lastBlock: types.Block, keyManager: KeyManager): types.Block {
-  return BlockUtils.buildNextBlock({
+  return BlockUtils.signBlock(BlockUtils.buildNextBlock({
     transactions: [],
     transactionReceipts: [],
     stateDiff: []
-  }, lastBlock, { sign: true, nodeName, keyManager });
+  }, lastBlock), keyManager, nodeName);
 }
 
 describe("Block storage", () => {
