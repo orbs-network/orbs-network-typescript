@@ -9,7 +9,10 @@ const flags = args.parse(process.argv);
 
 if (flags.port && flags.stubs) {
 
-  createMockServer(JSON.parse(flags.stubs)).listen(flags.port, () => console.log(`started on port ${flags.port}`));
+  createMockServer(JSON.parse(flags.stubs))
+    .then(server => server.listen(flags.port, () => console.log(`started on port ${flags.port}`)))
+    .catch(error => console.log(`server failed to start, got error: ${error}`));
+
 } else {
   console.log(args.showHelp());
 }

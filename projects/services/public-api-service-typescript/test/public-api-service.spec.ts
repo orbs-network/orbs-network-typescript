@@ -206,7 +206,7 @@ describe("Public API Service - Component Test", async function () {
     runTests();
 
     afterEach(async () => {
-      httpService.kill();
+      httpService && httpService.kill();
     });
   });
 
