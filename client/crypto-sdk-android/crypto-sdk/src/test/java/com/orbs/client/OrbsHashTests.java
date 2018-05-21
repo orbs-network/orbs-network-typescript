@@ -3,7 +3,11 @@ package com.orbs.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.junit.Assert;
+
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -33,6 +37,13 @@ public class OrbsHashTests {
   @Test
   public void test_hash256() {
     final String KUKU_HASH = "81A50432934AF4642227A1561BF0DC3ABA0F4B82F904C11E12E82F61E034F2DA";
-    OrbsHashUtils.hash256("kuku");
+    final byte[] KUKU_HASH_BYTES = {-127, -91, 4, 50, -109, 74, -12, 100, 34, 39, -95, 86, 27, -16, -36, 58, -70, 15, 75, -126, -7, 4, -63, 30, 18, -24, 47, 97, -32, 52, -14, -38};
+    try {
+      byte[] kukuHash = OrbsHashUtils.hash256("kuku");
+      Assert.assertArrayEquals(KUKU_HASH_BYTES, kukuHash);
+    }
+    catch (Exception ex) {
+      Assert.fail();
+    }
   }
 }
