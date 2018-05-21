@@ -33,10 +33,11 @@ public class OrbsContract {
     return gson.toJson(payload);
   }
 
-  public String generateCallPayload(String methodName, Object[] args) {
-    CallPayload payload = new CallPayload();
-    payload.method = methodName;
-    payload.args = args;
+  public String generateCallPayload(String methodName, Object[] args) throws Exception {
+    CallPayload payload = new CallPayload.Builder()
+            .withMethod(methodName)
+            .withArgs(args)
+            .build();
     Gson gson = new Gson();
     return gson.toJson(payload);
   }
