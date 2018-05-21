@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
-import { BlockUtils, logger, types, JsonBuffer } from "../common-library";
+import { BlockUtils, logger, types, JsonBuffer, KeyManager } from "../common-library";
 import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status";
 import { StartupCheck } from "../common-library/startup-check";
 

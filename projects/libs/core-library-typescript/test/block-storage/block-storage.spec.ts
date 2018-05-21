@@ -149,12 +149,17 @@ describe("Block storage", () => {
 
 describe("Block storage - Bad setup (no transaction pool)", () => {
   let blockStorage: BlockStorage;
+  let keyManager: KeyManager;
+
+  before(function () {
+    keyManager = new KeyManager(generateKeyPairs(this));
+  });
 
   beforeEach(async () => {
     try {
       fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
-    blockStorage = await initBlockStorage(undefined);
+    blockStorage = await initBlockStorage(keyManager, undefined);
   });
   it("checkStartupStatus should fail", async () => {
     const startupStatus = await blockStorage.startupCheck();
