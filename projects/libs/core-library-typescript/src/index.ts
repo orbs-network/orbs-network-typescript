@@ -10,4 +10,4 @@ export { PendingTransactionPool, CommittedTransactionPool, TransactionValidator 
 export { VirtualMachine } from "./virtual-machine";
 export { Service, ServiceRunner, ServiceConfig } from "./base-service";
 export { StartupStatus, StartupCheck, StartupCheckRunner, STARTUP_STATUS } from "./common-library";
-export { FakeGossipClient, generateServiceIPCClient } from "./test-kit";
+export { FakeGossipClient, generateServiceInProcessClient } from "./test-kit";
