@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class OrbsStableTransactionRequestSerializerTest {
+public class OrbsHashTests {
 
   final String EXPECTED_REQUEST_JSON = "{\"header\":{\"contractAddressBase58\":\"abc\",\"senderAddressBase58\":\"zxc\",\"timestamp\":\"123\",\"version\":0},\"payload\":\"{some: json}\"}";
 
@@ -26,5 +26,13 @@ public class OrbsStableTransactionRequestSerializerTest {
 
     String res = gson.toJson(req);
     assertEquals(res, EXPECTED_REQUEST_JSON);
+  }
+
+
+
+  @Test
+  public void test_hash256() {
+    final String KUKU_HASH = "81A50432934AF4642227A1561BF0DC3ABA0F4B82F904C11E12E82F61E034F2DA";
+    OrbsHashUtils.hash256("kuku");
   }
 }
