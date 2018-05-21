@@ -15,7 +15,11 @@ export class StartupCheckRunner {
 
     const startupCheckPromises = this.startupCheckers.map((s: StartupCheck) => s.startupCheck());
     return Promise.all(startupCheckPromises)
-      .then(statuses => this.mergeStartupStatuses(this.name, statuses))
+      .then(statuses => {
+        const mergedStartupStatus = this.mergeStartupStatuses(this.name, statuses);
+        logger.info(`StartupCheckRunner.run() result: ${JSON.stringify(mergedStartupStatus)}`);
+        return mergedStartupStatus;
+      })
       .catch(err => {
         logger.error(err);
         return <StartupStatus>{ status: STARTUP_STATUS.FAIL, message: err.message };

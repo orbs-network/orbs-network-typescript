@@ -5,4 +5,4 @@ export interface StartupStatus {
   message?: string;
 }
 
-export enum STARTUP_STATUS { OK, FAIL, PARTIALLY_OPERATIONAL }
+export enum STARTUP_STATUS { OK = "OK", FAIL = "FAIL", PARTIALLY_OPERATIONAL = "PARTIALLY_OPERATIONAL" }
