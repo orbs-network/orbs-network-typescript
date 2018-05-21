@@ -32,7 +32,7 @@ function makeConsensus(peers: types.ClientMap, consensusConfig: RaftConsensusCon
 }
 
 function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress: string, subscriptionProfiles: SubscriptionProfiles) {
-  const subscriptionManagerConfig = { ethereumContractAddress, subscriptionProfiles: {}};
+  const subscriptionManagerConfig = { ethereumContractAddress, subscriptionProfiles };
   return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfig);
 }
 

@@ -4,7 +4,7 @@ import { types } from "../common-library/types";
 import { ERCBillingContractProxy, Subscription } from "./erc-billing-contract-proxy";
 
 export interface MonthlySubscriptionRateData {
-  expiresAt?: Date;
+  expiresAt?: number; // timestamp
   rate: number;
 }
 
@@ -54,7 +54,7 @@ export class SubscriptionManager {
       minimumRequiredFee = rateData.rate * (subscriptionDurationInMilliseconds / numOfMillisecondsThisMonth);
     }
 
-    if (subscriptionData.tokens <= minimumRequiredFee) {
+    if (subscriptionData.tokens < minimumRequiredFee) {
       logger.info(`Subscription fee is not sufficient (${subscriptionData.tokens} < ${minimumRequiredFee})`);
       return false;
     }
@@ -66,7 +66,7 @@ export class SubscriptionManager {
     const profileRates: MonthlySubscriptionRateData[] = this.config.subscriptionProfiles[profile];
     if (profileRates != undefined) {
       let nonExpiredRates: MonthlySubscriptionRateData[];
-      nonExpiredRates = profileRates.filter(rateData => (rateData.expiresAt == undefined) || (rateData.expiresAt > date));
+      nonExpiredRates = profileRates.filter(rateData => (rateData.expiresAt == undefined) || (rateData.expiresAt > date.getTime()));
       if (nonExpiredRates.length > 0 ) {
         return nonExpiredRates.sort((a, b) => {
           if (a.expiresAt == undefined) {
@@ -74,7 +74,7 @@ export class SubscriptionManager {
           } else if (b.expiresAt == undefined) {
             return -1; // b >= a
           } else {
-            return a.expiresAt.getTime() - b.expiresAt.getTime();
+            return a.expiresAt - b.expiresAt;
           }
         })[0];
       }

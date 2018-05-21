@@ -24,7 +24,7 @@ describe("isSubscriptionValid()", () => {
       subscriptionProfiles: {
         "testProfile": [{
           rate: 1000,
-          expiresAt: new Date("2018-06-01")
+          expiresAt: new Date("2018-06-01").getTime()
         }, {
           rate: 2000,
           expiresAt: undefined
@@ -38,7 +38,7 @@ describe("isSubscriptionValid()", () => {
       id: subscriptionKey,
       profile: "testProfile",
       startTime: (new Date("2018-01-01").getTime()),
-      tokens: 1100
+      tokens: 1000
     };
     (<sinon.SinonStub>sidechainConnector.callEthereumContract).returns(<types.CallEthereumContractOutput>{
       resultJson: JSON.stringify(result)
