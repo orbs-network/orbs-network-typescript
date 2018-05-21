@@ -13,6 +13,7 @@ export interface RaftConsensusConfig {
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
+  debug?: boolean;
 }
 
 export abstract class BaseConsensus {

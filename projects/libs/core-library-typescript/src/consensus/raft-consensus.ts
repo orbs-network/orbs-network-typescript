@@ -15,12 +15,14 @@ import { JsonBuffer, BlockUtils } from "../common-library";
 class RPCConnector extends EventEmitter {
   private id: string;
   private gossip: types.GossipClient;
+  private debug: boolean;
 
-  public constructor(id: string, gossip: types.GossipClient) {
+  public constructor(id: string, gossip: types.GossipClient, debug: boolean) {
     super();
 
     this.id = id;
     this.gossip = gossip;
+    this.debug = debug;
   }
 
   public connect(): void {
@@ -37,8 +39,10 @@ class RPCConnector extends EventEmitter {
   }
 
   public broadcast(data: any): void {
-    logger.debug(`Raft message multicast packet size: `, new Buffer(JSON.stringify(data)).length);
-    logger.debug(`Raft broadcast message: ${JSON.stringify(data)}`);
+    if (this.debug) {
+      const size = new Buffer(JSON.stringify(data)).length;
+      logger.debug(`Raft broadcast message (${size} bytes): ${JSON.stringify(data)}`);
+    }
 
     this.gossip.broadcastMessage({
       broadcastGroup: "consensus",
@@ -49,8 +53,10 @@ class RPCConnector extends EventEmitter {
   }
 
   public send(nodeId: string, data: any): void {
-    logger.debug(`Raft message unicast packet size: `, new Buffer(JSON.stringify(data)).length);
-    logger.debug(`Raft unicast message: ${JSON.stringify(data)}`);
+    if (this.debug) {
+      const size = new Buffer(JSON.stringify(data)).length;
+      logger.debug(`Raft unicast message (${size} bytes): ${JSON.stringify(data)}`);
+    }
 
     this.gossip.unicastMessage({
       recipient: nodeId,
@@ -75,6 +81,9 @@ export class RaftConsensus extends BaseConsensus {
   private node: any;
   private nextBlockChainIndex: number; // maintain consistency between gaggle log and storage
 
+  private pollIntervalMs: number;
+  private pollInterval: NodeJS.Timer;
+
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
@@ -84,15 +93,21 @@ export class RaftConsensus extends BaseConsensus {
   ) {
     super();
     logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config)}`);
-    this.connector = new RPCConnector(config.nodeName, gossip);
+
+    this.pollIntervalMs = 3000;
     this.transactionPool = transactionPool;
+
+    this.connector = new RPCConnector(config.nodeName, gossip, config.debug);
+
     this.blockBuilder = new BlockBuilder({
       virtualMachine, transactionPool, blockStorage,
       newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
       pollIntervalMs: config.blockBuilderPollInterval,
       blockSizeLimit: config.blockSizeLimit
     });
+
     this.nextBlockChainIndex = 0;
+
     this.node = gaggle({
       id: config.nodeName,
       clusterSize: config.clusterSize,
@@ -120,7 +135,6 @@ export class RaftConsensus extends BaseConsensus {
     this.node.on("committed", async (data: any, index: number) => this.onCommitted(data, index));
 
     this.node.on("leaderElected", () => this.onLeaderElected());
-
   }
 
   private async onCommitted(data: any, index: number) {
@@ -151,12 +165,11 @@ export class RaftConsensus extends BaseConsensus {
       logger.error(`Failed to commit block with height ${block.header.height} and hash ${blockHash}: ${JSON.stringify(err)}`);
       // this.node.stepDown(); // -leader steps down (election time out will occur)
     }
-
-
   }
 
-
   private async onLeaderElected() {
+    this.reportLeadershipStatus();
+
     if (this.node.isLeader()) {
       logger.info(`Node ${this.node.id} was elected as a new leader!`);
 
@@ -183,10 +196,12 @@ export class RaftConsensus extends BaseConsensus {
   }
 
   async initialize(): Promise<any> {
+    this.startReporting();
     return this.blockBuilder.initialize();
   }
 
   async shutdown(): Promise<any> {
+    this.stopReporting();
     await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
   }
 
@@ -194,27 +209,30 @@ export class RaftConsensus extends BaseConsensus {
     return this.node.isLeader();
   }
 
-  public getState() {
-    return this.node._state;
+  private getConsensusState(): any {
+    return {
+      state: this.node._state,
+      leader: this.node._leader,
+      term: this.node._currentTerm,
+      clusterSize: this.node._clusterSize,
+      votes: JSON.stringify(this.node._votes),
+      timeout: this.node._timeout
+    };
   }
 
-  public getLeader() {
-    return this.node._leader;
+  private reportLeadershipStatus() {
+    const status = this.isLeader() ? "the leader" : "not the leader";
+    logger.debug(`Node is ${status}`);
+    logger.debug(`Node state: `, this.getConsensusState());
   }
 
-  public getTerm() {
-    return this.node._currentTerm;
+  private startReporting() {
+    this.pollInterval = setInterval(() => {
+      this.reportLeadershipStatus();
+    }, this.pollIntervalMs);
   }
 
-  public getVotes() {
-    return JSON.stringify(this.node._votes);
-  }
-
-  public getClusterSize() {
-    return this.node._clusterSize;
-  }
-
-  public getElectionTimeout() {
-    return this.node._timeout;
+  private stopReporting() {
+    clearInterval(this.pollInterval);
   }
 }
