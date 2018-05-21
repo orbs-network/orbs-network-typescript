@@ -134,7 +134,7 @@ describe("BlockStorage service", function () {
     const expected: StartupStatus = {
       name: "storage",
       status: STARTUP_STATUS.OK,
-      childStartupStatuses: [
+      services: [
         { name: "block-storage", status: STARTUP_STATUS.OK },
         { name: "state-storage", status: STARTUP_STATUS.OK }
       ]

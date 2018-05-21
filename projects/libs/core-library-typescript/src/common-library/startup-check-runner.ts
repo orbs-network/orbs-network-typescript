@@ -36,12 +36,12 @@ export class StartupCheckRunner {
     }
 
     if (!hasAtLeastOneFailure) {
-      return { name, status: STARTUP_STATUS.OK, childStartupStatuses: startupStatuses };
+      return { name, status: STARTUP_STATUS.OK, services: startupStatuses };
     }
     if (hasAtLeastOneOk) {
-      return { name, status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, childStartupStatuses: startupStatuses };
+      return { name, status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, services: startupStatuses };
     }
-    return { name, status: STARTUP_STATUS.FAIL, childStartupStatuses: startupStatuses };
+    return { name, status: STARTUP_STATUS.FAIL, services: startupStatuses };
   }
 
 }

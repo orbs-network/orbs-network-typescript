@@ -42,7 +42,7 @@ describe("StartupCheckRunner", () => {
     const startupCheckRunner = new StartupCheckRunner(ROOT_COMPONENT, [ok1, ok2]);
     const expected = {
       name: ROOT_COMPONENT,
-      status: STARTUP_STATUS.OK, childStartupStatuses: [
+      status: STARTUP_STATUS.OK, services: [
         { name: "CheckerOk1", status: STARTUP_STATUS.OK },
         { name: "CheckerOk2", status: STARTUP_STATUS.OK }
       ]
@@ -55,7 +55,7 @@ describe("StartupCheckRunner", () => {
     const startupCheckRunner = new StartupCheckRunner(ROOT_COMPONENT, [ok1, fail1]);
     const expected = {
       name: ROOT_COMPONENT,
-      status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, childStartupStatuses: [
+      status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, services: [
         { name: "CheckerOk1", status: STARTUP_STATUS.OK },
         { name: "CheckerFail1", status: STARTUP_STATUS.FAIL }
       ]
@@ -68,7 +68,7 @@ describe("StartupCheckRunner", () => {
     const startupCheckRunner = new StartupCheckRunner(ROOT_COMPONENT, [fail1, fail2]);
     const expected = {
       name: ROOT_COMPONENT,
-      status: STARTUP_STATUS.FAIL, childStartupStatuses: [
+      status: STARTUP_STATUS.FAIL, services: [
         { name: "CheckerFail1", status: STARTUP_STATUS.FAIL },
         { name: "CheckerFail2", status: STARTUP_STATUS.FAIL }
       ]
@@ -79,7 +79,7 @@ describe("StartupCheckRunner", () => {
 
   it("should return ok if no service status checks", async () => {
     const startupCheckRunner = new StartupCheckRunner(ROOT_COMPONENT, []);
-    const expected = { name: ROOT_COMPONENT, status: STARTUP_STATUS.OK, childStartupStatuses: <StartupStatus[]>[] };
+    const expected = { name: ROOT_COMPONENT, status: STARTUP_STATUS.OK, services: <StartupStatus[]>[] };
     const actual = await startupCheckRunner.run();
     expect(actual).to.deep.equal(expected);
   });

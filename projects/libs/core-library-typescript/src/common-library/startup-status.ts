@@ -1,7 +1,7 @@
 export interface StartupStatus {
   name: string;
   status: STARTUP_STATUS;
-  childStartupStatuses?: StartupStatus[];
+  services?: StartupStatus[];
   message?: string;
 }
 
