@@ -3,8 +3,8 @@ import { StartupStatus, STARTUP_STATUS } from "./startup-status";
 import { logger } from "../common-library";
 
 export class StartupCheckRunner {
-  name: string;
-  startupCheckers: StartupCheck[] = [];
+  public readonly name: string;
+  public readonly startupCheckers: StartupCheck[] = [];
 
   constructor(name: string, startupCheckers: StartupCheck[]) {
     this.name = name;
@@ -36,17 +36,12 @@ export class StartupCheckRunner {
     }
 
     if (!hasAtLeastOneFailure) {
-      return <StartupStatus>{ name: this.name, status: STARTUP_STATUS.OK, childStartupStatuses: startupStatuses };
+      return { name: this.name, status: STARTUP_STATUS.OK, childStartupStatuses: startupStatuses };
     }
     if (hasAtLeastOneOk) {
-      return <StartupStatus>{ name: this.name, status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, childStartupStatuses: startupStatuses };
+      return { name: this.name, status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, childStartupStatuses: startupStatuses };
     }
-    return <StartupStatus>{ name: this.name, status: STARTUP_STATUS.FAIL, childStartupStatuses: startupStatuses };
-
+    return { name: this.name, status: STARTUP_STATUS.FAIL, childStartupStatuses: startupStatuses };
   };
-
-
-
-
 
 }

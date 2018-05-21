@@ -11,24 +11,26 @@ chai.use(chaiAsPromised);
 
 describe("GRPCServer cannot start if no services or no endpoint are attached to it", () => {
 
+  let builder: GRPCServerBuilder;
+
   it("should Promise.reject() if trying to start with no endpoint", async () => {
     // This endpoint is not used, it's just so GRPCserver will not fail on missing endpoint
-    const builder = new GRPCServerBuilder().withManagementPort(8081);
+    builder = new GRPCServerBuilder().withManagementPort(8081);
     const expectation = expect(builder.start()).to.be.rejected;
-    if (builder) {
-      builder.stop();
-    }
     return expectation;
   });
 
 
   it("should Promise.reject() if trying to start with no services attached", async () => {
     // This endpoint is not used, it's just so GRPCserver will not fail on missing endpoint
-    const builder = new GRPCServerBuilder().withManagementPort(8081).onEndpoint("localhost:1234");
+    builder = new GRPCServerBuilder().withManagementPort(8081).onEndpoint("localhost:1234");
     const expectation = expect(builder.start()).to.be.rejectedWith("Mali was not set up correctly. did you forget to call withService()?");
+    return expectation;
+  });
+
+  afterEach(() => {
     if (builder) {
       builder.stop();
     }
-    return expectation;
   });
 });

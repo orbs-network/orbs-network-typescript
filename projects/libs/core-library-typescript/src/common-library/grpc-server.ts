@@ -1,6 +1,7 @@
 import * as Mali from "mali";
 import * as express from "express";
 import { Request, Response } from "express";
+import * as _ from "lodash";
 import { StartupCheck } from "./startup-check";
 import { STARTUP_STATUS, StartupStatus } from "./startup-status";
 import { StartupCheckRunner } from "./startup-check-runner";
@@ -11,6 +12,7 @@ import { getPathToProto } from "orbs-interfaces";
 
 import { filter } from "lodash";
 import { logger } from ".";
+import { StartupCheckRunnerDefault } from "./startup-check-runner-default";
 
 
 const protos: Map<string, string> = new Map<string, string>();
@@ -32,7 +34,7 @@ export class GRPCServerBuilder {
   mali: Mali;
   services: Service[] = [];
   managementServer: any;
-  startupCheckRunner: StartupCheckRunner;
+  startupCheckRunner: StartupCheckRunner = new StartupCheckRunnerDefault("DEFAULT");
 
   onEndpoint(endpoint: string): GRPCServerBuilder {
     this.endpoint = endpoint;
@@ -90,35 +92,49 @@ export class GRPCServerBuilder {
       return Promise.reject("Mali was not set up correctly. did you forget to call withService()?");
     }
 
-    // TODO extract to method
+    this.managementServer = this.startManagementServer(this.startupCheckRunner, this.managementPort);
+    const all = Promise.all(this.services.map(s => s.start()));
+    this.mali.start(this.endpoint);
 
+    logger.info(`GRPCServer starts, configuration: ${JSON.stringify(this.getStartLogMessage())}`);
+
+    return all;
+  }
+
+
+  stop(): Promise<any> {
+    const all = Promise.all(this.services.map(s => s.stop()));
+    if (this.mali) {
+      this.mali.close(this.endpoint);
+    }
+    if (this.managementServer) {
+      this.managementServer.close();
+    }
+    return all;
+  }
+
+  private startManagementServer(startupCheckRunner: StartupCheckRunner, managementPort: number): any {
     const app = express();
     app.get("/admin/startupCheck", (req: Request, res: Response) => {
-      this.startupCheckRunner.run()
+      startupCheckRunner.run()
         .then((result: StartupStatus) => {
           const httpCode = result.status === STARTUP_STATUS.OK ? 200 : 503;
           return res.status(httpCode).send(result);
         });
     });
 
-    return new Promise(resolve => {
-      this.managementServer = app.listen(this.managementPort, resolve);
-    })
-      .then(() => {
-        const all = Promise.all(this.services.map(s => s.start()));
-        this.mali.start(this.endpoint);
-        return all;
-
-
-      });
+    return app.listen(managementPort);
   }
 
-  stop(): Promise<any> {
-    const all = Promise.all(this.services.map(s => s.stop()));
-    this.mali && this.mali.close(this.endpoint);
-    this.managementServer && this.managementServer.close();
-    return all;
+  private getStartLogMessage() {
+    return {
+      endpoint: this.endpoint,
+      serviceNames: _.map(this.services || [], "name"),
+      startupCheckRunnerName: this.startupCheckRunner.name,
+      managementPort: this.managementPort
+    };
   }
+
 
 }
 

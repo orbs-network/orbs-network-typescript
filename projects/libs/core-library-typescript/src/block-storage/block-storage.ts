@@ -7,7 +7,7 @@ import { StartupCheck } from "../common-library/startup-check";
 
 export class BlockStorage implements StartupCheck {
 
-  private SERVICE_NAME = "block";
+  public readonly SERVICE_NAME = "block-storage";
 
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
@@ -140,10 +140,15 @@ export class BlockStorage implements StartupCheck {
   public async startupCheck(): Promise<StartupStatus> {
 
     if (!this.transactionPool) {
-      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL };
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL };
     }
 
-    const lastBlock = await this.getLastBlock();
-    return <StartupStatus>{ name: this.SERVICE_NAME, status: lastBlock ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL };
+    let lastBlock;
+    try {
+      lastBlock = await this.getLastBlock();
+    } catch (err) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `Exception in getLastBlock: ${err ? err.message : ""}` };
+    }
+    return { name: this.SERVICE_NAME, status: lastBlock ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL };
   }
 }

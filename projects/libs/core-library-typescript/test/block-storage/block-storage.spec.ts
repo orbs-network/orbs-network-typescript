@@ -125,25 +125,23 @@ describe("Block storage", () => {
   describe("run checkStartupStatus", () => {
     it("checkStartupStatus should succeed", async () => {
       const startupStatus = await blockStorage.startupCheck();
-      return expect(startupStatus).to.deep.equal(<StartupStatus>{ name: "block", status: STARTUP_STATUS.OK });
+      return expect(startupStatus).to.deep.equal({ name: "block-storage", status: STARTUP_STATUS.OK });
     });
   });
 });
 
 describe("Block storage - Bad setup (no transaction pool)", () => {
   let blockStorage: BlockStorage;
-  // let lastBlock: types.Block;
 
   beforeEach(async () => {
     try {
       fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
     blockStorage = await initBlockStorage(undefined);
-    // lastBlock = await blockStorage.getLastBlock();
   });
   it("checkStartupStatus should fail", async () => {
     const startupStatus = await blockStorage.startupCheck();
-    return expect(startupStatus).to.deep.equal(<StartupStatus>{ name: "block", status: STARTUP_STATUS.FAIL });
+    return expect(startupStatus).to.deep.equal({ name: "block-storage", status: STARTUP_STATUS.FAIL });
   });
 
   afterEach(async () => {

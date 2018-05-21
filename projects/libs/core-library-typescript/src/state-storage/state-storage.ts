@@ -10,7 +10,7 @@ import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status"
 import { StartupCheck } from "../common-library/startup-check";
 
 export class StateStorage implements StartupCheck {
-  private SERVICE_NAME = "state";
+  public readonly SERVICE_NAME = "state-storage";
   private blockStorage: types.BlockStorageClient;
 
   private kvstore = new InMemoryKVStore();
@@ -109,18 +109,18 @@ export class StateStorage implements StartupCheck {
   public async startupCheck(): Promise<StartupStatus> {
 
     if (!this.kvstore) {
-      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing kvstore" };
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing kvstore" };
     }
 
     if (!this.pollIntervalMs) {
-      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing pollIntervalMs" };
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing pollIntervalMs" };
     }
 
     if (!this.blockStorage) {
-      return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing blockStorage" };
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing block storage client" };
     }
 
-    return <StartupStatus>{ name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
+    return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
   }
 
 }

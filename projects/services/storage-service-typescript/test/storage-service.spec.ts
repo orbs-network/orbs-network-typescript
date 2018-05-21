@@ -7,7 +7,6 @@ import * as getPort from "get-port";
 import * as chaiAsPromised from "chai-as-promised";
 import { stubInterface } from "ts-sinon";
 import * as request from "supertest";
-import { Response } from "express";
 import * as _ from "lodash";
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
@@ -136,8 +135,8 @@ describe("BlockStorage service", function () {
       name: "storage",
       status: STARTUP_STATUS.OK,
       childStartupStatuses: [
-        <StartupStatus>{ name: "block", status: STARTUP_STATUS.OK },
-        <StartupStatus>{ name: "state", status: STARTUP_STATUS.OK }
+        { name: "block-storage", status: STARTUP_STATUS.OK },
+        { name: "state-storage", status: STARTUP_STATUS.OK }
       ]
     };
 

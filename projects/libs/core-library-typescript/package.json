@@ -62,7 +62,6 @@
     "@types/mocha": "^2.2.48",
     "@types/nconf": "0.0.37",
     "@types/node": "^9.4.4",
-    "@types/request-promise": "^4.1.41",
     "@types/shelljs": "^0.7.8",
     "@types/sinon": "^4.3.1",
     "@types/sinon-chai": "^2.7.29",

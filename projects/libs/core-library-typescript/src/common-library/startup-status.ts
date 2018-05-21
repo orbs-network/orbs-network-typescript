@@ -5,10 +5,4 @@ export interface StartupStatus {
   message?: string;
 }
 
-// export interface CompositeStartupStatus {
-//   status: STARTUP_STATUS;
-//   startupStatuses?: StartupStatus[];
-//   message?: string;
-// }
-
 export enum STARTUP_STATUS { OK, FAIL, PARTIALLY_OPERATIONAL }
