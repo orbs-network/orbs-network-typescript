@@ -15,14 +15,14 @@ export class StartupCheckRunner {
 
     const startupCheckPromises = this.startupCheckers.map((s: StartupCheck) => s.startupCheck());
     return Promise.all(startupCheckPromises)
-      .then(this.mergeStartupStatuses)
+      .then(statuses => this.mergeStartupStatuses(this.name, statuses))
       .catch(err => {
         logger.error(err);
         return <StartupStatus>{ status: STARTUP_STATUS.FAIL, message: err.message };
       });
   }
 
-  private mergeStartupStatuses = (startupStatuses: StartupStatus[]): StartupStatus => {
+  mergeStartupStatuses(name: string, startupStatuses: StartupStatus[]): StartupStatus {
 
     let hasAtLeastOneOk = false;
     let hasAtLeastOneFailure = false;
@@ -36,12 +36,12 @@ export class StartupCheckRunner {
     }
 
     if (!hasAtLeastOneFailure) {
-      return { name: this.name, status: STARTUP_STATUS.OK, childStartupStatuses: startupStatuses };
+      return { name, status: STARTUP_STATUS.OK, childStartupStatuses: startupStatuses };
     }
     if (hasAtLeastOneOk) {
-      return { name: this.name, status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, childStartupStatuses: startupStatuses };
+      return { name, status: STARTUP_STATUS.PARTIALLY_OPERATIONAL, childStartupStatuses: startupStatuses };
     }
-    return { name: this.name, status: STARTUP_STATUS.FAIL, childStartupStatuses: startupStatuses };
-  };
+    return { name, status: STARTUP_STATUS.FAIL, childStartupStatuses: startupStatuses };
+  }
 
 }
