@@ -9,11 +9,11 @@ services:
     environment:
       SLACK_TOKEN: ${SLACK_TOKEN}
       ORBS_API_ENDPOINT: http://us-east-1.global.nodes.staging.orbs-test.com
-      REDIS_URL: redis://redis
+      REDIS_URL: redis://redis:6379
     links:
       - redis:redis
 
   redis:
     image: redis
     volumes:
-      ./data:/data
+      - ./data:/data

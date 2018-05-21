@@ -27,7 +27,7 @@ jobs:
       - checkout
       - run: ./.circleci/setup-rngd.sh
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
-      - run: ./docker/build-sdk-base.sh
+      - run: export NO_ANDROID=true && ./docker/build-sdk-base.sh
       - run: ./docker/build-bot.sh
       - run: export DOCKER_TAG=$(./docker-tag.sh) && docker tag orbs:bot ${DOCKER_IMAGE_BOT}:${DOCKER_TAG}
       - run: docker push ${DOCKER_IMAGE_BOT}
@@ -48,7 +48,7 @@ jobs:
       - run: ./.circleci/setup-rngd.sh
       - run: $(aws ecr get-login --no-include-email --region us-west-2)
       - run: ./.circleci/docker-pull.sh
-      - run: ./docker/build-sdk-base.sh
+      - run: export NO_ANDROID=true && ./docker/build-sdk-base.sh
       - run: ./docker/build-e2e.sh
       - run: ./docker-test.sh
 
