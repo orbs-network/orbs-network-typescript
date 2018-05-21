@@ -27,7 +27,13 @@ export class StubConsensus extends BaseConsensus {
     logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config)}`);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
-      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block)
+      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
+      config: {
+        sign: config.signBlocks,
+        keyManager: config.keyManager,
+        nodeName: config.nodeName,
+        pollIntervalMs: config.blockBuilderPollInterval
+      }
     });
     this.gossip = gossip;
     this.blockStorage = blockStorage;

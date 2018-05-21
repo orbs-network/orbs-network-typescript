@@ -74,7 +74,8 @@ describe("a block", () => {
     (<sinon.SinonStub>virtualMachine.processTransactionSet).returns(processTransactionSetOutput);
 
     blockBuilder = new BlockBuilder(
-      { virtualMachine, transactionPool, blockStorage, newBlockBuildCallback, pollIntervalMs: 10
+      { virtualMachine, transactionPool, blockStorage, newBlockBuildCallback,
+        config: { pollIntervalMs: 10 }
       });
   });
 

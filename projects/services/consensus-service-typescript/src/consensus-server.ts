@@ -1,7 +1,8 @@
 import { defaults } from "lodash";
 
-import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig } from "orbs-core-library";
+import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig, KeyManager } from "orbs-core-library";
 import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "orbs-core-library";
+import * as _ from "lodash";
 
 
 import ConsensusService from "./consensus-service";
@@ -13,12 +14,13 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   heartbeatInterval: number;
   nodeName: string;
   clusterSize: number;
+  signBlocks: boolean;
+  keyManager?: KeyManager;
   algorithm: string;
   leaderNodeName?: string;
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
-
 
   constructor(min?: number, max?: number, heartbeat?: number) {
     this.electionTimeout = { min: min || 2000, max: max || 4000 };
@@ -47,7 +49,7 @@ function makeCommittedTransactionPool() {
 
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME, CONSENSUS_SIGN_BLOCKS } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -66,6 +68,10 @@ export default function(nodeTopology: any, env: any) {
   const consensusConfig = new DefaultConsensusConfig(Number(MIN_ELECTION_TIMEOUT), Number(MAX_ELECTION_TIMEOUT), Number(HEARBEAT_INTERVAL));
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
+  consensusConfig.signBlocks = _.lowerCase(CONSENSUS_SIGN_BLOCKS) === "true";
+  consensusConfig.keyManager = consensusConfig.signBlocks ? new KeyManager({
+    privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
+  }) : undefined;
   consensusConfig.blockBuilderPollInterval = Number(BLOCK_BUILDER_POLL_INTERVAL) || 500;
   consensusConfig.msgLimit = Number(MSG_LIMIT) || 4000000;
   consensusConfig.blockSizeLimit = Number(BLOCK_SIZE_LIMIT) || Math.floor(consensusConfig.msgLimit / (2 * 250));
