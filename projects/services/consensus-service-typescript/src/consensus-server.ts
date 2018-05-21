@@ -1,7 +1,7 @@
 import { defaults } from "lodash";
 
 import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig } from "orbs-core-library";
-import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "orbs-core-library";
+import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator, SubscriptionProfiles } from "orbs-core-library";
 
 
 import ConsensusService from "./consensus-service";
@@ -31,9 +31,9 @@ function makeConsensus(peers: types.ClientMap, consensusConfig: RaftConsensusCon
   return new Consensus(consensusConfig, peers.gossip, peers.virtualMachine, peers.blockStorage, peers.transactionPool);
 }
 
-function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress: string) {
-  const subscriptionManagerConfiguration = { ethereumContractAddress };
-  return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
+function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress: string, subscriptionProfiles: SubscriptionProfiles) {
+  const subscriptionManagerConfig = { ethereumContractAddress, subscriptionProfiles: {}};
+  return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfig);
 }
 
 function makePendingTransactionPool(peers: types.ClientMap, transactionLifespanMs: number) {
@@ -45,9 +45,19 @@ function makeCommittedTransactionPool() {
   return new CommittedTransactionPool();
 }
 
+function parseSubscriptionProfiles(subscriptionProfileJson: string) {
+  try {
+    return JSON.parse(subscriptionProfileJson);
+  } catch (err) {
+    logger.error(`Bad subscription profile setting: ${subscriptionProfileJson} of type ${typeof subscriptionProfileJson}. Defaulting to empty list of profiles`);
+    return {};
+  }
+}
+
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME,
+    SUBSCRIPTION_PROFILES } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -85,8 +95,10 @@ export default function(nodeTopology: any, env: any) {
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);
 
+  const subscriptionProfiles = parseSubscriptionProfiles(SUBSCRIPTION_PROFILES);
+
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers, consensusConfig), nodeConfig))
-    .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers, ETHEREUM_CONTRACT_ADDRESS), nodeConfig))
+    .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers, ETHEREUM_CONTRACT_ADDRESS, subscriptionProfiles), nodeConfig))
     .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers, transactionLifespanMs), makeCommittedTransactionPool(), nodeConfig));
 }

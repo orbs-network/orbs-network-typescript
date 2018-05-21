@@ -22,19 +22,19 @@ describe("transaction validation", () => {
   });
 
   it("succeeds for a valid transaction of an active vchain subscription", async () => {
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({isValid: true});
     const tx = aDummyTransaction();
     return expect(transactionValidator.validate(tx)).to.eventually.be.true;
   });
 
   it("fails if the subscription is not active", async () => {
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: false});
+    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({isValid: false});
     const tx = aDummyTransaction();
     return expect(transactionValidator.validate(tx)).to.eventually.be.false;
   });
 
   it("fails if the virtual chain of the sender and the contract don't match", async () => {
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({isValid: true});
     const tx: types.Transaction =  {
       header: {
         version: 0,
@@ -55,7 +55,7 @@ describe("transaction validator with enabled signature verification ", () => {
 
   beforeEach(() => {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({isValid: true});
     transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: true});
   });
 

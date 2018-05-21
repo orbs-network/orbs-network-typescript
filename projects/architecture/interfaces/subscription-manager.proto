@@ -9,5 +9,5 @@ message GetSubscriptionStatusInput {
 }
 
 message GetSubscriptionStatusOutput {
-  bool active = 1;
+  bool isValid = 1;
 }
