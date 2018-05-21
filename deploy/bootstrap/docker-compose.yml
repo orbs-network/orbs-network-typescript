@@ -30,6 +30,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: consensus
+      CONSENSUS_SIGN_BLOCKS: 'true'
       ETHEREUM_CONTRACT_ADDRESS: '0x0836C6b91e68A6Ca30086d196e998f75346c2c72'
       BLOCK_BUILDER_POLL_INTERVAL: 500
       MIN_ELECTION_TIMEOUT: 10000
@@ -40,6 +41,7 @@ services:
       BLOCK_SIZE_LIMIT: 2000
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
+      - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
     networks:
       default:
 
@@ -69,7 +71,9 @@ services:
     environment:
       SERVICE_NAME: storage
       BLOCK_STORAGE_DB_PATH: /opt/orbs/db
+      BLOCK_STORAGE_VERIFY_SIGNATURES: 'true'
     volumes:
+      - /opt/orbs/public-keys/block:/opt/orbs/public-keys/block
       - /mnt/data/db:/opt/orbs/db
       - /mnt/data/logs:/opt/orbs/logs
     networks:
