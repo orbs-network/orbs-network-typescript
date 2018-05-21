@@ -35,9 +35,6 @@ distTest
 .DS_Store
 Thumbs.db
 
-# Docker-compose tmp files
-docker-compose.test.yml.tmp*
-
 # Databases
 db
 .ldb_history
@@ -48,3 +45,6 @@ public-keys
 
 # build artifacts
 artifacts
+
+# docker
+docker/images
