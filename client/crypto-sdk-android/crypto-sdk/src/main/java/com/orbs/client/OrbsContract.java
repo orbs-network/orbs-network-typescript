@@ -24,10 +24,11 @@ public class OrbsContract {
     return orbsClient.call(this.contractAddress, payload);
   }
 
-  public String generateSendTransactionPayload(String methodName, Object[] args) {
-    SendTransactionPayload payload = new SendTransactionPayload();
-    payload.method = methodName;
-    payload.args = args;
+  public String generateSendTransactionPayload(String methodName, Object[] args) throws Exception {
+    SendTransactionPayload payload = new SendTransactionPayload.Builder()
+            .withMethod(methodName)
+            .withArgs(args)
+            .build();
     Gson gson = new Gson();
     return gson.toJson(payload);
   }
