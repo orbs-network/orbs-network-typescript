@@ -54,5 +54,5 @@ deploy
 # build artifacts
 artifacts
 
-# docker
+# Docker images
 docker/images

@@ -17,7 +17,8 @@
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "test": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/**/*.spec.js",
-    "test-spec": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/test/$SPEC/$SPEC.spec.js"
+    "test-spec": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/test/$SPEC/$SPEC.spec.js",
+    "test-module": "tsc -p tsconfig.test.json && NODE_ENV=test ./node_modules/.bin/mocha distTest/test/$MODULE/*.spec.js"
   },
   "dependencies": {
     "@types/json-stable-stringify": "^1.0.32",
@@ -26,7 +27,8 @@
     "bind-decorator": "^1.0.11",
     "bluebird": "^3.5.1",
     "bs58": "^4.0.1",
-    "gaggle": "git+https://github.com/lbeder/gaggle.git",
+    "gaggle": "git+https://github.com/orbs-network/gaggle.git#dfebd2866024c1d0f98171ba37cdd50a5c645fac",
+    "elliptic": "^6.4.0",
     "grpc": "^1.9.0",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "json-stable-stringify": "^1.0.1",

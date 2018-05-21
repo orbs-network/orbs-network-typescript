@@ -5,14 +5,17 @@ import { TransactionHandler } from "../public-api/transaction-handler";
 export class PublicApi {
   private transactionHandler: TransactionHandler;
   private virtualMachine: types.VirtualMachineClient;
+  private transactionPool: types.TransactionPoolClient;
 
-  public constructor(transactionHandler: TransactionHandler, virtualMachine: types.VirtualMachineClient) {
+  public constructor(transactionHandler: TransactionHandler, virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient) {
     this.transactionHandler = transactionHandler;
     this.virtualMachine = virtualMachine;
+    this.transactionPool = transactionPool;
   }
 
-  public async sendTransaction(transactionContext: types.SendTransactionInput) {
-    await this.transactionHandler.handle(transactionContext);
+  public async sendTransaction(transactionContext: types.SendTransactionInput): Promise<string> {
+    const txid = await this.transactionHandler.handle(transactionContext);
+    return txid;
   }
 
   public async callContract(input: types.CallContractInput) {
@@ -23,5 +26,9 @@ export class PublicApi {
     });
 
     return resultJson;
+  }
+
+  public async getTransactionStatus(input: types.GetTransactionStatusInput) {
+    return this.transactionPool.getTransactionStatus(input);
   }
 }

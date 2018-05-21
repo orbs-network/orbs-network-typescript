@@ -1,28 +1,40 @@
 import { types } from "../common-library/types";
-import  { Address, createContractAddress } from "../common-library/address";
+import  { Address } from "../common-library/address";
 import { createHash } from "crypto";
-import { TransactionUtils } from "..";
+import { TransactionHelper } from "..";
+import { eddsa } from "elliptic";
+const ec = new eddsa("ed25519");
 
-export function aDummyTransaction(overrides: {timestamp?: number, senderPublicKey?: Buffer} = {}): types.Transaction {
-  const senderPublicKey: Buffer = overrides.senderPublicKey == undefined ?
-    createHash("sha256").update("dummyAccount").digest() : overrides.senderPublicKey;
+export function aDummyTransaction(overrides: {
+  timestamp?: number
+} = {}) {
+  const privateKey = "3f81e53116ee3f860c154d03b9cabf8af71d8beec210c535ed300c0aee5fcbe7";
+  const key = ec.keyFromSecret(privateKey);
+  const publicKey = Buffer.from("b9a91acbf23c22123a8253cfc4325d7b4b7a620465c57f932c7943f60887308b", "hex");
 
-    return {
+  const transaction: types.Transaction =  {
     header: {
       version: 0,
-      sender: new Address(senderPublicKey).toBuffer(),
+      sender: new Address(publicKey).toBuffer(),
       timestamp: (overrides.timestamp == undefined ? Date.now() : overrides.timestamp).toString(),
-      contractAddress: createContractAddress("dummyContract").toBuffer()
+      contractAddress: Address.createContractAddress("dummyContract").toBuffer()
     },
-    payload: "{}"
+    payload: "{}",
+    signatureData: undefined
   };
+  const transactionHash = new TransactionHelper(transaction).calculateHash();
+  transaction.signatureData = {
+    signature: Buffer.from(key.sign([...transactionHash]).toBytes()),
+    publicKey
+  };
+  return transaction;
 }
 
 export function aDummyTransactionSet(numberOfTransactions = 3): types.Transaction[] {
   const transactions: types.Transaction[] = [];
   for (let i = 0; i < numberOfTransactions; i++) {
-    const transaction = aDummyTransaction({senderPublicKey: createHash("sha256").update(`address${i}`).digest()});
-    const txHash = TransactionUtils.calculateTransactionHash(transaction);
+    const transaction = aDummyTransaction();
+    const txHash = new TransactionHelper(transaction).calculateHash();
     transactions.push(transaction);
   }
 

@@ -5,8 +5,8 @@ import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
 import { TransactionPoolClient, VirtualMachineClient, BlockStorageClient } from "orbs-interfaces";
-import { BlockUtils, TransactionUtils } from "../../src/common-library";
-import { Address, createContractAddress } from "../../src/common-library/address";
+import { BlockUtils, TransactionHelper } from "../../src/common-library";
+import { Address } from "../../src/common-library/address";
 import * as sinon from "sinon";
 import { createHash } from "crypto";
 import { aDummyTransactionSet } from "../../src/test-kit/transaction-builders";
@@ -32,7 +32,7 @@ function aGenesisBlock(): types.Block {
 function aDummyStateDiff(): types.ModifiedStateKey[] {
   return [
     {
-      contractAddress: createContractAddress("dummyContract").toBuffer(),
+      contractAddress: Address.createContractAddress("dummyContract").toBuffer(),
       key: "dummyKey",
       value: "dummyValue",
     }
@@ -47,7 +47,7 @@ describe("a block", () => {
   const dummyTransactionSet = aDummyTransactionSet();
   const dummyStateDiff = aDummyStateDiff();
   const dummyTransactionReceipts: types.TransactionReceipt[] = dummyTransactionSet.map(tx => ({
-    txHash: TransactionUtils.calculateTransactionHash(tx),
+    txHash: new TransactionHelper(tx).calculateHash (),
     success: true
   }));
 
@@ -84,6 +84,26 @@ describe("a block", () => {
     });
 
     it("is built from pending transactions shortly after started", (done) => {
+      blockBuilder.start();
+
+      setTimeout(() => {
+        try {
+          const bodyMatch = sinon.match.has("transactions", dummyTransactionSet)
+          .and(sinon.match.has("stateDiff", dummyStateDiff))
+          .and(sinon.match.has("transactionReceipts"));
+          expect(newBlockBuildCallback).to.have.been.calledWith(sinon.match.has("body", bodyMatch));
+          done();
+        } catch (e) {
+          done(e);
+        } finally {
+          blockBuilder.stop();
+        }
+      }, 100);
+    });
+
+    it("restarts successfully after being stopped", (done) => {
+      blockBuilder.start();
+      blockBuilder.stop();
       blockBuilder.start();
 
       setTimeout(() => {

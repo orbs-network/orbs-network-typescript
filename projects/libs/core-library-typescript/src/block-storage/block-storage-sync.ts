@@ -35,6 +35,8 @@ export class BlockStorageSync {
     const uniqueBlocks = uniqBy(data, (block) => block.header.height);
     const sortedBlocks = sortBy(uniqueBlocks, (block) => block.header.height);
 
+    logger.info(`BlockStorageSync tries to append new blocks`);
+
     for (const block of sortedBlocks) {
       try {
         await this.blockStorage.addBlock(block);

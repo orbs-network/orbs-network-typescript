@@ -1,10 +1,10 @@
-import * as _ from "lodash";
 import bind from "bind-decorator";
 
 import { types, logger, JsonBuffer } from "orbs-core-library";
 
-import { Service, ServiceConfig } from "orbs-core-library";
+import { Service, ServiceConfig, TransactionHelper } from "orbs-core-library";
 import { PendingTransactionPool, CommittedTransactionPool } from "orbs-core-library";
+import { TransactionStatus, Transaction } from "orbs-interfaces";
 
 export default class TransactionPoolService extends Service {
   private pendingTransactionPool: PendingTransactionPool;
@@ -12,9 +12,10 @@ export default class TransactionPoolService extends Service {
   private monitorPollTimer: NodeJS.Timer;
   private monitorPollIntervalMs = 2000;
 
-  public constructor(pendingTransactionPool: PendingTransactionPool, serviceConfig: ServiceConfig) {
+  public constructor(pendingTransactionPool: PendingTransactionPool, commitedTransactionPool: CommittedTransactionPool, serviceConfig: ServiceConfig) {
     super(serviceConfig);
     this.pendingTransactionPool = pendingTransactionPool;
+    this.committedTransactionPool = commitedTransactionPool;
   }
 
   async initialize() {
@@ -47,17 +48,30 @@ export default class TransactionPoolService extends Service {
     }
   }
 
+  private validateTransactionUniqueOrThrow(transaction: Transaction): boolean {
+    const txid = new TransactionHelper(transaction).calculateTransactionId();
+    if (this.pendingTransactionPool.hasTransactionWithId(txid)) {
+      throw new Error(`Transaction with id ${txid} already exists in the pending transaction pool`);
+    } else if (this.committedTransactionPool.hasTransactionWithId(txid)) {
+      throw new Error(`Transaction with id ${txid} already exists in the committed transaction pool`);
+    } else {
+      return true;
+    }
+  }
 
   @Service.RPCMethod
   public async markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext) {
-    this.pendingTransactionPool.markCommittedTransactions(rpc.req.transactionEntries);
+    this.committedTransactionPool.addCommittedTransactions(rpc.req.transactionReceipts);
+    this.pendingTransactionPool.clearCommittedTransactionsFromPendingPool(rpc.req.transactionReceipts);
     rpc.res = {};
   }
 
   @Service.RPCMethod
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
-     await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
-     rpc.res = {};
+    if (this.validateTransactionUniqueOrThrow(rpc.req.transaction)) {
+      const res = await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
+      rpc.res = { txid: res };
+    }
   }
 
   @Service.RPCMethod
@@ -67,12 +81,23 @@ export default class TransactionPoolService extends Service {
     logger.debug(`getAllPendingTransactions() . returns ${JSON.stringify(rpc.res)}`);
   }
 
+  @Service.RPCMethod
+  public async getTransactionStatus(rpc: types.GetTransactionStatusContext) {
+    const txid = rpc.req.txid;
+    rpc.res = this.pendingTransactionPool.getTransactionStatus(txid);
+    if (rpc.res && rpc.res.status == TransactionStatus.NOT_FOUND) {
+      rpc.res = this.committedTransactionPool.getTransactionStatus(txid);
+    }
+  }
+
   @Service.SilentRPCMethod
   public async gossipMessageReceived(rpc: types.GossipMessageReceivedContext) {
-    const obj: any = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
     if (rpc.req.messageType === "newTransaction") {
+      const obj: any = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
       const message = <types.NewTransactionBroadcastMessage>obj;
-      await this.pendingTransactionPool.onNewBroadcastTransaction(message.transaction);
+      if (this.validateTransactionUniqueOrThrow(message.transaction)) {
+        await this.pendingTransactionPool.onNewBroadcastTransaction(message.transaction);
+      }
     }
   }
 }

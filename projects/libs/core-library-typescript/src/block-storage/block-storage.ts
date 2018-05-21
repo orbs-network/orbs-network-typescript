@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
-import { BlockUtils , logger, types, JsonBuffer, TransactionUtils } from "../common-library";
+import { BlockUtils , logger, types, JsonBuffer } from "../common-library";
 
 export class BlockStorage {
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
@@ -59,7 +59,15 @@ export class BlockStorage {
   //
   // NOTE: this method should be only called serially.
   public async addBlock(block: types.Block) {
+    const start = new Date().getTime();
+
+    const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
+
+    logger.info(`Adding new block with block height ${block.header.height} and hash ${blockHash}`);
+
     this.verifyNewBlock(block);
+
+    logger.info(`Verified new block with block height ${block.header.height} and hash ${blockHash}`);
 
     await this.db.put<number>(BlockStorage.LAST_BLOCK_HEIGHT_KEY, block.header.height);
     await this.putBlock(block);
@@ -67,15 +75,14 @@ export class BlockStorage {
 
     this.lastBlock = block;
 
-    logger.info(`Added new block with block height: ${block.header.height}`);
+    const end = new Date().getTime();
+
+    logger.info(`Added new block with block height: ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
   }
 
   private async reportBlockTransactionToPool(block: types.Block) {
-    const transactionEntries: types.CommittedTransactionEntry[] = block.body.transactions.map(transaction => ({
-      txHash: TransactionUtils.calculateTransactionHash(transaction),
-      timestamp: transaction.header.timestamp
-    }));
-    await this.transactionPool.markCommittedTransactions({ transactionEntries });
+    const transactionReceipts = block.body.transactionReceipts;
+    await this.transactionPool.markCommittedTransactions({ transactionReceipts });
   }
 
   // Returns an array of blocks, starting from a specific block ID and up to the last block.
@@ -108,12 +115,12 @@ export class BlockStorage {
     }
 
     if (block.header.height !== this.lastBlock.header.height + 1) {
-      throw new Error(`Invalid block height of block: ${JSON.stringify(block)}! Should have been ${this.lastBlock.header.height + 1}`);
+      throw new Error(`Invalid block height of block: ${JSON.stringify(block.header)}! Should have been ${this.lastBlock.header.height + 1}`);
     }
 
     const lastBlockHash = BlockUtils.calculateBlockHash(this.lastBlock);
     if (!block.header.prevBlockHash.equals(lastBlockHash)) {
-      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block)}! Should have been ${JSON.stringify(lastBlockHash)}`);
+      throw new Error(`Invalid prev block hash of block: ${JSON.stringify(block.header)}! Should have been ${JSON.stringify(lastBlockHash)}`);
     }
   }
 

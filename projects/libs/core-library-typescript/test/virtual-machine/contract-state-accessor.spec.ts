@@ -1,13 +1,17 @@
 import { expect } from "chai";
+import * as chai from "chai";
+import * as sinonChai from "sinon-chai";
 import { ContractStateReadWriteAccessor } from "../../src/virtual-machine/contract-state-accessor";
 import { stubInterface } from "ts-sinon";
 import { types } from "../../src/common-library/types";
 import { StateCache, StateCacheKey } from "../../src/virtual-machine/state-cache";
-import { createContractAddress } from "../../src/common-library/address";
+import { Address } from "../../src/common-library/address";
+
+chai.use(sinonChai);
 
 describe("read-write contract state cache accessor", () => {
   let contractState: ContractStateReadWriteAccessor;
-  const contractAddress = createContractAddress("contractName");
+  const contractAddress = Address.createContractAddress("contractName");
   let stateCache: StateCache;
   let stateStorageClient: types.StateStorageClient;
   beforeEach(() => {

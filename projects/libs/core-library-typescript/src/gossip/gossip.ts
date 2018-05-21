@@ -102,6 +102,7 @@ export class Gossip {
 
   connect(peers: string[]) {
     for (const peer of peers) {
+      logger.debug(`Gossip trying to connect to: ${peer}`);
       const ws: WebSocket = new WebSocket(peer);
       ws.addEventListener("open", () => { this.prepareConnection(ws); });
     }
@@ -119,6 +120,7 @@ export class Gossip {
     }));
 
     this.clients.forEach((client: WebSocket, address: string) => {
+      logger.debug(`Sending message to group ${broadcastGroup} of type ${objectType} to ${address}`);
       if (client.readyState === WebSocket.OPEN) {
         client.send(message, handleWSError(address, client.url));
       }

@@ -1,12 +1,13 @@
-import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress } from "orbs-core-library";
+import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress, TransactionHelper } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
 import * as getPort from "get-port";
 import * as request from "supertest";
 import httpServer from "../src/server";
-import mockHttpServer from "./mock-server";
-import { Server } from "http";
+import mockHttpServer, { runMockServer, RequestStub } from "./mock-server";
+import "mocha";
+import { ChildProcess } from "child_process";
 
 chai.use(sinonChai);
 
@@ -14,8 +15,28 @@ const { expect } = chai;
 
 const senderAddressBase58 = "T00EXMPnnaWFqRyVxWdhYCgGzpnaL4qBy4TM9btp";
 const contractAddressBase58 = "T00LUPVrDh4SDHggRBJHpT8hiBb6FEf2rMkGvQPR";
+const publicKeyHex = "0101010101010101010101010101010101010101010101010101010101010101";
+const signatureHex = "0202020202020202020202020202020202020202020202020202020202020202";
 const transactionTimestamp = "12345678";
 const payload = JSON.stringify({ foo: "bar" });
+
+const transaction: types.Transaction = {
+  header: {
+    version: 0,
+    timestamp: transactionTimestamp,
+    sender: bs58DecodeRawAddress(senderAddressBase58),
+    contractAddress: bs58DecodeRawAddress(contractAddressBase58)
+  },
+  payload,
+  signatureData: {
+    publicKey: Buffer.from(publicKeyHex, "hex"),
+    signature: Buffer.from(signatureHex, "hex")
+  }
+};
+
+const tx = new TransactionHelper(transaction);
+const txid = tx.calculateTransactionId();
+const txHash = tx.calculateHash();
 
 const sendTransactionRequestData = {
   header: {
@@ -25,6 +46,10 @@ const sendTransactionRequestData = {
     contractAddressBase58
   },
   payload,
+  signatureData: {
+    publicKeyHex,
+    signatureHex
+  }
 };
 
 const callContractRequestData = {
@@ -33,16 +58,12 @@ const callContractRequestData = {
   payload,
 };
 
+const getTransactionStatusData = {
+  txid
+};
+
 const expectedAddNewPendingTransactionInput: types.AddNewPendingTransactionInput = {
-  transaction: {
-    header: {
-      version: 0,
-      timestamp: transactionTimestamp,
-      sender: bs58DecodeRawAddress(senderAddressBase58),
-      contractAddress: bs58DecodeRawAddress(contractAddressBase58)
-    },
-    payload
-  }
+  transaction
 };
 
 const expectedVirtualMachineCallContractInput: types.CallContractInput = {
@@ -50,6 +71,8 @@ const expectedVirtualMachineCallContractInput: types.CallContractInput = {
   contractAddress: bs58DecodeRawAddress(contractAddressBase58),
   payload
 };
+
+const expectedGetTransactionStatusInput: types.GetTransactionStatusInput = { txid };
 
 class FakeVirtualMachineService extends Service implements types.VirtualMachineServer {
   async initialize(): Promise<void> {
@@ -76,6 +99,7 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
   @Service.RPCMethod
   addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext): void {
     expect(rpc.req).to.be.eql(expectedAddNewPendingTransactionInput);
+    rpc.res = { txid };
   }
 
   getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext): void {
@@ -84,6 +108,18 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
 
   markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext): void {
     throw new Error("Method not implemented.");
+  }
+
+  @Service.RPCMethod
+  getTransactionStatus(rpc: types.GetTransactionStatusContext): void {
+    expect(rpc.req).to.be.eql(expectedGetTransactionStatusInput);
+    rpc.res = {
+      status: types.TransactionStatus.COMMITTED,
+      receipt: {
+        success: true,
+        txHash
+      }
+    };
   }
 
   gossipMessageReceived(rpc: types.GossipMessageReceivedContext): void {
@@ -101,10 +137,10 @@ class FakeTransactionPool extends Service implements types.TransactionPoolServer
 
 
 describe("Public API Service - Component Test", async function () {
-  let httpService: PublicApiHTTPService;
   let httpEndpoint: string;
 
   let grpcService: GRPCServerBuilder;
+  let httpService: PublicApiHTTPService;
 
   describe("Real HTTP API", () => {
     beforeEach(async () => {
@@ -149,19 +185,28 @@ describe("Public API Service - Component Test", async function () {
   });
 
   describe("Fake HTTP API", () => {
-    let httpService: Server;
+    let httpService: ChildProcess;
 
     beforeEach(async () => {
       const httpPort = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
-      httpService = mockHttpServer(sendTransactionRequestData, callContractRequestData).listen(httpPort);
+      const stubs: RequestStub[] = [
+        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({transactionId: txid})},
+        { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer"})},
+        { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true }})}
+      ];
+
+      httpService = await runMockServer(httpPort, stubs);
+      httpService.stdout.pipe(process.stdout);
+      httpService.stderr.pipe(process.stderr);
+
     });
 
     runTests();
 
     afterEach(async () => {
-      httpService.close();
+      httpService && httpService.kill();
     });
   });
 
@@ -170,14 +215,34 @@ describe("Public API Service - Component Test", async function () {
       return request(httpEndpoint)
         .post("/public/sendTransaction")
         .send(sendTransactionRequestData)
-        .expect(200, { result: "ok" });
+        .expect(200)
+        .then((response) => {
+          const res = JSON.parse(response.text);
+          expect(res).to.have.property("transactionId", txid);
+        });
     });
 
     it("called contract through http propagates properly to the virtual machine", () => {
       return request(httpEndpoint)
         .post("/public/callContract")
         .send(callContractRequestData)
-        .expect(200, { result: "some-answer" });
+        .expect(200)
+        .then((response) => {
+          const res = JSON.parse(response.text);
+          expect(res).to.have.property("result").that.is.eql("some-answer");
+        });
+    });
+
+    it("got transaction status through http propagates properly to transaction pool", () => {
+      return request(httpEndpoint)
+        .post("/public/getTransactionStatus")
+        .send(getTransactionStatusData)
+        .expect(200)
+        .then((response) => {
+          const res = JSON.parse(response.text);
+          expect(res).to.have.property("status", "COMMITTED");
+          expect(res).to.have.property("receipt").that.has.property("success", true);
+        });
     });
   }
 });

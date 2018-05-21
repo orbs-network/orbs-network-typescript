@@ -1,18 +1,26 @@
 import { delay } from "bluebird";
-import { Transaction, SendTransactionOutput } from "orbs-interfaces";
 import * as request from "request-promise";
 import { Address } from "./address";
-import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest } from "./orbs-api-interface";
+import { OrbsAPICallContractRequest, OrbsAPISendTransactionRequest, OrbsAPIGetTransactionStatusRequest, OrbsAPIGetTransactionStatusResponse } from "./orbs-api-interface";
+import { ED25519Key } from ".";
+import { createHash } from "crypto";
+import * as stringify from "json-stable-stringify";
 
 export class OrbsClient {
   private endpoint: string;
   readonly senderAddress: Address;
   private sendTransactionTimeoutMs: number;
+  private keyPair: ED25519Key;
 
-  constructor(endpoint: string, senderAddress: Address, sendTransactionTimeoutMs = 5000) {
+  constructor(endpoint: string, senderAddress: Address, senderKeyPair: ED25519Key, sendTransactionTimeoutMs = 5000) {
     this.senderAddress = senderAddress;
     this.endpoint = endpoint;
     this.sendTransactionTimeoutMs = sendTransactionTimeoutMs;
+    this.keyPair = senderKeyPair;
+
+    if (this.senderAddress.publicKey != senderKeyPair.publicKey) {
+      throw new Error("Public key of the sender address should match the public key of the sender key-pair");
+    }
   }
 
   async sendTransaction(contractAddress: Address, payload: string): Promise<any> {
@@ -30,11 +38,7 @@ export class OrbsClient {
   }
 
   async call(contractAddress: Address, payload: string): Promise<any> {
-    const callData: OrbsAPICallContractRequest = {
-      senderAddressBase58: this.senderAddress.toString(),
-      contractAddressBase58: contractAddress.toString(),
-      payload: payload
-    };
+    const callData: OrbsAPICallContractRequest = this.generateCallRequest(contractAddress, payload);
     const body = await request.post({
       url: `${this.endpoint}/public/callContract`,
       body: callData,
@@ -44,15 +48,48 @@ export class OrbsClient {
     return body.result;
   }
 
-  public generateTransactionRequest(contractAddress: Address, payload: string, timestamp: number = Date.now()): OrbsAPISendTransactionRequest {
+  async getTransactionStatus(txid: string): Promise<OrbsAPIGetTransactionStatusResponse> {
+    const requestData: OrbsAPIGetTransactionStatusRequest = { txid };
+
+    const body = await request.post({
+      url: `${this.endpoint}/public/getTransactionStatus`,
+      body: requestData,
+      json: true
+    });
+
+    return body;
+  }
+
+  public generateCallRequest(contractAddress: Address, payload: string): OrbsAPICallContractRequest {
     return {
-      header: {
-        version: 0,
-        senderAddressBase58: this.senderAddress.toString(),
-        timestamp: timestamp.toString(),
-        contractAddressBase58: contractAddress.toString()
-      },
-      payload
+      senderAddressBase58: this.senderAddress.toString(),
+      contractAddressBase58: contractAddress.toString(),
+      payload: payload
     };
+  }
+
+  public generateTransactionRequest(contractAddress: Address, payload: string, timestamp: number = Date.now()): OrbsAPISendTransactionRequest {
+    // build transaction without signatute data
+    const header = {
+      version: 0,
+      senderAddressBase58: this.senderAddress.toString(),
+      timestamp: timestamp.toString(),
+      contractAddressBase58: contractAddress.toString()
+    };
+
+    const hasher = createHash("sha256");
+    hasher.update(stringify({header, payload}));
+    const txHash = hasher.digest();
+    const signatureHex =  this.keyPair.sign(txHash).toString("hex");
+
+    const req: OrbsAPISendTransactionRequest = {
+      header,
+      payload,
+      signatureData: {
+        publicKeyHex: this.keyPair.publicKey,
+        signatureHex
+      }
+    };
+    return req;
   }
 }

@@ -7,11 +7,6 @@ service Gossip {
   rpc UnicastMessage (UnicastMessageInput) returns (UnicastMessageOutput);
 }
 
-enum Recipient {
-  Gossip = 1;
-  Consensus = 2;
-}
-
 message BroadcastMessageInput {
   string broadcastGroup = 1;
   string messageType = 2;

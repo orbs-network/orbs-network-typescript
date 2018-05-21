@@ -1,6 +1,6 @@
 import { StateCache, StateCacheKey } from "../../src/virtual-machine/state-cache";
 import { expect } from "chai";
-import { createContractAddress } from "../../src/common-library/address";
+import { Address } from "../../src/common-library/address";
 
 describe("state cache", () => {
   let stateCache: StateCache;
@@ -9,7 +9,7 @@ describe("state cache", () => {
   });
   it("loads a key that was stored with the correct value", () => {
     const key: StateCacheKey = {
-      contractAddress: createContractAddress("contractName").toBuffer(),
+      contractAddress: Address.createContractAddress("contractName").toBuffer(),
       key: "key"
     };
     stateCache.set(key, "value");

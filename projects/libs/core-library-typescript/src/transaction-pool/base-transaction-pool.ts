@@ -7,13 +7,13 @@ export interface TransactionPoolConfig {
 
 export default abstract class BaseTransactionPool {
   static readonly DEFAULT_TRANSACTION_LIFESPAN_MS = 1000 * 30;
-  static readonly DEFAULT_CLEANUP_INTERVAL = 1000 * 15;
+  static readonly DEFAULT_CLEANUP_INTERVAL_MS = 1000 * 15;
   public readonly transactionLifespanMs: number;
   public readonly cleanupIntervalMs: number;
   private cleanupTimer: NodeJS.Timer;
 
   constructor(config?: TransactionPoolConfig) {
-    this.cleanupIntervalMs = (config && config.cleanupIntervalMs) || BaseTransactionPool.DEFAULT_CLEANUP_INTERVAL;
+    this.cleanupIntervalMs = (config && config.cleanupIntervalMs) || BaseTransactionPool.DEFAULT_CLEANUP_INTERVAL_MS;
     this.transactionLifespanMs = (config && config.transactionLifespanMs) || BaseTransactionPool.DEFAULT_TRANSACTION_LIFESPAN_MS;
   }
 
@@ -21,8 +21,10 @@ export default abstract class BaseTransactionPool {
 
   public startCleanupTimer() {
     this.cleanupTimer = setInterval(() => {
+      this.stopCleanupTimer();
       const count = this.clearExpiredTransactions();
       logger.debug(`Cleaned up ${count} transactions from pool. Class name: ${this.constructor.name}`);
+      this.startCleanupTimer();
     }, this.cleanupIntervalMs);
   }
 

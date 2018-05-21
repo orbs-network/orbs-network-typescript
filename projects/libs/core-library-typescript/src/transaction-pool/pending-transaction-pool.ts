@@ -1,24 +1,40 @@
-import { logger, types, TransactionUtils } from "../common-library";
+import { logger, types, TransactionHelper, transactionHashToId } from "../common-library";
 import { CommittedTransactionPool } from "./committed-transaction-pool";
 import BaseTransactionPool, { TransactionPoolConfig } from "./base-transaction-pool";
-
-const {calculateTransactionHash, calculateTransactionId} = TransactionUtils;
+import { TransactionValidator } from "./transaction-validator";
+import { TransactionStatus } from "orbs-interfaces";
 
 export class PendingTransactionPool extends BaseTransactionPool {
   private pendingTransactions = new Map<string, types.Transaction>();
-  private committedTransactionPool: CommittedTransactionPool;
   private gossip: types.GossipClient;
 
-  constructor(gossip: types.GossipClient, committedTransactionPool: CommittedTransactionPool, config?: TransactionPoolConfig) {
+  private transactionValidator: TransactionValidator;
+
+  constructor(gossip: types.GossipClient, transactionValidator: TransactionValidator, config?: TransactionPoolConfig) {
     super(config);
     this.gossip = gossip;
-    this.committedTransactionPool = committedTransactionPool;
+    this.transactionValidator = transactionValidator;
   }
 
   public async addNewPendingTransaction(transaction: types.Transaction): Promise<string> {
     const txid = await this.storePendingTransaction(transaction);
     await this.broadcastTransactionToOtherNodes(transaction);
     return txid;
+  }
+
+  public hasTransactionWithId(txid: string): boolean {
+    return this.pendingTransactions.has(txid);
+  }
+
+  public getTransactionStatus(txid: string): types.GetTransactionStatusOutput {
+    const receipt = <types.TransactionReceipt>undefined;
+    let status: types.TransactionStatus = TransactionStatus.NOT_FOUND;
+
+    if (this.pendingTransactions.has(txid)) {
+      status = types.TransactionStatus.PENDING;
+    }
+
+    return { status , receipt };
   }
 
   public getAllPendingTransactions(): types.TransactionEntry[] {
@@ -31,7 +47,11 @@ export class PendingTransactionPool extends BaseTransactionPool {
   }
 
   public onNewBroadcastTransaction(transaction: types.Transaction) {
-    this.storePendingTransaction(transaction);
+    try {
+      this.storePendingTransaction(transaction);
+    } catch (err) {
+      logger.info(`failed storing pending transaction: ${JSON.stringify(transaction)}`);
+    }
   }
 
   public clearExpiredTransactions(): number {
@@ -45,37 +65,32 @@ export class PendingTransactionPool extends BaseTransactionPool {
     return count;
   }
 
-  public markCommittedTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
-    this.committedTransactionPool.addCommittedTransactions(transactionEntries);
-
-    this.clearTransactions(transactionEntries);
-  }
-
   public getQueueSize(): number {
     return this.pendingTransactions.size;
   }
 
-  private clearTransactions(transactionEntries: types.CommittedTransactionEntry[]) {
-    for (const { txHash, timestamp } of transactionEntries) {
-      const txid = txHash.toString("hex");
+  public clearCommittedTransactionsFromPendingPool(transactionReceipts: types.TransactionReceipt[]) {
+    for (const { txHash } of transactionReceipts) {
+      const txid = transactionHashToId(txHash);
       this.pendingTransactions.delete(txid);
     }
   }
 
-
   private async storePendingTransaction(transaction: types.Transaction) {
     if (this.isTransactionExpired(transaction)) {
-      throw new Error(`transaction ${JSON.stringify(transaction)} has expired. not storing in the pool`);
+      throw new Error(`Transaction ${JSON.stringify(transaction)} has expired. not storing in the pool`);
     }
 
-    const txid = calculateTransactionId(transaction);
-    if (this.pendingTransactions.has(txid) || this.committedTransactionPool.hasTransactionWithId(txid)) {
-      throw new Error(`transaction with id ${txid} already exists in the transaction pool`);
+    const isValid = await this.transactionValidator.validate(transaction);
+
+    if (!isValid) {
+      throw new Error(`Transaction ${JSON.stringify(transaction)} is not valid. not storing in the pool`);
     }
 
+    const txid = new TransactionHelper(transaction).calculateTransactionId();
     this.pendingTransactions.set(txid, transaction);
 
-    logger.debug(`added a new transaction ${JSON.stringify(transaction)} to the pool`);
+    logger.debug(`Added a new transaction ${JSON.stringify(transaction)} to the pool`);
 
     return txid;
   }

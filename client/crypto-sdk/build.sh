@@ -32,7 +32,17 @@ function build_android() {
 }
 
 function build_current() {
-    (cd ../ && CMAKE_ONLY=1 ./clean.sh)
+    case ${PLATFORM} in
+        IOS)
+            (cd ../ && CMAKE_ONLY=1 ./clean.sh)
+
+            ;;
+        ANDROID)
+            (cd ../ && CMAKE_ONLY=1 ./clean.sh)
+
+            ;;
+    esac
+
     cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=${LOCAL_PLATFORM}
     make
 }

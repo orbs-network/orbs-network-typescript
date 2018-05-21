@@ -1,14 +1,14 @@
 
 import * as chai from "chai";
 import { VirtualMachine } from "../../src/virtual-machine";
-import { types, TransactionUtils } from "../../src/common-library";
+import { types, TransactionHelper } from "../../src/common-library";
 import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
 import * as path from "path";
 import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-coded-contracts/processor";
 import { HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
-import { Address, createContractAddress } from "../../src/common-library/address";
+import { Address } from "../../src/common-library/address";
 import { createHash } from "crypto";
 import { stubInterface } from "ts-sinon";
 
@@ -18,7 +18,7 @@ const expect = chai.expect;
 
 const SMART_CONTRACT_NAME = "foobar";
 const SMART_CONTRACT_VCHAIN = "010101";
-const SMART_CONTRACT_ADDRESS = createContractAddress("foobar", SMART_CONTRACT_VCHAIN);
+const SMART_CONTRACT_ADDRESS = Address.createContractAddress("foobar", SMART_CONTRACT_VCHAIN);
 const ACCOUNT1 = new Address(createHash("sha256").update("account1").digest());
 const ACCOUNT2 = new Address(createHash("sha256").update("account2").digest());
 const ACCOUNT3 = new Address(createHash("sha256").update("account3").digest());
@@ -35,10 +35,11 @@ function aTransactionEntry(builder: { from: Address, to: Address, amount: number
       method: "transfer",
       args: [builder.to.toBase58(), builder.amount]
     }),
+    signatureData: undefined
   };
   return {
     transaction,
-    txHash: TransactionUtils.calculateTransactionHash(transaction)
+    txHash: new TransactionHelper(transaction).calculateHash()
   };
 }
 

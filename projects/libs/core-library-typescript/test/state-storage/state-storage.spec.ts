@@ -7,7 +7,7 @@ import { stubInterface } from "ts-sinon";
 import { BlockUtils } from "../../src/common-library";
 import { StateStorage } from "../../src/state-storage";
 import * as sinon from "sinon";
-import { createContractAddress } from "../../src/common-library/address";
+import { Address } from "../../src/common-library/address";
 
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
@@ -35,7 +35,7 @@ function anInitialBlockChain(numOfBlocks: number, stateDiff: types.ModifiedState
 describe("the state storage", () => {
   let blockStorage: types.BlockStorageClient;
   let stateStorage: StateStorage;
-  const contractAddress = createContractAddress("dummyContract").toBuffer();
+  const contractAddress = Address.createContractAddress("dummyContract").toBuffer();
   const blocks = anInitialBlockChain(4, [{contractAddress , key: "dummyKey", value: "dummyValue"}]);
   const pollingInterval = 200;
   beforeEach((done) => {
