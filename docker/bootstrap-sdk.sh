@@ -9,6 +9,11 @@ curl https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh --output cmake-b
 
 SDK_HOME=${SDK_HOME:-"/opt"}
 
+if [ ! -z "$NO_ANDROID" ]; then
+    echo "SKIPPING ANDROID SDK..."
+    exit 0
+fi
+
 # Install Gradle
 GRADLE_VERSION=${GRADLE_VERSION:-"4.6"}
 GRADLE_SDK_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
