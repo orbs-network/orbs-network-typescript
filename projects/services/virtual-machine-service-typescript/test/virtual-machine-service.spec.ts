@@ -2,13 +2,15 @@ import * as chai from "chai";
 import * as mocha from "mocha";
 import * as _ from "lodash";
 import * as getPort from "get-port";
+import * as request from "supertest";
 
-import { types, grpc, GRPCServerBuilder, Service, ServiceConfig, Address } from "orbs-core-library";
+import { types, grpc, GRPCServerBuilder, Service, ServiceConfig, Address, StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import virtualMachineServer from "../src/server";
 import { createHash } from "crypto";
 
 const { expect } = chai;
 
+const SERVER_IP_ADDRESS = "127.0.0.1";
 const SMART_CONTRACT_NAME = "peon";
 const SMART_CONTRACT_VCHAIN = "010101";
 const SMART_CONTRACT_ADDRESS = Address.createContractAddress(SMART_CONTRACT_NAME, SMART_CONTRACT_VCHAIN);
@@ -38,7 +40,7 @@ class StubStorageServer extends Service implements types.StateStorageServer {
   // either way it should not affect compilation because of the tsconfig.test.json
   @Service.RPCMethod
   readKeys(rpc: types.ReadKeysContext): void {
-    rpc.res = { values: _.pick(this.state, rpc.req.keys)};
+    rpc.res = { values: _.pick(this.state, rpc.req.keys) };
   }
 }
 
@@ -61,46 +63,65 @@ function accountBalanceKey(account: Address) {
 }
 
 describe("vm service tests", () => {
-    let server: GRPCServerBuilder;
-    let client: types.VirtualMachineClient;
-    let storageServer: StubStorageServer;
+  let server: GRPCServerBuilder;
+  let client: types.VirtualMachineClient;
+  let storageServer: StubStorageServer;
+  let managementPort: number;
 
-    before(async () => {
-      const endpoint = `127.0.0.1:${await getPort()}`;
+  before(async () => {
+    const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
 
-      const topology =  {
-                  peers: [
-                    {
-                      service: "storage",
-                      endpoint,
-                    },
-                  ],
-                };
+    const topology = {
+      peers: [
+        {
+          service: "storage",
+          endpoint,
+        },
+      ],
+    };
 
-      const SMART_CONTRACTS_TO_LOAD = JSON.stringify([{vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract"}]);
-      const NODE_NAME = "tester";
-      const vmEnv = { NODE_NAME, SMART_CONTRACTS_TO_LOAD };
-      const stubStorageServiceConfig = {nodeName: NODE_NAME};
-      const stubStorageState = { [accountBalanceKey(ACCOUNT1)]: "10", [accountBalanceKey(ACCOUNT2)]: "0" };
+    const SMART_CONTRACTS_TO_LOAD = JSON.stringify([{ vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract" }]);
+    const NODE_NAME = "tester";
+    const vmEnv = { NODE_NAME, SMART_CONTRACTS_TO_LOAD };
+    const stubStorageServiceConfig = { nodeName: NODE_NAME };
+    const stubStorageState = { [accountBalanceKey(ACCOUNT1)]: "10", [accountBalanceKey(ACCOUNT2)]: "0" };
+    managementPort = await getPort();
 
-      storageServer = new StubStorageServer(stubStorageServiceConfig, stubStorageState);
-      server = virtualMachineServer(topology, vmEnv)
-        .withService("StateStorage", storageServer)
-        .onEndpoint(endpoint);
+    storageServer = new StubStorageServer(stubStorageServiceConfig, stubStorageState);
+    server = virtualMachineServer(topology, vmEnv)
+      .withService("StateStorage", storageServer)
+      .withManagementPort(managementPort)
+      .onEndpoint(endpoint);
 
-      client = grpc.virtualMachineClient({ endpoint });
+    client = grpc.virtualMachineClient({ endpoint });
 
-      // this ensures tests will run after the service is up
-      return server.start();
-    });
+    // this ensures tests will run after the service is up
+    return server.start();
+  });
 
-    it("should load contract from service", async () => {
-      storageServer.givenState({ [accountBalanceKey(ACCOUNT1)]: "10" , [accountBalanceKey(ACCOUNT2)]: "0" });
-      const result = await client.callContract(buildCallRequest(ACCOUNT1, SMART_CONTRACT_ADDRESS));
-      expect(result.resultJson).to.equal("10");
-    });
+  it("should load contract from service", async () => {
+    storageServer.givenState({ [accountBalanceKey(ACCOUNT1)]: "10", [accountBalanceKey(ACCOUNT2)]: "0" });
+    const result = await client.callContract(buildCallRequest(ACCOUNT1, SMART_CONTRACT_ADDRESS));
+    expect(result.resultJson).to.equal("10");
+  });
 
-    after(async () => {
-      return server.stop();
-    });
+  after(async () => {
+    return server.stop();
+  });
+
+  it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on virtual machine service (happy path)", async () => {
+
+    const expected: StartupStatus = {
+      name: "storage",
+      status: STARTUP_STATUS.OK,
+      services: [
+        { name: "virtual-machine", status: STARTUP_STATUS.OK }
+      ]
+    };
+
+    return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
+      .get("/admin/startupCheck")
+      .expect(200, expected);
+  });
+
 });
