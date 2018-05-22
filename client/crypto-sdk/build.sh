@@ -4,7 +4,7 @@ function build_ios() {
     echo "Building for ${IOS_PLATFORM}..."
 
     (cd ../ && CMAKE_ONLY=1 ./clean.sh)
-    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=iOS -DIOS_PLATFORM=${IOS_PLATFORM} -DCMAKE_TOOLCHAIN_FILE="toolchains/ios.toolchain.cmake"
+    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=ios -DIOS_PLATFORM=${IOS_PLATFORM} -DCMAKE_TOOLCHAIN_FILE="toolchains/ios.toolchain.cmake"
     make
 }
 
@@ -27,17 +27,17 @@ function build_android() {
     esac
 
     (cd ../ && CMAKE_ONLY=1 ./clean.sh)
-    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=Android -DANDROID_ABI=${ANDROID_ABI} -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
+    cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DPLATFORM=android -DANDROID_ABI=${ANDROID_ABI} -DCMAKE_TOOLCHAIN_FILE="${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake"
     make
 }
 
 function build_current() {
     case ${PLATFORM} in
-        iOS)
+        ios)
             (cd ../ && CMAKE_ONLY=1 ./clean.sh)
 
             ;;
-        Android)
+        android)
             (cd ../ && CMAKE_ONLY=1 ./clean.sh)
 
             ;;
@@ -50,11 +50,11 @@ function build_current() {
 SYSNAME="$(uname -s)"
 case ${SYSNAME} in
     Darwin)
-        export LOCAL_PLATFORM="Mac"
+        export LOCAL_PLATFORM="mac"
 
         ;;
     Linux)
-        export LOCAL_PLATFORM="Linux"
+        export LOCAL_PLATFORM="linux"
 
         ;;
     *)
@@ -79,12 +79,12 @@ fi
 echo "Building ${BUILD_TYPE} version for ${PLATFORM:-$(uname -s)}..."
 
 case ${PLATFORM} in
-    iOS)
+    ios)
         IOS_PLATFORM="iPhoneSimulator"
         build_ios
 
         ;;
-    Android)
+    android)
         ANDROID_ABI="armeabi-v7a"
         build_android
 

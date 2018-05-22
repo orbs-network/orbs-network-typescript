@@ -89,13 +89,13 @@ function build_current() {
 
 case "$(uname -s)" in
     Darwin)
-        LOCAL_PLATFORM="Mac"
+        LOCAL_PLATFORM="mac"
         ANDROID_HOME=${ANDROID_HOME:-~/Library/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
     Linux)
-        LOCAL_PLATFORM="Linux"
+        LOCAL_PLATFORM="linux"
         ANDROID_HOME=${ANDROID_HOME:-/opt/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
@@ -121,7 +121,7 @@ LOCAL_PREFIX=$(readlink "${LOCAL_PREFIX}")
 cd ${LIBGCRYPT_PACKAGE}
 
 case ${PLATFORM} in
-    iOS)
+    ios)
         # Fix compilation errors by:
         #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
         #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.
@@ -165,7 +165,7 @@ case ${PLATFORM} in
         mv -f -- "${IOS64_PREFIX}/include" "$PREFIX/"
 
         ;;
-    Android)
+    android)
         # Fix compilation errors by:
         #   1. Patching tests/random.c in order to avoid calling the system() function which isn't available on iOS.
         #   2. Patching src/sexp.c to explicitly implement stpcpy, which is missing when building for x86.

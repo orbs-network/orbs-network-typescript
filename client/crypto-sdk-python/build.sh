@@ -16,7 +16,7 @@ fi
 
 case "${SYSNAME}" in
     Darwin)
-        export PLATFORM="Mac"
+        export PLATFORM="mac"
         LOCAL_LIBRARY="${PLATFORM}/lib/libcryptosdk.dylib"
 
         PYTHON_VERSION=`python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)";`
@@ -27,7 +27,7 @@ case "${SYSNAME}" in
 
         ;;
     Linux)
-        export PLATFORM="Linux"
+        export PLATFORM="linux"
         LOCAL_LIBRARY="${PLATFORM}/lib/libcryptosdk.so"
 
         ;;

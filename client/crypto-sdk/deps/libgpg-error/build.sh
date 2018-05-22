@@ -85,13 +85,13 @@ function build_current() {
 
 case "$(uname -s)" in
     Darwin)
-        LOCAL_PLATFORM="Mac"
+        LOCAL_PLATFORM="mac"
         ANDROID_HOME=${ANDROID_HOME:-~/Library/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
     Linux)
-        LOCAL_PLATFORM="Linux"
+        LOCAL_PLATFORM="linux"
         ANDROID_HOME=${ANDROID_HOME:-/opt/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
@@ -117,7 +117,7 @@ LOCAL_PREFIX=$(readlink "${LOCAL_PREFIX}")
 cd ${LIBGPG_ERROR_PACKAGE}
 
 case ${PLATFORM} in
-    iOS)
+    ios)
         XCODEDIR=$(xcode-select -p)
 
         # Build for the simulator
@@ -155,7 +155,7 @@ case ${PLATFORM} in
         cp -rf -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
 
         ;;
-    Android)
+    android)
         # Fix compilation errors by:
         #   1. Patching src/logging.c to avoid passing NULL as va_list.
         #   2. Manually generating:

@@ -86,7 +86,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "crypto-sdk tests",
-            "program": "${workspaceRoot}/client/crypto-sdk/build/Mac/bin/crypto-test",
+            "program": "${workspaceRoot}/client/crypto-sdk/build/mac/bin/crypto-test",
             "cwd": "${workspaceRoot}/"
         }
     ],

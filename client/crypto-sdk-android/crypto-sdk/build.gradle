@@ -15,7 +15,7 @@ android {
         externalNativeBuild {
             cmake {
                 version '3.10.2'
-                arguments '-DPLATFORM=Android'
+                arguments '-DPLATFORM=android'
                 cppFlags '-fexceptions -std=c++11'
             }
         }
