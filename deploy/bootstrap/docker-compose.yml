@@ -39,7 +39,7 @@ services:
       TRANSACTION_EXPIRATION_TIMEOUT: 240000
       MSG_LIMIT: 4000000
       BLOCK_SIZE_LIMIT: 2000
-      VERIFY_TRANSACTION_SIGNATURES: 'true'
+      VERIFY_TRANSACTION_SIGNATURES: 'false'
       VERIFY_SUBSCRIPTION: 'false'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
