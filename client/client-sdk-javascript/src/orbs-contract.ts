@@ -24,9 +24,13 @@ export class OrbsContract {
   }
 
   public generateSendTransactionPayload(methodName: string, args: OrbsContractMethodArgs) {
+    let argsToUse = args;
+    if (args == undefined) {
+      argsToUse = [];
+    }
     return JSON.stringify({
       method: methodName,
-      args: args
+      args: argsToUse
     });
   }
 
@@ -36,9 +40,13 @@ export class OrbsContract {
   }
 
   public generateCallPayload(methodName: string, args: OrbsContractMethodArgs) {
+    let argsToUse = args;
+    if (args == undefined) {
+      argsToUse = [];
+    }
     return JSON.stringify({
       method: methodName,
-      args: args
+      args: argsToUse
     });
   }
 }

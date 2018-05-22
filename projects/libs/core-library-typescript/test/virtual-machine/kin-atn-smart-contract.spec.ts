@@ -50,6 +50,9 @@ describe("kin atn contract - transfer tests", () => {
   });
 
   it("init token balances and transfer tokens", async () => {
+    // test will break if finance is broken, avoiding direct state manipulation
+    await senderContract.financeAccount(SENDER_ADDRESS);
+    await senderContract.financeAccount(RECIPIENT_ADDRESS);
     await senderContract.transfer(RECIPIENT_ADDRESS, 1);
     expect(await senderContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE - 1);
     expect(await recipientContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE + 1);
@@ -61,12 +64,16 @@ describe("kin atn contract - transfer tests", () => {
   });
 
   it("can transfer float values", async () => {
+    await senderContract.financeAccount(SENDER_ADDRESS);
+    await senderContract.financeAccount(RECIPIENT_ADDRESS);
     await senderContract.transfer(RECIPIENT_ADDRESS, 1.5);
     expect(await senderContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE - 1.5);
     expect(await recipientContract.getBalance()).to.be.equal(KinAtnSmartContract.DEFAULT_BALANCE + 1.5);
   });
 
   it("can transfer float values close to zero", async () => {
+    await senderContract.financeAccount(SENDER_ADDRESS);
+    await senderContract.financeAccount(RECIPIENT_ADDRESS);
     const someFloat = 0.00000000001;
     await senderContract.transfer(RECIPIENT_ADDRESS, someFloat);
     expect(await senderContract.getBalance()).to.be.below(KinAtnSmartContract.DEFAULT_BALANCE);
@@ -83,10 +90,15 @@ describe("kin atn contract - transfer tests", () => {
   });
 
   it("transaction is rejected if account about to overflow", async () => {
+    await senderContract.financeAccount(SENDER_ADDRESS);
     const almostMaxSafeInt = Number.MAX_SAFE_INTEGER - 1;
     await adapter.store(`balances.${RECIPIENT_ADDRESS}`, JSON.stringify(almostMaxSafeInt));
     const toAdd = 2;
     await expect(senderContract.transfer(RECIPIENT_ADDRESS, toAdd)).to.eventually.be.rejectedWith(`Recipient account of ${RECIPIENT_ADDRESS} is at balance ${almostMaxSafeInt} and will overflow if ${toAdd} is added`);
     expect(await recipientContract.getBalance()).to.be.equal(almostMaxSafeInt);
+  });
+
+  it("transfer from account with no balance fails", async () => {
+    await expect(senderContract.transfer(RECIPIENT_ADDRESS, 1)).to.eventually.be.rejectedWith("Insufficient balance 0 < 1");
   });
 });

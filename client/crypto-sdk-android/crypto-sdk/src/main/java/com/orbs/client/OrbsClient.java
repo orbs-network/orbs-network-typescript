@@ -5,10 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.orbs.cryptosdk.Address;
 import com.orbs.cryptosdk.ED25519Key;
 
+import java.net.URL;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Callback;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -16,17 +18,17 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OrbsClient {
-  final String apiEndpoint;
+  final OrbsHost apiEndpoint;
   final Address senderAddress;
   final int timeoutInMs;
   final ED25519Key keyPair;
 
-  public OrbsClient(String apiEndpoint, Address senderAddress, ED25519Key keyPair) {
-    this(apiEndpoint, senderAddress, keyPair, 2000);
+  public OrbsClient(OrbsHost endpoint, Address senderAddress, ED25519Key keyPair) {
+    this(endpoint, senderAddress, keyPair,3000);
   }
 
-  public OrbsClient(String apiEndpoint, Address senderAddress, ED25519Key keyPair, Integer timeoutInMs) {
-    this.apiEndpoint = apiEndpoint;
+  public OrbsClient(OrbsHost endpoint, Address senderAddress, ED25519Key keyPair,Integer timeoutInMs) {
+    this.apiEndpoint = endpoint;
     this.senderAddress = senderAddress;
     this.keyPair = keyPair;
     this.timeoutInMs = timeoutInMs;
@@ -35,7 +37,7 @@ public class OrbsClient {
   public SendTransactionResponse sendTransaction(Address contractAddress, String payload) throws Exception {
     String requestJson = generateTransactionRequest(contractAddress, payload);
 
-    String rawRetVal = this.sendHTTPRequest(this.apiEndpoint + "/public/sendTransaction", requestJson);
+    String rawRetVal = this.sendHTTPRequest("public/sendTransaction", requestJson);
     return parseSendTransactionResponse(rawRetVal);
   }
 
@@ -71,7 +73,7 @@ public class OrbsClient {
   public String call(Address contractAddress, String payload) throws Exception {
     String requestJson = generateCallRequest(contractAddress, payload);
 
-    return this.sendHTTPRequest(this.apiEndpoint + "/public/callContract", requestJson);
+    return this.sendHTTPRequest("public/callContract", requestJson);
   }
 
   public String generateCallRequest(Address contractAddress, String payload) {
@@ -83,18 +85,28 @@ public class OrbsClient {
     return gson.toJson(requestPayload);
   }
 
-
   private OkHttpClient createClient() {
     return new OkHttpClient.Builder()
             .readTimeout(this.timeoutInMs, TimeUnit.MILLISECONDS)
             .build();
   }
 
+  public URL buildUrlForRequest(String path) {
+    return new HttpUrl.Builder()
+            .scheme(this.apiEndpoint.getScheme())
+            .host(this.apiEndpoint.getHost())
+            .port(this.apiEndpoint.getPort())
+            .addPathSegments(path)
+            .build()
+            .url();
+  }
+
   private Request createRequest(String path, String jsonPayload) {
     MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     RequestBody body = RequestBody.create(JSON, jsonPayload);
+
     return new Request.Builder()
-            .url(this.apiEndpoint + path)
+            .url(buildUrlForRequest(path))
             .post(body)
             .build();
   }

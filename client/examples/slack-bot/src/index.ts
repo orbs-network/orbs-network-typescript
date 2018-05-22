@@ -2,6 +2,10 @@ import { FooBarAccount } from "./foobar-account";
 import { RTMClient } from "@slack/client";
 import { OrbsClient, OrbsContract, Address, ED25519Key } from "orbs-client-sdk";
 import * as crypto from "crypto";
+import * as bluebird from "bluebird";
+import * as redis from "redis";
+
+bluebird.promisifyAll(redis.RedisClient.prototype);
 
 interface Config {
   endpoint: string;
@@ -9,14 +13,13 @@ interface Config {
 }
 
 const {
-  SLACK_VERIFICATION_TOKEN,
   SLACK_TOKEN,
-  CONVERSATION_ID,
   ORBS_API_ENDPOINT,
   TRANSACTION_TIMEOUT
 } = process.env;
 
 const PULL_REQUEST_AWARD = 100;
+const VIRTUAL_CHAIN_ID = "640ed3";
 
 const config = {
   endpoint: ORBS_API_ENDPOINT,
@@ -24,20 +27,31 @@ const config = {
 };
 
 
-function generateAddress(): [string, ED25519Key] {
-  const virtualChainId = "640ed3";
-  const keyPair = new ED25519Key();
-  const address = new Address(keyPair.publicKey, virtualChainId, Address.TEST_NETWORK_ID);
+function generateAddress(): [Address, ED25519Key] {
 
-  return [address.toString(), keyPair];
+  const keyPair = new ED25519Key();
+  const address = new Address(keyPair.publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+
+  return [address, keyPair];
 }
 
-
 async function getAccount(username: string, config: Config): Promise<FooBarAccount> {
-  const [address, keyPair] = generateAddress();
-  const orbsClient = new OrbsClient(address, undefined, keyPair, config.timeout);
+  const data = await loadAccount(username);
+
+  let address: Address;
+  let keyPair;
+
+  if (data) {
+    address = new Address(data.publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+    keyPair = new ED25519Key(data.publicKey, data.privateKey);
+  } else {
+    [address, keyPair] = generateAddress();
+    await saveAccount(username, keyPair);
+  }
+
+  const orbsClient = new OrbsClient(ORBS_API_ENDPOINT, address, keyPair, config.timeout);
   const contract = new OrbsContract(orbsClient, "foobar");
-  const account = new FooBarAccount(username, address, contract);
+  const account = new FooBarAccount(username, address.toString(), contract);
 
   return Promise.resolve(account);
 }
@@ -57,6 +71,16 @@ async function matchInput(message: any, condition: RegExp, botUsername: string,
 
 function mention(client: FooBarAccount) {
   return `<@${client.username}> ${client.address}`;
+}
+
+const redisClient: any = redis.createClient(process.env.REDIS_URL);
+
+async function saveAccount(username: any, keyPair: any) {
+  return redisClient.hmsetAsync(username, { publicKey: keyPair.publicKey, privateKey: keyPair.getPrivateKeyUnsafe() });
+}
+
+async function loadAccount(address: any) {
+  return redisClient.hgetallAsync(address);
 }
 
 const rtm = new RTMClient(SLACK_TOKEN, { autoReconnect: true, useRtmConnect: true });

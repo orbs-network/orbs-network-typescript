@@ -12,21 +12,13 @@ export default class KinAtnSmartContract extends BaseSmartContract {
       throw this.validationError("Transaction amount must be > 0");
     }
 
-    let senderBalance: number = await this.getBalanceForAccount(this.senderAddressBase58);
-    // auto-fund accounts
-    if (senderBalance == 0) {
-      senderBalance = await this.financeAccount(this.senderAddressBase58);
-    }
+    const senderBalance: number = await this.getBalanceForAccount(this.senderAddressBase58);
 
     if (senderBalance < amount) {
       throw this.validationError(`Insufficient balance ${senderBalance} < ${amount}`);
     }
 
-    let recipientBalance: number = await this.getBalanceForAccount(recipient);
-    if (recipientBalance == 0) {
-      // this is to finance a new account that is receiving money for the first time
-      recipientBalance = await this.financeAccount(recipient);
-    }
+    const recipientBalance: number = await this.getBalanceForAccount(recipient);
 
     if (recipientBalance > (Number.MAX_SAFE_INTEGER - amount)) {
       throw this.validationError(`Recipient account of ${recipient} is at balance ${recipientBalance} and will overflow if ${amount} is added`);
