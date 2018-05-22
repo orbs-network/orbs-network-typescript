@@ -7,7 +7,6 @@ import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
 import * as path from "path";
-import * as mocha from "mocha";
 import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-coded-contracts/processor";
 import { HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
 import { Address } from "../../src/common-library/address";
