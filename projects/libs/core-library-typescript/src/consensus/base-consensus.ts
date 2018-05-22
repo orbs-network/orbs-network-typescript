@@ -15,6 +15,7 @@ export interface RaftConsensusConfig {
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
+  debug?: boolean;
   signBlocks: boolean;
   keyManager?: KeyManager;
 }
