@@ -69,7 +69,7 @@ export class PendingTransactionPool extends BaseTransactionPool {
     return this.pendingTransactions.size;
   }
 
-  public clearCommittedTransactionsFromPendingPool(transactionReceipts: types.TransactionReceipt[]) {
+  public async clearCommittedTransactionsFromPendingPool(transactionReceipts: types.TransactionReceipt[]) {
     for (const { txHash } of transactionReceipts) {
       const txid = transactionHashToId(txHash);
       this.pendingTransactions.delete(txid);

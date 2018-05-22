@@ -43,14 +43,6 @@ export default class BlockBuilder {
     }
   }
 
-  // public getPendingTransactionsBlock(blockSize: number): types.TransactionEntry[] {
-  //   const transactionEntries: types.TransactionEntry[] = [];
-  //   for (const [txid, transaction] of [...this.pendingTransactions.entries()].sort().slice(0, blockSize)) {
-  //     const txHash = Buffer.from(txid, "hex");
-  //     transactionEntries.push({txHash, transaction});
-  //   }
-  //   return transactionEntries;
-  // }
 
 
   private async buildBlockFromPendingTransactions(lastBlock: types.Block): Promise<types.Block> {
@@ -81,12 +73,23 @@ export default class BlockBuilder {
     logger.debug("blockBuilder stopping..");
   }
 
+  // Returns an array of blocks, starting from a specific block ID and up to the last block.
+  public async getBlocks(fromLastBlockHeight: number): Promise<types.Block[]> {
+    try {
+      const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: fromLastBlockHeight });
+      return blocks;
+    }
+    catch (err) {
+     return undefined;
+    }
+  }
+
   public async commitBlock(block: types.Block) {
     await this.blockStorage.addBlock({ block });
     this.lastBlock = block;
   }
 
-  private async getOrFetchLastBlock(): Promise<types.Block> {
+  public async getOrFetchLastBlock(): Promise<types.Block> {
     if (this.lastBlock == undefined) {
       const { block } = await this.blockStorage.getLastBlock({});
       this.lastBlock = block;
@@ -97,12 +100,12 @@ export default class BlockBuilder {
   // Append a new block to log. Only called on leader elected or after committed.
   // while pool is empty retry every time interval
   public async appendNextBlock(): Promise<types.Block> {
+    logger.debug("Node in appendNextBlock");
 
     this.stop();
     try {
       const lastBlock = await this.getOrFetchLastBlock();
       const block = await this.buildBlockFromPendingTransactions(lastBlock);
-
       if (block == undefined) {
         this.pollInterval = setInterval(async () => {
           try {

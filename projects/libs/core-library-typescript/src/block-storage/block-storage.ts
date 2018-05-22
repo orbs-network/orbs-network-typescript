@@ -65,7 +65,7 @@ export class BlockStorage {
 
     logger.info(`Adding new block with block height ${block.header.height} and hash ${blockHash}`);
 
-    this.verifyNewBlock(block);
+    await this.verifyNewBlock(block);
 
     logger.info(`Verified new block with block height ${block.header.height} and hash ${blockHash}`);
 
@@ -109,7 +109,7 @@ export class BlockStorage {
     return (await this.getLastBlock()).header.height > fromLastBlockHeight;
   }
 
-  private verifyNewBlock(block: types.Block) {
+  private async verifyNewBlock(block: types.Block) {
     if (block.header.version !== 0) {
       throw new Error(`Invalid block version: ${block.header.version}!`);
     }

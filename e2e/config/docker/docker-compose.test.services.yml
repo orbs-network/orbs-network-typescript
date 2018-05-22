@@ -18,6 +18,7 @@ services:
       - TRANSACTION_EXPIRATION_TIMEOUT=240000
       - MSG_LIMIT=4000000
       - BLOCK_SIZE_LIMIT=2000
+      - LEADER_SYNC_INTERVAL=100
 
     ports:
       - ${DEBUG_PORT}:9229
@@ -66,7 +67,7 @@ services:
     command: node dist/index.js ${NODE_CONFIG_PATH}/storage.js
     restart: always
     environment:
-      BLOCK_STORAGE_POLL_INTERVAL: 20000
+      BLOCK_STORAGE_POLL_INTERVAL: 20000000
     volumes_from:
       - shared_volumes
     networks:

@@ -16,6 +16,7 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
+  leaderIntervalMs?: number;
 
   constructor(min?: number, max?: number, heartbeat?: number) {
     this.electionTimeout = { min: min || 2000, max: max || 4000 };
@@ -42,7 +43,7 @@ function makeCommittedTransactionPool() {
 }
 
 export default function(nodeTopology: any, env: any) {
-  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT,
+  const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT, LEADER_SYNC_INTERVAL,
     MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT } = env;
 
   if (!NODE_NAME) {
@@ -65,6 +66,8 @@ export default function(nodeTopology: any, env: any) {
   consensusConfig.blockBuilderPollInterval = Number(BLOCK_BUILDER_POLL_INTERVAL) || 500;
   consensusConfig.msgLimit = Number(MSG_LIMIT) || 4000000;
   consensusConfig.blockSizeLimit = Number(BLOCK_SIZE_LIMIT) || Math.floor(consensusConfig.msgLimit / (2 * 250));
+  consensusConfig.leaderIntervalMs = Number(LEADER_SYNC_INTERVAL) || 100;
+
 
 
   const nodeConfig = { nodeName: NODE_NAME };
