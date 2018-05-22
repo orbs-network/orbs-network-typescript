@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  bot:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    working_dir: /opt/orbs/client/examples/slack-bot
+    command: yarn run bot
+    restart: always
+    environment:
+      SLACK_TOKEN: ${SLACK_TOKEN}
+      ORBS_API_ENDPOINT: http://us-east-1.global.nodes.staging.orbs-test.com
+      REDIS_URL: redis://redis:6379
+    links:
+      - redis:redis
+
+  redis:
+    image: redis
+    volumes:
+      - ./data:/data
