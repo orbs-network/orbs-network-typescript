@@ -46,7 +46,7 @@ export class TransactionValidator {
 
     // checks subscription
     const subscriptionKey = this.getSubscriptionKey(contractAddress);
-    const status = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
+    const status = await this.subscriptionManager.isSubscriptionValid({ subscriptionKey });
 
     if (!status.isValid) {
       logger.info(`Subscription ${subscriptionKey} not valid`);

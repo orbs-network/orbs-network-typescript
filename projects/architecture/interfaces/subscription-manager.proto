@@ -1,13 +1,13 @@
 syntax = "proto3";
 
 service SubscriptionManager {
-  rpc GetSubscriptionStatus (GetSubscriptionStatusInput) returns (GetSubscriptionStatusOutput);
+  rpc IsSubscriptionValid (IsSubscriptionValidInput) returns (IsSubscriptionValidOutput);
 }
 
-message GetSubscriptionStatusInput {
+message IsSubscriptionValidInput {
   string subscriptionKey = 1;
 }
 
-message GetSubscriptionStatusOutput {
+message IsSubscriptionValidOutput {
   bool isValid = 1;
 }

@@ -37,7 +37,7 @@ describe("subscription manager service tests", function() {
     it("should get subscription status", async () => {
         (<sinon.SinonStub>subscriptionManagerStub.isSubscriptionValid).returns(true);
 
-        const { isValid } = await client.getSubscriptionStatus({ subscriptionKey: "abc" });
+        const { isValid } = await client.isSubscriptionValid({ subscriptionKey: "abc" });
 
         expect(isValid).to.be.true;
     });
@@ -46,7 +46,7 @@ describe("subscription manager service tests", function() {
     it("should be invalid if subscription manager returns false", async () => {
         (<sinon.SinonStub>subscriptionManagerStub.isSubscriptionValid).returns(false);
 
-        const { isValid } = await client.getSubscriptionStatus({ subscriptionKey: "abc" });
+        const { isValid } = await client.isSubscriptionValid({ subscriptionKey: "abc" });
 
         expect(isValid).to.be.false;
     });
