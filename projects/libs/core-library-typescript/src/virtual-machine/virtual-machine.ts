@@ -1,4 +1,4 @@
-import { types, logger } from "../common-library";
+import { types, logger, StartupCheck, StartupStatus, STARTUP_STATUS } from "../common-library";
 
 import HardCodedSmartContractProcessor from "./hard-coded-contracts/processor";
 import { StateCache, StateCacheKey } from "./state-cache";
@@ -6,7 +6,9 @@ import { stat } from "fs";
 import { Transaction } from "orbs-interfaces";
 import { HardCodedSmartContractRegistry, HardCodedSmartContractRegistryConfig } from "./hard-coded-contracts/hard-coded-smart-contract-registry";
 
-export class VirtualMachine {
+export class VirtualMachine implements StartupCheck {
+
+  public readonly SERVICE_NAME = "virtual-machine";
   private stateStorage: types.StateStorageClient;
   private processor: HardCodedSmartContractProcessor;
 
@@ -19,7 +21,7 @@ export class VirtualMachine {
     const stateCache = new StateCache();
     const transactionReceipts: types.TransactionReceipt[] = [];
 
-    for (const {txHash, transaction} of input.orderedTransactions) {
+    for (const { txHash, transaction } of input.orderedTransactions) {
       const transactionScopeStateCache = stateCache.fork();
       let success: boolean = false;
       try {
@@ -38,12 +40,12 @@ export class VirtualMachine {
           continue;
         }
       } finally {
-        const transactionReceipt: types.TransactionReceipt = { txHash, success};
+        const transactionReceipt: types.TransactionReceipt = { txHash, success };
         transactionReceipts.push(transactionReceipt);
       }
     }
 
-    const stateDiff = stateCache.getModifiedKeys().map(({ key, value}) => ({contractAddress: key.contractAddress, key: key.key, value }));
+    const stateDiff = stateCache.getModifiedKeys().map(({ key, value }) => ({ contractAddress: key.contractAddress, key: key.key, value }));
 
     return {
       transactionReceipts,
@@ -57,5 +59,19 @@ export class VirtualMachine {
       contractAddress: input.contractAddress,
       payload: input.payload
     });
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+
+    if (!this.processor || !this.stateStorage) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Smart contract processor or State storage not initialized" };
+    }
+
+    if (!this.processor.call || !this.processor.processTransaction) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Bad impl of Smart contract processor. Either call() or processTransaction() do not exist" };
+    }
+    // Consider a deeper check here, in addition to checking that processor and stateStorage are defined
+    return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
+
   }
 }

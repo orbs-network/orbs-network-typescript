@@ -1,7 +1,8 @@
 
+import * as mocha from "mocha";
 import * as chai from "chai";
 import { VirtualMachine } from "../../src/virtual-machine";
-import { types, TransactionHelper } from "../../src/common-library";
+import { types, TransactionHelper, STARTUP_STATUS } from "../../src/common-library";
 import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
@@ -65,14 +66,16 @@ describe("test virtual machine", () => {
   const stateStorage = stubInterface<types.StateStorageClient>();
 
   beforeEach(() => {
-    (<sinon.SinonStub>stateStorage.readKeys).returns({values: {
-      [accountBalanceKey(ACCOUNT1)]: "10",
-      [accountBalanceKey(ACCOUNT2)]: "0"
-    }});
+    (<sinon.SinonStub>stateStorage.readKeys).returns({
+      values: {
+        [accountBalanceKey(ACCOUNT1)]: "10",
+        [accountBalanceKey(ACCOUNT2)]: "0"
+      }
+    });
 
     const contractRegistryConfig: HardCodedSmartContractRegistryConfig = {
       contracts: [
-        {vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract"}
+        { vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract" }
       ]
     };
 
@@ -108,9 +111,9 @@ describe("test virtual machine", () => {
 
     expect(stateDiff).to
       .have.lengthOf(3)
-      .and.containSubset([{key: accountBalanceKey(ACCOUNT1), value: "1"}])
-      .and.containSubset([{key: accountBalanceKey(ACCOUNT2), value: "7"}])
-      .and.containSubset([{key: accountBalanceKey(ACCOUNT3), value: "2"}]);
+      .and.containSubset([{ key: accountBalanceKey(ACCOUNT1), value: "1" }])
+      .and.containSubset([{ key: accountBalanceKey(ACCOUNT2), value: "7" }])
+      .and.containSubset([{ key: accountBalanceKey(ACCOUNT3), value: "2" }]);
   });
 
 
@@ -127,9 +130,9 @@ describe("test virtual machine", () => {
     for (const item of stateDiff) {
       expect(item).to.have.property("contractAddress").deep.equal(SMART_CONTRACT_ADDRESS.toBuffer());
     }
-    expect(stateDiff).to.containSubset([{key: accountBalanceKey(ACCOUNT1), value: "1"}])
-      .and.containSubset([{key: accountBalanceKey(ACCOUNT2), value: "7"}])
-      .and.containSubset([{key: accountBalanceKey(ACCOUNT3), value: "2"}]);
+    expect(stateDiff).to.containSubset([{ key: accountBalanceKey(ACCOUNT1), value: "1" }])
+      .and.containSubset([{ key: accountBalanceKey(ACCOUNT2), value: "7" }])
+      .and.containSubset([{ key: accountBalanceKey(ACCOUNT3), value: "2" }]);
   });
 
   it("calls a smart contract", async () => {
@@ -149,4 +152,37 @@ describe("test virtual machine", () => {
 
     chai.expect(virtualMachine.callContract(callObject)).to.be.rejected;
   });
+
+  it("virtual machine should succeed on startup check", async () => {
+    const startupStatus = await virtualMachine.startupCheck();
+    return expect(startupStatus).to.deep.equal({ name: "virtual-machine", status: STARTUP_STATUS.OK });
+  });
+
+});
+
+describe("Virtual machine - Bad setup", () => {
+
+  let virtualMachine: VirtualMachine;
+  const stateStorage = stubInterface<types.StateStorageClient>();
+
+  (<sinon.SinonStub>stateStorage.readKeys).returns({
+    values: {
+      [accountBalanceKey(ACCOUNT1)]: "10",
+      [accountBalanceKey(ACCOUNT2)]: "0"
+    }
+  });
+
+  const contractRegistryConfig: HardCodedSmartContractRegistryConfig = {
+    contracts: [
+      { vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract" }
+    ]
+  };
+
+  it("virtual machine should fail on startup check if no state storage", async () => {
+    virtualMachine = new VirtualMachine(contractRegistryConfig, undefined);
+    const startupStatus = await virtualMachine.startupCheck();
+    return expect(startupStatus).to.deep.include({ name: "virtual-machine", status: STARTUP_STATUS.FAIL });
+
+  });
+
 });
