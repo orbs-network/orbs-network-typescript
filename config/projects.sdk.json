@@ -14,6 +14,11 @@
     "type": "library",
     "path": "client/client-sdk-javascript"
   },
+  "crypto-sdk-python": {
+    "runtime": "c++",
+    "type": "library",
+    "path": "client/crypto-sdk-python"
+  },
   "crypto-sdk-android": {
     "runtime": "java",
     "type": "library",
@@ -41,6 +46,7 @@
     "example-android-app",
     "client-sdk-javascript",
     "example-slack-bot",
+    "crypto-sdk-python",
     "client-contract-test"
   ]
 }

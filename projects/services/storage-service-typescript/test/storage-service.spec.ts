@@ -1,3 +1,4 @@
+import * as mocha from "mocha";
 import * as chai from "chai";
 import * as fse from "fs-extra";
 import * as path from "path";
@@ -5,16 +6,18 @@ import * as os from "os";
 import * as getPort from "get-port";
 import * as chaiAsPromised from "chai-as-promised";
 import { stubInterface } from "ts-sinon";
+import * as request from "supertest";
 import * as _ from "lodash";
-
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
 import storageServer from "../src/server";
 import GossipService from "../../gossip-service-typescript/src/service";
 import TransactionPoolService from "../../consensus-service-typescript/src/transaction-pool-service";
+import { STARTUP_STATUS, StartupStatus } from "../../../libs/core-library-typescript/src/common-library/startup-status";
 
 const { expect } = chai;
 
+const SERVER_IP_ADDRESS = "127.0.0.1";
 chai.use(chaiAsPromised);
 
 ErrorHandler.setup();
@@ -32,7 +35,7 @@ function generateBigBrokenBlock(): types.Block {
       },
       payload: JSON.stringify({
         method: "someMethod",
-        args: [ 1, 2, 3, 4, "some-other-arguments" ]
+        args: [1, 2, 3, 4, "some-other-arguments"]
       }),
       signatureData: {
         publicKey: undefined,
@@ -48,16 +51,16 @@ function generateBigBrokenBlock(): types.Block {
   });
 }
 
+let endpoint: string;
+
 describe("BlockStorage service", function () {
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
-  let endpoint: string;
-
+  let managementPort: number;
   beforeEach(async () => {
-    endpoint = `127.0.0.1:${await getPort()}`;
-
-    const topology =  {
+    endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
+    const topology = {
       peers: [
         {
           service: "storage",
@@ -87,14 +90,18 @@ describe("BlockStorage service", function () {
     // handle the filesystem for this test, will empty/create the db folder before starting the services
     fse.emptyDirSync(BLOCK_STORAGE_DB_PATH);
 
+    managementPort = await getPort();
+
     server = storageServer(topology, storageEnv)
       .withService("Gossip", gossipServerStub)
       .withService("TransactionPool", transactionPoolStub)
+      .withManagementPort(managementPort)
       .onEndpoint(endpoint);
 
     blockClient = grpc.blockStorageClient({ endpoint });
     stateClient = grpc.stateStorageClient({ endpoint });
 
+    logger.debug(`Starting Storage Service on ${endpoint}`);
     // return the start promise to delay execution of the tests until its resolved (=services started) mocha plays nicely like that
     return server.start();
   });
@@ -122,6 +129,22 @@ describe("BlockStorage service", function () {
     return expect(state).to.have.deep.property("values", {});
   });
 
+  it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
+
+    const expected: StartupStatus = {
+      name: "storage",
+      status: STARTUP_STATUS.OK,
+      services: [
+        { name: "block-storage", status: STARTUP_STATUS.OK },
+        { name: "state-storage", status: STARTUP_STATUS.OK }
+      ]
+    };
+
+    return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
+      .get("/admin/startupCheck")
+      .expect(200, expected);
+  });
+
   // Here we are aiming to eliminate specific GRPC error;
   // expected result is to receive an error about block height because the block is invalid
   it("should send and receive big blocks", async function () {
@@ -132,6 +155,8 @@ describe("BlockStorage service", function () {
   });
 
   afterEach(() => {
+    logger.debug(`Stopping Storage Service`);
     return server.stop();
   });
 });
+

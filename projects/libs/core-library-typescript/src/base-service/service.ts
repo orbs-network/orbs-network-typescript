@@ -22,7 +22,7 @@ export abstract class Service {
 
     if (!silent) {
       const originalMethod = descriptor.value;
-      descriptor.value = function(rpc: any) {
+      descriptor.value = function (rpc: any) {
         logger.debug(`${this.config.nodeName}: ${propertyKey} ${JSON.stringify(rpc.req)}`);
 
         return originalMethod.apply(this, [rpc]);

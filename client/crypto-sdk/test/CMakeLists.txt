@@ -5,10 +5,10 @@ file(GLOB CRYPTO_SDK_TEST_SRC
   "*.cpp"
 )
 
-if(PLATFORM STREQUAL "Mac")
+if(PLATFORM STREQUAL "mac")
   set(LIBGPG_ERROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/mac/libgpg-error)
   set(LIBGCRYPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/mac/libgcrypt)
-elseif(PLATFORM STREQUAL "Linux")
+elseif(PLATFORM STREQUAL "linux")
   set(LIBGPG_ERROR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/linux/libgpg-error)
   set(LIBGCRYPT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/linux/libgcrypt)
 endif()
