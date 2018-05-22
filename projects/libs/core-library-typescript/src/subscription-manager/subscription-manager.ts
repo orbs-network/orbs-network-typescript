@@ -43,7 +43,8 @@ export class SubscriptionManager {
     let minimumRequiredFee: number;
 
     if (subscriptionData.startTime >= new Date().getTime()) {
-      throw new Error(`Subscription startTime is in the future: ${JSON.stringify(subscriptionData)}`);
+      logger.info(`Subscription startTime is in the future: ${JSON.stringify(subscriptionData)}`);
+      return false;
     }
 
     if (subscriptionData.startTime <= beginningOfThisMonth) {
