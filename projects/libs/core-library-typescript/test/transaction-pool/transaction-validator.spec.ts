@@ -18,7 +18,7 @@ describe("transaction validation", () => {
 
   beforeEach(() => {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
-    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: false});
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: false, verifySubscription: true});
   });
 
   it("succeeds for a valid transaction of an active vchain subscription", async () => {
@@ -56,7 +56,7 @@ describe("transaction validator with enabled signature verification ", () => {
   beforeEach(() => {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
     (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
-    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: true});
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: true, verifySubscription: true});
   });
 
   it("succeeds for a correctly generated signature", () => {
