@@ -3,7 +3,6 @@
 #include <assert.h>
 
 #include "crypto-sdk/lib/utils.h"
-#include "crypto-sdk/lib/base58.h"
 
 #include "address.h"
 
