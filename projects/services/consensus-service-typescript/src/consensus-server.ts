@@ -38,8 +38,8 @@ function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress
   return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
 }
 
-function makePendingTransactionPool(peers: types.ClientMap, transactionLifespanMs: number) {
-  const transactionValidator = new TransactionValidator(peers.subscriptionManager);
+function makePendingTransactionPool(peers: types.ClientMap, transactionLifespanMs: number, verifySignature: boolean, verifySubscription: boolean) {
+  const transactionValidator = new TransactionValidator(peers.subscriptionManager, { verifySignature, verifySubscription });
   return new PendingTransactionPool(peers.gossip, transactionValidator, { transactionLifespanMs });
 }
 
@@ -49,7 +49,7 @@ function makeCommittedTransactionPool() {
 
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME, CONSENSUS_SIGN_BLOCKS, DEBUG_RAFT } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME, CONSENSUS_SIGN_BLOCKS, DEBUG_RAFT, VERIFY_TRANSACTION_SIGNATURES, VERIFY_SUBSCRIPTION } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -92,8 +92,11 @@ export default function(nodeTopology: any, env: any) {
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);
 
+  const verifySignature = toLower(VERIFY_TRANSACTION_SIGNATURES) === "true";
+  const verifySubscription = toLower(VERIFY_SUBSCRIPTION) === "true";
+
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers, consensusConfig), nodeConfig))
     .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers, ETHEREUM_CONTRACT_ADDRESS), nodeConfig))
-    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers, transactionLifespanMs), makeCommittedTransactionPool(), nodeConfig));
+    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers, transactionLifespanMs, verifySignature, verifySubscription), makeCommittedTransactionPool(), nodeConfig));
 }

@@ -1,4 +1,5 @@
 import { types } from "../../common-library/types";
+import { logger } from "../../common-library";
 import { StateCache, StateCacheKey } from "../state-cache";
 import {
   BaseContractStateAccessor,
@@ -67,8 +68,13 @@ export default class HardCodedSmartContractProcessor {
     }
 
     const { method, args } = this.parsePayload(request.payload);
+    if (args == undefined) {
+      throw new Error("Method arguments parsing falied, unable to proceed with method execution");
+    }
+
     const contract = new Contract.default(bs58EncodeRawAddress(request.sender), stateAdapter);
 
+    logger.debug(`Executing method ${method} with args ${JSON.stringify(args)} on contract with address ${bs58EncodeRawAddress(request.contractAddress)}`);
     return contract[method](...args);
   }
 }
