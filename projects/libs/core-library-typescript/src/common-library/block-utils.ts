@@ -1,5 +1,5 @@
 
-import { types, logger } from ".";
+import { types, logger, KeyManager } from ".";
 import { createHash } from "crypto";
 import * as stringify from "json-stable-stringify";
 
@@ -20,6 +20,10 @@ export namespace BlockUtils {
     const block: types.Block = {
       header: blockComponents.header,
       body: blockComponents.body,
+      signatureData: {
+        signature: new Buffer(""),
+        signatory: "none"
+      }
     };
 
     return block;
@@ -34,5 +38,24 @@ export namespace BlockUtils {
       },
       body
     });
+  }
+
+  export function signBlock(block: types.Block, keyManager: KeyManager, nodeName: string) {
+    const  signature = Buffer.from(keyManager.sign(BlockUtils.calculateBlockHash(block)), keyManager.SIGNATURE_ENCODING);
+    const signatory = nodeName;
+
+    block.signatureData = {
+      signature,
+      signatory
+    };
+
+    return block;
+  }
+
+  export function verifyBlockSignature(block: types.Block, keyManager: KeyManager) {
+    const signature = block.signatureData.signature.toString(keyManager.SIGNATURE_ENCODING);
+    const publicKeyName = block.signatureData.signatory;
+
+    return keyManager.verify(BlockUtils.calculateBlockHash(block), signature, publicKeyName);
   }
 }
