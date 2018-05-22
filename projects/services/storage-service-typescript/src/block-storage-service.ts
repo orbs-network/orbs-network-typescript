@@ -4,6 +4,10 @@ import * as path from "path";
 import { logger, types, JsonBuffer, KeyManager } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
+import { StartupCheck } from "orbs-core-library/dist/common-library/startup-check";
+import { StartupStatus } from "orbs-core-library/dist/common-library/startup-status";
+
+
 
 export interface BlockStorageServiceConfig extends ServiceConfig {
   dbPath: string;
@@ -12,7 +16,7 @@ export interface BlockStorageServiceConfig extends ServiceConfig {
   keyManager?: KeyManager;
 }
 
-export default class BlockStorageService extends Service {
+export default class BlockStorageService extends Service implements StartupCheck {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
@@ -189,5 +193,9 @@ export default class BlockStorageService extends Service {
 
   public isSyncing(): boolean {
     return this.sync.isSyncing();
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    return this.blockStorage.startupCheck();
   }
 }

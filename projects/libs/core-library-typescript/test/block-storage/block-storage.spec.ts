@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import * as mocha from "mocha";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
@@ -6,6 +7,8 @@ import * as fsExtra from "fs-extra";
 
 import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
+import { STARTUP_STATUS, StartupStatus } from "../../src/common-library/startup-status";
+import { StartupCheck } from "../../src/common-library/startup-check";
 import { BlockUtils, KeyManager } from "../../src/common-library";
 import generateKeyPairs from "../../src/test-kit/generate-key-pairs";
 
@@ -134,5 +137,37 @@ describe("Block storage", () => {
 
       await expect(blockStorage.getBlocks(lastBlock.header.height)).to.eventually.be.eql([exampleBlock]);
     });
+  });
+
+  describe("run checkStartupStatus", () => {
+    it("checkStartupStatus should succeed", async () => {
+      const startupStatus = await blockStorage.startupCheck();
+      return expect(startupStatus).to.deep.equal({ name: "block-storage", status: STARTUP_STATUS.OK });
+    });
+  });
+});
+
+describe("Block storage - Bad setup (no transaction pool)", () => {
+  let blockStorage: BlockStorage;
+  let keyManager: KeyManager;
+
+  before(function () {
+    keyManager = new KeyManager(generateKeyPairs(this));
+  });
+
+  beforeEach(async () => {
+    try {
+      fsExtra.removeSync(LEVELDB_PATH);
+    } catch (e) { }
+    blockStorage = await initBlockStorage(keyManager, undefined);
+  });
+  it("checkStartupStatus should fail", async () => {
+    const startupStatus = await blockStorage.startupCheck();
+    return expect(startupStatus).to.deep.equal({ name: "block-storage", status: STARTUP_STATUS.FAIL });
+  });
+
+  afterEach(async () => {
+    await blockStorage.shutdown();
+    blockStorage = undefined;
   });
 });

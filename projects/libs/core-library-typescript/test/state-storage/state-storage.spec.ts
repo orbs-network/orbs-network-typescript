@@ -1,4 +1,4 @@
-import { types,  } from "../../src/common-library/types";
+import { types, } from "../../src/common-library/types";
 import * as chai from "chai";
 import { expect } from "chai";
 import * as sinonChai from "sinon-chai";
@@ -16,7 +16,7 @@ function anInitialBlockChain(numOfBlocks: number, stateDiff: types.ModifiedState
   const blocks: types.Block[] = [];
   let prevBlock: types.Block;
   for (let i = 0; i < numOfBlocks - 1; i++) {
-    prevBlock = BlockUtils.buildNextBlock({transactions: [], stateDiff: [], transactionReceipts: []}, prevBlock);
+    prevBlock = BlockUtils.buildNextBlock({ transactions: [], stateDiff: [], transactionReceipts: [] }, prevBlock);
     blocks.push(prevBlock);
   }
   // one last block with the state diff
@@ -36,19 +36,19 @@ describe("the state storage", () => {
   let blockStorage: types.BlockStorageClient;
   let stateStorage: StateStorage;
   const contractAddress = Address.createContractAddress("dummyContract").toBuffer();
-  const blocks = anInitialBlockChain(4, [{contractAddress , key: "dummyKey", value: "dummyValue"}]);
+  const blocks = anInitialBlockChain(4, [{ contractAddress, key: "dummyKey", value: "dummyValue" }]);
   const pollingInterval = 200;
   beforeEach((done) => {
     blockStorage = stubInterface<types.BlockStorageClient>();
     const lastBlock = blocks[blocks.length - 1];
-    (<sinon.SinonStub>blockStorage.getLastBlock).returns({block: blocks[blocks.length - 1]});
+    (<sinon.SinonStub>blockStorage.getLastBlock).returns({ block: blocks[blocks.length - 1] });
     blockStorage.getBlocks = input => ({ blocks: blocks.slice(input.lastBlockHeight + 1) });
 
     stateStorage = new StateStorage(blockStorage, pollingInterval);
     done();
   });
 
-  it("is quickly synced with the block storage after starts polling", async() => {
+  it("is quickly synced with the block storage after starts polling", async () => {
     const expectedResult = new Map<string, string>([["dummyKey", "dummyValue"]]);
     await expect(stateStorage.readKeys(contractAddress, ["dummyKey"])).to.eventually.eql(expectedResult);
   });
@@ -59,7 +59,7 @@ describe("the state storage", () => {
     expect(async () => { await stateStorage.pollBlockStorage(); }).to.not.throw();
   });
 
-  it("polling exploads when blockStorage returns an unexpected error", async() => {
+  it("polling exploads when blockStorage returns an unexpected error", async () => {
     blockStorage.getBlocks = input => { throw new Error("some-random-error"); };
     stateStorage.stop();
     await expect(stateStorage.pollBlockStorage()).to.be.rejectedWith(Error);

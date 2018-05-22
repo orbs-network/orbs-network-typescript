@@ -1,7 +1,9 @@
 import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
-import { BlockUtils , logger, types, JsonBuffer, KeyManager } from "../common-library";
+import { BlockUtils, logger, types, JsonBuffer, KeyManager } from "../common-library";
+import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status";
+import { StartupCheck } from "../common-library/startup-check";
 
 export interface BlockStorageConfig {
   dbPath: string;
@@ -9,7 +11,10 @@ export interface BlockStorageConfig {
   keyManager?: KeyManager;
 }
 
-export class BlockStorage {
+
+export class BlockStorage implements StartupCheck {
+
+  public readonly SERVICE_NAME = "block-storage";
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
   private lastBlock: types.Block;
@@ -151,5 +156,20 @@ export class BlockStorage {
 
   private async putBlock(block: types.Block): Promise<void> {
     await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+
+    if (!this.transactionPool) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL };
+    }
+
+    let lastBlock;
+    try {
+      lastBlock = await this.getLastBlock();
+    } catch (err) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `Exception in getLastBlock: ${err ? err.message : ""}` };
+    }
+    return { name: this.SERVICE_NAME, status: lastBlock ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL };
   }
 }
