@@ -1,3 +1,5 @@
+import { KeyManager } from "..";
+
 export interface ElectionTimeoutConfig {
   min: number;
   max: number;
@@ -13,6 +15,9 @@ export interface RaftConsensusConfig {
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
+  debug?: boolean;
+  signBlocks: boolean;
+  keyManager?: KeyManager;
 }
 
 export abstract class BaseConsensus {

@@ -22,11 +22,13 @@ Service-specific configuration:
 
 * `SERVICE_NAME` is used for all services for logging purposes, **required**. Included by default in `docker-compose.yml`
 * `SIGN_MESSAGES` is used by `gossip` to verify incoming messages from other nodes. Refer to [documentation](../README.md) to learn more about key management.
+* `GOSSIP_PEER_POLL_INTERVAL` is used by `gossip` to determine how often to poll (in ms) for peer/braodcast groups health check.
 * `ETHEREUM_CONTRACT_ADDRESS` is used by `consensus` to bill customers.
+* `CONSENSUS_SIGN_BLOCKS` is used by `consensus` to sign new blocks.
 * `BLOCK_STORAGE_DB_PATH` is used by `storage` to point where the store the blocks.
 * `BLOCK_STORAGE_POLL_INTERVAL` is used by `storage` to determine how often to poll (in ms) for new blocks from other nodes to prevent being out of sync.
+* `BLOCK_STORAGE_VERIFY_SIGNATURES` is used by `storage` to turn on/off block signature verification.
 * `STATE_STORAGE_POLL_INTERVAL` is used by `storage` to determine how often to poll (in ms) for new blocks from the block storage component and sync the blocks into the storage.
-* `GOSSIP_PEER_POLL_INTERVAL` is used by `gossip` to determine how often to poll (in ms) for peer/braodcast groups health check.
 
 ## Debugging
 
