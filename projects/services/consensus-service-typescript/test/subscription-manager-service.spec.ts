@@ -21,37 +21,37 @@ describe("subscription manager service tests", function() {
 
 
     beforeEach(async () => {
-        const endpoint = `127.0.0.1:${await getPort()}`;
-        subscriptionManagerStub = stubInterface<SubscriptionManager>();
+      const endpoint = `127.0.0.1:${await getPort()}`;
+      subscriptionManagerStub = stubInterface<SubscriptionManager>();
 
-        server = grpcServer.builder()
-            .withService("SubscriptionManager", new SubscriptionManagerService(subscriptionManagerStub, { nodeName: "tester"}))
-            .onEndpoint(endpoint);
+      server = grpcServer.builder()
+          .withService("SubscriptionManager", new SubscriptionManagerService(subscriptionManagerStub, { nodeName: "tester"}))
+          .onEndpoint(endpoint);
 
-        client = grpc.subscriptionManagerClient({ endpoint });
+      client = grpc.subscriptionManagerClient({ endpoint });
 
-        return server.start();
+      return server.start();
 
     });
 
     it("should get subscription status", async () => {
-        (<sinon.SinonStub>subscriptionManagerStub.getSubscriptionStatus).returns({ id: 1, tokens: new BigNumber(2) });
+        (<sinon.SinonStub>subscriptionManagerStub.isSubscriptionValid).returns(true);
 
-        const subData = await client.getSubscriptionStatus({ subscriptionKey: "abc" });
+        const { isValid } = await client.isSubscriptionValid({ subscriptionKey: "abc" });
 
-        expect(subData).to.have.nested.property("active", true);
+        expect(isValid).to.be.true;
     });
 
 
-    it("should be inactive if no tokens", async () => {
-        (<sinon.SinonStub>subscriptionManagerStub.getSubscriptionStatus).returns({ id: 1, tokens: new BigNumber(0) });
+    it("should be invalid if subscription manager returns false", async () => {
+        (<sinon.SinonStub>subscriptionManagerStub.isSubscriptionValid).returns(false);
 
-        const subData = await client.getSubscriptionStatus({ subscriptionKey: "abc" });
+        const { isValid } = await client.isSubscriptionValid({ subscriptionKey: "abc" });
 
-        expect(subData).to.have.nested.property("active", false);
+        expect(isValid).to.be.false;
     });
 
     afterEach(async () => {
-        return server.stop();
+      return server.stop();
     });
 });

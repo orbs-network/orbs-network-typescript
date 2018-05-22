@@ -1,6 +1,7 @@
 import { StartupCheck } from "./startup-check";
 import { StartupStatus, STARTUP_STATUS } from "./startup-status";
 import { logger } from "../common-library";
+import * as _ from "lodash";
 
 export class StartupCheckRunner {
   public readonly name: string;
@@ -17,7 +18,7 @@ export class StartupCheckRunner {
     return Promise.all(startupCheckPromises)
       .then(statuses => {
         const mergedStartupStatus = this.mergeStartupStatuses(this.name, statuses);
-        logger.info(`StartupCheckRunner.run() result: ${JSON.stringify(mergedStartupStatus)}`);
+        logger.info("Health check", _.cloneDeep(mergedStartupStatus)); // mergedStartupStatus is mutated inside logger.info, so cloned
         return mergedStartupStatus;
       })
       .catch(err => {

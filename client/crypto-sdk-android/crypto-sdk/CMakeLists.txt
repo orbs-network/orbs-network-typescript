@@ -7,8 +7,6 @@ file(GLOB CRYPTO_SDK_ANDROID_SRC
   "src/main/cpp/*.cpp"
 )
 
-set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libcryptosdk.so)
-
 if(ANDROID_ABI)
     set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libcryptosdk.so)
 else()

@@ -85,13 +85,13 @@ function build_current() {
 
 case "$(uname -s)" in
     Darwin)
-        LOCAL_PLATFORM="Mac"
+        LOCAL_PLATFORM="mac"
         ANDROID_HOME=${ANDROID_HOME:-~/Library/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
         ;;
     Linux)
-        LOCAL_PLATFORM="Linux"
+        LOCAL_PLATFORM="linux"
         ANDROID_HOME=${ANDROID_HOME:-/opt/Android/sdk}
         ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
 
@@ -106,10 +106,8 @@ PROCESSORS=${NPROCESSORS:-3}
 LIBGPG_ERROR_VERSION=1.28
 LIBGPG_ERROR_PACKAGE="libgpg-error-${LIBGPG_ERROR_VERSION}"
 
-PLATFORM_PREFIX=$(echo "${PLATFORM}" | awk '{print tolower($0)}')
-LOCAL_PLATFORM_PREFIX=$(echo "${LOCAL_PLATFORM}" | awk '{print tolower($0)}')
-PREFIX="$(pwd)/../../build/${PLATFORM_PREFIX}/libgpg-error/"
-LOCAL_PREFIX="$(pwd)/../../build/${LOCAL_PLATFORM_PREFIX}/libgpg-error/"
+PREFIX="$(pwd)/../../build/${PLATFORM}/libgpg-error/"
+LOCAL_PREFIX="$(pwd)/../../build/${LOCAL_PLATFORM}/libgpg-error/"
 
 mkdir -p ${PREFIX} ${LOCAL_PREFIX}
 
@@ -119,7 +117,7 @@ LOCAL_PREFIX=$(readlink "${LOCAL_PREFIX}")
 cd ${LIBGPG_ERROR_PACKAGE}
 
 case ${PLATFORM} in
-    IOS)
+    ios)
         XCODEDIR=$(xcode-select -p)
 
         # Build for the simulator
@@ -157,7 +155,7 @@ case ${PLATFORM} in
         cp -rf -- "${SIMULATOR64_PREFIX}/include" "$PREFIX/"
 
         ;;
-    ANDROID)
+    android)
         # Fix compilation errors by:
         #   1. Patching src/logging.c to avoid passing NULL as va_list.
         #   2. Manually generating:

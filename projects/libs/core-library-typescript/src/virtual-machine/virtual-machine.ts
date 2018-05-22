@@ -31,12 +31,13 @@ export class VirtualMachine implements StartupCheck {
           contractAddress: transaction.header.contractAddress,
         }, transactionScopeStateCache);
         success = true;
+        logger.debug(`Transaction ${txHash.toString("hex")} has been processed successfully.`);
         stateCache.merge(transactionScopeStateCache.getModifiedKeys());
       } catch (err) {
         if (!err.expected) {
           throw err;
         } else {
-          logger.error(`transaction ${JSON.stringify(transaction)} failed. error: ${JSON.stringify(err)}`);
+          logger.info(`Transaction ${txHash.toString("hex")} with payload ${JSON.stringify(transaction)} failed. error: ${JSON.stringify(err)}`);
           continue;
         }
       } finally {

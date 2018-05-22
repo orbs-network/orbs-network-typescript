@@ -19,6 +19,8 @@ export class TestEnvironment extends TestStack {
     readonly nodeCluster: OrbsNodeCluster;
     readonly ethereumSimulationNode: EthereumSimulationNode;
     readonly config: TestEnvironmentConfig;
+    readonly testSubscriptionProfile = "TEST_PROFILE";
+    readonly minTokensForSubscription = 1000;
 
     private started: boolean = false;
 
@@ -32,7 +34,12 @@ export class TestEnvironment extends TestStack {
         }
         await this.startComponent(this.ethereumSimulationNode);
 
-        const contractAddress = await this.ethereumSimulationNode.deployOrbsStubContract(1000, this.config.testSubscriptionKey, this.config.connectFromHost);
+        const contractAddress = await this.ethereumSimulationNode.deployOrbsStubContract(
+          this.minTokensForSubscription,
+          this.config.testSubscriptionKey,
+          this.testSubscriptionProfile,
+          this.config.connectFromHost
+        );
         this.nodeCluster.setEthereumSubscriptionContractAddress(contractAddress);
         await this.startComponent(this.nodeCluster);
         this.started = true;
@@ -62,7 +69,11 @@ export class TestEnvironment extends TestStack {
             orbsNetwork: this.orbsNetwork,
             publicApiNetwork: this.publicNetwork,
             ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false),
-            envFile: config.envFile
+            envFile: config.envFile,
+            subscriptionConfig: {
+              minTokensForSubscription: this.minTokensForSubscription,
+              subscriptionProfile: this.testSubscriptionProfile
+            }
         });
     }
 }

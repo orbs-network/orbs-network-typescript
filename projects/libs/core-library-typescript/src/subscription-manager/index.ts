@@ -1,1 +1,1 @@
-export { SubscriptionManager } from "./subscription-manager";
+export { SubscriptionManager, SubscriptionManagerConfiguration, SubscriptionProfiles } from "./subscription-manager";
