@@ -21,7 +21,8 @@ public class ContractUnitTests {
   @Test
   public void test_response_parsing() {
     Address address = new Address(PUBLIC_KEY,"640ed3", "T");
-    OrbsClient client = new OrbsClient("dont_care", address , new ED25519Key(PUBLIC_KEY, PRIVATE_KEY));
+    OrbsHost endpoint = new OrbsHost(false, "dont_care", 80);
+    OrbsClient client = new OrbsClient(endpoint, address , new ED25519Key(PUBLIC_KEY, PRIVATE_KEY));
     final String response = "{\"transactionId\": \"some_id\"}";
     SendTransactionResponse res = client.parseSendTransactionResponse(response);
     assertEquals(res.transactionId, "some_id");

@@ -10,12 +10,14 @@ export function createJavaOrbsContract(contractName: string, apiEndpoint: string
 
   const Address = java.import("com.orbs.cryptosdk.Address");
   const ED25519Key = java.import("com.orbs.cryptosdk.ED25519Key");
+  const OrbsHost = java.import("com.orbs.client.OrbsHost");
   const OrbsClient = java.import("com.orbs.client.OrbsClient");
   const OrbsContract = java.import("com.orbs.client.OrbsContract");
 
   const senderAddress = new Address(senderPublicKey, virtualChainId, networkId);
   const keyPair = new ED25519Key(senderPublicKey, senderPrivateKey);
-  const client = new OrbsClient(apiEndpoint, senderAddress, keyPair, timeout);
+  const host = new OrbsHost(false, "localhost", 80);
+  const client = new OrbsClient(host, senderAddress, keyPair, timeout);
 
   return new OrbsContract(client, contractName);
 }

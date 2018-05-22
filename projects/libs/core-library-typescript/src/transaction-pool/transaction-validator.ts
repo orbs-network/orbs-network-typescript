@@ -5,6 +5,7 @@ const ec = new eddsa("ed25519");
 
 export interface TransactionValidatorOptions {
   verifySignature: boolean;
+  verifySubscription: boolean;
 }
 
 export class TransactionValidator {
@@ -39,6 +40,10 @@ export class TransactionValidator {
       return false;
     }
 
+    if (!this.options.verifySubscription) {
+      return true;
+    }
+
     // checks subscription
     const subscriptionKey = this.getSubscriptionKey(contractAddress);
     const status = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
@@ -63,7 +68,7 @@ export class TransactionValidator {
     return subscriptionKey;
   }
 
-  constructor(subscriptionManager: types.SubscriptionManagerClient, options: TransactionValidatorOptions = {verifySignature: false}) {
+  constructor(subscriptionManager: types.SubscriptionManagerClient, options: TransactionValidatorOptions) {
     this.subscriptionManager = subscriptionManager;
     this.options = options;
   }

@@ -67,11 +67,16 @@ export class KeyManager {
   }
 
   public verify(object: any, signature: string, publicKeyName: string): boolean {
+    const publicKey = this.getPublicKey(publicKeyName);
+
+    return this.verifyObject(object, signature, publicKey);
+  }
+
+  public getPublicKey(publicKeyName: string) {
     if (!this.publicKeys.has(publicKeyName)) {
       throw new Error(`No public key found: ${publicKeyName}`);
     }
 
-    const publicKey = this.publicKeys.get(publicKeyName);
-    return this.verifyObject(object, signature, publicKey);
+    return this.publicKeys.get(publicKeyName);
   }
 }
