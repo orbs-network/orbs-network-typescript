@@ -13,6 +13,10 @@ const TEST_SMART_CONTRACTS = [
   {vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract"}
 ];
 
+export interface SubscriptionConfig {
+  minTokensForSubscription: number;
+  subscriptionProfile: string;
+}
 export interface OrbsNodeConfig {
   nodeName: string;
   numOfNodes: number;
@@ -26,6 +30,7 @@ export interface OrbsNodeConfig {
   gossipPeers: string[];
   ethereumNodeHttpAddress: string;
   ethereumSubscriptionContractAddress?: string;
+  subscriptionConfig: SubscriptionConfig;
   debugPort: number;
   envFile: string;
 }
@@ -82,6 +87,12 @@ export class OrbsNode implements TestComponent {
             SIDECHAIN_CONNECTOR_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
             SIDECHAIN_CONNECTOR_PUBLIC_IP: this.config.sidechainConnectorPublicIp,
             SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS: this.config.ethereumSubscriptionContractAddress,
+            SUBSCRIPTION_PROFILES: JSON.stringify({
+              [this.config.subscriptionConfig.subscriptionProfile]: [{
+                expiresAt: Date.now() + 24 * 60 * 60 * 1000 * 30, // expires 30 days from now
+                rate: this.config.subscriptionConfig.minTokensForSubscription
+              }]
+            }),
             VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD: JSON.stringify(TEST_SMART_CONTRACTS),
             DEBUG_PORT: this.config.debugPort,
             ENV_FILE: this.config.envFile
@@ -104,6 +115,7 @@ interface OrbsNodeClusterConfig {
   publicApiNetwork: TestSubnet;
   ethereumNodeHttpAddress: string;
   envFile: string;
+  subscriptionConfig: SubscriptionConfig;
 }
 
 export class OrbsNodeCluster implements TestComponent {
@@ -130,7 +142,8 @@ export class OrbsNodeCluster implements TestComponent {
         publicApiHostPort: 20000 + i,
         publicApiHostHTTPPort: 30000 + i,
         debugPort: 9229 + i,
-        envFile: this.config.envFile
+        envFile: this.config.envFile,
+        subscriptionConfig: this.config.subscriptionConfig
       }));
     }
     return nodes;

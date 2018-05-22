@@ -46,13 +46,13 @@ export class TransactionValidator {
 
     // checks subscription
     const subscriptionKey = this.getSubscriptionKey(contractAddress);
-    const status = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
+    const status = await this.subscriptionManager.isSubscriptionValid({ subscriptionKey });
 
-    if (!status.active) {
-      logger.info(`Subscription ${subscriptionKey} not active`);
+    if (!status.isValid) {
+      logger.info(`Subscription ${subscriptionKey} not valid`);
     }
 
-    return status.active;
+    return status.isValid;
   }
 
   private verifySignature(tx: types.Transaction) {
