@@ -24,12 +24,14 @@
     "bluebird": "^3.5.1",
     "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "lodash": "^4.14.98",
-    "orbs-client-sdk": "file:../../client-sdk-javascript"
+    "orbs-client-sdk": "file:../../client-sdk-javascript",
+    "redis": "^2.8.0"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
     "@types/lodash": "^4.14.98",
     "@types/node": "^9.4.4",
+    "@types/redis": "^2.8.6",
     "tslint": "^5.9.1",
     "typescript": "^2.7.1"
   }

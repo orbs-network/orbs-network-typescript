@@ -25,20 +25,18 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
   contractMethodName: string;
   contractMethodArgs: OrbsContractMethodArgs;
 
-  constructor(orbsContract: OrbsContract, contractMethodName: string, contractMethodArgs: OrbsContractMethodArgs) {
+  constructor(orbsContract: OrbsContract) {
     this.orbsContract = orbsContract;
-    this.contractMethodArgs = contractMethodArgs;
-    this.contractMethodName = contractMethodName;
   }
 
-  getSendTransactionObject(): OrbsAPISendTransactionRequest {
-    const sendTransactionPayload = this.orbsContract.generateSendTransactionPayload(this.contractMethodName, this.contractMethodArgs);
+  getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPISendTransactionRequest {
+    const sendTransactionPayload = this.orbsContract.generateSendTransactionPayload(methodName, args);
     const sendTranscationObject = this.orbsContract.orbsClient.generateTransactionRequest(this.orbsContract.contractAddress, sendTransactionPayload, Date.now());
 
     return sendTranscationObject;
   }
-  getCallObject(): OrbsAPICallContractRequest {
-    const callPayload = this.orbsContract.generateCallPayload(this.contractMethodName, this.contractMethodArgs);
+  getCallObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPICallContractRequest {
+    const callPayload = this.orbsContract.generateCallPayload(methodName, args);
     const callObject = this.orbsContract.orbsClient.generateCallRequest(this.orbsContract.contractAddress, callPayload);
 
     return callObject;
@@ -47,24 +45,20 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
 
 class JavaContractAdapter implements OrbsContractAdapter {
   javaContract: any;
-  contractMethodName: string;
-  contractMethodArgs: OrbsContractMethodArgs;
 
-  constructor(javaContract: any, contractMethodName: string, contractMethodArgs: OrbsContractMethodArgs) {
+  constructor(javaContract: any) {
     this.javaContract = javaContract;
-    this.contractMethodArgs = contractMethodArgs;
-    this.contractMethodName = contractMethodName;
   }
 
-  getSendTransactionObject(): OrbsAPISendTransactionRequest {
-    const sendTransactionPayload = this.javaContract.generateSendTransactionPayloadSync(this.contractMethodName, this.contractMethodArgs);
+  getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPISendTransactionRequest {
+    const sendTransactionPayload = this.javaContract.generateSendTransactionPayloadSync(methodName, args);
     const javaClient = this.javaContract.getOrbsClientSync();
     const sendTransactionObjectJson = javaClient.generateTransactionRequestSync(this.javaContract.getContractAddressSync(), sendTransactionPayload);
     const sendTransactionObject = JSON.parse(sendTransactionObjectJson);
     return sendTransactionObject;
   }
-  getCallObject(): OrbsAPICallContractRequest {
-    const callPayload = this.javaContract.generateCallPayloadSync(this.contractMethodName, this.contractMethodArgs);
+  getCallObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPICallContractRequest {
+    const callPayload = this.javaContract.generateCallPayloadSync(methodName, args);
     const javaClient = this.javaContract.getOrbsClientSync();
     const callObjectJson = javaClient.generateCallRequestSync(this.javaContract.getContractAddressSync(), callPayload);
     const callObject = JSON.parse(callObjectJson);
@@ -145,13 +139,12 @@ describe("The Javascript SDK", () => {
   const keyPair = new ED25519Key(SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY);
   const client = new OrbsClient(API_ENDPOINT, SENDER_ADDRESS, keyPair, TIMEOUT);
   const contract = new OrbsContract(client, CONTRACT_NAME);
-  testContract(() => new TypeScriptContractAdapter(contract, CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS));
+  testContract(() => new TypeScriptContractAdapter(contract));
 });
 
 describe("The Java SDK", () => {
   testContract(() => new JavaContractAdapter(
-    createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT),
-    CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
+    createJavaOrbsContract(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT))
   );
 });
 

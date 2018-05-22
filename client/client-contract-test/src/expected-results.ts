@@ -38,11 +38,16 @@ export const expectedSendTransactionRequest: OrbsAPISendTransactionRequest = {
     signatureData: undefined
 };
 
-
 export const expectedCallContractRequest: OrbsAPICallContractRequest = {
     contractAddressBase58: expectedContractAddressBase58(CONTRACT_NAME),
     senderAddressBase58: SENDER_ADDRESS.toString(),
     payload: expectedPayload(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS)
+};
+
+export const expectedCallContractRequestNoArgs: OrbsAPICallContractRequest = {
+    contractAddressBase58: expectedContractAddressBase58(CONTRACT_NAME),
+    senderAddressBase58: SENDER_ADDRESS.toString(),
+    payload: expectedPayload(CONTRACT_METHOD_NAME, [])
 };
 
 export const expectedGetTransactionStatusRequest: OrbsAPIGetTransactionStatusRequest = {
