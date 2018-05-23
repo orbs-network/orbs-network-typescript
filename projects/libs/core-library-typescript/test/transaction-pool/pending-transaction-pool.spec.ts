@@ -66,15 +66,6 @@ describe("Transaction Pool", () => {
     expect(transactionEntries).to.have.lengthOf(0);
   });
 
-
-  it("two identical transactions are processed only once", async () => {
-    const tx = aValidTransaction();
-    const txid = await transactionPool.addNewPendingTransaction(tx);
-    await expect(transactionPool.addNewPendingTransaction(tx)).to.eventually.be.rejectedWith(
-      `Transaction with id ${txid} already exists in the transaction pool`
-    );
-  });
-
   it("expired transaction is not added to the pool", async () => {
     const tx = anExpiredTransaction();
     await expect(transactionPool.addNewPendingTransaction(tx)).to.be.rejected;
@@ -146,10 +137,10 @@ describe("Transaction Pool", () => {
         receipt: undefined
       });
     });
-    it("that is in the pending pool", () => {
+    it("that is in the pending pool", async () => {
       const transaction = aValidTransaction();
       const txid = new TransactionHelper(transaction).calculateTransactionId();
-      transactionPool.addNewPendingTransaction(transaction);
+      await transactionPool.addNewPendingTransaction(transaction);
       expect(transactionPool.getTransactionStatus(txid)).to.be.eql({
         status: types.TransactionStatus.PENDING,
         receipt: undefined

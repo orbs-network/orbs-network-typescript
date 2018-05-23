@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.6)
 
+set(CMAKE_CXX_STANDARD 11)
+
 file(GLOB CRYPTO_SDK_ANDROID_SRC
   "src/main/cpp/*.h"
   "src/main/cpp/*.cpp"
 )
-
-set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libcryptosdk.so)
 
 if(ANDROID_ABI)
     set(CRYPTO_SDK_LIBRARY ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libcryptosdk.so)

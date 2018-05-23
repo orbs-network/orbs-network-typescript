@@ -1,6 +1,7 @@
 import { types } from "../../src/common-library/types";
 import * as chai from "chai";
 import { expect } from "chai";
+import * as mocha from "mocha";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
@@ -18,23 +19,23 @@ describe("transaction validation", () => {
 
   beforeEach(() => {
     subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
-    transactionValidator = new TransactionValidator(subscriptionManager);
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: false, verifySubscription: true});
   });
 
   it("succeeds for a valid transaction of an active vchain subscription", async () => {
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    (<sinon.SinonStub>subscriptionManager.isSubscriptionValid).returns({isValid: true});
     const tx = aDummyTransaction();
     return expect(transactionValidator.validate(tx)).to.eventually.be.true;
   });
 
   it("fails if the subscription is not active", async () => {
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: false});
+    (<sinon.SinonStub>subscriptionManager.isSubscriptionValid).returns({isValid: false});
     const tx = aDummyTransaction();
     return expect(transactionValidator.validate(tx)).to.eventually.be.false;
   });
 
   it("fails if the virtual chain of the sender and the contract don't match", async () => {
-    (<sinon.SinonStub>subscriptionManager.getSubscriptionStatus).returns({active: true});
+    (<sinon.SinonStub>subscriptionManager.isSubscriptionValid).returns({isValid: true});
     const tx: types.Transaction =  {
       header: {
         version: 0,
@@ -42,14 +43,38 @@ describe("transaction validation", () => {
         timestamp: "0",
         contractAddress: Address.createContractAddress("dummyContract", "020202").toBuffer()
       },
-      payload: "{}"
+      payload: "{}",
+      signatureData: undefined
     };
     return expect(transactionValidator.validate(tx)).to.eventually.be.false;
   });
+});
 
-  xit("fails if the transaction signature is invalid", () => {
+describe("transaction validator with enabled signature verification ", () => {
+  let transactionValidator: TransactionValidator;
+  let subscriptionManager: types.SubscriptionManagerClient;
+
+  beforeEach(() => {
+    subscriptionManager = stubInterface<types.SubscriptionManagerClient>();
+    (<sinon.SinonStub>subscriptionManager.isSubscriptionValid).returns({isValid: true});
+    transactionValidator = new TransactionValidator(subscriptionManager, {verifySignature: true, verifySubscription: true});
   });
 
-  xit("succeeds if the transaction is valid", () => {
+  it("succeeds for a correctly generated signature", () => {
+    const correctlySignedTransaction: types.Transaction = aDummyTransaction();
+
+    return expect(transactionValidator.validate(correctlySignedTransaction)).to.eventually.be.true;
   });
+
+  it("failed for incorrect signature", () => {
+    const badlySignedTransaction: types.Transaction = aDummyTransaction();
+
+    badlySignedTransaction.signatureData.signature = Buffer.from(
+      "00000000000000000000000000000000000000000000000000000000000000",
+      "hex"
+    );
+    return expect(transactionValidator.validate(badlySignedTransaction)).to.eventually.be.false;
+  });
+
+
 });

@@ -32,10 +32,12 @@ describe("gossip server test", function () {
     // and then the gossip port must be different as its websocket based unrelated to the grpc server/service
     const gossipPort = await getPort();
     const anotherGossipPort = await getPort();
+    const gossipManagementPort = await getPort();
+    const anotherGossipManagementPort = await getPort();
     const endpoint = `127.0.0.1:${await getPort()}`;
     const anotherEndpoint = `127.0.0.1:${await getPort()}`;
 
-    const topology =  {
+    const topology = {
       peers: [
         {
           service: "consensus",
@@ -47,10 +49,10 @@ describe("gossip server test", function () {
         },
       ],
       gossipPort: gossipPort,
-      gossipPeers: [ `ws://127.0.0.1:${anotherGossipPort}` ]
+      gossipPeers: [`ws://127.0.0.1:${anotherGossipPort}`]
     };
 
-    const anotherTopology =  {
+    const anotherTopology = {
       peers: [
         {
           service: "consensus",
@@ -62,7 +64,7 @@ describe("gossip server test", function () {
         },
       ],
       gossipPort: anotherGossipPort,
-      gossipPeers: [ `ws://127.0.0.1:${gossipPort}` ]
+      gossipPeers: [`ws://127.0.0.1:${gossipPort}`]
     };
 
     let NODE_NAME = "testerA";
@@ -73,6 +75,7 @@ describe("gossip server test", function () {
 
     serverA = gossipServer(topology, gossipEnv)
       .withService("Consensus", consensusStub)
+      .withManagementPort(gossipManagementPort)
       .onEndpoint(endpoint);
 
 
@@ -81,6 +84,7 @@ describe("gossip server test", function () {
 
     serverB = gossipServer(anotherTopology, gossipBEnv)
       .withService("Consensus", consensusStub)
+      .withManagementPort(anotherGossipManagementPort)
       .onEndpoint(anotherEndpoint);
 
 

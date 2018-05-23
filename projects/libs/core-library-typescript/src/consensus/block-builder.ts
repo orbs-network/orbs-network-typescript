@@ -1,5 +1,13 @@
-import { types, logger, BlockUtils } from "../common-library";
+import { types, logger, BlockUtils, KeyManager } from "../common-library";
 
+
+export interface BlockBuilderConfig {
+  pollIntervalMs?: number;
+  sign?: boolean;
+  keyManager?: KeyManager;
+  nodeName?: string;
+  blockSizeLimit?: number;
+}
 export default class BlockBuilder {
   private virtualMachine: types.VirtualMachineClient;
   private transactionPool: types.TransactionPoolClient;
@@ -9,24 +17,29 @@ export default class BlockBuilder {
   private lastBlock: types.Block;
   private blockStorage: types.BlockStorageClient;
   private onNewBlockBuild: (block: types.Block) => void;
+  private config: BlockBuilderConfig;
 
   constructor(input: {
     virtualMachine: types.VirtualMachineClient,
     transactionPool: types.TransactionPoolClient,
     blockStorage: types.BlockStorageClient,
     newBlockBuildCallback: (block: types.Block) => void,
-    pollIntervalMs?: number,
-    blockSizeLimit?: number
+    config: BlockBuilderConfig
   }) {
       this.virtualMachine = input.virtualMachine;
       this.transactionPool = input.transactionPool;
       this.blockStorage = input.blockStorage;
       this.onNewBlockBuild = input.newBlockBuildCallback;
-      this.pollIntervalMs = input.pollIntervalMs || 500;
-      this.blockSizeLimit = input.blockSizeLimit || 2000;
+
+      this.config = input.config;
+      this.pollIntervalMs = input.config.pollIntervalMs || 500;
+      this.blockSizeLimit = input.config.blockSizeLimit || 2000;
   }
 
   private pollForPendingTransactions() {
+    if (this.pollInterval) {
+      return;
+    }
     this.pollInterval = setInterval(async () => {
       try {
         logger.debug("blockBuilder tick");
@@ -40,6 +53,7 @@ export default class BlockBuilder {
   private stopPolling() {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
+      delete this.pollInterval;
     }
   }
 
@@ -47,6 +61,7 @@ export default class BlockBuilder {
 
   private async buildBlockFromPendingTransactions(lastBlock: types.Block): Promise<types.Block> {
     const { transactionEntries } = await this.transactionPool.getAllPendingTransactions({});
+    // FIXME: refactor getAllPendingTransaction to getPendingTransactions with a limit
     const transactionEntriesCap: types.TransactionEntry[] = transactionEntries.slice(0, this.blockSizeLimit);
 
     if (transactionEntriesCap.length == 0) {
@@ -56,11 +71,17 @@ export default class BlockBuilder {
 
     const { transactionReceipts, stateDiff } = await this.virtualMachine.processTransactionSet({ orderedTransactions: transactionEntriesCap });
 
-    return BlockUtils.buildNextBlock({
+    const block = BlockUtils.buildNextBlock({
       transactions: transactionEntriesCap.map(entry => entry.transaction),
       transactionReceipts,
       stateDiff
     }, lastBlock);
+
+    if (this.config.sign) {
+      return BlockUtils.signBlock(block, this.config.keyManager, this.config.nodeName);
+    }
+
+    return block;
   }
 
   public start() {
@@ -107,24 +128,16 @@ export default class BlockBuilder {
       const lastBlock = await this.getOrFetchLastBlock();
       const block = await this.buildBlockFromPendingTransactions(lastBlock);
       if (block == undefined) {
-        this.pollInterval = setInterval(async () => {
-          try {
-            logger.debug("blockBuilder tick");
-            this.appendNextBlock();
-          } catch (err) {
-            logger.error(`buildBlockFromPendingTransactions error: ${JSON.stringify(err)}`);
-          }
-        }, this.pollIntervalMs);
+        this.start();
       }
       else {
-        // this.stopPolling();
         const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
         logger.info(`Appended new block with block height ${block.header.height} and hash ${blockHash}`);
         this.onNewBlockBuild(block);
         return block;
       }
     } catch (e) {
-      // this.start();
+      this.start();
       throw e;
     }
   }

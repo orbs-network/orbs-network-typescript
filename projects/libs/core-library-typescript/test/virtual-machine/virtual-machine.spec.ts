@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
 import * as path from "path";
+import * as mocha from "mocha";
 import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-coded-contracts/processor";
 import { HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
 import { Address } from "../../src/common-library/address";
@@ -35,6 +36,7 @@ function aTransactionEntry(builder: { from: Address, to: Address, amount: number
       method: "transfer",
       args: [builder.to.toBase58(), builder.amount]
     }),
+    signatureData: undefined
   };
   return {
     transaction,
@@ -46,6 +48,19 @@ function buildCallRequest(account: Address, contractAddress: Address) {
   const payload = JSON.stringify({
     method: "getMyBalance",
     args: []
+  });
+
+  return {
+    sender: account.toBuffer(),
+    contractAddress: contractAddress.toBuffer(),
+    payload: payload
+  };
+}
+
+function buildCallRequestInvalidArgs(account: Address, contractAddress: Address) {
+  const payload = JSON.stringify({
+    method: "getBalance",
+    args: undefined
   });
 
   return {
@@ -146,6 +161,12 @@ describe("test virtual machine", () => {
     const callObject = buildCallRequest(ACCOUNT1, SMART_CONTRACT_ADDRESS);
     callObject.payload = "kuku";
 
-    chai.expect(virtualMachine.callContract(callObject)).to.be.rejected;
+    await chai.expect(virtualMachine.callContract(callObject)).to.be.rejected;
+  });
+
+  it("calls a smart contract with an invalid payload arguments - should not panic", async () => {
+    const callObject = buildCallRequestInvalidArgs(ACCOUNT1, SMART_CONTRACT_ADDRESS);
+
+    await chai.expect(virtualMachine.callContract(callObject)).to.be.rejectedWith("Method arguments parsing falied, unable to proceed with method execution");
   });
 });

@@ -21,8 +21,8 @@ export default class SubscriptionManagerService extends Service {
   }
 
   @Service.RPCMethod
-  async getSubscriptionStatus(rpc: types.GetSubscriptionStatusContext) {
-    const { id, tokens } = await this.subscriptionManager.getSubscriptionStatus(rpc.req.subscriptionKey);
-    rpc.res = { active: tokens.isGreaterThan(0) };
+  async isSubscriptionValid(rpc: types.IsSubscriptionValidContext) {
+    const isValid = await this.subscriptionManager.isSubscriptionValid(rpc.req.subscriptionKey);
+    rpc.res = { isValid };
   }
 }

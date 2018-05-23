@@ -4,22 +4,25 @@ import { EventEmitter } from "events";
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import BlockBuilder from "./block-builder";
+import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
-import { JsonBuffer, BlockUtils } from "../common-library";
+import { JsonBuffer, KeyManager, BlockUtils } from "../common-library";
 
 // An RPC adapter to use with Gaggle's channels. We're using this adapter in order to implement the transport layer,
 // for using Gaggle's "custom" channel (which we've extended ourselves).
 class RPCConnector extends EventEmitter {
   private id: string;
   private gossip: types.GossipClient;
+  private debug: boolean;
 
-  public constructor(id: string, gossip: types.GossipClient) {
+  public constructor(id: string, gossip: types.GossipClient, debug: boolean) {
     super();
 
     this.id = id;
     this.gossip = gossip;
+    this.debug = debug;
   }
 
   public connect(): void {
@@ -36,8 +39,10 @@ class RPCConnector extends EventEmitter {
   }
 
   public broadcast(data: any): void {
-    logger.debug(`Raft message multicast packet size: `, new Buffer(JSON.stringify(data)).length);
-    logger.debug(`Raft broadcast message: ${JSON.stringify(data)}`);
+    if (this.debug) {
+      const size = new Buffer(JSON.stringify(data)).length;
+      logger.debug(`Raft broadcast message (${size} bytes): ${JSON.stringify(data)}`);
+    }
 
     this.gossip.broadcastMessage({
       broadcastGroup: "consensus",
@@ -48,8 +53,10 @@ class RPCConnector extends EventEmitter {
   }
 
   public send(nodeId: string, data: any): void {
-    logger.debug(`Raft message unicast packet size: `, new Buffer(JSON.stringify(data)).length);
-    logger.debug(`Raft unicast message: ${JSON.stringify(data)}`);
+    if (this.debug) {
+      const size = new Buffer(JSON.stringify(data)).length;
+      logger.debug(`Raft unicast message (${size} bytes): ${JSON.stringify(data)}`);
+    }
 
     this.gossip.unicastMessage({
       recipient: nodeId,
@@ -66,19 +73,7 @@ export interface ElectionTimeoutConfig {
   max: number;
 }
 
-export interface RaftConsensusConfig {
-  nodeName: string;
-  clusterSize: number;
-  electionTimeout: ElectionTimeoutConfig;
-  heartbeatInterval: number;
-  blockBuilderPollInterval?: number;
-  msgLimit?: number;
-  blockSizeLimit?: number;
-  leaderIntervalMs?: number;
-}
-
-
-export class RaftConsensus {
+export class RaftConsensus extends BaseConsensus {
   private transactionPool: types.TransactionPoolClient;
   private blockBuilder: BlockBuilder;
 
@@ -88,6 +83,9 @@ export class RaftConsensus {
   private leaderIntervalMs: number;
   private leaderInterval: NodeJS.Timer;
 
+  private pollIntervalMs: number;
+  private pollInterval: NodeJS.Timer;
+
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
@@ -95,14 +93,22 @@ export class RaftConsensus {
     transactionPool: types.TransactionPoolClient,
     virtualMachine: types.VirtualMachineClient
   ) {
+    super();
     logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config)}`);
-    this.connector = new RPCConnector(config.nodeName, gossip);
+
+    this.pollIntervalMs = 3000;
     this.transactionPool = transactionPool;
+
+    this.connector = new RPCConnector(config.nodeName, gossip, config.debug);
+
     this.blockBuilder = new BlockBuilder({
-      virtualMachine, transactionPool, blockStorage,
-      newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
-      pollIntervalMs: config.blockBuilderPollInterval,
-      blockSizeLimit: config.blockSizeLimit
+      virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block), config: {
+        sign: config.signBlocks,
+        keyManager: config.keyManager,
+        nodeName: config.nodeName,
+        pollIntervalMs: config.blockBuilderPollInterval,
+        blockSizeLimit: config.blockSizeLimit
+      }
     });
     this.blockBuilder.stop();
     this.raftIndex = -1;
@@ -216,6 +222,8 @@ export class RaftConsensus {
 
   // leader will create block only if it is in sync
   private async onLeaderElected() {
+    this.reportLeadershipStatus();
+
     if (this.leaderInterval) {
       clearInterval(this.leaderInterval);
     }
@@ -240,7 +248,7 @@ export class RaftConsensus {
 
   }
 
-  async onMessageReceived(fromAddress: string, messageType: string, message: any) {
+  async onMessageReceived(fromAddress: string, messageType: string, message: any): Promise<any> {
     switch (messageType) {
       case "RaftMessage": {
         this.connector.received(message.from, message.data);
@@ -260,11 +268,13 @@ export class RaftConsensus {
     }
   }
 
-  async initialize() {
+  async initialize(): Promise<any> {
+    this.startReporting();
     return this.blockBuilder.initialize();
   }
 
-  async shutdown() {
+  async shutdown(): Promise<any> {
+    this.stopReporting();
     await Promise.all([this.node.close(), this.blockBuilder.shutdown()]);
   }
 
@@ -272,27 +282,30 @@ export class RaftConsensus {
     return this.node.isLeader();
   }
 
-  public getState() {
-    return this.node._state;
+  private getConsensusState(): any {
+    return {
+      state: this.node._state,
+      leader: this.node._leader,
+      term: this.node._currentTerm,
+      clusterSize: this.node._clusterSize,
+      votes: JSON.stringify(this.node._votes),
+      timeout: this.node._timeout
+    };
   }
 
-  public getLeader() {
-    return this.node._leader;
+  private reportLeadershipStatus() {
+    const status = this.isLeader() ? "the leader" : "not the leader";
+    logger.debug(`Node is ${status}`);
+    logger.debug(`Node state: `, this.getConsensusState());
   }
 
-  public getTerm() {
-    return this.node._currentTerm;
+  private startReporting() {
+    this.pollInterval = setInterval(() => {
+      this.reportLeadershipStatus();
+    }, this.pollIntervalMs);
   }
 
-  public getVotes() {
-    return JSON.stringify(this.node._votes);
-  }
-
-  public getClusterSize() {
-    return this.node._clusterSize;
-  }
-
-  public getElectionTimeout() {
-    return this.node._timeout;
+  private stopReporting() {
+    clearInterval(this.pollInterval);
   }
 }

@@ -11,6 +11,7 @@ services:
     environment:
       - NUM_OF_NODES=${NUM_OF_NODES}
       - ETHEREUM_CONTRACT_ADDRESS=${SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS}
+      - SUBSCRIPTION_PROFILES=${SUBSCRIPTION_PROFILES}
       - BLOCK_BUILDER_POLL_INTERVAL=500
       - MIN_ELECTION_TIMEOUT=2000
       - MAX_ELECTION_TIMEOUT=4000
@@ -67,7 +68,7 @@ services:
     command: node dist/index.js ${NODE_CONFIG_PATH}/storage.js
     restart: always
     environment:
-      BLOCK_STORAGE_POLL_INTERVAL: 20000000
+      BLOCK_STORAGE_POLL_INTERVAL: 20000
     volumes_from:
       - shared_volumes
     networks:

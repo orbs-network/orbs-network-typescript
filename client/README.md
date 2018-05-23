@@ -93,6 +93,16 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 
 * ED25519 key pair support
 
+#### Digital Signature Schemes
+
+* EdDSA signature support. As a convention, the signature is encoded as:
+
+| bytes  |       |
+| :----: | :---: |
+| 0 - 32 | R     |
+| 0 - 64 | S     |
+
+
 ### External Dependencies
 
 * Google Test (`gtest`): Google Test is a unit testing library for the C++ programming language, based on the xUnit architecture.
@@ -133,7 +143,7 @@ Every public address in Orbs platform has the form of {Network ID, Address Schem
 Note: in order to build using Android Studio, please make sure to have `local.properties` files (next to `build.gradle`), specifying both `sdk.dir` and `ndk.dir` (usually, these are generated automatically for you).
 
 ```bash
-brew install cmake
+brew install cmake boost-python
 ```
 
 ## Build
@@ -163,22 +173,6 @@ DEBUG=1 ./build.sh
 ```bash
 CMAKE_ONLY=1 ./clean.sh
 ```
-
-### Building for iOS
-
-The following iOS builds are currently supported:
-
-1. iPhone Simulator 64bit.
-2. iOS 64bit.
-
-> In order to build for iOS, you'd need to provide the `PLATFORM=IOS` environment variable. Please note that:
-> 1. You'd need to have both **Xcode** and **iPhone Simulator** installed.
-> 2. You'd need to run `./clean.sh` before switching to build for another architecture.
-
-```bash
-PLATFORM=IOS ./build.sh
-```
-
 ## Test
 
 > In order to run the tests, you'd need to run the `test.sh` script:

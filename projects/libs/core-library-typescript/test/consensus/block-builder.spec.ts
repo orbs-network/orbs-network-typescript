@@ -74,7 +74,8 @@ describe("a block", () => {
     (<sinon.SinonStub>virtualMachine.processTransactionSet).returns(processTransactionSetOutput);
 
     blockBuilder = new BlockBuilder(
-      { virtualMachine, transactionPool, blockStorage, newBlockBuildCallback, pollIntervalMs: 10
+      { virtualMachine, transactionPool, blockStorage, newBlockBuildCallback,
+        config: { pollIntervalMs: 10 }
       });
   });
 
@@ -84,6 +85,26 @@ describe("a block", () => {
     });
 
     it("is built from pending transactions shortly after started", (done) => {
+      blockBuilder.start();
+
+      setTimeout(() => {
+        try {
+          const bodyMatch = sinon.match.has("transactions", dummyTransactionSet)
+          .and(sinon.match.has("stateDiff", dummyStateDiff))
+          .and(sinon.match.has("transactionReceipts"));
+          expect(newBlockBuildCallback).to.have.been.calledWith(sinon.match.has("body", bodyMatch));
+          done();
+        } catch (e) {
+          done(e);
+        } finally {
+          blockBuilder.stop();
+        }
+      }, 100);
+    });
+
+    it("restarts successfully after being stopped", (done) => {
+      blockBuilder.start();
+      blockBuilder.stop();
       blockBuilder.start();
 
       setTimeout(() => {

@@ -1,7 +1,5 @@
-import { defaults } from "lodash";
-
-import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig } from "orbs-core-library";
-import { Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "orbs-core-library";
+import { defaults, toLower } from "lodash";
+import { grpcServer, types, topologyPeers, logger, RaftConsensusConfig, ElectionTimeoutConfig, KeyManager, Consensus, SubscriptionManager, PendingTransactionPool, CommittedTransactionPool, TransactionValidator, SubscriptionProfiles } from "orbs-core-library";
 
 
 import ConsensusService from "./consensus-service";
@@ -13,14 +11,20 @@ class DefaultConsensusConfig implements RaftConsensusConfig {
   heartbeatInterval: number;
   nodeName: string;
   clusterSize: number;
+  signBlocks: boolean;
+  keyManager?: KeyManager;
+  algorithm: string;
+  leaderNodeName?: string;
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
   leaderIntervalMs?: number;
+  debug?: boolean;
 
   constructor(min?: number, max?: number, heartbeat?: number) {
     this.electionTimeout = { min: min || 2000, max: max || 4000 };
     this.heartbeatInterval = heartbeat || 100;
+    this.algorithm = "raft";
   }
 }
 
@@ -28,13 +32,13 @@ function makeConsensus(peers: types.ClientMap, consensusConfig: RaftConsensusCon
   return new Consensus(consensusConfig, peers.gossip, peers.virtualMachine, peers.blockStorage, peers.transactionPool);
 }
 
-function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress: string) {
-  const subscriptionManagerConfiguration = { ethereumContractAddress };
-  return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfiguration);
+function makeSubscriptionManager(peers: types.ClientMap, ethereumContractAddress: string, subscriptionProfiles: SubscriptionProfiles) {
+  const subscriptionManagerConfig = { ethereumContractAddress, subscriptionProfiles };
+  return new SubscriptionManager(peers.sidechainConnector, subscriptionManagerConfig);
 }
 
-function makePendingTransactionPool(peers: types.ClientMap, transactionLifespanMs: number) {
-  const transactionValidator = new TransactionValidator(peers.subscriptionManager);
+function makePendingTransactionPool(peers: types.ClientMap, transactionLifespanMs: number, verifySignature: boolean, verifySubscription: boolean) {
+  const transactionValidator = new TransactionValidator(peers.subscriptionManager, { verifySignature, verifySubscription });
   return new PendingTransactionPool(peers.gossip, transactionValidator, { transactionLifespanMs });
 }
 
@@ -42,9 +46,18 @@ function makeCommittedTransactionPool() {
   return new CommittedTransactionPool();
 }
 
+function parseSubscriptionProfiles(subscriptionProfileJson: string) {
+  try {
+    return JSON.parse(subscriptionProfileJson);
+  } catch (err) {
+    logger.error(`Bad subscription profile setting: ${subscriptionProfileJson} of type ${typeof subscriptionProfileJson}. Defaulting to empty list of profiles`);
+    return {};
+  }
+}
+
 export default function(nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT, LEADER_SYNC_INTERVAL,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME, CONSENSUS_SIGN_BLOCKS, DEBUG_RAFT, VERIFY_TRANSACTION_SIGNATURES, VERIFY_SUBSCRIPTION, SUBSCRIPTION_PROFILES } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -63,18 +76,37 @@ export default function(nodeTopology: any, env: any) {
   const consensusConfig = new DefaultConsensusConfig(Number(MIN_ELECTION_TIMEOUT), Number(MAX_ELECTION_TIMEOUT), Number(HEARBEAT_INTERVAL));
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
+  consensusConfig.signBlocks = toLower(CONSENSUS_SIGN_BLOCKS) === "true";
+  consensusConfig.keyManager = consensusConfig.signBlocks ? new KeyManager({
+    privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
+  }) : undefined;
   consensusConfig.blockBuilderPollInterval = Number(BLOCK_BUILDER_POLL_INTERVAL) || 500;
   consensusConfig.msgLimit = Number(MSG_LIMIT) || 4000000;
   consensusConfig.blockSizeLimit = Number(BLOCK_SIZE_LIMIT) || Math.floor(consensusConfig.msgLimit / (2 * 250));
   consensusConfig.leaderIntervalMs = Number(LEADER_SYNC_INTERVAL) || 100;
+  consensusConfig.debug = toLower(DEBUG_RAFT) === "true";
 
 
+  if (CONSENSUS_ALGORITHM) {
+    consensusConfig.algorithm = CONSENSUS_ALGORITHM;
+  }
+  if (consensusConfig.algorithm.toLowerCase() === "stub") {
+    if (!CONSENSUS_LEADER_NODE_NAME) {
+      throw new Error("CONSENSUS_LEADER_NODE_NAME can't be missing from stub consensus!");
+    }
+    consensusConfig.leaderNodeName = CONSENSUS_LEADER_NODE_NAME;
+    consensusConfig.heartbeatInterval = 1000; // this is the block interval
+  }
 
   const nodeConfig = { nodeName: NODE_NAME };
   const peers = topologyPeers(nodeTopology.peers);
 
+  const subscriptionProfiles = parseSubscriptionProfiles(SUBSCRIPTION_PROFILES);
+  const verifySignature = toLower(VERIFY_TRANSACTION_SIGNATURES) === "true";
+  const verifySubscription = toLower(VERIFY_SUBSCRIPTION) === "true";
+
   return grpcServer.builder()
     .withService("Consensus", new ConsensusService(makeConsensus(peers, consensusConfig), nodeConfig))
-    .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers, ETHEREUM_CONTRACT_ADDRESS), nodeConfig))
-    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers, transactionLifespanMs), makeCommittedTransactionPool(), nodeConfig));
+    .withService("SubscriptionManager", new SubscriptionManagerService(makeSubscriptionManager(peers, ETHEREUM_CONTRACT_ADDRESS, subscriptionProfiles), nodeConfig))
+    .withService("TransactionPool", new TransactionPoolService(makePendingTransactionPool(peers, transactionLifespanMs, verifySignature, verifySubscription), makeCommittedTransactionPool(), nodeConfig));
 }

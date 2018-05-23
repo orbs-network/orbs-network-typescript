@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import * as mocha from "mocha";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
@@ -6,37 +7,45 @@ import * as fsExtra from "fs-extra";
 
 import { types } from "../../src/common-library/types";
 import { BlockStorage } from "../../src/block-storage/block-storage";
-import { BlockUtils } from "../../src/common-library";
+import { STARTUP_STATUS, StartupStatus } from "../../src/common-library/startup-status";
+import { StartupCheck } from "../../src/common-library/startup-check";
+import { BlockUtils, KeyManager } from "../../src/common-library";
+import generateKeyPairs from "../../src/test-kit/generate-key-pairs";
 
 
 const LEVELDB_PATH = "/tmp/leveldb-test";
+const nodeName = "secret-message-key";
 
-async function initBlockStorage(transactionPool: types.TransactionPoolClient): Promise<BlockStorage> {
-  const blockStorage = new BlockStorage(LEVELDB_PATH, transactionPool);
+async function initBlockStorage(keyManager: KeyManager, transactionPool: types.TransactionPoolClient): Promise<BlockStorage> {
+  const blockStorage = new BlockStorage({ dbPath: LEVELDB_PATH, verifySignature: true, keyManager }, transactionPool);
   await blockStorage.load();
   return blockStorage;
 }
 
-function generateEmptyBlock(lastBlock: types.Block): types.Block {
-  return BlockUtils.buildNextBlock({
+function generateEmptyBlock(lastBlock: types.Block, keyManager: KeyManager): types.Block {
+  return BlockUtils.signBlock(BlockUtils.buildNextBlock({
     transactions: [],
     transactionReceipts: [],
     stateDiff: []
-  }, lastBlock);
+  }, lastBlock), keyManager, nodeName);
 }
 
 describe("Block storage", () => {
   let blockStorage: BlockStorage;
   let lastBlock: types.Block;
   let transactionPool: types.TransactionPoolClient;
+  let keyManager: KeyManager;
 
+  before(function () {
+    keyManager = new KeyManager(generateKeyPairs(this));
+  });
 
   beforeEach(async () => {
     try {
       fsExtra.removeSync(LEVELDB_PATH);
     } catch (e) { }
     transactionPool = stubInterface<types.TransactionPoolClient>();
-    blockStorage = await initBlockStorage(transactionPool);
+    blockStorage = await initBlockStorage(keyManager, transactionPool);
     lastBlock = await blockStorage.getLastBlock();
   });
 
@@ -54,7 +63,7 @@ describe("Block storage", () => {
 
   describe("#getBlock", () => {
     it("returns a block", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
 
       await blockStorage.addBlock(exampleBlock);
       const block = await blockStorage.getBlock(1);
@@ -64,7 +73,7 @@ describe("Block storage", () => {
 
   describe("#addBlock", () => {
     it("adds a new block", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
 
       await blockStorage.addBlock(exampleBlock);
       const block = await blockStorage.getLastBlock();
@@ -73,7 +82,7 @@ describe("Block storage", () => {
     });
 
     it("checks previous block hash", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
       exampleBlock.header.prevBlockHash = Buffer.concat([exampleBlock.header.prevBlockHash, new Buffer("noise")]);
 
       const result = blockStorage.addBlock(exampleBlock);
@@ -82,7 +91,7 @@ describe("Block storage", () => {
     });
 
     it("checks block height", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
       exampleBlock.header.height += 1;
 
       const result = blockStorage.addBlock(exampleBlock);
@@ -90,16 +99,28 @@ describe("Block storage", () => {
     });
 
     it("reports transactions back to pool", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
 
       await blockStorage.addBlock(exampleBlock);
       await expect(transactionPool.markCommittedTransactions).to.have.been.calledOnce;
+    });
+
+    it("checks block signature", async () => {
+      const exampleBlockWithWrongSignatory: types.Block = generateEmptyBlock(lastBlock, keyManager);
+      exampleBlockWithWrongSignatory.signatureData.signatory = "some-random-node";
+
+      await expect(blockStorage.addBlock(exampleBlockWithWrongSignatory)).to.eventually.be.rejectedWith("Invalid block signature: Error: No public key found: some-random-node");
+
+      const exampleBlockWithWrongSignature: types.Block = generateEmptyBlock(lastBlock, keyManager);
+      exampleBlockWithWrongSignature.signatureData.signature = new Buffer("some garbage");
+
+      await expect(blockStorage.addBlock(exampleBlockWithWrongSignature)).to.eventually.be.rejectedWith(`Invalid block signature: ${JSON.stringify(exampleBlockWithWrongSignature.header)} was not signed by secret-message-key`);
     });
   });
 
   describe("#hasNewBlocks", () => {
     it("returns appropriate values", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
 
       await blockStorage.addBlock(exampleBlock);
 
@@ -110,11 +131,43 @@ describe("Block storage", () => {
 
   describe("#getBlocks", () => {
     it("returns array of blocks starting from blockNumber", async () => {
-      const exampleBlock: types.Block = generateEmptyBlock(lastBlock);
+      const exampleBlock: types.Block = generateEmptyBlock(lastBlock, keyManager);
 
       await blockStorage.addBlock(exampleBlock);
 
       await expect(blockStorage.getBlocks(lastBlock.header.height)).to.eventually.be.eql([exampleBlock]);
     });
+  });
+
+  describe("run checkStartupStatus", () => {
+    it("checkStartupStatus should succeed", async () => {
+      const startupStatus = await blockStorage.startupCheck();
+      return expect(startupStatus).to.deep.equal({ name: "block-storage", status: STARTUP_STATUS.OK });
+    });
+  });
+});
+
+describe("Block storage - Bad setup (no transaction pool)", () => {
+  let blockStorage: BlockStorage;
+  let keyManager: KeyManager;
+
+  before(function () {
+    keyManager = new KeyManager(generateKeyPairs(this));
+  });
+
+  beforeEach(async () => {
+    try {
+      fsExtra.removeSync(LEVELDB_PATH);
+    } catch (e) { }
+    blockStorage = await initBlockStorage(keyManager, undefined);
+  });
+  it("checkStartupStatus should fail", async () => {
+    const startupStatus = await blockStorage.startupCheck();
+    return expect(startupStatus).to.deep.equal({ name: "block-storage", status: STARTUP_STATUS.FAIL });
+  });
+
+  afterEach(async () => {
+    await blockStorage.shutdown();
+    blockStorage = undefined;
   });
 });

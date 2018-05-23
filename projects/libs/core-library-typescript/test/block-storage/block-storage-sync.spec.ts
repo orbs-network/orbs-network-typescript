@@ -16,7 +16,7 @@ chai.use(chai.should);
 async function init(): Promise<{blockStorage: BlockStorage, blockStorageSync: BlockStorageSync}> {
   fsExtra.removeSync(LEVELDB_PATH);
   const transactionPool = stubInterface<types.TransactionPoolClient>();
-  const blockStorage = new BlockStorage(LEVELDB_PATH, transactionPool);
+  const blockStorage = new BlockStorage({ dbPath: LEVELDB_PATH, verifySignature: false }, transactionPool);
   await blockStorage.load();
   const blockStorageSync = new BlockStorageSync(blockStorage);
   return { blockStorage, blockStorageSync };

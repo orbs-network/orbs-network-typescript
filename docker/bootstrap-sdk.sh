@@ -1,6 +1,6 @@
 #!/bin/bash -e
 apt-get update
-apt-get install -y git-core build-essential curl pkg-config file unzip default-jdk
+apt-get install -y git-core build-essential curl pkg-config file unzip default-jdk libboost-all-dev
 apt-get clean
 
 # Install CMake
@@ -8,6 +8,11 @@ curl https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh --output cmake-b
     bash cmake-bootstrap --skip-license --prefix=/usr && rm cmake-bootstrap
 
 SDK_HOME=${SDK_HOME:-"/opt"}
+
+if [ ! -z "$NO_ANDROID" ]; then
+    echo "SKIPPING ANDROID SDK..."
+    exit 0
+fi
 
 # Install Gradle
 GRADLE_VERSION=${GRADLE_VERSION:-"4.6"}

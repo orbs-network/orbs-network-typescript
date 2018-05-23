@@ -1,0 +1,13 @@
+---
+BasedOnStyle: None
+IndentWidth: 4
+UseTab: Never
+---
+Language: Cpp
+ColumnLimit: 120
+NamespaceIndentation: None
+AccessModifierOffset: -4
+AlignAfterOpenBracket: false
+BinPackParameters: false
+ContinuationIndentWidth: 0
+---

@@ -4,7 +4,7 @@ import { types, logger, JsonBuffer } from "orbs-core-library";
 
 import { Service, ServiceConfig, TransactionHelper } from "orbs-core-library";
 import { PendingTransactionPool, CommittedTransactionPool } from "orbs-core-library";
-import { TransactionStatus } from "orbs-interfaces";
+import { TransactionStatus, Transaction } from "orbs-interfaces";
 
 export default class TransactionPoolService extends Service {
   private pendingTransactionPool: PendingTransactionPool;
@@ -48,6 +48,17 @@ export default class TransactionPoolService extends Service {
     }
   }
 
+  private validateTransactionUniqueOrThrow(transaction: Transaction): boolean {
+    const txid = new TransactionHelper(transaction).calculateTransactionId();
+    if (this.pendingTransactionPool.hasTransactionWithId(txid)) {
+      throw new Error(`Transaction with id ${txid} already exists in the pending transaction pool`);
+    } else if (this.committedTransactionPool.hasTransactionWithId(txid)) {
+      throw new Error(`Transaction with id ${txid} already exists in the committed transaction pool`);
+    } else {
+      return true;
+    }
+  }
+
   @Service.RPCMethod
   public async markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext) {
     await this.committedTransactionPool.addCommittedTransactions(rpc.req.transactionReceipts);
@@ -57,8 +68,10 @@ export default class TransactionPoolService extends Service {
 
   @Service.RPCMethod
   public async addNewPendingTransaction(rpc: types.AddNewPendingTransactionContext) {
-     const res = await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
-     rpc.res = { txid: res };
+    if (this.validateTransactionUniqueOrThrow(rpc.req.transaction)) {
+      const res = await this.pendingTransactionPool.addNewPendingTransaction(rpc.req.transaction);
+      rpc.res = { txid: res };
+    }
   }
 
   @Service.RPCMethod
@@ -82,16 +95,9 @@ export default class TransactionPoolService extends Service {
     if (rpc.req.messageType === "newTransaction") {
       const obj: any = JsonBuffer.parseJsonWithBuffers(rpc.req.buffer.toString("utf8"));
       const message = <types.NewTransactionBroadcastMessage>obj;
-      const txid = new TransactionHelper(message.transaction).calculateTransactionId();
-      if (this.pendingTransactionPool.hasTransactionWithId(txid)) {
-        throw new Error(`Transaction with id ${txid} already exists in the pending transaction pool`);
-      } else if (this.committedTransactionPool.hasTransactionWithId(txid)) {
-        throw new Error(`Transaction with id ${txid} already exists in the committed transaction pool`);
-      } else {
+      if (this.validateTransactionUniqueOrThrow(message.transaction)) {
         await this.pendingTransactionPool.onNewBroadcastTransaction(message.transaction);
       }
     }
   }
-
-
 }

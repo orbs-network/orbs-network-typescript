@@ -1,18 +1,31 @@
 import * as path from "path";
 
 import { LevelDBDriver } from "./leveldb-driver";
-import { BlockUtils , logger, types, JsonBuffer } from "../common-library";
+import { BlockUtils, logger, types, JsonBuffer, KeyManager } from "../common-library";
+import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status";
+import { StartupCheck } from "../common-library/startup-check";
 
-export class BlockStorage {
+export interface BlockStorageConfig {
+  dbPath: string;
+  verifySignature: boolean;
+  keyManager?: KeyManager;
+}
+
+
+export class BlockStorage implements StartupCheck {
+
+  public readonly SERVICE_NAME = "block-storage";
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
 
   private lastBlock: types.Block;
   private db: LevelDBDriver;
   private transactionPool: types.TransactionPoolClient;
+  private config: BlockStorageConfig;
 
-  public constructor(dbPath: string, transactionPool: types.TransactionPoolClient) {
+  public constructor(config: BlockStorageConfig, transactionPool: types.TransactionPoolClient) {
+    this.config = config;
     // Open/create the blocks LevelDB database.
-    this.db = new LevelDBDriver(dbPath);
+    this.db = new LevelDBDriver(config.dbPath);
     this.transactionPool = transactionPool;
   }
 
@@ -110,6 +123,19 @@ export class BlockStorage {
   }
 
   private async verifyNewBlock(block: types.Block) {
+    if (this.config.verifySignature) {
+      let verified = false;
+      try {
+        verified = BlockUtils.verifyBlockSignature(block, this.config.keyManager);
+      } catch (e) {
+        throw new Error(`Invalid block signature: ${e.toString()}`);
+      }
+
+      if (!verified) {
+        throw new Error(`Invalid block signature: ${JSON.stringify(block.header)} was not signed by ${block.signatureData.signatory}`);
+      }
+    }
+
     if (block.header.version !== 0) {
       throw new Error(`Invalid block version: ${block.header.version}!`);
     }
@@ -130,5 +156,20 @@ export class BlockStorage {
 
   private async putBlock(block: types.Block): Promise<void> {
     await this.db.put<string>(block.header.height.toString(), JSON.stringify(block));
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+
+    if (!this.transactionPool) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL };
+    }
+
+    let lastBlock;
+    try {
+      lastBlock = await this.getLastBlock();
+    } catch (err) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `Exception in getLastBlock: ${err ? err.message : ""}` };
+    }
+    return { name: this.SERVICE_NAME, status: lastBlock ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL };
   }
 }

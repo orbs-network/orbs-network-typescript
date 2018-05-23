@@ -56,35 +56,34 @@ export default class EthereumSimulationNode implements TestComponent {
   }
 
 
-  async deployOrbsStubContract(minTokensForSubscription: number, activeSubscriptionId: string, connectFromHost: boolean) {
+  async deployOrbsStubContract(minTokensForSubscription: number, activeSubscriptionId: string, activeSubscriptionProfile: string, connectFromHost: boolean) {
     const STUD_ORBS_TOKEN_SOLIDITY_CONTRACT = `
         pragma solidity 0.4.18;
 
         contract StubOrbsToken  {
-            struct Subscription {
-                bytes32 id;
-                uint256 tokens;
+          bytes32 activeSubscriptionId;
+          uint256 minTokensForSubscription;
+          string activeSubscriptionProfile;
+
+          function StubOrbsToken(uint256 _minTokensForSubscription, bytes32 _activeSubscriptionId, string _activeSubscriptionProfile) public {
+              minTokensForSubscription = _minTokensForSubscription;
+              activeSubscriptionId = _activeSubscriptionId;
+              activeSubscriptionProfile = _activeSubscriptionProfile;
+          }
+
+          function getSubscriptionData(bytes32 _id) public view returns (bytes32 id, string profile, uint256 startTime,
+            uint256 tokens) {
+            id = _id;
+            if (id == activeSubscriptionId) {
+                tokens = minTokensForSubscription;
+                profile = activeSubscriptionProfile;
+                startTime = 0;
+            } else {
+                tokens = 0;
             }
-
-            bytes32 activeSubscriptionId;
-
-            uint256 minTokensForSubscription;
-
-            function StubOrbsToken(uint256 _minTokensForSubscription, bytes32 _activeSubscriptionId) public {
-                minTokensForSubscription = _minTokensForSubscription;
-                activeSubscriptionId = _activeSubscriptionId;
-            }
-
-            function getSubscriptionData(bytes32 _id) public view returns (bytes32 id, uint256 tokens) {
-                id = _id;
-                if (id == activeSubscriptionId) {
-                    tokens = minTokensForSubscription;
-                } else {
-                    tokens = 0;
-                }
-            }
+          }
         }
-        `;
+      `;
 
     const web3 = new Web3(new Web3.providers.HttpProvider(this.getPublicAddress(connectFromHost)));
     // compile contract
@@ -95,7 +94,7 @@ export default class EthereumSimulationNode implements TestComponent {
     const abi = JSON.parse(output.contracts[":StubOrbsToken"].interface);
     // deploy contract
     const contract = new web3.eth.Contract(abi, undefined, { data: `0x${bytecode}` });
-    const tx = contract.deploy({ arguments: [minTokensForSubscription, activeSubscriptionId], data: undefined });
+    const tx = contract.deploy({ arguments: [minTokensForSubscription, activeSubscriptionId, activeSubscriptionProfile], data: undefined });
 
     const account = (await web3.eth.getAccounts())[0];
     const deployedContract = await tx.send({

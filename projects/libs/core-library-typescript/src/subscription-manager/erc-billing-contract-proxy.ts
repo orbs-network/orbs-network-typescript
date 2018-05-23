@@ -1,11 +1,11 @@
-import { BigNumber } from "bignumber.js";
-
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 
 export interface Subscription {
   id: number;
-  tokens: BigNumber;
+  profile: string;
+  startTime: number;
+  tokens: number;
 }
 
 export class ERCBillingContractProxy {
@@ -20,7 +20,7 @@ export class ERCBillingContractProxy {
     this.contractAddress = contractAddress;
   }
 
-  public async getSubscription(subscriptionKey: string): Promise<Subscription> {
+  public async getSubscriptionData(subscriptionKey: string): Promise<Subscription> {
     const res = await this.sidechainConnectorClient.callEthereumContract({
       contractAddress: this.contractAddress,
       functionInterface: {
@@ -32,13 +32,20 @@ export class ERCBillingContractProxy {
           "name": "id",
           "type": "bytes32",
         }, {
+          "name": "profile",
+          "type": "string",
+        }, {
+          "name": "startTime",
+          "type": "uint256"
+        },
+        {
           "name": "tokens",
           "type": "uint256"
         }]
       },
       parameters: [subscriptionKey],
     });
-    const { id, tokens } = JSON.parse(res.resultJson);
-    return { id, tokens: new BigNumber(tokens) };
+    const { id, profile, startTime, tokens } = JSON.parse(res.resultJson);
+    return { id, profile, startTime: Number.parseInt(startTime), tokens: Number.parseInt(tokens) };
   }
 }

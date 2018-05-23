@@ -3,54 +3,36 @@ import { types } from "../common-library/types";
 
 import { Gossip } from "../gossip";
 
-import { RaftConsensusConfig, RaftConsensus } from "./raft-consensus";
+import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
+import { RaftConsensus } from "./raft-consensus";
+import { StubConsensus } from "./stub-consensus";
 
 export class Consensus {
-  private raftConsensus: RaftConsensus;
-  private pollIntervalMs: number;
-  private pollInterval: NodeJS.Timer;
+  private actualConsensus: BaseConsensus;
+  private config: RaftConsensusConfig;
 
   constructor(
     config: RaftConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
      transactionPool: types.TransactionPoolClient) {
-    this.raftConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
-    this.pollIntervalMs = 100;
-  }
+      this.config = config;
 
-  async initialize() {
-    this.reportLeadershipStatus();
-    return this.raftConsensus.initialize();
-  }
-
-  async shutdown() {
-    this.stopReporting();
-    return this.raftConsensus.shutdown();
-  }
-
-  async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
-    await this.raftConsensus.onMessageReceived(fromAddress, messageType, message);
-  }
-
-  private reportLeadershipStatus() {
-    this.pollInterval = setInterval(async () => {
-      const status = this.raftConsensus.isLeader() ? "the leader" : "not the leader";
-      logger.debug(`Node is ${status}`);
-      logger.debug(`Node state: `, {
-        state: this.raftConsensus.getState(),
-        leader: this.raftConsensus.getLeader(),
-        term: this.raftConsensus.getTerm(),
-        clusterSize: this.raftConsensus.getClusterSize(),
-        votes: this.raftConsensus.getVotes(),
-        timeout: this.raftConsensus.getElectionTimeout()
-      });
-    }, this.pollIntervalMs);
-  }
-
-  private stopReporting() {
-    if (this.pollInterval) {
-      clearInterval(this.pollInterval);
+    if (config.algorithm.toLowerCase() === "stub") {
+      this.actualConsensus = new StubConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+    } else {
+      this.actualConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
     }
   }
 
+  async initialize() {
+    return this.actualConsensus.initialize();
+  }
+
+  async shutdown() {
+    return this.actualConsensus.shutdown();
+  }
+
+  async gossipMessageReceived(fromAddress: string, messageType: string, message: any) {
+    await this.actualConsensus.onMessageReceived(fromAddress, messageType, message);
+  }
 }

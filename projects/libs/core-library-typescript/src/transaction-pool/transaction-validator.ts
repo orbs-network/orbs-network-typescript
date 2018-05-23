@@ -1,40 +1,65 @@
-import { types, Address, logger } from "..";
+import { types, Address, logger, TransactionHelper } from "..";
+import { eddsa } from "elliptic";
+const ec = new eddsa("ed25519");
+
+
+export interface TransactionValidatorOptions {
+  verifySignature: boolean;
+  verifySubscription: boolean;
+}
 
 export class TransactionValidator {
   subscriptionManager: types.SubscriptionManagerClient;
+  options: TransactionValidatorOptions;
 
-  public async validate(transaction: types.Transaction): Promise<boolean> {
-    if (transaction.header.version !== 0) {
-      throw new Error(`Invalid transaction version: ${transaction.header.version}`);
+  public async validate(tx: types.Transaction): Promise<boolean> {
+    if (tx.header.version !== 0) {
+      throw new Error(`Invalid transaction version: ${tx.header.version}`);
+    }
+
+    if ((this.options.verifySignature) && (!this.verifySignature(tx))) {
+      logger.info(`Signature of ${JSON.stringify(tx)} is invalid`);
+      return false;
     }
 
     // deserializes addresses and validate checksums
-    const senderAddress = Address.fromBuffer(transaction.header.sender, undefined, true);
+    const senderAddress = Address.fromBuffer(tx.header.sender, undefined, true);
     if (senderAddress == undefined) {
-      logger.info(`address validation ${transaction.header.sender} failed on deserialization (fromBuffer())`);
+      logger.info(`Address validation ${tx.header.sender} failed on deserialization (fromBuffer())`);
       return false;
     }
-    const contractAddress = Address.fromBuffer(transaction.header.contractAddress, undefined, true);
+    const contractAddress = Address.fromBuffer(tx.header.contractAddress, undefined, true);
     if (contractAddress == undefined) {
-      logger.info(`address validation ${transaction.header.contractAddress} failed on deserialization (fromBuffer())`);
+      logger.info(`Address validation ${tx.header.contractAddress} failed on deserialization (fromBuffer())`);
       return false;
     }
 
     // check that virtual chains of sender and contract match
     if (senderAddress.virtualChainId != contractAddress.virtualChainId) {
-      logger.info(`virtual chain of address and contract address should match ${senderAddress.virtualChainId} != ${contractAddress.virtualChainId}`);
+      logger.info(`Virtual chain of address and contract address should match ${senderAddress.virtualChainId} != ${contractAddress.virtualChainId}`);
       return false;
+    }
+
+    if (!this.options.verifySubscription) {
+      return true;
     }
 
     // checks subscription
     const subscriptionKey = this.getSubscriptionKey(contractAddress);
-    const status = await this.subscriptionManager.getSubscriptionStatus({ subscriptionKey });
+    const status = await this.subscriptionManager.isSubscriptionValid({ subscriptionKey });
 
-    if (!status.active) {
-      logger.info("subscription ${subscriptionKey} not active");
+    if (!status.isValid) {
+      logger.info(`Subscription ${subscriptionKey} not valid`);
     }
 
-    return status.active;
+    return status.isValid;
+  }
+
+  private verifySignature(tx: types.Transaction) {
+    const txHelper = new TransactionHelper(tx);
+    const hash = txHelper.calculateHash();
+    const key = ec.keyFromPublic(tx.signatureData.publicKey.toString("hex"));
+    return key.verify(hash, tx.signatureData.signature.toString("hex"));
   }
 
   private getSubscriptionKey(contractAddress: Address): string {
@@ -43,7 +68,8 @@ export class TransactionValidator {
     return subscriptionKey;
   }
 
-  constructor(subscriptionManager: types.SubscriptionManagerClient) {
+  constructor(subscriptionManager: types.SubscriptionManagerClient, options: TransactionValidatorOptions) {
     this.subscriptionManager = subscriptionManager;
+    this.options = options;
   }
 }

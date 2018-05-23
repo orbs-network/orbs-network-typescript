@@ -4,26 +4,18 @@ import { expect } from "chai";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
 import BlockBuilder from "../../src/consensus/block-builder";
-import { KeyManager } from "../../src/common-library";
+import { KeyManager, KeyManagerConfig } from "../../src/common-library";
 import * as sinon from "sinon";
 import * as shell from "shelljs";
+import generateKeyPairs from "../../src/test-kit/generate-key-pairs";
 
 chai.use(sinonChai);
 
 describe("KeyManager", () => {
+  let keyManagerConfig: KeyManagerConfig;
+
   before(async function() {
-    this.timeout(4000);
-
-    shell.exec(`
-      rm -rf ${__dirname}/test-private-keys
-      mkdir -p ${__dirname}/test-private-keys
-
-      rm -rf ${__dirname}/test-public-keys
-      mkdir -p ${__dirname}/test-public-keys
-
-      ssh-keygen -t rsa -b 4096 -N "" -f ${__dirname}/test-private-keys/secret-message-key
-      ssh-keygen -f ${__dirname}/test-private-keys/secret-message-key.pub -e -m pem > ${__dirname}/test-public-keys/secret-message-key
-    `);
+    keyManagerConfig = generateKeyPairs(this);
   });
 
   describe("#constructor", () => {
@@ -35,7 +27,7 @@ describe("KeyManager", () => {
   describe("#signMessage", () => {
     it("returns a signed object", () => {
       const keyManager = new KeyManager({
-        privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
+        privateKeyPath: keyManagerConfig.privateKeyPath
       });
 
       expect(keyManager.sign({
@@ -47,7 +39,7 @@ describe("KeyManager", () => {
     it("fails if private key is not found", () => {
       expect(() => {
         new KeyManager({
-          publicKeysPath: `${__dirname}/test-public-keys/`
+          publicKeysPath: keyManagerConfig.publicKeysPath
         }).sign({
           message: "Hello",
           anotherMessage: "world"
@@ -59,7 +51,7 @@ describe("KeyManager", () => {
   describe("#verifyMessage", () => {
     it("verifies message by public key", () => {
       const keyManager = new KeyManager({
-        privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
+        privateKeyPath: keyManagerConfig.privateKeyPath
       });
 
       const message = {
@@ -70,7 +62,7 @@ describe("KeyManager", () => {
       const signature = keyManager.sign(message);
 
       const signatureVerifier = new KeyManager({
-        publicKeysPath: `${__dirname}/test-public-keys`
+        publicKeysPath: keyManagerConfig.publicKeysPath
       });
 
       const keyName = "secret-message-key";
@@ -80,7 +72,7 @@ describe("KeyManager", () => {
 
     it("works with buffers", () => {
       const keyManager = new KeyManager({
-        privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
+        privateKeyPath: keyManagerConfig.privateKeyPath
       });
 
       const message = Buffer.from([0, 1]);
@@ -88,7 +80,7 @@ describe("KeyManager", () => {
       const signature = keyManager.sign(message);
 
       const signatureVerifier = new KeyManager({
-        publicKeysPath: `${__dirname}/test-public-keys`
+        publicKeysPath: keyManagerConfig.publicKeysPath
       });
 
       const keyName = "secret-message-key";
@@ -98,7 +90,7 @@ describe("KeyManager", () => {
 
     it("fails if public key is not found", () => {
       const keyManager = new KeyManager({
-        privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`
+        privateKeyPath: keyManagerConfig.privateKeyPath
       });
 
       const message = {
@@ -109,7 +101,7 @@ describe("KeyManager", () => {
       const signature = keyManager.sign(message);
 
       const signatureVerifier = new KeyManager({
-        publicKeysPath: `${__dirname}/test-public-keys`
+        publicKeysPath: keyManagerConfig.publicKeysPath
       });
 
       const keyName = "fake-message-key";

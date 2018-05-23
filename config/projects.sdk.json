@@ -14,6 +14,11 @@
     "type": "library",
     "path": "client/client-sdk-javascript"
   },
+  "crypto-sdk-python": {
+    "runtime": "c++",
+    "type": "library",
+    "path": "client/crypto-sdk-python"
+  },
   "crypto-sdk-android": {
     "runtime": "java",
     "type": "library",
@@ -29,12 +34,19 @@
     "type": "android-app",
     "path": "client/examples/android-sample-app"
   },
+  "client-contract-test": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/client-contract-test"
+  },
   "order": [
     "architecture",
     "crypto-sdk",
+    "crypto-sdk-android",
+    "example-android-app",
     "client-sdk-javascript",
     "example-slack-bot",
-    "crypto-sdk-android",
-    "example-android-app"
+    "crypto-sdk-python",
+    "client-contract-test"
   ]
 }

@@ -1,16 +1,22 @@
 import * as _ from "lodash";
 import * as path from "path";
 
-import { logger, types, JsonBuffer } from "orbs-core-library";
+import { logger, types, JsonBuffer, KeyManager } from "orbs-core-library";
 import { BlockStorage, BlockStorageSync } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
+import { StartupCheck } from "orbs-core-library/dist/common-library/startup-check";
+import { StartupStatus } from "orbs-core-library/dist/common-library/startup-status";
+
+
 
 export interface BlockStorageServiceConfig extends ServiceConfig {
   dbPath: string;
   pollInterval: number;
+  verifySignature: boolean;
+  keyManager?: KeyManager;
 }
 
-export default class BlockStorageService extends Service {
+export default class BlockStorageService extends Service implements StartupCheck {
   private blockStorage: BlockStorage;
   private sync: BlockStorageSync;
   private gossip: types.GossipClient;
@@ -35,7 +41,11 @@ export default class BlockStorageService extends Service {
 
   async initBlockStorage(): Promise<void> {
     const blockStorageConfig = <BlockStorageServiceConfig>this.config;
-    this.blockStorage = new BlockStorage(blockStorageConfig.dbPath, this.transactionPool);
+    this.blockStorage = new BlockStorage({
+      dbPath: blockStorageConfig.dbPath,
+      verifySignature: blockStorageConfig.verifySignature,
+      keyManager: blockStorageConfig.keyManager
+    }, this.transactionPool);
     await this.blockStorage.load();
     this.sync = new BlockStorageSync(this.blockStorage);
   }
@@ -183,5 +193,9 @@ export default class BlockStorageService extends Service {
 
   public isSyncing(): boolean {
     return this.sync.isSyncing();
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    return this.blockStorage.startupCheck();
   }
 }
