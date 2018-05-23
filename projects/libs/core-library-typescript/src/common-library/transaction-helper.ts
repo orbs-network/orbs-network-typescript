@@ -19,7 +19,7 @@ export class TransactionHelper implements types.Transaction {
     hash.update(stringify({
       header: {
         contractAddressBase58: bs58EncodeRawAddress(this.header.contractAddress),
-        senderBase58: bs58EncodeRawAddress(this.header.sender),
+        senderAddressBase58: bs58EncodeRawAddress(this.header.sender),
         timestamp: this.header.timestamp,
         version: this.header.version
       },

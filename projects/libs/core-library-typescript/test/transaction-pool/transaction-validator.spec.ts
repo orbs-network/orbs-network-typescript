@@ -1,6 +1,7 @@
 import { types } from "../../src/common-library/types";
 import * as chai from "chai";
 import { expect } from "chai";
+import * as mocha from "mocha";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
 import { stubInterface } from "ts-sinon";
