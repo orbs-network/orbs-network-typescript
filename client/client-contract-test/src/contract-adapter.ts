@@ -4,11 +4,11 @@ import { expectedSendTransactionRequest, expectedCallContractRequest, expectedCa
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest } from "./orbs-api-interface";
 import { eddsa } from "elliptic";
 import { createHash } from "crypto";
+import * as stringify from "json-stable-stringify";
 
 export interface OrbsContractAdapter {
-
-    getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPISendTransactionRequest;
-    getCallObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPICallContractRequest;
+    getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPISendTransactionRequest>;
+    getCallObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPICallContractRequest>;
 }
 
 function testTransactionObjectSignature(sendTransactionObject: OrbsAPISendTransactionRequest) {
@@ -23,8 +23,9 @@ function testTransactionObjectSignature(sendTransactionObject: OrbsAPISendTransa
         "timestamp":"${sendTransactionObject.header.timestamp}",
         "version":${sendTransactionObject.header.version}
       },
-      "payload":${JSON.stringify(sendTransactionObject.payload)}
+      "payload":${stringify(sendTransactionObject.payload)}
     }`.replace(/\s/g, "");
+
   const hasher = createHash("sha256");
   hasher.update(message);
   const hash = hasher.digest();
@@ -43,6 +44,7 @@ export function testContract(makeContract: () => OrbsContractAdapter, options: {
         expect(sendTransactionObject).to.have.property("header").that.has.property("senderAddressBase58").that.is.eql(expectedSendTransactionRequest.header.senderAddressBase58);
         expect(sendTransactionObject).to.have.property("header").that.has.property("contractAddressBase58").that.is.eql(expectedSendTransactionRequest.header.contractAddressBase58);
         expect(sendTransactionObject).to.have.property("header").that.has.property("timestamp").that.is.a("string");
+
         const now = Date.now();
         // testing that timestamp is less than a couple of seconds old and not in the future
         const timestamp = Number(sendTransactionObject.header.timestamp);

@@ -2,13 +2,12 @@
 
 import unittest
 import json
-from pycrypto import ED25519Key, Address
 
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
 from orbs_client import HttpClient, Contract
-
+from orbs_client.pycrypto import ED25519Key, Address
 
 class TestContract(unittest.TestCase):
     def test_generate_payload(self):
@@ -34,17 +33,29 @@ class TestContract(unittest.TestCase):
         method = "myMethod"
         args = [1, 2, 3, 7]
 
-        req = json.loads(contract.generate_payload(method, args))
-        print req
+        reqSendTransaction = json.loads(contract.generate_send_transaction_payload(method, args))
+        print reqSendTransaction
 
-        self.assertEqual(req['method'], method)
-        self.assertEqual(req['args'], args)
+        self.assertEqual(reqSendTransaction['method'], method)
+        self.assertEqual(reqSendTransaction['args'], args)
 
-        reqWithNoArgs = json.loads(contract.generate_payload(method, None))
-        print reqWithNoArgs
+        reqSendTransactionWithNoArgs = json.loads(contract.generate_send_transaction_payload(method, None))
+        print reqSendTransactionWithNoArgs
 
-        self.assertEqual(reqWithNoArgs['method'], method)
-        self.assertEqual(reqWithNoArgs['args'], [])
+        self.assertEqual(reqSendTransactionWithNoArgs['method'], method)
+        self.assertEqual(reqSendTransactionWithNoArgs['args'], [])
+
+        reqCall = json.loads(contract.generate_send_transaction_payload(method, args))
+        print reqCall
+
+        self.assertEqual(reqCall['method'], method)
+        self.assertEqual(reqCall['args'], args)
+
+        reqCallWithNoArgs = json.loads(contract.generate_send_transaction_payload(method, None))
+        print reqCallWithNoArgs
+
+        self.assertEqual(reqCallWithNoArgs['method'], method)
+        self.assertEqual(reqCallWithNoArgs['args'], [])
 
 
 if __name__ == '__main__':

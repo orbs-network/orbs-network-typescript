@@ -29,17 +29,18 @@ class TypeScriptContractAdapter implements OrbsContractAdapter {
     this.orbsContract = orbsContract;
   }
 
-  getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPISendTransactionRequest {
+  getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPISendTransactionRequest> {
     const sendTransactionPayload = this.orbsContract.generateSendTransactionPayload(methodName, args);
     const sendTranscationObject = this.orbsContract.orbsClient.generateTransactionRequest(this.orbsContract.contractAddress, sendTransactionPayload, Date.now());
 
-    return sendTranscationObject;
+    return Promise.resolve(sendTranscationObject);
   }
-  getCallObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPICallContractRequest {
+
+  getCallObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPICallContractRequest> {
     const callPayload = this.orbsContract.generateCallPayload(methodName, args);
     const callObject = this.orbsContract.orbsClient.generateCallRequest(this.orbsContract.contractAddress, callPayload);
 
-    return callObject;
+    return Promise.resolve(callObject);
   }
 }
 
@@ -50,83 +51,99 @@ class JavaContractAdapter implements OrbsContractAdapter {
     this.javaContract = javaContract;
   }
 
-  getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPISendTransactionRequest {
+  getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPISendTransactionRequest> {
     const sendTransactionPayload = this.javaContract.generateSendTransactionPayloadSync(methodName, args);
     const javaClient = this.javaContract.getOrbsClientSync();
     const sendTransactionObjectJson = javaClient.generateTransactionRequestSync(this.javaContract.getContractAddressSync(), sendTransactionPayload);
     const sendTransactionObject = JSON.parse(sendTransactionObjectJson);
-    return sendTransactionObject;
+    return Promise.resolve(sendTransactionObject);
   }
-  getCallObject(methodName: string, args: OrbsContractMethodArgs): OrbsAPICallContractRequest {
+
+  getCallObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPICallContractRequest> {
     const callPayload = this.javaContract.generateCallPayloadSync(methodName, args);
     const javaClient = this.javaContract.getOrbsClientSync();
     const callObjectJson = javaClient.generateCallRequestSync(this.javaContract.getContractAddressSync(), callPayload);
     const callObject = JSON.parse(callObjectJson);
-    return callObject;
+    return Promise.resolve(callObject);
   }
 }
 
-// class PythonContractAdapter implements OrbsContractAdapter {
-//   contractName: string;
-//   apiEndpoint: string;
-//   senderPublicKey: string;
-//   virtualChainId: string;
-//   networkId: string;
-//   timeoutInMillis: number;
+class PythonContractAdapter implements OrbsContractAdapter {
+  contractName: string;
+  apiEndpoint: string;
+  senderPublicKey: string;
+  senderPrivateKey: string;
+  virtualChainId: string;
+  networkId: string;
+  timeoutInMillis: number;
 
-//   pythonClientRoot = path.resolve(__dirname, "../../../crypto-sdk-python/");
+  pythonClientRoot = path.resolve(__dirname, "../../../crypto-sdk-python/");
 
-//   constructor(contractName: string, apiEndpoint: string, senderPublicKey: string,
-//     virtualChainId: string, networkId: string, timeoutInMillis: number) {
+  constructor(contractName: string, apiEndpoint: string, senderPublicKey: string, senderPrivateKey: string,
+    virtualChainId: string, networkId: string, timeoutInMillis: number) {
 
-//       this.contractName = contractName;
-//       this.apiEndpoint = apiEndpoint;
-//       this.senderPublicKey = senderPublicKey;
-//       this.virtualChainId = virtualChainId;
-//       this.networkId = networkId;
-//       this.timeoutInMillis = timeoutInMillis;
+      this.contractName = contractName;
+      this.apiEndpoint = apiEndpoint;
+      this.senderPublicKey = senderPublicKey;
+      this.senderPrivateKey = senderPrivateKey;
+      this.virtualChainId = virtualChainId;
+      this.networkId = networkId;
+      this.timeoutInMillis = timeoutInMillis;
 
-//       console.log(this.pythonClientRoot);
-//   }
+      console.log(this.pythonClientRoot);
+  }
 
-//   private async createPython(): Promise<PythonBridge> {
-//     const python = pythonBridge({
-//       env: {PYTHONPATH: this.pythonClientRoot}
-//     });
+  private async createPython(): Promise<PythonBridge> {
+    const python = pythonBridge({
+      python: "/usr/local/bin/python", // FIXME: check if it works in Docker
+      env: {PYTHONPATH: this.pythonClientRoot}
+    });
 
-//     function rethrow(e: Error) {
-//       python.kill("SIGKILL");
-//       return Promise.reject(e);
-//     }
+    function rethrow(e: Error) {
+      python.kill("SIGKILL");
+      return Promise.reject(e);
+    }
 
-//     await python.ex`
-//       import orbs_client
+    await python.ex`
+      import orbs_client
+      from orbs_client import pycrypto
 
-//       address = orbs_client.Address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
-//       client = orbs_client.HttpClient(${this.apiEndpoint}, address, ${this.timeoutInMillis})
-//       contract = orbs_client.Contract(client, ${this.contractName})`.catch(rethrow);
+      key_pair = pycrypto.ED25519Key(${this.senderPublicKey}, ${this.senderPrivateKey})
+      address = pycrypto.Address(${this.senderPublicKey}, ${this.virtualChainId}, ${this.networkId})
+      client = orbs_client.HttpClient(${this.apiEndpoint}, address, key_pair, ${this.timeoutInMillis})
+      contract = orbs_client.Contract(client, ${this.contractName})
 
-//     return python;
-//   }
+      undefined = None
+    `.catch(rethrow);
 
-//   async sendTransaction(methodName: string, args: OrbsContractMethodArgs): Promise<SendTransactionOutput> {
+    return python;
+  }
 
-//     const python = await this.createPython();
-//     const result = await python`contract.send_transaction(${methodName}, ${args})`;
-//     await python.end();
+  async getSendTransactionObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPISendTransactionRequest> {
+    const python = await this.createPython();
 
-//     return result;
-//   }
+    const sendTransactionObject = await python`
+    client.generate_transaction_request(contract.address, contract.generate_send_transaction_payload(${methodName}, ${args}))
+    `;
 
-//   async call(methodName: string, args: OrbsContractMethodArgs): Promise<any> {
-//     const python = await this.createPython();
-//     const result = await python`contract.call(${methodName}, ${args})`;
-//     await python.end();
+    await python.end();
 
-//     return result;
-//   }
+    return Promise.resolve(sendTransactionObject);
+  }
 
-// }
+  async getCallObject(methodName: string, args: OrbsContractMethodArgs): Promise<OrbsAPICallContractRequest> {
+    const python = await this.createPython();
+
+    const sendCallObject = await python`
+    client.generate_call_request(contract.address, contract.generate_call_payload(${methodName}, ${args}))
+    `;
+
+    await python.end();
+
+    return Promise.resolve(sendCallObject);
+
+  }
+}
 
 // TODO: we do not need to use this mock server, we need to use the one that comes with public api - it is still a WIP
 // let httpServer: Server;
@@ -148,8 +165,8 @@ describe("The Java SDK", () => {
   );
 });
 
-describe.skip("The Python SDK", () => {
-  // testContract(() => new PythonContractAdapter(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT));
+describe("The Python SDK", () => {
+  testContract(() => new PythonContractAdapter(CONTRACT_NAME, API_ENDPOINT, SENDER_PUBLIC_KEY, SENDER_PRIVATE_KEY, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID, TIMEOUT));
 });
 
 after((done) => {

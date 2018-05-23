@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import unittest
-from pycrypto import ED25519Key, Address
 
 from os import sys, path
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
+from orbs_client.pycrypto import ED25519Key, Address
 from orbs_client import HttpClient
 
 

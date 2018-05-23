@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 import unittest
-from pycrypto import ED25519Key
+
+from os import sys, path
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+
+from orbs_client.pycrypto import ED25519Key
 
 
 class TestED25519Key(unittest.TestCase):

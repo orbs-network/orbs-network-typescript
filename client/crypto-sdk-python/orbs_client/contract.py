@@ -11,22 +11,33 @@ class Contract:
 
 
   def send_transaction(self, method_name, *args):
-    payload = self.generate_payload(method_name, args)
+    payload = self.generate_send_transaction_payload(method_name, args)
     return self.http_client.send_transaction(self.address, payload);
 
 
   def call(self, method_name, *args):
-    payload = this.generate_payload(method_name, args)
+    payload = this.generate_call_payload(method_name, args)
     return self.http_client.call(self.address, payload)
 
 
-  def generate_payload(self, methodName, args):
+  def generate_send_transaction_payload(self, methodName, args):
     args_to_use = args
 
     if not args:
       args_to_use = []
 
     return json.dumps({
-      'method': methodName,
-      'args': args_to_use
-    })
+      'args': args_to_use,
+      'method': methodName
+    }, sort_keys=True, separators=(',', ':'))
+
+  def generate_call_payload(self, methodName, args):
+    args_to_use = args
+
+    if not args:
+      args_to_use = []
+
+    return json.dumps({
+      'args': args_to_use,
+      'method': methodName
+    }, sort_keys=True, separators=(',', ':'))
