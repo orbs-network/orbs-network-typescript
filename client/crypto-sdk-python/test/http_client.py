@@ -9,7 +9,7 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from orbs_client import HttpClient
 
 
-class TestAddress(unittest.TestCase):
+class TestHttpClient(unittest.TestCase):
     def test_generate_transaction_request(self):
         virtual_chain_id = "640ed3"
         network_id = Address.MAIN_NETWORK_ID
