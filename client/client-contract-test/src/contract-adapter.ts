@@ -40,7 +40,7 @@ export function testContract(makeContract: () => OrbsContractAdapter, options: {
 
       it("getSendTransactionObject() is called", async () => {
         const sendTransactionObject = await makeContract().getSendTransactionObject(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS);
-        expect(sendTransactionObject).to.have.property("payload").that.is.eql(expectedSendTransactionRequest.payload);
+        expect(JSON.parse(sendTransactionObject.payload)).to.be.eql(JSON.parse(expectedSendTransactionRequest.payload));
         expect(sendTransactionObject).to.have.property("header").that.has.property("senderAddressBase58").that.is.eql(expectedSendTransactionRequest.header.senderAddressBase58);
         expect(sendTransactionObject).to.have.property("header").that.has.property("contractAddressBase58").that.is.eql(expectedSendTransactionRequest.header.contractAddressBase58);
         expect(sendTransactionObject).to.have.property("header").that.has.property("timestamp").that.is.a("string");
@@ -61,14 +61,14 @@ export function testContract(makeContract: () => OrbsContractAdapter, options: {
 
       it("getCallObject() is called", async () => {
         const callObject = await makeContract().getCallObject(CONTRACT_METHOD_NAME, CONTRACT_METHOD_ARGS);
-        expect(callObject).to.have.property("payload").that.is.eql(expectedCallContractRequest.payload);
+        expect(JSON.parse(callObject.payload)).to.be.eql(JSON.parse(expectedCallContractRequest.payload));
         expect(callObject).to.have.property("contractAddressBase58", expectedCallContractRequest.contractAddressBase58);
         expect(callObject).to.have.property("senderAddressBase58", expectedCallContractRequest.senderAddressBase58);
       });
 
       it("getCallObject() is called, undefined args", async () => {
         const callObject = await makeContract().getCallObject(CONTRACT_METHOD_NAME, undefined);
-        expect(callObject).to.have.property("payload").that.is.eql(expectedCallContractRequestNoArgs.payload);
+        expect(JSON.parse(callObject.payload)).to.be.eql(JSON.parse(expectedCallContractRequestNoArgs.payload));
         expect(callObject).to.have.property("contractAddressBase58", expectedCallContractRequestNoArgs.contractAddressBase58);
         expect(callObject).to.have.property("senderAddressBase58", expectedCallContractRequestNoArgs.senderAddressBase58);
       });
