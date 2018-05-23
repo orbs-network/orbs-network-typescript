@@ -10,6 +10,32 @@ class HttpClient:
     self.key_pair = key_pair
     self.timeout_in_millis = timeout_in_millis
 
+
+  def send_transaction(self, contract_address, payload):
+    transaction = self.generate_transaction_request(contract_address, payload)
+
+    request = requests.post(self.endpoint + '/public/sendTransaction', json=transaction)
+    response = request.json()
+
+    return response['result']
+
+
+  def call(self, contract_address, payload):
+    call_data = self.generate_call_request(contract_address, payload)
+
+    request = requests.post(self.endpoint + '/public/callContract', json=call_data)
+    response = request.json()
+
+    return response['result']
+
+
+  def get_transaction_status(txid):
+    request = requests.post(self.endpoint + 'public/getTransactionStatus', json={'txid': txid})
+    response = request.json()
+
+    return response
+
+
   def generate_transaction_request(self, contract_address, payload, timestamp = datetime.utcnow()):
     # build transaction without signatute data
     header = {
@@ -32,6 +58,7 @@ class HttpClient:
     }
 
     return req
+
 
   def generate_call_request(self, contract_address, payload):
     req = {
