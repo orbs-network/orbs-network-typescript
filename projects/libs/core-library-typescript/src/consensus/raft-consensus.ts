@@ -84,6 +84,14 @@ export class RaftConsensus extends BaseConsensus {
   private pollIntervalMs: number;
   private pollInterval: NodeJS.Timer;
 
+  private configSanitation(key: string, value: any): any {
+    if (key == "keyManager") {
+      return undefined;
+    }
+
+    return value;
+  }
+
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
@@ -92,7 +100,7 @@ export class RaftConsensus extends BaseConsensus {
     virtualMachine: types.VirtualMachineClient
   ) {
     super();
-    logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config)}`);
+    logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config, this.configSanitation)}`);
 
     this.pollIntervalMs = 3000;
     this.transactionPool = transactionPool;

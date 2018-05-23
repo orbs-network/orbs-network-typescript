@@ -20,13 +20,22 @@ export default class GossipService extends Service {
     super(serviceConfig);
   }
 
+
+  private configSanitation(key: string, value: any): any {
+    if (key == "keyManager") {
+      return undefined;
+    }
+
+    return value;
+  }
+
   async initialize() {
     await this.initGossip();
   }
 
   async initGossip(): Promise<void> {
     const gossipConfig = <GossipServiceConfig>this.config;
-    logger.debug(`Gossip service starting with config: ${JSON.stringify(gossipConfig)}`);
+    logger.debug(`Gossip service starting with config: ${JSON.stringify(gossipConfig, this.configSanitation)}`);
     this.gossip = new Gossip({
       port: gossipConfig.gossipPort,
       localAddress: gossipConfig.nodeName,
