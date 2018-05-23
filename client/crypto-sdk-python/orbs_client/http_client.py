@@ -32,3 +32,12 @@ class HttpClient:
     }
 
     return req
+
+  def generate_call_request(self, contract_address, payload):
+    req = {
+      'senderAddressBase58': self.address.to_string(),
+      'contractAddressBase58': contract_address.to_string(),
+      'payload': payload
+    }
+
+    return req
