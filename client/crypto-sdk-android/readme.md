@@ -18,8 +18,6 @@ dependencies {
 }
 ```
 
-Currently the latest release version is `0.0.6`
-
 ### Other dependencies
 
 The SDK uses `okhttp` for network access and `gson` for serialization.
@@ -57,7 +55,7 @@ public class SampleApp extends AppCompatActivity {
     ...
 ```
 
-Not calling initialize may cause the SDK to become unstable and may cause issues with generating addresses and working with them.
+Not calling initialize may cause the SDK to become unstable and may cause issues with generating addresses and working with them, you may see several error/warning log messages being outputted if you miss the initialize call.
 
 The client classes `OrbsContract` and `OrbsClient` are used to access and manipulate data on the orbs-network as explained above.
 
@@ -77,14 +75,22 @@ Key generation time should take around 20-30ms but may sometime spike as the PRN
 
 More information about the addressing scheme is available at the [client documentation](https://github.com/orbs-network/orbs-network/tree/master/client).
 
+## The OrbsHost class
+
+This class is used to provide the connection endpoint, it will receive three arguments which construct the connection info:
+
+* `isHttps` - true/false for ssl
+* `host` - the host address of the node to connect to, for example `my.app.orbs.network`
+* `port` - the endpoint port, for example `80`
+
 ## The OrbsClient class
 
 You can create an `OrbsClient` class to call the contract methods with some client (Address). The client will accept:
 
-* `apiEndpoint` - the orbs-network node
-* `senderAddress` - the address of the entity 'acting' right now
-* `keyPair` - the public and private key for the current sender (`ED25519Key` object)
-* `timeoutInMs` - optional network timeout, the default is 2000ms
+* `endpoint` - the orbs-network node repesented as a `OrbsHost` class
+* `senderAddress` - the address of the entity 'acting' right now, its virtual chain must match the addressing scheme of the contract
+* `keyPair` - the public and private key for the current sender, used to sign the message (`ED25519Key` object)
+* `timeoutInMs` - optional network timeout, the default is 3000ms
 
 Creating the client will enable you to perform two main operation, `sendTransaction()` and `call()`.
 
@@ -103,7 +109,7 @@ Both of these actions will accept two variables:
 
 ### sendTransaction
 
-Use `sendTransaction()` to perform an action (method of the smart contract) which changes the state such as transfer action
+Use `sendTransaction()` to perform an action (method of the smart contract) which changes the state such as a transfer action.
 
 ### call
 
