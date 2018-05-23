@@ -28,7 +28,7 @@ export default function (nodeTopology: any, env: any) {
 
   const virtualMachine = new VirtualMachine(contractRegistryConfig, peers.stateStorage);
   const virtualMachineService = new VirtualMachineService(virtualMachine, nodeConfig);
-  const startupCheckRunner = new StartupCheckRunner("storage", [virtualMachineService]);
+  const startupCheckRunner = new StartupCheckRunner("virtual-machine-service", [virtualMachineService]);
   return grpcServer.builder()
     .withService("VirtualMachine", virtualMachineService)
     .withStartupCheckRunner(startupCheckRunner)
