@@ -43,7 +43,7 @@ export class CommittedTransactionPool extends BaseTransactionPool {
     return count;
   }
 
-  public addCommittedTransactions(transactionReceipts: types.TransactionReceipt[]) {
+  public async addCommittedTransactions(transactionReceipts: types.TransactionReceipt[]) {
     const entryTimestamp = Date.now();
     for (const receipt of transactionReceipts) {
       const txid = transactionHashToId(receipt.txHash);

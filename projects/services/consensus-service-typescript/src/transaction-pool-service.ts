@@ -61,8 +61,8 @@ export default class TransactionPoolService extends Service {
 
   @Service.RPCMethod
   public async markCommittedTransactions(rpc: types.MarkCommittedTransactionsContext) {
-    this.committedTransactionPool.addCommittedTransactions(rpc.req.transactionReceipts);
-    this.pendingTransactionPool.clearCommittedTransactionsFromPendingPool(rpc.req.transactionReceipts);
+    await this.committedTransactionPool.addCommittedTransactions(rpc.req.transactionReceipts);
+    await this.pendingTransactionPool.clearCommittedTransactionsFromPendingPool(rpc.req.transactionReceipts);
     rpc.res = {};
   }
 

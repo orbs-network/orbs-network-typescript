@@ -79,7 +79,9 @@ export class RaftConsensus extends BaseConsensus {
 
   private connector: RPCConnector;
   private node: any;
-  private nextBlockChainIndex: number; // maintain consistency between gaggle log and storage
+  private raftIndex: number; // maintain consistency between gaggle log and storage
+  private leaderIntervalMs: number;
+  private leaderInterval: NodeJS.Timer;
 
   private pollIntervalMs: number;
   private pollInterval: NodeJS.Timer;
@@ -116,9 +118,9 @@ export class RaftConsensus extends BaseConsensus {
         blockSizeLimit: config.blockSizeLimit
       }
     });
-
-    this.nextBlockChainIndex = 0;
-
+    this.blockBuilder.stop();
+    this.raftIndex = -1;
+    this.leaderIntervalMs = config.leaderIntervalMs;
     this.node = gaggle({
       id: config.nodeName,
       clusterSize: config.clusterSize,
@@ -143,49 +145,115 @@ export class RaftConsensus extends BaseConsensus {
     // Note: we might consider adding transactions as the result to the "appended" event, which will require further
     // synchronization, but will make everything a wee bit faster.
 
-    this.node.on("committed", async (data: any, index: number) => this.onCommitted(data, index));
+    this.node.on("committed", async () => this.onCommitted());
 
-    this.node.on("leaderElected", () => this.onLeaderElected());
+    this.node.on("leaderElected", async () => this.onLeaderElected());
+
+    this.node.inSync = function() {
+      return this.raftIndex == this.node.getCommitIndex();
+    };
+
   }
 
-  private async onCommitted(data: any, index: number) {
-    const msg: types.ConsensusMessage = data.data;
 
-    const start = new Date().getTime();
-    const block: types.Block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
-    const end = new Date().getTime();
+  // onCommitted triggered by raft consensus
+  // The node is responsible to PULL the diff
+  // Note: current implementation will commit invalid blocks - which will not be appended to block chain storage
+  private async onCommitted() {
+    const raftCommitIndex: number = this.node.getCommitIndex();
+    let block: types.Block = undefined;
+    let blockHash = "";
+    if (this.raftIndex < raftCommitIndex) {
+      const entries: any[] = await this.node.getBlocks(this.raftIndex, raftCommitIndex + 1);
+      for (let i = 0; i < entries.length; i++) {
+        try {
+            const msg: types.ConsensusMessage = entries[i].data;
+            // Since we're currently storing single transactions per-block, we'd increase the block numbers for every
+            // committed entry.
+            const start = new Date().getTime();
+            block = JsonBuffer.parseJsonWithBuffers(JSON.stringify(msg.block));
+            const end = new Date().getTime();
 
-    const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.debug(`onCommitted ${this.node.id}: New block with height ${block.header.height} and hash ${blockHash} is about to be committed (RAFT index ${index})`);
+            blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.info(`Finished deserializing block with height ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
+            logger.debug(`onCommitted ${this.node.id}: New block with height ${block.header.height} and hash ${blockHash} is about to be committed (RAFT index ${this.raftIndex + i})`);
 
-    logger.info(`New block to be committed with height ${block.header.height} and hash ${blockHash}`);
+            logger.info(`Finished deserializing block with height ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
 
-    try {
-      await this.blockBuilder.commitBlock(block);
-      if (this.node.isLeader()) {
-        if (this.node.getCommitIndex() == index)
-            this.blockBuilder.appendNextBlock();
+            logger.info(`New block to be committed with height ${block.header.height} and hash ${blockHash}`);
+
+
+            await this.blockBuilder.commitBlock(block);
+
+            logger.info(`${this.node.id}: Successfully committed block with height ${block.header.height} and hash ${blockHash}, raftIndex ${this.raftIndex + i}`);
+            const raftLog: any[] = this.node.getLog();
+            const b = { blocks: await this.blockBuilder.getBlocks(0) };
+            if (b.blocks != undefined) {
+              let blockChainStr = "Node " + this.node.id + " Current block chain: ";
+
+              // logger.info();
+              for (let i = 0; i < b.blocks.length; i++) {
+                const blockHash = BlockUtils.calculateBlockHash(b.blocks[i]).toString("hex");
+                blockChainStr += "Height " + i + ":  " + blockHash +  "\n";
+                // logger.info(`Height ${i}:  ${blockHash}`);
+
+              }
+              logger.info(blockChainStr);
+              let rafLogStr = "Node " + this.node.id + "Current raft log: ";
+              // logger.info(`Node ${this.node.id} Current raft log: `);
+              for (let i = 0; i < raftLog.length; i++) {
+                const blockHash = raftLog[i].term;
+                // BlockUtils.calculateBlockHash(raftLog[i]).toString("hex");
+                rafLogStr += "Height " + i + ":  term:" + raftLog[i].term + " data: " + raftLog[i].data + "\n";
+                // logger.info(`Height ${i}:  ${blockHash}`);
+              }
+              logger.info(rafLogStr);
+            }
+        } catch (err) {
+            // note: we maintain a sync routine with the raft log to update the storage state...
+            // invalid blocks which are committed on raft are acceptable
+            if (block != undefined)
+                logger.error(`${this.node.id}: Failed to commit block with height ${block.header.height} and hash ${blockHash}: ${JSON.stringify(err)}`);
+            // if (this.node.isLeader())
+            //     this.node.stepDown(); // -leader steps down (election time out will occur)
+        }
       }
-    } catch (err) {
-      // Gad: if for any reason the commit flow (block storage + transaction pool) failed
-      //  TODO: note: we maintain a sync routine with the raft log to try and update the storage state...
-      logger.error(err);
-      logger.error(`Failed to commit block with height ${block.header.height} and hash ${blockHash}: ${JSON.stringify(err)}`);
-      // this.node.stepDown(); // -leader steps down (election time out will occur)
+      this.raftIndex = raftCommitIndex;
+      this.onLeaderElected();
     }
   }
 
+
+
+
+
+  // leader will create block only if it is in sync
   private async onLeaderElected() {
     this.reportLeadershipStatus();
 
-    if (this.node.isLeader()) {
-      logger.info(`Node ${this.node.id} was elected as a new leader!`);
-
-      this.blockBuilder.appendNextBlock();
+    if (this.leaderInterval) {
+      clearInterval(this.leaderInterval);
     }
+
+    if (this.node.isLeader()) {
+      const raftCommitIndex: number = this.node.getCommitIndex();
+      if (this.raftIndex >= raftCommitIndex) {  // Important: Assume Gaggle commit index is initialized to -1 !!
+        logger.info(`Node ${this.node.id} was elected as a new leader! after update to blockchain ${this.raftIndex}:${raftCommitIndex}; local:remote`);
+        this.blockBuilder.appendNextBlock();
+      }
+      else {
+        this.leaderInterval = setInterval(async () => {
+          try {
+            logger.debug("new leader waits for transaction pool to update tick");
+            this.onLeaderElected();
+          } catch (err) {
+            logger.error(`new leader error: ${JSON.stringify(err)}`);
+          }
+        }, this.leaderIntervalMs);
+      }
+    }
+
   }
 
   async onMessageReceived(fromAddress: string, messageType: string, message: any): Promise<any> {
@@ -197,13 +265,15 @@ export class RaftConsensus extends BaseConsensus {
   }
 
   public onNewBlockBuild(block: types.Block) {
-    const appendMessage: types.ConsensusMessage = { block };
+    if (this.node.isLeader()) {
+        const appendMessage: types.ConsensusMessage = { block };
 
-    const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
+        const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-    logger.debug(`onNewBlockBuilds ${this.node.id}:  New block with height ${block.header.height} and hash ${blockHash} is about to be appended to RAFT log`);
+        logger.debug(`onNewBlockBuilds ${this.node.id}:  New block with height ${block.header.height} and hash ${blockHash} is about to be appended to RAFT log`);
 
-    this.node.append(appendMessage);
+        this.node.append(appendMessage);
+    }
   }
 
   async initialize(): Promise<any> {
