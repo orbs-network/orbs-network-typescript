@@ -2,6 +2,7 @@ import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 
 import { ERCBillingContractProxy, Subscription } from "./erc-billing-contract-proxy";
+import * as cache from "memory-cache";
 
 export interface MonthlySubscriptionRateData {
   expiresAt?: number; // timestamp
@@ -20,14 +21,24 @@ export class SubscriptionManagerConfiguration {
 export class SubscriptionManager {
   private contractProxy: ERCBillingContractProxy;
   private config: SubscriptionManagerConfiguration;
+  private subscriptionCache: cache.CacheClass<string, Subscription>;
+  private readonly CACHE_TIMEOUT_IN_MS: number = 24 * 60 * 60 * 1000; // 24 hours in ms
 
   constructor(sidechainConnector: types.SidechainConnectorClient, config: SubscriptionManagerConfiguration) {
     this.config = config;
     this.contractProxy = new ERCBillingContractProxy(sidechainConnector, this.config.ethereumContractAddress);
+    this.subscriptionCache = new cache.Cache();
   }
 
   async isSubscriptionValid(subscriptionKey: string): Promise<boolean> {
-    const subscriptionData =  await this.contractProxy.getSubscriptionData(subscriptionKey);
+    let subscriptionData = this.subscriptionCache.get(subscriptionKey);
+    if (subscriptionData == undefined) {
+      subscriptionData =  await this.contractProxy.getSubscriptionData(subscriptionKey);
+      this.subscriptionCache.put(subscriptionKey, subscriptionData, this.CACHE_TIMEOUT_IN_MS);
+    }
+    else {
+      logger.debug(`Subscription ${subscriptionKey} loaded from cache`);
+    }
 
     const now = new Date();
 
@@ -60,7 +71,7 @@ export class SubscriptionManager {
     }
 
     if (subscriptionData.tokens < minimumRequiredFee) {
-      logger.info(`Subscription fee is not sufficient (${subscriptionData.tokens} < ${minimumRequiredFee})`);
+      logger.info(`Subscription fee is insufficient (${subscriptionData.tokens} < ${minimumRequiredFee})`);
       return false;
     }
 
