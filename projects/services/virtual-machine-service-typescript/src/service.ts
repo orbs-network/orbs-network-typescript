@@ -3,10 +3,10 @@ import * as _ from "lodash";
 
 import { logger, types } from "orbs-core-library";
 
-import { Service, ServiceConfig } from "orbs-core-library";
+import { Service, ServiceConfig, StartupCheck, StartupStatus } from "orbs-core-library";
 import { VirtualMachine } from "orbs-core-library";
 
-export default class VirtualMachineService extends Service {
+export default class VirtualMachineService extends Service implements StartupCheck {
   private virtualMachine: VirtualMachine;
 
   public constructor(virtualMachine: VirtualMachine, serviceConfig: ServiceConfig) {
@@ -35,4 +35,9 @@ export default class VirtualMachineService extends Service {
       resultJson: JSON.stringify(result)
     };
   }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    return this.virtualMachine.startupCheck();
+  }
+
 }
