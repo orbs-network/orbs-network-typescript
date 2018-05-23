@@ -2,6 +2,7 @@ import { SubscriptionManager, types } from "../../src";
 import { stubInterface } from "ts-sinon";
 import { SidechainConnector } from "orbs-interfaces";
 import * as chai from "chai";
+import * as mocha from "mocha";
 import { expect } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as sinonChai from "sinon-chai";
@@ -39,6 +40,30 @@ describe("isSubscriptionValid()", () => {
       profile: "testProfile",
       startTime: (new Date("2018-01-01").getTime()),
       tokens: 1000
+    };
+    (<sinon.SinonStub>sidechainConnector.callEthereumContract).returns(<types.CallEthereumContractOutput>{
+      resultJson: JSON.stringify(result)
+    });
+    return expect(subscriptionManager.isSubscriptionValid(subscriptionKey)).to.eventually.be.true;
+  });
+
+  it("subscription cache is used", async () => {
+    const result = {
+      id: subscriptionKey,
+      profile: "testProfile",
+      startTime: (new Date("2018-01-01").getTime()),
+      tokens: 1000
+    };
+    (<sinon.SinonStub>sidechainConnector.callEthereumContract).returns(<types.CallEthereumContractOutput>{
+      resultJson: JSON.stringify(result)
+    });
+    await expect(subscriptionManager.isSubscriptionValid(subscriptionKey)).to.eventually.be.true;
+    // cache hit expected below, otherwise test will fail.
+    const badResult = {
+      id: subscriptionKey,
+      profile: "testProfile",
+      startTime: (new Date("2018-01-01").getTime()),
+      tokens: 900
     };
     (<sinon.SinonStub>sidechainConnector.callEthereumContract).returns(<types.CallEthereumContractOutput>{
       resultJson: JSON.stringify(result)
