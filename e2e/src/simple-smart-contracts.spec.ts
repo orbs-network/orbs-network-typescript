@@ -10,7 +10,7 @@ import ChaiBarsPlugin from "./chai-bars-plugin";
 import { DockerHealthChecks } from "./docker-health-checks";
 
 const expect = chai.expect;
-const DOCKER_HEALTH_CHECK_MAX_RETRIES = 5;
+const DOCKER_HEALTH_CHECK_MAX_RETRIES = 10;
 const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 12;
 
 chai.should();
