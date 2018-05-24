@@ -18,6 +18,7 @@ export interface RaftConsensusConfig {
   debug?: boolean;
   signBlocks: boolean;
   keyManager?: KeyManager;
+  leaderIntervalMs?: number;
 }
 
 export abstract class BaseConsensus {

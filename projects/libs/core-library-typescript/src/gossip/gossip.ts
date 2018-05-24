@@ -8,8 +8,7 @@ import * as _ from "lodash";
 function handleWSError(address: string, url: string) {
   return (err: Error) => {
     if (err) {
-      logger.error(`WebSocket error`, { err });
-      logger.error(`Error sending unicast message to ${address} (${url})`);
+      logger.error(`Error sending unicast message to ${address} (${url}), WS Error: ${JSON.stringify(err)}`);
     }
   };
 }

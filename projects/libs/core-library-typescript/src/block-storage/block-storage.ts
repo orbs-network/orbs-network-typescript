@@ -78,7 +78,7 @@ export class BlockStorage implements StartupCheck {
 
     logger.info(`Adding new block with block height ${block.header.height} and hash ${blockHash}`);
 
-    this.verifyNewBlock(block);
+    await this.verifyNewBlock(block);
 
     logger.info(`Verified new block with block height ${block.header.height} and hash ${blockHash}`);
 
@@ -122,7 +122,7 @@ export class BlockStorage implements StartupCheck {
     return (await this.getLastBlock()).header.height > fromLastBlockHeight;
   }
 
-  private verifyNewBlock(block: types.Block) {
+  private async verifyNewBlock(block: types.Block) {
     if (this.config.verifySignature) {
       let verified = false;
       try {
