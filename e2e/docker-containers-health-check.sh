@@ -9,7 +9,7 @@ check_docker()
     allowed_attempts=$2
     retry_interval=$3
     # Print number of containers that don't have a "healthy" designation on them
-    result=$(docker ps | grep -v "CONTAINER ID" | grep -v ganache | awk 'BEGIN { healthy=0; } match($0, /\(healthy\)/) { healthy++; } END { print NR-healthy }')
+    result=$(docker ps | grep "orbs-test-node" | awk 'BEGIN { healthy=0; } match($0, /\(healthy\)/) { healthy++; } END { print NR-healthy }')
 
     if [[ result -gt 0 ]] ; then
         echo "Attempt #${attempt} of ${allowed_attempts}: Found ${result} containers not marked as healthy, will retry in ${retry_interval} seconds"
@@ -19,7 +19,7 @@ check_docker()
     fi
     return 0
 }
-
+\
 [[ $# -ne 2 ]] && { echo "Usage: $0 <max_retries> <interval_sec>"; exit 1; }
 
 let i=1
