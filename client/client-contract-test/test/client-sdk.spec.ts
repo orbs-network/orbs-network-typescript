@@ -95,7 +95,7 @@ class PythonContractAdapter implements OrbsContractAdapter {
 
   private async createPython(): Promise<PythonBridge> {
     const python = pythonBridge({
-      python: "/usr/local/bin/python", // FIXME: check if it works in Docker
+      python: process.platform === "darwin" ? "/usr/local/bin/python" : "/usr/bin/python",
       env: {PYTHONPATH: this.pythonClientRoot}
     });
 

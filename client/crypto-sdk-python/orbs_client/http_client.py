@@ -36,7 +36,7 @@ class HttpClient:
   def get_transaction_status(txid):
     import requests
 
-    request = requests.post(self.endpoint + 'public/getTransactionStatus', json={'txid': txid})
+    request = requests.post(self.endpoint + '/public/getTransactionStatus', json={'txid': txid})
     response = request.json()
 
     return response
