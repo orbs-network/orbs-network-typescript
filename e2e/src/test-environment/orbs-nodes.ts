@@ -49,7 +49,6 @@ export class OrbsNode implements TestComponent {
       command += " --forceRecreate";
     }
     await this.runDockerCompose(command);
-    // await delay(60000);
   }
 
   public async stop(): Promise<void> {
