@@ -19,7 +19,7 @@ class HttpClient:
     request = requests.post(self.endpoint + '/public/sendTransaction', json=transaction)
     response = request.json()
 
-    return response['result']
+    return response
 
 
   def call(self, contract_address, payload):
