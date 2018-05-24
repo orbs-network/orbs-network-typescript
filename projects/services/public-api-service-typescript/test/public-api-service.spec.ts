@@ -146,12 +146,15 @@ describe("Public API Service - Component Test", async function () {
     beforeEach(async () => {
       const httpPort = await getPort();
       const httpManagementPort = await getPort();
+      const httpManagementPortUnused = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
       const grpcEndpoint = `0.0.0.0:${await getPort()}`;
 
       grpcService = grpcServer.builder()
         .withService("VirtualMachine", new FakeVirtualMachineService({ nodeName: "tester" }))
         .withService("TransactionPool", new FakeTransactionPool({ nodeName: "tester" }))
+        // the mgmt server in this GRPC Server is unused (the real mgmt server is run by httpServer) but it still needs a random port to avoid collisions
+        .withManagementPort(httpManagementPortUnused)
         .onEndpoint(grpcEndpoint);
 
       grpcService.start();
