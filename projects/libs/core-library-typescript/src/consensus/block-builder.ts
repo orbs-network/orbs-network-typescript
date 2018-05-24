@@ -45,7 +45,7 @@ export default class BlockBuilder {
         logger.debug("blockBuilder tick");
         await this.appendNextBlock();
       } catch (err) {
-        logger.error(`newBlockAppendTick error: ${JSON.stringify(err)}`);
+        logger.error(`Error in appendNextBlock: ${JSON.stringify(err)}`);
       }
     }, this.pollIntervalMs);
   }
@@ -65,7 +65,7 @@ export default class BlockBuilder {
     const transactionEntriesCap: types.TransactionEntry[] = transactionEntries.slice(0, this.blockSizeLimit);
 
     if (transactionEntriesCap.length == 0) {
-        logger.error(`not an error: EMPTY POOL`);
+        logger.debug(`Empty transaction pool on buildBlockFromPendingTransactions()`);
         return undefined;
     }
 

@@ -99,8 +99,7 @@ export class StubConsensus extends BaseConsensus {
     try {
       await this.blockBuilder.commitBlock(block);
     } catch (err) {
-      logger.error(err);
-      logger.error(`Failed to commit block with height ${block.header.height}`);
+      logger.error(`Failed to commit block with height ${block.header.height}, error: ${JSON.stringify(err)}`);
     }
   }
 
