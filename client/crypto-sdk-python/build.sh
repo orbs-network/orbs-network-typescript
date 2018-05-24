@@ -54,6 +54,7 @@ make
 
 popd
 
-cp -f build/${PLATFORM}/lib/pycrypto.so test/
+cp -f build/${PLATFORM}/lib/pycrypto.so orbs_client/
+# cp -f build/${PLATFORM}/lib/pycrypto.so test/
 
 ./test.sh

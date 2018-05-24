@@ -33,6 +33,7 @@
     "typescript": "^2.7.1"
   },
   "dependencies": {
+    "@types/json-stable-stringify": "^1.0.32",
     "chai": "^4.1.2",
     "mocha": "^5.0.1",
     "orbs-client-sdk": "file:../client-sdk-javascript",
