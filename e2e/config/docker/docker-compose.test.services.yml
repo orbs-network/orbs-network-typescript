@@ -20,6 +20,8 @@ services:
       - MSG_LIMIT=4000000
       - BLOCK_SIZE_LIMIT=2000
       - LEADER_SYNC_INTERVAL=100
+      - CONSENSUS_ALGORITHM=stub
+      - CONSENSUS_LEADER_NODE_NAME=node2
 
     ports:
       - ${DEBUG_PORT}:9229

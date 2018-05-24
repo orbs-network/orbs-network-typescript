@@ -127,16 +127,20 @@ export class StubConsensus extends BaseConsensus {
     });
   }
 
+  async reportMyLastBlock(address: string) {
+    const { block } = await this.blockStorage.getLastBlock({});
+    if (block) {
+      this.sendMyLastBlockHeight(address, block.header.height);
+    } else {
+      logger.debug(`Block storage is not initialized yet`);
+    }
+  }
+
   async onMessageReceived(fromAddress: string, messageType: string, data: any): Promise<any> {
     switch (messageType) {
       case "CommitBlock":
         await this.onCommitted(data);
-        const { block } = await this.blockStorage.getLastBlock({});
-        if (block) {
-          this.sendMyLastBlockHeight(fromAddress, block.header.height);
-        } else {
-          logger.debug(`Block storage is not initialized yet`);
-        }
+        this.reportMyLastBlock(fromAddress);
         break;
       case "MyLastBlockHeight":
         this.lastBlockHeightByNodeName.set(fromAddress, data);
@@ -146,11 +150,15 @@ export class StubConsensus extends BaseConsensus {
 
   async initialize(): Promise<any> {
     await this.blockBuilder.initialize();
-    if (this.isLeader()) {
-      this.pollInterval = setInterval(async () => {
+
+    this.pollInterval = setInterval(async () => {
+      if (this.isLeader()) {
         this.onLeaderHeartbeatTick();
-      }, this.config.heartbeatInterval);
-    }
+      } else {
+        this.reportMyLastBlock(this.config.leaderNodeName);
+      }
+    }, this.config.heartbeatInterval);
+
   }
 
   async shutdown(): Promise<any> {
