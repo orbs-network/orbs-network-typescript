@@ -41,6 +41,8 @@ services:
       BLOCK_SIZE_LIMIT: 2000
       VERIFY_TRANSACTION_SIGNATURES: 'true'
       VERIFY_SUBSCRIPTION: 'false'
+      CONSENSUS_ALGORITHM: 'stub'
+      CONSENSUS_LEADER_NODE_NAME: 'orbs-global-506367651493-staging-ap-northeast-1'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
@@ -114,5 +116,3 @@ services:
 networks:
   default:
     driver: bridge
-
-# Touch
