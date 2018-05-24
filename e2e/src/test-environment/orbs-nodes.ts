@@ -9,8 +9,8 @@ const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docke
 const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 const VCHAIN_ID = "640ed3"; // TODO: vchainId should not be hard-coded but rather propagated from the test config!!!
 const TEST_SMART_CONTRACTS = [
-  {vchainId: VCHAIN_ID, name : "foobar", filename: "foobar-smart-contract"},
-  {vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract"}
+  { vchainId: VCHAIN_ID, name: "foobar", filename: "foobar-smart-contract" },
+  { vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract" }
 ];
 
 export interface SubscriptionConfig {
@@ -49,7 +49,7 @@ export class OrbsNode implements TestComponent {
       command += " --forceRecreate";
     }
     await this.runDockerCompose(command);
-    await delay(60000);
+    // await delay(60000);
   }
 
   public async stop(): Promise<void> {
