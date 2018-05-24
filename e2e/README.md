@@ -16,7 +16,7 @@ The test case is a transfer of 1 bar token from one account to another.
 
 ### The Test Environment
 
-* `Orbs nodes` - run as separated dockers and connected through an `orbs-network` docker network.
+* `Orbs nodes` - run as separate docker containers which are connected through an `orbs-network` docker network.
 * `Ganache server` - simulates an Ethereum node. Used for supporting the subscription validation of processed transactions. This simulation node is loaded with a stub Orbs Subscription contract that is pre-registered with a single Orbs Subscription Key, which all transactions are signed with.
 
 The test script connects to a Public API Service of one of the nodes through a `public-network` docker network.
@@ -38,6 +38,9 @@ run:
 > If you wish to run it inside a docker, run:
 
 `./test-from-docker.sh`
+> IMPORTANT: `test-from-docker.sh` is what is triggered by CircleCI when you push code.
+To prevent build failures, it's best that you run it locally and make sure it passes.
+
 
 ### Advanced Usage
 
