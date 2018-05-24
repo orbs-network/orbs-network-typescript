@@ -145,6 +145,7 @@ describe("Public API Service - Component Test", async function () {
   describe("Real HTTP API", () => {
     beforeEach(async () => {
       const httpPort = await getPort();
+      const httpManagementPort = await getPort();
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
       const grpcEndpoint = `0.0.0.0:${await getPort()}`;
 
@@ -170,7 +171,8 @@ describe("Public API Service - Component Test", async function () {
 
       const env = {
         NODE_NAME: "tester",
-        HTTP_PORT: httpPort
+        HTTP_PORT: httpPort,
+        HTTP_MANAGEMENT_PORT: httpManagementPort
       };
       httpService = httpServer(topology, env);
       httpService.start();
@@ -192,9 +194,9 @@ describe("Public API Service - Component Test", async function () {
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
       const stubs: RequestStub[] = [
-        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({transactionId: txid})},
-        { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer"})},
-        { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true }})}
+        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({ transactionId: txid }) },
+        { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer" }) },
+        { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true } }) }
       ];
 
       httpService = await runMockServer(httpPort, stubs);
