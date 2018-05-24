@@ -1,7 +1,7 @@
 import { OrbsContractMethodArgs, Address } from "orbs-client-sdk";
 import * as crypto from "crypto";
 import { OrbsAPISendTransactionRequest, OrbsAPICallContractRequest, OrbsAPIGetTransactionStatusRequest } from "./orbs-api-interface";
-
+import * as stringify from "json-stable-stringify";
 
 export const VIRTUAL_CHAIN_ID = "640ed3";
 export const CONTRACT_NAME = "contractName";
@@ -21,7 +21,7 @@ export function expectedContractAddressBase58(contractName: string) {
 }
 
 export function expectedPayload(methodName: string, args: OrbsContractMethodArgs) {
-    return JSON.stringify({
+    return stringify({
         method: methodName,
         args: args
     });

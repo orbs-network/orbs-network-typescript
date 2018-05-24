@@ -68,7 +68,7 @@ describe("gossip server test", function () {
     };
 
     let NODE_NAME = "testerA";
-    const SIGN_MESSAGES = false;
+    const SIGN_MESSAGES = "false";
     const GOSSIP_PEER_POLL_INTERVAL = 5000;
     const gossipEnv = { NODE_NAME, SIGN_MESSAGES, GOSSIP_PEER_POLL_INTERVAL };
     consensusStub = stubInterface<ConsensusService>();

@@ -112,7 +112,7 @@ describe("vm service tests", () => {
   it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on virtual machine service (happy path)", async () => {
 
     const expected: StartupStatus = {
-      name: "storage",
+      name: "virtual-machine-service",
       status: STARTUP_STATUS.OK,
       services: [
         { name: "virtual-machine", status: STARTUP_STATUS.OK }
