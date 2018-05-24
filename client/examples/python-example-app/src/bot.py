@@ -83,11 +83,11 @@ def process_command(event):
         contract = create_contract(address, key_pair)
 
         if event["text"] == COMMANDS["get_messages"]:
-            raw_messages = contract.call("getMyMessages", [])
+            raw_messages = contract.call("getMyMessages", [])[-10:]
             messages = map(lambda m: json.loads(m["message"]), raw_messages)
             response = "\n".join(map(format_message, messages))
 
-            post_message(event["channel"], "<@" + event["user"] + "> latest messages: \n"+ response)
+            post_message(event["channel"], "<@" + event["user"] + "> last 10 messages: \n"+ response)
 
     except Exception as e:
         print str(e)
