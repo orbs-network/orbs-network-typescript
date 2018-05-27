@@ -1,10 +1,15 @@
 import * as path from "path";
 import { Address, bs58EncodeRawAddress, logger } from "../../common-library";
 
-export type Contracts = { vchainId: string, name: string; filename: string; }[];
+export interface Contract {
+  vchainId: string;
+  name: string;
+  filename: string;
+  networkId: string;
+}
 
 export interface HardCodedSmartContractRegistryConfig {
-  contracts: Contracts;
+  contracts: Contract[];
   registryRoot?: string;
 }
 
@@ -14,10 +19,10 @@ export class HardCodedSmartContractRegistry {
   constructor(config: HardCodedSmartContractRegistryConfig) {
     const contractsToLoad =  config.contracts || [];
     const root = config.registryRoot || path.resolve(__dirname, "registry");
-    contractsToLoad.forEach(contract => this.registerContract(contract.vchainId, contract.name, contract.filename, root));
+    contractsToLoad.forEach(contract => this.registerContract(contract.vchainId, contract.networkId, contract.name, contract.filename, root));
   }
 
-  private registerContract(vchainId: string, name: string, filename: string, root: string) {
+  private registerContract(vchainId: string, networkId: string, name: string, filename: string, root: string) {
     const theModule = require(path.resolve(root, filename)); // TODO this is extremely unsafe; replace with something that has some notion of security
 
     const contractAddress = Address.createContractAddress(name, vchainId);

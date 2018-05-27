@@ -11,6 +11,7 @@ interface TestEnvironmentConfig {
     testSubscriptionKey: string;
     numOfNodes: number;
     envFile: string;
+    networkId: string;
 }
 
 export class TestEnvironment extends TestStack {
@@ -70,6 +71,7 @@ export class TestEnvironment extends TestStack {
             publicApiNetwork: this.publicNetwork,
             ethereumNodeHttpAddress: this.ethereumSimulationNode.getPublicAddress(false),
             envFile: config.envFile,
+            networkId: process.env.NETWORK_ID || "1d", // this network id exists only in e2e
             subscriptionConfig: {
               minTokensForSubscription: this.minTokensForSubscription,
               subscriptionProfile: this.testSubscriptionProfile

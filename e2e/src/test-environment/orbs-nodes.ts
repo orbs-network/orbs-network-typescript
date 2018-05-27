@@ -8,10 +8,6 @@ import { delay } from "bluebird";
 const DOCKER_CONFIG_PATH = path.resolve(path.join(__dirname, "../../config/docker"));
 const NODE_CONFIG_PATH = "/opt/orbs/config/topologies/discovery/node1";
 const VCHAIN_ID = "640ed3"; // TODO: vchainId should not be hard-coded but rather propagated from the test config!!!
-const TEST_SMART_CONTRACTS = [
-  {vchainId: VCHAIN_ID, name : "foobar", filename: "foobar-smart-contract"},
-  {vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract"}
-];
 
 export interface SubscriptionConfig {
   minTokensForSubscription: number;
@@ -66,6 +62,11 @@ export class OrbsNode implements TestComponent {
   }
 
   private runDockerCompose(dockerComposeCommand: string) {
+    const TEST_SMART_CONTRACTS = [
+      {vchainId: VCHAIN_ID, name : "foobar", filename: "foobar-smart-contract", "networkId": this.config.networkId},
+      {vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract", "networkId": this.config.networkId}
+    ];
+
     if (this.config.ethereumSubscriptionContractAddress == undefined) {
       throw "ethereumSubscriptionContractAddress must be defined";
     }
@@ -116,6 +117,7 @@ interface OrbsNodeClusterConfig {
   ethereumNodeHttpAddress: string;
   envFile: string;
   subscriptionConfig: SubscriptionConfig;
+  networkId: string;
 }
 
 export class OrbsNodeCluster implements TestComponent {

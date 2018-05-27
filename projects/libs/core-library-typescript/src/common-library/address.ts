@@ -95,9 +95,9 @@ export class Address {
     return address;
   }
 
-  static createContractAddress(contractName: string, vchainId = Address.SYSTEM_VCHAINID) {
+  static createContractAddress(contractName: string, vchainId?: string, networkId?: string) {
     const publicKey = crypto.createHash("sha256").update(contractName).digest();
-    return new Address(publicKey, vchainId);
+    return new Address(publicKey, vchainId, networkId);
   }
 }
 
