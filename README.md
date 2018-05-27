@@ -26,6 +26,8 @@ On a fresh MacOS, run the following:
 6. chmod u+x orbs-team-member-bootstrap.sh
 7. ./orbs-team-member-bootstrap.sh
 
+> Make sure you configure the memory requirements of the Docker app, see [Run Inside of Docker](#run-inside-of-docker) section below.
+
 ## Installation
 
 > Run when you want a fresh start. This will git clone all sub projects into `./projects`:
@@ -66,6 +68,9 @@ Build process is divided into 3 parts:
 * build e2e: `./docker/build-sdk-base.sh && ./docker/build-e2e.sh`
 
 You don't have to rebuild your base images most of the time unless something changed in `docker` folder or one of the docker files.
+> The default memory configuration of the Docker app on your Mac is insufficient to run e2e.
+> Open the Docker app --> Preferences --> Advanced --> Memory: 4.0 GiB and CPUs: 3.
+> Leaving the default 2.0 GiB will result in Docker containers getting stuck during the e2e run on your machine.
 
 ### Deployment to AWS
 

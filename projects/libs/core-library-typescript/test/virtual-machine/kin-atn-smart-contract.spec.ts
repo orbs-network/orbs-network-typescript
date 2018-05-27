@@ -49,6 +49,30 @@ describe("kin atn contract - transfer tests", () => {
     recipientContract = new KinAtnSmartContract(RECIPIENT_ADDRESS, adapter);
   });
 
+  it("validates the recipient argument in transfer", async () => {
+    return expect(senderContract["transfer"](1 as any, 2 as any)).to.eventually.be.rejectedWith("Argument recipient must be a string");
+  });
+
+  it("validates the amount argument in transfer", async () => {
+    return expect(senderContract["transfer"]("dont_care" as any, "2" as any)).to.eventually.be.rejectedWith("Argument amount must be a number");
+  });
+
+  it("validates the accountToFinance argument in financeAccount", async () => {
+    return expect(senderContract["financeAccount"](2 as any)).to.eventually.be.rejectedWith("Argument accountToFinance must be a string");
+  });
+
+  it("validates the sender account is stored as numbers or rejects the transaction", async () => {
+    await adapter.store(`balances.${SENDER_ADDRESS}`, JSON.stringify("0"));
+    return expect(senderContract.transfer(RECIPIENT_ADDRESS, 1)).to.eventually.be.rejectedWith(`Account ${SENDER_ADDRESS} is corrupted, please use a new account`);
+  });
+
+  it("validates the recipient account is stored as numbers or rejects the transaction", async () => {
+    await adapter.store(`balances.${RECIPIENT_ADDRESS}`, JSON.stringify("0"));
+    await senderContract.financeAccount(SENDER_ADDRESS);
+    return expect(senderContract.transfer(RECIPIENT_ADDRESS, 1)).to.eventually.be.rejectedWith(`Account ${RECIPIENT_ADDRESS} is corrupted, please use a new account`);
+  });
+
+
   it("init token balances and transfer tokens", async () => {
     // test will break if finance is broken, avoiding direct state manipulation
     await senderContract.financeAccount(SENDER_ADDRESS);
