@@ -1,4 +1,5 @@
 import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress, TransactionHelper } from "orbs-core-library";
+import { StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
@@ -143,11 +144,15 @@ describe("Public API Service - Component Test", async function () {
   let httpService: PublicApiHTTPService;
 
   describe("Real HTTP API", () => {
+
+    const SERVER_IP_ADDRESS = "127.0.0.1";
+    let httpManagementPort: number;
+
     beforeEach(async () => {
       const httpPort = await getPort();
-      const httpManagementPort = await getPort();
+      httpManagementPort = await getPort();
       const httpManagementPortUnused = await getPort();
-      httpEndpoint = `http://127.0.0.1:${httpPort}`;
+      httpEndpoint = `http://${SERVER_IP_ADDRESS}:${httpPort}`;
       const grpcEndpoint = `0.0.0.0:${await getPort()}`;
 
       grpcService = grpcServer.builder()
@@ -182,6 +187,19 @@ describe("Public API Service - Component Test", async function () {
     });
 
     runTests();
+
+    it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on public api service (happy path)", async () => {
+
+      const expected: StartupStatus = {
+        name: "public-api-http",
+        status: STARTUP_STATUS.OK
+      };
+
+      return request(`http://${SERVER_IP_ADDRESS}:${httpManagementPort}`)
+        .get("/admin/startupCheck")
+        .expect(200, expected);
+    });
+
 
     afterEach(async () => {
       httpService.stop();

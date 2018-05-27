@@ -55,16 +55,27 @@ export default class PublicApiHTTPService extends Service {
 
   }
 
+  private async startupCheckHttpService(): Promise<StartupStatus> {
+    const status: STARTUP_STATUS = (this.server && this.server.listening) ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL;
+    return { name: "public-api-http", status };
+  }
+
   // TODO Unify this code with GRPCServer.ts
   private startManagementServer(startupCheckRunner: StartupCheckRunner): any {
     logger.info("PublicApiService.startManagementServer starts");
     const { httpManagementPort } = (<PublicApiHTTPServiceConfig>this.config);
     const mgmtApp = express();
+    let startupCheckResult: StartupStatus;
     mgmtApp.get("/admin/startupCheck", (req: express.Request, res: express.Response) => {
       startupCheckRunner.run()
         .then((result: StartupStatus) => {
-          const httpCode = result.status === STARTUP_STATUS.OK ? 200 : 503;
+          startupCheckResult = result;
+          return this.startupCheckHttpService();
+        })
+        .then((result: StartupStatus) => {
+          const httpCode = (result.status === STARTUP_STATUS.OK && startupCheckResult.status === STARTUP_STATUS.OK) ? 200 : 503;
           return res.status(httpCode).send(result);
+
         });
     });
 
