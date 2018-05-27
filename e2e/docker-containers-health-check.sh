@@ -19,7 +19,7 @@ check_docker()
     fi
     return 0
 }
-\
+
 [[ $# -ne 2 ]] && { echo "Usage: $0 <max_retries> <interval_sec>"; exit 1; }
 
 let i=1
