@@ -8,6 +8,14 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   static readonly POOL_INITIAL_VALUE = KinAtnSmartContract.ONE_BILLION * 20;
 
   public async transfer(recipient: string, amount: number) {
+    if (typeof recipient != "string") {
+      throw this.validationError("Argument recipient must be a string");
+    }
+
+    if (typeof amount != "number") {
+      throw this.validationError("Argument amount must be a number");
+    }
+
     if (amount <= 0) {
       throw this.validationError("Transaction amount must be > 0");
     }
@@ -43,6 +51,10 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   }
 
   public async financeAccount(accountToFinance: string): Promise<number> {
+    if (typeof accountToFinance != "string") {
+      throw this.validationError("Argument accountToFinance must be a string");
+    }
+
     await this.setBalance(accountToFinance, KinAtnSmartContract.DEFAULT_BALANCE);
     await this.reduceFromPool(KinAtnSmartContract.DEFAULT_BALANCE);
 
