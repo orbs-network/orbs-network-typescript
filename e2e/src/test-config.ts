@@ -16,7 +16,7 @@ interface TestConfig {
 export function loadDefaultTestConfig(): TestConfig {
   const config: TestConfig = {
     virtualChainId: "640ed3",
-    networkId: nconf.get("NETWORK_ID") || "Z", // this network id is just to see that the change propagates through config
+    networkId: nconf.get("NETWORK_ID") || "M", // this network id is just to see that the change propagates through config
     stressTest: {
       accounts: Number(nconf.get("E2E_ACCOUNTS_TOTAL")) || 4
     }
