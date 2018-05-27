@@ -38,8 +38,8 @@ run:
 > If you wish to run it inside a docker, run:
 
 `./test-from-docker.sh`
-> IMPORTANT: `test-from-docker.sh` is what is triggered by CircleCI when you push code.
-To prevent build failures, it's best that you run it locally and make sure it passes.
+> IMPORTANT: If you encounter e2e errors on CircleCI when you push code, run `test-from-docker.sh` locally to try to reproduce the errors. This is what CircleCI runs during build.
+Note that it runs slower than `test-from-host.sh`.
 
 
 ### Advanced Usage
