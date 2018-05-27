@@ -13,8 +13,8 @@ export class Address {
   readonly checksum: number;
   private fullAddress: Buffer;
 
-  static readonly MAIN_NETWORK_ID = "4d";
-  static readonly TEST_NETWORK_ID = "54";
+  static readonly MAIN_NETWORK_ID = "M";
+  static readonly TEST_NETWORK_ID = "T";
   static readonly SYSTEM_VCHAINID = "000000";
 
   constructor(
@@ -48,7 +48,7 @@ export class Address {
   }
 
   generateFullAddressNoChecksum() {
-    const networkPart = Buffer.from(this.networkId, "hex");
+    const networkPart = Buffer.from(this.networkId);
     const versionPart = Buffer.alloc(1);
     versionPart.writeUInt8(this.version, 0);
     const vchainIdPart = Buffer.from(this.virtualChainId, "hex");
@@ -67,7 +67,7 @@ export class Address {
   }
 
   static fromBuffer(rawAddress: Buffer, publicKey?: Buffer, validateChecksum = true): Address {
-    const networkId = rawAddress.slice(0, 1).toString("hex");
+    const networkId = rawAddress.slice(0, 1).toString();
     const version = rawAddress.readUInt8(1);
     const vchainId = rawAddress.slice(2, 5).toString("hex");
     const accountId = rawAddress.slice(5, 25);

@@ -25,7 +25,7 @@ export class HardCodedSmartContractRegistry {
   private registerContract(vchainId: string, networkId: string, name: string, filename: string, root: string) {
     const theModule = require(path.resolve(root, filename)); // TODO this is extremely unsafe; replace with something that has some notion of security
 
-    const contractAddress = Address.createContractAddress(name, vchainId);
+    const contractAddress = Address.createContractAddress(name, vchainId, networkId);
 
     this.loadedContracts.set(contractAddress.toBase58(), theModule);
 

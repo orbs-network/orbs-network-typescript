@@ -66,7 +66,7 @@ export default class HardCodedSmartContractProcessor {
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
     const Contract = this.registry.getContractByRawAddress(request.contractAddress);
     if (Contract == undefined) {
-      throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
+      throw new Error(`contract with address ${bs58EncodeRawAddress(request.contractAddress)} not registered`);
     }
 
     const { method, args } = this.parsePayload(request.payload);
