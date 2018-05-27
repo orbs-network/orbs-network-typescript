@@ -69,7 +69,7 @@ describe("gossip server test", function () {
 
     let NODE_NAME = "testerA";
     const SIGN_MESSAGES = "false";
-    const GOSSIP_PEER_POLL_INTERVAL = 5000;
+    const GOSSIP_PEER_POLL_INTERVAL = 1000;
     const gossipEnv = { NODE_NAME, SIGN_MESSAGES, GOSSIP_PEER_POLL_INTERVAL };
     consensusStub = stubInterface<ConsensusService>();
 
@@ -103,7 +103,82 @@ describe("gossip server test", function () {
     expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
   });
 
+  it("test polling", async () => {
+    // longer delay, to ensure that polling will happen, if the below code then works the service is still okay and it did not crash the logic
+    await bluebird.delay(1200);
+    const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
+    await gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
+    // this delay is so we give the gossip time to actually send the message, it takes about 2 milliseconds,we must put a delay as there may be a race condition
+    await bluebird.delay(200);
+    expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
+  });
+
   afterEach(() => {
     return Promise.all([serverA.stop(), serverB.stop()]);
+  });
+});
+
+describe("testing gossip with no peers", function () {
+  this.timeout(10000);
+  let serverA: GRPCServerBuilder;
+  let gossipAClient: GossipClient;
+  let consensusStub: ConsensusService;
+
+  beforeEach(async () => {
+    // note about gossip connections: the grpc needs one endpoint,
+    // and then the gossip port must be different as its websocket based unrelated to the grpc server/service
+    const gossipPort = await getPort();
+    const gossipManagementPort = await getPort();
+    const endpoint = `127.0.0.1:${await getPort()}`;
+
+    const topology = {
+      peers: [
+        {
+          service: "consensus",
+          endpoint: endpoint,
+        },
+        {
+          service: "storage",
+          endpoint: endpoint,
+        },
+      ],
+      gossipPort: gossipPort,
+      gossipPeers: [] as any
+    };
+
+    const NODE_NAME = "testerA";
+    const SIGN_MESSAGES = "false";
+    const GOSSIP_PEER_POLL_INTERVAL = 1000;
+    const gossipEnv = { NODE_NAME, SIGN_MESSAGES, GOSSIP_PEER_POLL_INTERVAL };
+    consensusStub = stubInterface<ConsensusService>();
+
+    serverA = gossipServer(topology, gossipEnv)
+      .withService("Consensus", consensusStub)
+      .withManagementPort(gossipManagementPort)
+      .onEndpoint(endpoint);
+
+    gossipAClient = grpc.gossipClient({ endpoint });
+
+    return serverA.start();
+  });
+
+  it("should work without peers", async () => {
+    await bluebird.delay(200);
+    const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
+    await gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
+    await bluebird.delay(200);
+    expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("0");
+  });
+
+  it("polling should work without peers", async () => {
+    await bluebird.delay(1200);
+    const buffer = new Buffer(JSON.stringify({ israel: "is70" }));
+    await gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
+    await bluebird.delay(200);
+    expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("0");
+  });
+
+  afterEach(() => {
+    return serverA.stop();
   });
 });

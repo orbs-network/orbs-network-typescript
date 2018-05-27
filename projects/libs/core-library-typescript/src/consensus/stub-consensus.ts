@@ -16,6 +16,14 @@ export class StubConsensus extends BaseConsensus {
   private lastBlockHeightByNodeName: Map<string, number> = new Map();
   private pollInterval: NodeJS.Timer;
 
+  private configSanitation(key: string, value: any): any {
+    if (key == "keyManager") {
+      return undefined;
+    }
+
+    return value;
+  }
+
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
@@ -24,7 +32,7 @@ export class StubConsensus extends BaseConsensus {
     virtualMachine: types.VirtualMachineClient
   ) {
     super();
-    logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config)}`);
+    logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config, this.configSanitation)}`);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
       virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
@@ -127,16 +135,24 @@ export class StubConsensus extends BaseConsensus {
     });
   }
 
+  async reportMyLastBlock(address: string) {
+    const { block } = await this.blockStorage.getLastBlock({});
+    if (block) {
+      this.sendMyLastBlockHeight(address, block.header.height);
+    } else {
+      logger.debug(`Block storage is not initialized yet`);
+    }
+  }
+
   async onMessageReceived(fromAddress: string, messageType: string, data: any): Promise<any> {
     switch (messageType) {
       case "CommitBlock":
-        await this.onCommitted(data);
-        const { block } = await this.blockStorage.getLastBlock({});
-        if (block) {
-          this.sendMyLastBlockHeight(fromAddress, block.header.height);
-        } else {
-          logger.debug(`Block storage is not initialized yet`);
+        try {
+          await this.onCommitted(data);
+        } catch (err) {
+          logger.error(`Failed to commit a block: ${JSON.stringify(err)}`);
         }
+        this.reportMyLastBlock(fromAddress);
         break;
       case "MyLastBlockHeight":
         this.lastBlockHeightByNodeName.set(fromAddress, data);
@@ -146,11 +162,13 @@ export class StubConsensus extends BaseConsensus {
 
   async initialize(): Promise<any> {
     await this.blockBuilder.initialize();
-    if (this.isLeader()) {
-      this.pollInterval = setInterval(async () => {
+
+    this.pollInterval = setInterval(async () => {
+      if (this.isLeader()) {
         this.onLeaderHeartbeatTick();
-      }, this.config.heartbeatInterval);
-    }
+      }
+    }, this.config.heartbeatInterval);
+
   }
 
   async shutdown(): Promise<any> {

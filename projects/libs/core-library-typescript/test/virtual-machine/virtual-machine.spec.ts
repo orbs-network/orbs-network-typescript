@@ -88,7 +88,7 @@ describe("test virtual machine", () => {
 
     const contractRegistryConfig: HardCodedSmartContractRegistryConfig = {
       contracts: [
-        { vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract" }
+        { vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract", networkId: Address.TEST_NETWORK_ID }
       ]
     };
 
@@ -193,7 +193,7 @@ describe("Virtual machine - Bad setup", () => {
 
   const contractRegistryConfig: HardCodedSmartContractRegistryConfig = {
     contracts: [
-      { vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract" }
+      { vchainId: SMART_CONTRACT_VCHAIN, name: SMART_CONTRACT_NAME, filename: "foobar-smart-contract", networkId: Address.TEST_NETWORK_ID }
     ]
   };
 

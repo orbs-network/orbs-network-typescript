@@ -40,6 +40,7 @@ export default class HardCodedSmartContractProcessor {
       this.stateStorageClient
     );
 
+    logger.debug(`Processing transaction on contract ${bs58EncodeRawAddress(request.contractAddress)}`);
     await this.processMethod(request, writeAdapter);
   }
 
@@ -50,6 +51,7 @@ export default class HardCodedSmartContractProcessor {
       transactionScopeStateCache,
       this.stateStorageClient
     );
+    logger.debug(`Processing call contract on contract ${bs58EncodeRawAddress(request.contractAddress)}`);
     return this.processMethod(request, readonlyAdapter);
   }
 
@@ -64,7 +66,7 @@ export default class HardCodedSmartContractProcessor {
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
     const Contract = this.registry.getContractByRawAddress(request.contractAddress);
     if (Contract == undefined) {
-      throw new Error(`contract with address ${JSON.stringify(request.contractAddress)} not registered`);
+      throw new Error(`contract with address ${bs58EncodeRawAddress(request.contractAddress)} not registered`);
     }
 
     const { method, args } = this.parsePayload(request.payload);
