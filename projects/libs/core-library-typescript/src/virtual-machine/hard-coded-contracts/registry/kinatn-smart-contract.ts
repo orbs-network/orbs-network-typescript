@@ -21,12 +21,18 @@ export default class KinAtnSmartContract extends BaseSmartContract {
     }
 
     const senderBalance: number = await this.getBalanceForAccount(this.senderAddressBase58);
+    if (typeof senderBalance != "number") {
+      throw this.validationError(`Account ${this.senderAddressBase58} is corrupted, please use a new account`);
+    }
 
     if (senderBalance < amount) {
       throw this.validationError(`Insufficient balance ${senderBalance} < ${amount}`);
     }
 
     const recipientBalance: number = await this.getBalanceForAccount(recipient);
+    if (typeof recipientBalance != "number") {
+      throw this.validationError(`Account ${recipient} is corrupted, please use a new account`);
+    }
 
     if (recipientBalance > (Number.MAX_SAFE_INTEGER - amount)) {
       throw this.validationError(`Recipient account of ${recipient} is at balance ${recipientBalance} and will overflow if ${amount} is added`);
