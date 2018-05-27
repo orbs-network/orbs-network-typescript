@@ -7,6 +7,7 @@ interface TestConfig {
   testEnvironment?: TestEnvironment;
   apiEndpoint?: string;
   virtualChainId: string;
+  networkId: string;
   stressTest: {
     accounts: number
   };
@@ -15,6 +16,7 @@ interface TestConfig {
 export function loadDefaultTestConfig(): TestConfig {
   const config: TestConfig = {
     virtualChainId: "640ed3",
+    networkId: nconf.get("NETWORK_ID") || "M", // this network id mainnet just to see that the change propagates through config
     stressTest: {
       accounts: Number(nconf.get("E2E_ACCOUNTS_TOTAL")) || 4
     }
@@ -35,7 +37,8 @@ export function loadDefaultTestConfig(): TestConfig {
       // left-padding the vchain ID to use it in order create a 32-byte subscription key (temporary workaround..)
       testSubscriptionKey: "0x0000000000000000000000000000000000000000000000000000000000" + config.virtualChainId,
       numOfNodes: Number(nconf.get("NUM_OF_NODES") || 6),
-      envFile
+      envFile,
+      networkId: config.networkId
     });
     config.apiEndpoint = config.testEnvironment.discoverApiEndpoint();
   }

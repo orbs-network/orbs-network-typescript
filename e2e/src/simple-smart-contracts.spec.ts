@@ -55,10 +55,10 @@ describe("simple token transfer", async function () {
 
   it("transfers 1 bar token from one account to another", async () => {
     console.log("initing account1 with 2 bars");
-    const account1 = await aFooBarAccountWith({ amountOfBars: 2, networkId: testConfig.testEnvironment.networkId });
+    const account1 = await aFooBarAccountWith({ amountOfBars: 2, networkId: testConfig.networkId });
     await account1.should.have.bars(2);
     console.log("initing account2 with 0 bars");
-    const account2 = await aFooBarAccountWith({ amountOfBars: 0, networkId: testConfig.testEnvironment.networkId });
+    const account2 = await aFooBarAccountWith({ amountOfBars: 0, networkId: testConfig.networkId });
     await account2.should.have.bars(0);
 
     console.log("sending 1 bar from account1 to account2");
@@ -81,10 +81,10 @@ describe("simple message", async function () {
 
   it("sends text messages between accounts", async () => {
     console.log("Initiating account for Alice");
-    const alice = await aTextMessageAccount(testConfig.testEnvironment.networkId);
+    const alice = await aTextMessageAccount(testConfig.networkId);
 
     console.log("Initiating account for Bob");
-    const bob = await aTextMessageAccount(testConfig.testEnvironment.networkId);
+    const bob = await aTextMessageAccount(testConfig.networkId);
 
     console.log("Sending messages from Alice to Bob and from Bob to Alice");
 

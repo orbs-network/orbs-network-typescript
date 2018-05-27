@@ -29,6 +29,7 @@ export interface OrbsNodeConfig {
   subscriptionConfig: SubscriptionConfig;
   debugPort: number;
   envFile: string;
+  networkId: string;
 }
 
 export class OrbsNode implements TestComponent {
@@ -145,7 +146,8 @@ export class OrbsNodeCluster implements TestComponent {
         publicApiHostHTTPPort: 30000 + i,
         debugPort: 9229 + i,
         envFile: this.config.envFile,
-        subscriptionConfig: this.config.subscriptionConfig
+        subscriptionConfig: this.config.subscriptionConfig,
+        networkId: this.config.networkId
       }));
     }
     return nodes;
