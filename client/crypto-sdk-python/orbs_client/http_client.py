@@ -42,12 +42,12 @@ class HttpClient:
     return response
 
 
-  def generate_transaction_request(self, contract_address, payload, timestamp = time()):
+  def generate_transaction_request(self, contract_address, payload):
     # build transaction without signatute data
     header = {
       'version': 0,
       'senderAddressBase58': self.address.to_string(),
-      'timestamp': json.dumps(int(timestamp * 1000)),
+      'timestamp': json.dumps(int(round(time() * 1000))),
       'contractAddressBase58': contract_address.to_string()
     }
 
