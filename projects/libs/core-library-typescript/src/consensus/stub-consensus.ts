@@ -139,7 +139,11 @@ export class StubConsensus extends BaseConsensus {
   async onMessageReceived(fromAddress: string, messageType: string, data: any): Promise<any> {
     switch (messageType) {
       case "CommitBlock":
-        await this.onCommitted(data);
+        try {
+          await this.onCommitted(data);
+        } catch (err) {
+          logger.error(`Failed to commit a block: ${JSON.stringify(err)}`);
+        }
         this.reportMyLastBlock(fromAddress);
         break;
       case "MyLastBlockHeight":
@@ -154,8 +158,6 @@ export class StubConsensus extends BaseConsensus {
     this.pollInterval = setInterval(async () => {
       if (this.isLeader()) {
         this.onLeaderHeartbeatTick();
-      } else {
-        this.reportMyLastBlock(this.config.leaderNodeName);
       }
     }, this.config.heartbeatInterval);
 
