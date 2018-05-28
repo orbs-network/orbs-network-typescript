@@ -1,4 +1,5 @@
 import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress, TransactionHelper } from "orbs-core-library";
+import { StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
