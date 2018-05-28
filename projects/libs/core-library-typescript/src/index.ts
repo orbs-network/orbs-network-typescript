@@ -11,3 +11,4 @@ export { VirtualMachine } from "./virtual-machine";
 export { Service, ServiceRunner, ServiceConfig } from "./base-service";
 export { StartupStatus, StartupCheck, StartupCheckRunner, STARTUP_STATUS, StartupCheckRunnerDefault } from "./common-library";
 export { FakeGossipClient, generateServiceInProcessClient } from "./test-kit";
+export { testStartupCheckHappyPath } from "./test-kit";

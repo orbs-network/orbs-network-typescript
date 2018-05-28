@@ -1,9 +1,10 @@
-import { logger, types } from "orbs-core-library";
+import { logger, types, StartupCheck } from "orbs-core-library";
+import { StartupStatus } from "orbs-core-library";
 
 import { Service } from "orbs-core-library";
 import { SidechainConnector, SidechainConnectorOptions } from "orbs-core-library";
 
-export default class SidechainConnectorService extends Service {
+export default class SidechainConnectorService extends Service implements StartupCheck {
   private options: SidechainConnectorOptions;
   private sidechainConnector: SidechainConnector;
 
@@ -31,4 +32,9 @@ export default class SidechainConnectorService extends Service {
       timestamp: block.timestamp
     };
   }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    return this.sidechainConnector.startupCheck();
+  }
+
 }

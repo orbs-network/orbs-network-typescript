@@ -63,8 +63,8 @@ export class OrbsNode implements TestComponent {
 
   private runDockerCompose(dockerComposeCommand: string) {
     const TEST_SMART_CONTRACTS = [
-      {vchainId: VCHAIN_ID, name : "foobar", filename: "foobar-smart-contract", "networkId": this.config.networkId},
-      {vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract", "networkId": this.config.networkId}
+      { vchainId: VCHAIN_ID, name: "foobar", filename: "foobar-smart-contract", "networkId": this.config.networkId },
+      { vchainId: VCHAIN_ID, name: "text-message", filename: "text-message-smart-contract", "networkId": this.config.networkId }
     ];
 
     if (this.config.ethereumSubscriptionContractAddress == undefined) {
