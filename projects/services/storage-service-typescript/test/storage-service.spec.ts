@@ -6,7 +6,6 @@ import * as os from "os";
 import * as getPort from "get-port";
 import * as chaiAsPromised from "chai-as-promised";
 import { stubInterface } from "ts-sinon";
-import * as request from "supertest";
 import * as _ from "lodash";
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
@@ -134,24 +133,6 @@ describe("BlockStorage service", function () {
   it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME} ${SERVER_IP_ADDRESS}:${managementPort}`, async () => {
     return testStartupCheckHappyPath(SERVER_IP_ADDRESS, managementPort, COMPONENT_NAME, ["block-storage", "state-storage"]);
   });
-
-  // startupCheckTester.testHappyPath(SERVER_IP_ADDRESS, managementPort, "storage", );
-
-  // it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
-
-  //   const expected: StartupStatus = {
-  //     name: "storage",
-  //     status: STARTUP_STATUS.OK,
-  //     services: [
-  //       { name: "block-storage", status: STARTUP_STATUS.OK },
-  //       { name: "state-storage", status: STARTUP_STATUS.OK }
-  //     ]
-  //   };
-
-  //   return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
-  //     .get("/admin/startupCheck")
-  //     .expect(200, expected);
-  // });
 
   // Here we are aiming to eliminate specific GRPC error;
   // expected result is to receive an error about block height because the block is invalid
