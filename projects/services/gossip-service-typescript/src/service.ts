@@ -2,6 +2,7 @@ import { logger, types } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, RaftConsensusConfig } from "orbs-core-library";
 import { Gossip, KeyManager } from "orbs-core-library";
+import * as _ from "lodash";
 
 export interface GossipServiceConfig extends ServiceConfig {
   gossipPort: number;
@@ -15,6 +16,9 @@ export interface GossipServiceConfig extends ServiceConfig {
 export default class GossipService extends Service {
   private gossip: Gossip;
   private peerPollInterval: any;
+  private previousActivePeers: String[];
+  private previousBroadcastGroups: String[];
+
 
   public constructor(serviceConfig: GossipServiceConfig) {
     super(serviceConfig);
@@ -34,6 +38,8 @@ export default class GossipService extends Service {
   }
 
   async initGossip(): Promise<void> {
+    this.previousActivePeers = [];
+    this.previousBroadcastGroups = [];
     const gossipConfig = <GossipServiceConfig>this.config;
     logger.debug(`Gossip service starting with config: ${JSON.stringify(gossipConfig, this.configSanitation)}`);
     this.gossip = new Gossip({
@@ -46,21 +52,27 @@ export default class GossipService extends Service {
 
     this.peerPollInterval = setInterval(() => {
       const activePeers = Array.from(this.gossip.activePeers()).sort();
-
       if (activePeers.length == 0) {
-        logger.warn(`${this.gossip.localAddress} has no active peers`);
+        if (this.previousActivePeers.length > 0) {
+          logger.warn(`${this.gossip.localAddress} has lost all its active peers and is all lone`);
+        }
         this.connectToGossipPeers();
       } else {
-        logger.info(`${this.gossip.localAddress} has active peers`, { activePeers });
+        if (!_.isEqual(this.previousActivePeers, activePeers)) {
+          logger.info(`${this.gossip.localAddress} has updated active peers`, { activePeers });
+        }
       }
+      this.previousActivePeers = activePeers;
 
       const broadcastGroups = Array.from(this.gossip.activeBroadcastGroups()).sort();
-
-      if (broadcastGroups.length == 0) {
-        logger.warn(`${this.gossip.localAddress} has no active broadcast groups`);
+      if (broadcastGroups.length == 0 && this.previousBroadcastGroups.length > 0) {
+        logger.warn(`${this.gossip.localAddress} has lost all its broadcast groups`);
       } else {
-        logger.info(`${this.gossip.localAddress} has active broadcast groups`, { broadcastGroups });
+        if (!_.isEqual(this.previousBroadcastGroups, broadcastGroups)) {
+          logger.info(`${this.gossip.localAddress} has updated active broadcast groups`, { broadcastGroups });
+        }
       }
+      this.previousBroadcastGroups = broadcastGroups;
     }, gossipConfig.peerPollInterval);
 
     this.connectToGossipPeers();

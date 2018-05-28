@@ -16,6 +16,14 @@ export class StubConsensus extends BaseConsensus {
   private lastBlockHeightByNodeName: Map<string, number> = new Map();
   private pollInterval: NodeJS.Timer;
 
+  private configSanitation(key: string, value: any): any {
+    if (key == "keyManager") {
+      return undefined;
+    }
+
+    return value;
+  }
+
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
@@ -24,7 +32,7 @@ export class StubConsensus extends BaseConsensus {
     virtualMachine: types.VirtualMachineClient
   ) {
     super();
-    logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config)}`);
+    logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config, this.configSanitation)}`);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
       virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block),

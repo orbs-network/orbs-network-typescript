@@ -16,17 +16,17 @@ const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 5;
 chai.should();
 chai.use(ChaiBarsPlugin);
 
-const generateAddress = (keyPair: ED25519Key): Address => {
-  const address = new Address(keyPair.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
+const generateAddress = (keyPair: ED25519Key, networkId: string): Address => {
+  const address = new Address(keyPair.publicKey, testConfig.virtualChainId, networkId);
 
   return address;
 };
 
 const testConfig = loadDefaultTestConfig();
 
-async function aFooBarAccountWith(input: { amountOfBars: number }) {
+async function aFooBarAccountWith(input: { amountOfBars: number, networkId: string }) {
   const keyPair = new ED25519Key();
-  const senderAddress = generateAddress(keyPair);
+  const senderAddress = generateAddress(keyPair, input.networkId);
   const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
   const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
@@ -36,9 +36,9 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
   return account;
 }
 
-async function aTextMessageAccount() {
+async function aTextMessageAccount(networkId: string) {
   const keyPair = new ED25519Key();
-  const senderAddress = generateAddress(keyPair);
+  const senderAddress = generateAddress(keyPair, networkId);
   const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "text-message");
   const account = new TextMessageAccount(senderAddress.toString(), contractAdapter);
@@ -59,10 +59,10 @@ describe("simple token transfer", async function () {
 
   it("transfers 1 bar token from one account to another", async () => {
     console.log("initing account1 with 2 bars");
-    const account1 = await aFooBarAccountWith({ amountOfBars: 2 });
+    const account1 = await aFooBarAccountWith({ amountOfBars: 2, networkId: testConfig.networkId });
     await account1.should.have.bars(2);
     console.log("initing account2 with 0 bars");
-    const account2 = await aFooBarAccountWith({ amountOfBars: 0 });
+    const account2 = await aFooBarAccountWith({ amountOfBars: 0, networkId: testConfig.networkId });
     await account2.should.have.bars(0);
 
     console.log("sending 1 bar from account1 to account2");
@@ -85,10 +85,10 @@ describe("simple message", async function () {
 
   it("sends text messages between accounts", async () => {
     console.log("Initiating account for Alice");
-    const alice = await aTextMessageAccount();
+    const alice = await aTextMessageAccount(testConfig.networkId);
 
     console.log("Initiating account for Bob");
-    const bob = await aTextMessageAccount();
+    const bob = await aTextMessageAccount(testConfig.networkId);
 
     console.log("Sending messages from Alice to Bob and from Bob to Alice");
 
