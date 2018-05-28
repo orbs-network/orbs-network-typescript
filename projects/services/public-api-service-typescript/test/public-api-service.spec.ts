@@ -200,7 +200,6 @@ describe("Public API Service - Component Test", async function () {
         .expect(200, expected);
     });
 
-
     afterEach(async () => {
       httpService.stop();
       grpcService.stop();

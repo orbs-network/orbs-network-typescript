@@ -6,12 +6,16 @@ import { types } from "../common-library/types";
 import { EthereumConnector } from "./ethereum-connector";
 import { SidechainConnectorClient } from "orbs-interfaces";
 import { ServiceConfig } from "..";
+import { STARTUP_STATUS, StartupStatus } from "../common-library/startup-status";
+import { StartupCheck } from "../common-library/startup-check";
+
 
 export interface SidechainConnectorOptions extends ServiceConfig {
   ethereumNodeHttpAddress?: string;
 }
 
-export class SidechainConnector {
+export class SidechainConnector implements StartupCheck {
+  public readonly SERVICE_NAME = "sidechain-connector";
   private ethereumConnector: EthereumConnector;
   private options: SidechainConnectorOptions;
 
@@ -32,5 +36,9 @@ export class SidechainConnector {
   constructor(options: SidechainConnectorOptions = { nodeName: "unnamed" }) {
     this.options = options;
     this.ethereumConnector = this.createEthereumConnector();
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    return { name: this.SERVICE_NAME, status: this.ethereumConnector ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL };
   }
 }
