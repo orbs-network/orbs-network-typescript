@@ -14,17 +14,17 @@ chai.use(ChaiBarsPlugin);
 
 const testConfig = loadDefaultTestConfig();
 const { API_ENDPOINT } = process.env;
-const generateAddress = (keyPair: ED25519Key): Address => {
-  const address = new Address(keyPair.publicKey, testConfig.virtualChainId, Address.TEST_NETWORK_ID);
+const generateAddress = (keyPair: ED25519Key, networkId: string): Address => {
+  const address = new Address(keyPair.publicKey, testConfig.virtualChainId, networkId);
 
   return address;
 };
 
-async function aFooBarAccountWith(input: { amountOfBars: number }) {
+async function aFooBarAccountWith(input: { amountOfBars: number, networkId: string }) {
   const prebuiltKeyPair = new ED25519Key();
 
   const keyPair = new ED25519Key(prebuiltKeyPair.publicKey, prebuiltKeyPair.getPrivateKeyUnsafe());
-  const senderAddress = generateAddress(keyPair);
+  const senderAddress = generateAddress(keyPair, input.networkId);
   const orbsClient = new OrbsClient(testConfig.apiEndpoint, senderAddress, keyPair);
   const contractAdapter = new OrbsContract(orbsClient, "foobar");
   const account = new FooBarAccount(senderAddress.toString(), contractAdapter);
@@ -34,21 +34,21 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
   return account;
 }
 
-async function createAccounts(input: { seed: number, numberOfAccounts: number }): Promise<FooBarAccount[]> {
+async function createAccounts(input: { seed: number, numberOfAccounts: number, networkId: string }): Promise<FooBarAccount[]> {
   return Promise.all(_.range(input.numberOfAccounts).map((num) => {
     const amountOfBars = num + 10;
 
-    return aFooBarAccountWith({ amountOfBars });
+    return aFooBarAccountWith({ amountOfBars, networkId: input.networkId });
   }));
 }
 
-async function stress(numberOfAccounts: number, seed: number) {
+async function stress(numberOfAccounts: number, seed: number, networkId: string) {
   console.log("Creating accounts...");
 
   // const seed = new Date().getTime();
   console.log(`Seed: ${seed}`);
 
-  const accounts = await createAccounts({ seed: seed, numberOfAccounts });
+  const accounts = await createAccounts({ seed: seed, numberOfAccounts, networkId });
 
   await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(10 + num)));
 
@@ -88,7 +88,7 @@ describe("test multiple transactions", async function () {
       console.log(`Attempt #${i}`);
       await delay(1000);
       try {
-        await stress(testConfig.stressTest.accounts, i);
+        await stress(testConfig.stressTest.accounts, i, testConfig.networkId);
         console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);
       } catch (e) {
         console.log(`Failed with error ${e}`);
