@@ -192,19 +192,6 @@ describe("Public API Service - Component Test", async function () {
       return testStartupCheckHappyPath(SERVER_IP_ADDRESS, httpManagementPort, COMPONENT_NAME);
     });
 
-
-    //   it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on public api service (happy path)", async () => {
-
-    //     const expected: StartupStatus = {
-    //       name: "public-api-http",
-    //       status: STARTUP_STATUS.OK
-    //     };
-
-    //     return request(`http://${SERVER_IP_ADDRESS}:${httpManagementPort}`)
-    //       .get("/admin/startupCheck")
-    //       .expect(200, expected);
-    //   });
-
     afterEach(async () => {
       httpService.stop();
       grpcService.stop();
