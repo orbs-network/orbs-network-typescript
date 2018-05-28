@@ -9,6 +9,7 @@ import TransactionPoolService from "./transaction-pool-service";
 class DefaultConsensusConfig implements RaftConsensusConfig {
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
+  acceptableUnsyncedNodes: number;
   nodeName: string;
   clusterSize: number;
   signBlocks: boolean;
@@ -96,6 +97,7 @@ export default function(nodeTopology: any, env: any) {
     }
     consensusConfig.leaderNodeName = CONSENSUS_LEADER_NODE_NAME;
     consensusConfig.heartbeatInterval = 1000; // this is the block interval
+    consensusConfig.acceptableUnsyncedNodes = 1; // this is the number of nodes that can be out of sync before stopping the consensus
   }
 
   const nodeConfig = { nodeName: NODE_NAME };

@@ -50,7 +50,8 @@ async function getAccount(username: string, config: Config): Promise<FooBarAccou
   }
 
   const orbsClient = new OrbsClient(ORBS_API_ENDPOINT, address, keyPair, config.timeout);
-  const contract = new OrbsContract(orbsClient, "foobar");
+  const contract = new OrbsContract(orbsClient, "text-message");
+  console.log(contract.contractAddress.networkId);
   const account = new FooBarAccount(username, address.toString(), contract);
 
   return Promise.resolve(account);

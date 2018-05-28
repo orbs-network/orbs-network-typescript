@@ -10,6 +10,7 @@ export interface RaftConsensusConfig {
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;
   heartbeatInterval: number;
+  acceptableUnsyncedNodes: number;
   algorithm: string;
   leaderNodeName?: string; // only if known (required for stub algorithm)
   blockBuilderPollInterval?: number;
