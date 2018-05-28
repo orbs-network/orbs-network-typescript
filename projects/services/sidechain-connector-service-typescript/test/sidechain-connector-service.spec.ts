@@ -78,22 +78,6 @@ describe("sidechain connector service tests", function () {
     return testStartupCheckHappyPath(SERVER_IP_ADDRESS, managementPort, COMPONENT_NAME, ["sidechain-connector"]);
   });
 
-  // it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on sidechain connector service (happy path)", async () => {
-
-  //   const expected: StartupStatus = {
-  //     name: "sidechain-connector-service",
-  //     status: STARTUP_STATUS.OK,
-  //     services: [
-  //       { name: "sidechain-connector", status: STARTUP_STATUS.OK }
-  //     ]
-  //   };
-
-  //   return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
-  //     .get("/admin/startupCheck")
-  //     .expect(200, expected);
-  // });
-
-
   after(async () => {
     ethSim.close();
     return server.stop();
