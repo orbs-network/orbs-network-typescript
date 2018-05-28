@@ -84,7 +84,8 @@ function waitForStacks(cloudFormation: any, region: any, condition: any) {
 
 function uploadBootstrap(options: any) {
   const { s3Path, localPath } = options.parity ? { s3Path: "parity", localPath: "parity" } : { s3Path: "v1", localPath: "bootstrap" };
-  shell.exec(`${getAWSCredentialsAsEnvVars(options)} aws s3 sync ${__dirname}/../${localPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
+  const bootstrapPath = options.bootstrap ? options.bootstrap : "${__dirname}/../${localPath}";
+  shell.exec(`${getAWSCredentialsAsEnvVars(options)} aws s3 sync ${bootstrapPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
 }
 
 function getDockerImageName(options: any) {
@@ -348,6 +349,7 @@ export function getBaseConfig() {
     peersCidr: config.get("peers-cidr"),
     secretBlockKey: config.get("secret-block-key"),
     secretMessageKey: config.get("secret-message-key"),
+    bootstrap: config.get("bootstrap"),
   };
 
   return nodeConfig;

@@ -28,12 +28,16 @@ async function main() {
 
   const regions = config.get("region").split(",");
 
-  for (const region of regions) {
-    // TODO: fix staging
-    const secretMessageKey = `${__dirname}/../temp-keys/private-keys/message/orbs-global-${accountId}-staging-${region}`;
-    const secretBlockKey = `${__dirname}/../temp-keys/private-keys/block/orbs-global-${accountId}-staging-${region}`;
+  const privateKeysPath = nconf.get("private-keys") ? nconf.get("private-keys") : "${__dirname}/../temp-keys/private-keys";
 
-    const regionalConfig = _.extend({}, getBaseConfig(), {
+  for (const region of regions) {
+    const baseConfig = getBaseConfig();
+
+    // TODO: fix staging
+    const secretMessageKey = `${privateKeysPath}/message/orbs-global-${accountId}-${baseConfig.NODE_ENV}-${region}`;
+    const secretBlockKey = `${privateKeysPath}/block/orbs-global-${accountId}-${baseConfig.NODE_ENV}-${region}`;
+
+    const regionalConfig = _.extend({}, baseConfig, {
       credentials,
       accountId,
       region,
