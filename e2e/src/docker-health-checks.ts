@@ -24,29 +24,28 @@ export function runDockerHealthCheckShellScript(maxRetries: number, intervalSec:
 export async function runDockerHealthCheck(maxRetries: number = 12, intervalSec: number = 5) {
   console.log(`Running docker health check maxRetries=${maxRetries} intervalSec=${intervalSec}...`);
 
-  let unhealthyNodes: string[] = [];
+  let unhealthyContainers: string[] = [];
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    unhealthyNodes = await runDockerHealthCheckOnce();
-    if (unhealthyNodes.length === 0) {
+    unhealthyContainers = await runDockerHealthCheckOnce();
+    if (unhealthyContainers.length === 0) {
       console.log(`All nodes are healthy`);
       break;
     } else {
-      console.log(`Attempt #${attempt + 1} of ${maxRetries}: Found ${unhealthyNodes.length} containers not marked as healthy, will retry in ${intervalSec} seconds. They are:`);
-      _.map(unhealthyNodes, console.log);
+      console.log(`Attempt #${attempt + 1} of ${maxRetries}: Found ${unhealthyContainers.length} containers not marked as healthy, retrying in ${intervalSec} seconds. They are:`);
+      _.forEach(unhealthyContainers, c => { console.log(`#${attempt}: ${c}`); });
     }
     await sleep(intervalSec * 1000);
   }
 
-  if (unhealthyNodes.length > 0) {
+  if (unhealthyContainers.length > 0) {
     console.log("Still have unhealthy nodes:");
-    _.map(unhealthyNodes, console.log);
+    _.map(unhealthyContainers, console.log);
   }
 
-  return unhealthyNodes;
+  return unhealthyContainers;
 }
 
 function runDockerHealthCheckOnce(): Promise<string[]> {
-  console.log(`Running docker health check once...`);
   return new Promise((resolve, reject) => {
     exec(`docker ps`, {
       async: true,
@@ -54,7 +53,6 @@ function runDockerHealthCheckOnce(): Promise<string[]> {
       cwd: "."
     }, (code: any, stdout: any, stderr: any) => {
       if (code == 0) {
-
         const orbsTestNodeLines: string[] = _.filter(stdout.split("\n"), s => s.indexOf("orbs-test-node") > -1);
         // We collect the negative (unhealthy) case so we can print the offending containers to assist debugging
         const unhealthyOrbsTestNodeLines = _.filter(orbsTestNodeLines, isUnhealthyDockerContainerLine);
