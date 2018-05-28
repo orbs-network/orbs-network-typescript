@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 
-import {  } from "orbs-core-library";
+import { StartupCheck, StartupCheckRunner, StartupCheckRunnerDefault, StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import { logger, types, Service, ServiceConfig, JsonBuffer, PublicApi, TransactionHandler, bs58DecodeRawAddress } from "orbs-core-library";
 import * as express from "express";
 import { Server } from "http";
@@ -9,13 +9,16 @@ import * as bodyParser from "body-parser";
 export interface PublicApiHTTPServiceConfig extends ServiceConfig {
   validateSubscription: boolean;
   httpPort: number;
+  httpManagementPort: number;
 }
 
 export default class PublicApiHTTPService extends Service {
+  private SERVICE_NAME = "public-api-service";
   private publicApi: PublicApi;
   private transactionHandler: TransactionHandler;
   private app: express.Express;
   private server: Server;
+  private managementServer: any;
 
   public constructor(virtualMachine: types.VirtualMachineClient, transactionPool: types.TransactionPoolClient, serviceConfig: ServiceConfig) {
     super(serviceConfig);
@@ -26,10 +29,16 @@ export default class PublicApiHTTPService extends Service {
 
   async initialize() {
     this.initializeApp();
+    const startupCheckRunner = new StartupCheckRunner(this.SERVICE_NAME, [<StartupCheck>this.publicApi]);
+    this.managementServer = this.startManagementServer(startupCheckRunner);
+    logger.info("PublicApiService.startManagementServer started");
   }
 
   async shutdown() {
     this.shutdownApp();
+    if (this.managementServer) {
+      this.managementServer.close();
+    }
   }
 
   private initializeApp() {
@@ -43,6 +52,36 @@ export default class PublicApiHTTPService extends Service {
     const { httpPort } = (<PublicApiHTTPServiceConfig>this.config);
     this.server = this.app.listen(httpPort);
     logger.info(`Started HTTP public api on port ${httpPort}`);
+
+  }
+
+  private async startupCheckHttpService(): Promise<StartupStatus> {
+    const status: STARTUP_STATUS = (this.server && this.server.listening) ? STARTUP_STATUS.OK : STARTUP_STATUS.FAIL;
+    return { name: "public-api-http", status };
+  }
+
+  // TODO Unify this code with GRPCServer.ts
+  private startManagementServer(startupCheckRunner: StartupCheckRunner): any {
+    logger.info("PublicApiService.startManagementServer starts");
+    const { httpManagementPort } = (<PublicApiHTTPServiceConfig>this.config);
+    const mgmtApp = express();
+    let startupCheckResult: StartupStatus;
+    mgmtApp.get("/admin/startupCheck", (req: express.Request, res: express.Response) => {
+      startupCheckRunner.run()
+        .then((result: StartupStatus) => {
+          startupCheckResult = result;
+          return this.startupCheckHttpService();
+        })
+        .then((result: StartupStatus) => {
+          const httpCode = (result.status === STARTUP_STATUS.OK && startupCheckResult.status === STARTUP_STATUS.OK) ? 200 : 503;
+          return res.status(httpCode).send(result);
+
+        });
+    });
+
+    const mgmtServer = mgmtApp.listen(httpManagementPort);
+    logger.info(`Started HTTP public api management server on port ${httpManagementPort}`);
+    return mgmtServer;
   }
 
   private shutdownApp() {

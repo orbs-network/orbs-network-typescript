@@ -1,4 +1,5 @@
 import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress, TransactionHelper } from "orbs-core-library";
+import { StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
@@ -143,14 +144,22 @@ describe("Public API Service - Component Test", async function () {
   let httpService: PublicApiHTTPService;
 
   describe("Real HTTP API", () => {
+
+    const SERVER_IP_ADDRESS = "127.0.0.1";
+    let httpManagementPort: number;
+
     beforeEach(async () => {
       const httpPort = await getPort();
-      httpEndpoint = `http://127.0.0.1:${httpPort}`;
+      httpManagementPort = await getPort();
+      const httpManagementPortUnused = await getPort();
+      httpEndpoint = `http://${SERVER_IP_ADDRESS}:${httpPort}`;
       const grpcEndpoint = `0.0.0.0:${await getPort()}`;
 
       grpcService = grpcServer.builder()
         .withService("VirtualMachine", new FakeVirtualMachineService({ nodeName: "tester" }))
         .withService("TransactionPool", new FakeTransactionPool({ nodeName: "tester" }))
+        // the mgmt server in this GRPC Server is unused (the real mgmt server is run by httpServer) but it still needs a random port to avoid collisions
+        .withManagementPort(httpManagementPortUnused)
         .onEndpoint(grpcEndpoint);
 
       grpcService.start();
@@ -170,13 +179,26 @@ describe("Public API Service - Component Test", async function () {
 
       const env = {
         NODE_NAME: "tester",
-        HTTP_PORT: httpPort
+        HTTP_PORT: httpPort,
+        HTTP_MANAGEMENT_PORT: httpManagementPort
       };
       httpService = httpServer(topology, env);
       httpService.start();
     });
 
     runTests();
+
+    it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on public api service (happy path)", async () => {
+
+      const expected: StartupStatus = {
+        name: "public-api-http",
+        status: STARTUP_STATUS.OK
+      };
+
+      return request(`http://${SERVER_IP_ADDRESS}:${httpManagementPort}`)
+        .get("/admin/startupCheck")
+        .expect(200, expected);
+    });
 
     afterEach(async () => {
       httpService.stop();
@@ -192,9 +214,9 @@ describe("Public API Service - Component Test", async function () {
       httpEndpoint = `http://127.0.0.1:${httpPort}`;
 
       const stubs: RequestStub[] = [
-        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({transactionId: txid})},
-        { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer"})},
-        { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true }})}
+        { path: "/public/sendTransaction", requestBody: JSON.stringify(sendTransactionRequestData), responseBody: JSON.stringify({ transactionId: txid }) },
+        { path: "/public/callContract", requestBody: JSON.stringify(callContractRequestData), responseBody: JSON.stringify({ result: "some-answer" }) },
+        { path: "/public/getTransactionStatus", requestBody: JSON.stringify(getTransactionStatusData), responseBody: JSON.stringify({ status: "COMMITTED", receipt: { success: true } }) }
       ];
 
       httpService = await runMockServer(httpPort, stubs);
