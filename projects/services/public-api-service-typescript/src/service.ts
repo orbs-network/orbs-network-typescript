@@ -89,6 +89,7 @@ export default class PublicApiHTTPService extends Service {
   }
 
   private getHTTPSendTransactionRequestHandler(): express.RequestHandler {
+    logger.debug("API sendTransaction hit");
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
       const body = JsonBuffer.parseJsonWithBuffers(req.body);
 
@@ -120,6 +121,7 @@ export default class PublicApiHTTPService extends Service {
   }
 
   private getHTTPCallContractRequestHandler(): express.RequestHandler {
+    logger.debug("API callContract hit");
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
       const body = JsonBuffer.parseJsonWithBuffers(req.body);
 
@@ -133,7 +135,6 @@ export default class PublicApiHTTPService extends Service {
         const result = JSON.parse(await this.publicApi.callContract(input));
         res.json({ result });
       } catch (err) {
-        console.log(err);
         logger.error(`HTTP API could not call a contract: ${err.toString()}`);
         res.sendStatus(500);
       }
@@ -141,6 +142,7 @@ export default class PublicApiHTTPService extends Service {
   }
 
   private getHTTPGetTransactionStatusRequestHandler(): express.RequestHandler {
+    logger.debug("API getTransactionStatus hit");
     return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
       const body = JsonBuffer.parseJsonWithBuffers(req.body);
 
@@ -171,7 +173,6 @@ export default class PublicApiHTTPService extends Service {
             throw new Error(`Unexpected transaction status with value ${status}`);
         }
       } catch (err) {
-        console.log(err);
         logger.error(`HTTP API could not get : ${err.toString()}`);
         res.sendStatus(500);
       }

@@ -8,17 +8,31 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   static readonly POOL_INITIAL_VALUE = KinAtnSmartContract.ONE_BILLION * 20;
 
   public async transfer(recipient: string, amount: number) {
+    if (typeof recipient != "string") {
+      throw this.validationError("Argument recipient must be a string");
+    }
+
+    if (typeof amount != "number") {
+      throw this.validationError("Argument amount must be a number");
+    }
+
     if (amount <= 0) {
       throw this.validationError("Transaction amount must be > 0");
     }
 
     const senderBalance: number = await this.getBalanceForAccount(this.senderAddressBase58);
+    if (typeof senderBalance != "number") {
+      throw this.validationError(`Account ${this.senderAddressBase58} is corrupted, please use a new account`);
+    }
 
     if (senderBalance < amount) {
       throw this.validationError(`Insufficient balance ${senderBalance} < ${amount}`);
     }
 
     const recipientBalance: number = await this.getBalanceForAccount(recipient);
+    if (typeof recipientBalance != "number") {
+      throw this.validationError(`Account ${recipient} is corrupted, please use a new account`);
+    }
 
     if (recipientBalance > (Number.MAX_SAFE_INTEGER - amount)) {
       throw this.validationError(`Recipient account of ${recipient} is at balance ${recipientBalance} and will overflow if ${amount} is added`);
@@ -43,6 +57,10 @@ export default class KinAtnSmartContract extends BaseSmartContract {
   }
 
   public async financeAccount(accountToFinance: string): Promise<number> {
+    if (typeof accountToFinance != "string") {
+      throw this.validationError("Argument accountToFinance must be a string");
+    }
+
     await this.setBalance(accountToFinance, KinAtnSmartContract.DEFAULT_BALANCE);
     await this.reduceFromPool(KinAtnSmartContract.DEFAULT_BALANCE);
 

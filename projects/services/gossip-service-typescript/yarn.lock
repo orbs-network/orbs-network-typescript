@@ -73,6 +73,10 @@
   version "1.0.32"
   resolved "https://registry.yarnpkg.com/@types/json-stable-stringify/-/json-stable-stringify-1.0.32.tgz#121f6917c4389db3923640b2e68de5fa64dda88e"
 
+"@types/lodash@^4.14.109":
+  version "4.14.109"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.109.tgz#b1c4442239730bf35cabaf493c772b18c045886d"
+
 "@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
@@ -2195,7 +2199,7 @@ optjs@~3.2.2:
     mali "^0.7.1"
     memory-cache "^0.2.0"
     mkdirp "^0.5.1"
-    orbs-interfaces "file:../../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
+    orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
     protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"
