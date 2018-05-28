@@ -2,7 +2,6 @@ import * as chai from "chai";
 import * as mocha from "mocha";
 import * as _ from "lodash";
 import * as getPort from "get-port";
-import * as request from "supertest";
 
 import { types, grpc, GRPCServerBuilder, Service, ServiceConfig, Address } from "orbs-core-library";
 import { STARTUP_STATUS, StartupStatus, testStartupCheckHappyPath } from "orbs-core-library";
@@ -114,21 +113,4 @@ describe("vm service tests", () => {
   after(async () => {
     return server.stop();
   });
-
-
-  // it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on virtual machine service (happy path)", async () => {
-
-  //   const expected: StartupStatus = {
-  //     name: "virtual-machine-service",
-  //     status: STARTUP_STATUS.OK,
-  //     services: [
-  //       { name: "virtual-machine", status: STARTUP_STATUS.OK }
-  //     ]
-  //   };
-
-  //   return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
-  //     .get("/admin/startupCheck")
-  //     .expect(200, expected);
-  // });
-
 });
