@@ -9,12 +9,13 @@ import { SidechainConnectorClient, EthereumFunctionParameter } from "orbs-interf
 import sidechainConnectorServer from "../src/server";
 import createEthSimulator from "./ethereum-driver";
 import { EthereumSimulator } from "./ethereum-driver";
-import { STARTUP_STATUS, StartupStatus } from "../../../libs/core-library-typescript/src/common-library/startup-status";
+import { STARTUP_STATUS, StartupStatus, testStartupCheckHappyPath } from "orbs-core-library";
 
 const { expect } = chai;
 logger.configure({ level: "debug" });
 
 describe("sidechain connector service tests", function () {
+  const COMPONENT_NAME = "sidechain-connector-service";
   const SERVER_IP_ADDRESS = "127.0.0.1";
   this.timeout(10000);
   let server: GRPCServerBuilder;
@@ -73,20 +74,24 @@ describe("sidechain connector service tests", function () {
     expect(res.timestamp).to.be.lt(now + 10);
   });
 
-  it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on sidechain connector service (happy path)", async () => {
-
-    const expected: StartupStatus = {
-      name: "sidechain-connector-service",
-      status: STARTUP_STATUS.OK,
-      services: [
-        { name: "sidechain-connector", status: STARTUP_STATUS.OK }
-      ]
-    };
-
-    return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
-      .get("/admin/startupCheck")
-      .expect(200, expected);
+  it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME}`, async () => {
+    return testStartupCheckHappyPath(SERVER_IP_ADDRESS, managementPort, COMPONENT_NAME, ["sidechain-connector"]);
   });
+
+  // it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on sidechain connector service (happy path)", async () => {
+
+  //   const expected: StartupStatus = {
+  //     name: "sidechain-connector-service",
+  //     status: STARTUP_STATUS.OK,
+  //     services: [
+  //       { name: "sidechain-connector", status: STARTUP_STATUS.OK }
+  //     ]
+  //   };
+
+  //   return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
+  //     .get("/admin/startupCheck")
+  //     .expect(200, expected);
+  // });
 
 
   after(async () => {
