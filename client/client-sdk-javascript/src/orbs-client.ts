@@ -34,7 +34,7 @@ export class OrbsClient {
 
     // TODO: block until we implement transaction receipts with proper sync interface at HTTP endpoint
     await delay(this.sendTransactionTimeoutMs);
-    return body.result;
+    return body;
   }
 
   async call(contractAddress: Address, payload: string): Promise<any> {

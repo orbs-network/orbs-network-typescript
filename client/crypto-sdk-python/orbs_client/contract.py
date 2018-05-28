@@ -10,13 +10,13 @@ class Contract:
     self.address = Address(self.contract_key, self.http_client.address.virtual_chain_id, self.http_client.address.network_id)
 
 
-  def send_transaction(self, method_name, *args):
+  def send_transaction(self, method_name, args):
     payload = self.generate_send_transaction_payload(method_name, args)
     return self.http_client.send_transaction(self.address, payload);
 
 
-  def call(self, method_name, *args):
-    payload = this.generate_call_payload(method_name, args)
+  def call(self, method_name, args):
+    payload = self.generate_call_payload(method_name, args)
     return self.http_client.call(self.address, payload)
 
 
