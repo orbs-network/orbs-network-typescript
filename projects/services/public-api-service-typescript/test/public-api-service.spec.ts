@@ -1,5 +1,5 @@
 import { types, ErrorHandler, grpcServer, GRPCServerBuilder, Service, bs58DecodeRawAddress, TransactionHelper } from "orbs-core-library";
-import { StartupStatus, STARTUP_STATUS } from "orbs-core-library";
+import { StartupStatus, STARTUP_STATUS, testStartupCheckHappyPath } from "orbs-core-library";
 import * as chai from "chai";
 import PublicApiHTTPService from "../src/service";
 import * as sinonChai from "sinon-chai";
@@ -9,7 +9,6 @@ import httpServer from "../src/server";
 import mockHttpServer, { runMockServer, RequestStub } from "./mock-server";
 import "mocha";
 import { ChildProcess } from "child_process";
-import { STARTUP_STATUS, StartupStatus, testStartupCheckHappyPath } from "orbs-core-library";
 
 chai.use(sinonChai);
 const { expect } = chai;
