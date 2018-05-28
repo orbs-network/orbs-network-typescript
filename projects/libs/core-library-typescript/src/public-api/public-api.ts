@@ -1,8 +1,11 @@
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import { TransactionHandler } from "../public-api/transaction-handler";
+import { StartupCheck } from "../common-library/startup-check";
+import { StartupStatus, STARTUP_STATUS } from "../common-library/startup-status";
 
-export class PublicApi {
+export class PublicApi implements StartupCheck {
+  private SERVICE_NAME = "public-api";
   private transactionHandler: TransactionHandler;
   private virtualMachine: types.VirtualMachineClient;
   private transactionPool: types.TransactionPoolClient;
@@ -31,4 +34,22 @@ export class PublicApi {
   public async getTransactionStatus(input: types.GetTransactionStatusInput) {
     return this.transactionPool.getTransactionStatus(input);
   }
+
+  public async startupCheck(): Promise<StartupStatus> {
+
+    if (!this.transactionHandler) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing transactionHandler" };
+    }
+
+    if (!this.virtualMachine) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing virtualMachine" };
+    }
+
+    if (!this.transactionPool) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing transactionPool" };
+    }
+
+    return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
+  }
+
 }

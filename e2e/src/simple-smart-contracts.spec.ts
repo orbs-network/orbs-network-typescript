@@ -7,8 +7,11 @@ import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
 import ChaiBarsPlugin from "./chai-bars-plugin";
+import { DockerHealthChecks } from "./docker-health-checks";
 
 const expect = chai.expect;
+const DOCKER_HEALTH_CHECK_MAX_RETRIES = 20;
+const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 5;
 
 chai.should();
 chai.use(ChaiBarsPlugin);
@@ -50,6 +53,7 @@ describe("simple token transfer", async function () {
     if (testConfig.testEnvironment) {
       console.log("starting test environment...");
       await testConfig.testEnvironment.start();
+      await DockerHealthChecks.runDockerHealthCheck(DOCKER_HEALTH_CHECK_MAX_RETRIES, DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC);
     }
   });
 
