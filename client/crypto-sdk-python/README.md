@@ -3,5 +3,5 @@
 ## Mac requirements
 
 ```bash
-brew install boost boost-python2
+    brew install boost boost-python python@2
 ```

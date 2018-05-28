@@ -16,6 +16,14 @@ export class StubConsensus extends BaseConsensus {
   private lastBlockHeightByNodeName: Map<string, number> = new Map();
   private pollInterval: NodeJS.Timer;
 
+  private configSanitation(key: string, value: any): any {
+    if (key == "keyManager") {
+      return undefined;
+    }
+
+    return value;
+  }
+
   public constructor(
     config: RaftConsensusConfig,
     gossip: types.GossipClient,
@@ -24,7 +32,7 @@ export class StubConsensus extends BaseConsensus {
     virtualMachine: types.VirtualMachineClient
   ) {
     super();
-    logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config)}`);
+    logger.info(`Starting stub consensus with configuration: ${JSON.stringify(config, this.configSanitation)}`);
     this.transactionPool = transactionPool;
     this.blockBuilder = new BlockBuilder({
       virtualMachine, transactionPool, blockStorage, newBlockBuildCallback: (block) => this.onNewBlockBuild(block),
@@ -65,20 +73,25 @@ export class StubConsensus extends BaseConsensus {
       logger.debug(`Stub consensus leader heartbeat - my last block is ${JSON.stringify(myLastCommittedBlock)}`);
 
       // check if all other nodes are synchronized with me
-      let areAllOtherNodesSyncedWithMe = true;
-      if (this.lastBlockHeightByNodeName.size != this.config.clusterSize - 1) {
+      let areEnoughNodesSyncedWithMe = true;
+      if (this.lastBlockHeightByNodeName.size < this.config.clusterSize - this.config.acceptableUnsyncedNodes - 1) {
         logger.debug(`Stub consensus leader heartbeat - missing some other nodes since we just see ${this.lastBlockHeightByNodeName.size}`);
-        areAllOtherNodesSyncedWithMe = false;
+        areEnoughNodesSyncedWithMe = false;
       } else {
+        let howManyNodesAreNotSynced = 0;
         for (const [nodeName, lastBlockHeight] of this.lastBlockHeightByNodeName) {
           if (lastBlockHeight != myLastCommittedBlockHeight) {
             logger.debug(`Stub consensus leader heartbeat - last block of ${nodeName} is ${lastBlockHeight} while mine is ${myLastCommittedBlockHeight}`);
-            areAllOtherNodesSyncedWithMe = false;
+            howManyNodesAreNotSynced++;
+          }
+          if (howManyNodesAreNotSynced > this.config.acceptableUnsyncedNodes) {
+            logger.debug(`Stub consensus leader heartbeat - There are ${howManyNodesAreNotSynced} out of sync.`);
+            areEnoughNodesSyncedWithMe = false;
           }
         }
       }
 
-      if (areAllOtherNodesSyncedWithMe) {
+      if (areEnoughNodesSyncedWithMe) {
         // they are synchronized, let's create a new block
         logger.debug(`Stub consensus leader heartbeat - everybody is synchronized, next block please`);
         this.blockBuilder.start();
