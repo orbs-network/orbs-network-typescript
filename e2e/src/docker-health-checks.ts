@@ -38,11 +38,12 @@ export async function runDockerHealthCheck(maxRetries: number = 12, intervalSec:
   }
 
   if (unhealthyContainers.length > 0) {
-    console.log("Still have unhealthy nodes:");
-    _.map(unhealthyContainers, console.log);
+    const errmsg = `Still have unhealthy nodes: ${JSON.stringify(unhealthyContainers)}`;
+    console.log(errmsg);
+    throw new Error(errmsg);
   }
 
-  return unhealthyContainers;
+  return true;
 }
 
 function runDockerHealthCheckOnce(): Promise<string[]> {

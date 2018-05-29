@@ -54,7 +54,12 @@ describe("simple token transfer", async function () {
     if (testConfig.testEnvironment) {
       console.log("starting test environment...");
       await testConfig.testEnvironment.start();
-      await runDockerHealthCheck(DOCKER_HEALTH_CHECK_MAX_RETRIES, DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC);
+      try {
+        await runDockerHealthCheck(DOCKER_HEALTH_CHECK_MAX_RETRIES, DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC);
+      } catch (e) {
+        console.log(`Error in Docker health check, not all docker containers are not healthy and all retry attempts exhaused`);
+        throw e;
+      }
     }
   });
 
