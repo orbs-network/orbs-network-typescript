@@ -39,7 +39,7 @@ export class InMemoryKVStore {
   setSync(contractAddress: Buffer, key: string, value: string) {
     const mapKey = this.generateMapKeyString(contractAddress, key);
     this.storeMap.set(mapKey, value);
-    logger.debug(`Stored ${contractAddress.toString("hex")}.${key} with value ${value}`);
+    logger.debug(`Stored ${mapKey} with value ${value}`);
   }
 
   generateMapKeyString(contractAddress: Buffer, key: string) {
