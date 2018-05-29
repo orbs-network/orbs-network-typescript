@@ -214,7 +214,7 @@ export class RaftConsensus extends BaseConsensus {
             // note: we maintain a sync routine with the raft log to update the storage state...
             // invalid blocks which are committed on raft are acceptable
             if (block != undefined)
-                logger.error(`${this.node.id}: Failed to commit block with height ${block.header.height} and hash ${blockHash}: ${JSON.stringify(err)}`);
+                logger.error(`${this.node.id}: Failed to commit block with height ${block.header.height} and hash ${blockHash},`, err);
             // if (this.node.isLeader())
             //     this.node.stepDown(); // -leader steps down (election time out will occur)
         }
@@ -248,7 +248,7 @@ export class RaftConsensus extends BaseConsensus {
             logger.debug("new leader waits for transaction pool to update tick");
             this.onLeaderElected();
           } catch (err) {
-            logger.error(`new leader error: ${JSON.stringify(err)}`);
+            logger.error(`new leader error:,`, err);
           }
         }, this.leaderIntervalMs);
       }

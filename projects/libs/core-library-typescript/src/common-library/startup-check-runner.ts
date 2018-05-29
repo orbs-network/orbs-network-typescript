@@ -24,7 +24,7 @@ export class StartupCheckRunner {
         return mergedStartupStatus;
       })
       .catch(err => {
-        logger.error(`Error on startup check: ${JSON.stringify(err)}`);
+        logger.error(`Error on startup check,`, err);
         return <StartupStatus>{ status: STARTUP_STATUS.FAIL, message: err.message };
       });
   }
