@@ -13,6 +13,17 @@ services:
     links:
       - redis:redis
 
+  logger:
+    image: ${DOCKER_IMAGE}:${DOCKER_TAG}
+    working_dir: /opt/orbs/client/examples/python-example-app
+    command: python src/bot.py
+    restart: always
+    environment:
+      SLACK_TOKEN: ${SLACK_TOKEN}
+      ORBS_API_ENDPOINT: http://eu-central-1.global.nodes.staging.orbs-test.com
+      REDIS_URL: redis://redis:6379
+    links:
+      - redis:redis
   redis:
     image: redis
     volumes:

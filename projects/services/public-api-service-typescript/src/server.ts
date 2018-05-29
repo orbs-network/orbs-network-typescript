@@ -3,7 +3,7 @@ import { topologyPeers } from "orbs-core-library";
 
 export default function (nodeTopology: any, env: any): PublicApiHTTPService {
   const peers = topologyPeers(nodeTopology.peers);
-  const { NODE_NAME, HTTP_PORT } = env;
+  const { NODE_NAME, HTTP_PORT, HTTP_MANAGEMENT_PORT } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -11,7 +11,8 @@ export default function (nodeTopology: any, env: any): PublicApiHTTPService {
 
   const httpNodeConfig = {
     nodeName: NODE_NAME,
-    httpPort: HTTP_PORT || 80
+    httpPort: HTTP_PORT || 80,
+    httpManagementPort: HTTP_MANAGEMENT_PORT || 8081
   };
 
   return new PublicApiHTTPService(peers.virtualMachine, peers.transactionPool, httpNodeConfig);

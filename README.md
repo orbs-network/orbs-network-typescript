@@ -112,3 +112,6 @@ There are shortcut scripts that are tailored for a specific type of build.
 * TODO Highlight
 * TSLint
 * vscode-proto3
+
+## Troubleshooting
+* For testing, we use a fork of `ts-sinon`, so if you get relevant build errors such as `Cannot find name 'Blob'` or `Cannot find name 'XMLHttpRequest'` (happened before when building Docker server), make sure package.json contains the line `"ts-sinon": "https://github.com/orbs-network/ts-sinon"` and not some version number.
