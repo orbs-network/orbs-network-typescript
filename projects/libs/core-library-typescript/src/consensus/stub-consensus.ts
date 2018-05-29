@@ -102,7 +102,7 @@ export class StubConsensus extends BaseConsensus {
       }
 
     } catch (err) {
-      logger.error(`Stub consensus leader heartbeat - error: ${err}`);
+      logger.error(`Stub consensus leader heartbeat,`, err);
     }
   }
 
@@ -112,7 +112,7 @@ export class StubConsensus extends BaseConsensus {
     try {
       await this.blockBuilder.commitBlock(block);
     } catch (err) {
-      logger.error(`Failed to commit block with height ${block.header.height}, error: ${err}`);
+      logger.error(`Failed to commit block with height ${block.header.height},`, err);
     }
   }
 
@@ -155,7 +155,7 @@ export class StubConsensus extends BaseConsensus {
         try {
           await this.onCommitted(data);
         } catch (err) {
-          logger.error(`Failed to commit a block: ${err}`);
+          logger.error(`Failed to commit a`, err);
         }
         this.reportMyLastBlock(fromAddress);
         break;

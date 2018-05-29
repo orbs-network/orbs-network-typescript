@@ -41,7 +41,7 @@ export class BlockStorageSync {
       try {
         await this.blockStorage.addBlock(block);
       } catch (e) {
-        logger.error(`Failed to addBlock() with error: ${e}`);
+        logger.error(`Failed to addBlock()`, e);
       }
     }
   }
