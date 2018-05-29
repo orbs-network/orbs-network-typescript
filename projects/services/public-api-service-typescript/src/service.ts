@@ -154,7 +154,9 @@ export default class PublicApiHTTPService extends Service {
         const { status, receipt } = await this.publicApi.getTransactionStatus(input);
         switch (status) {
           case types.TransactionStatus.NOT_FOUND:
-            res.sendStatus(404);
+            res.json({
+              status: "NOT FOUND"
+            });
             break;
           case types.TransactionStatus.PENDING:
             res.json({
