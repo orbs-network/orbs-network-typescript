@@ -2,7 +2,15 @@
 
 # Orbs
 
-This is a monorepo that contains all Orbs projects, including both server implementation and client SDK.
+Orbs is a public blockchain built for the needs of apps with millions of users, from SLAs to adjustable fee models to on-demand capacity.
+
+The Orbs platform is designed with the input of consumer applications such as Kik, and inspired by existing best practices, like those of leading cloud computing platforms.
+
+It’s an Infrastructure as a Service solution that makes it possible to launch disruptive, large-scale, consumer-focused applications.
+
+For more information, please check [https://orbs.com](https://orbs.com).
+
+This repository contains all Orbs projects, including both server implementation and client SDK.
 
 ## Preparing your system
 You are encouraged to run the script `orbs-team-member-bootstrap.sh`, it will install all necessary software on your MacOS and then run the full build.
