@@ -75,7 +75,8 @@ private String generateAddress() {
 
 Key generation time should take around 20-30ms but may sometime spike as the PRNG is waiting to collect enough entropy.
 
-More information about the addressing scheme is available at the [client documentation](https://github.com/orbs-network/orbs-network/tree/master/client).
+More information about the addressing scheme is available at the [client documentation](https://github.com/orbs-network/orbs-network/tree/master/client). The `CryptoSDK.Address` class will expose two constants `TEST_NETWORK_ID` and `MAIN_NETWORK_ID` that represent the possible valid network id values.
+
 
 ## The OrbsHost class
 
