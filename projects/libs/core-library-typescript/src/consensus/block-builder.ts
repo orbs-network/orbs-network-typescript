@@ -45,7 +45,7 @@ export default class BlockBuilder {
         logger.debug("blockBuilder tick");
         await this.appendNextBlock();
       } catch (err) {
-        logger.error(`Error in appendNextBlock: ${JSON.stringify(err)}`);
+        logger.error(`Error in appendNextBlock: ${err}`);
       }
     }, this.pollIntervalMs);
   }
