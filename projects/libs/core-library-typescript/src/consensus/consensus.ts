@@ -3,8 +3,8 @@ import { types } from "../common-library/types";
 
 import { Gossip } from "../gossip";
 
-import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
-import { RaftConsensus } from "./raft-consensus";
+import { BaseConsensusConfig, BaseConsensus } from "./base-consensus";
+import { BenchmarkConsensus } from "./benchmark-consensus";
 import { StubConsensus } from "./stub-consensus";
 import { StartupCheck } from "../common-library/startup-check";
 import { StartupStatus, STARTUP_STATUS } from "../common-library/startup-status";
@@ -12,10 +12,10 @@ import { StartupStatus, STARTUP_STATUS } from "../common-library/startup-status"
 export class Consensus implements StartupCheck {
   private COMPONENT_NAME = "consensus";
   private actualConsensus: BaseConsensus;
-  private config: RaftConsensusConfig;
+  private config: BaseConsensusConfig;
 
   constructor(
-    config: RaftConsensusConfig, gossip: types.GossipClient,
+    config: BaseConsensusConfig, gossip: types.GossipClient,
     virtualMachine: types.VirtualMachineClient, blockStorage: types.BlockStorageClient,
     transactionPool: types.TransactionPoolClient) {
     this.config = config;
@@ -23,7 +23,7 @@ export class Consensus implements StartupCheck {
     if (config.algorithm.toLowerCase() === "stub") {
       this.actualConsensus = new StubConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
     } else {
-      this.actualConsensus = new RaftConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+      this.actualConsensus = new BenchmarkConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
     }
   }
 

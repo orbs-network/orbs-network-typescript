@@ -21,7 +21,7 @@ logger.configure({ level: "debug" });
 
 chai.use(chaiAsPromised);
 
-describe("raft consensus service tests", function () {
+describe("benchmark consensus service tests", function () {
   const COMPONENT_NAME = "consensus-service";
   let server: GRPCServerBuilder;
   let client: ConsensusClient;
