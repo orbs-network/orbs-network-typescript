@@ -35,10 +35,10 @@ export class VirtualMachine implements StartupCheck {
         stateCache.merge(transactionScopeStateCache.getModifiedKeys());
       } catch (err) {
         if (!err.expected) {
-          logger.error(`Transaction ${txHash.toString("hex")} with payload ${JSON.stringify(transaction)} failed unexpectedly. error: ${JSON.stringify(err)}`);
+          logger.error(`Transaction ${txHash.toString("hex")} with payload ${JSON.stringify(transaction)} failed unexpectedly,`, err);
           throw err;
         } else {
-          logger.info(`Transaction ${txHash.toString("hex")} with payload ${JSON.stringify(transaction)} failed. error: ${JSON.stringify(err)}`);
+          logger.info(`Transaction ${txHash.toString("hex")} with payload ${JSON.stringify(transaction)} failed,`, err);
           continue;
         }
       } finally {

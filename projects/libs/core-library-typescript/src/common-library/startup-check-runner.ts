@@ -18,11 +18,13 @@ export class StartupCheckRunner {
     return Promise.all(startupCheckPromises)
       .then(statuses => {
         const mergedStartupStatus = this.mergeStartupStatuses(this.name, statuses);
-        logger.info("Health check", _.cloneDeep(mergedStartupStatus)); // mergedStartupStatus is mutated inside logger.info, so cloned
+        if (mergedStartupStatus.status !== STARTUP_STATUS.OK) {
+          logger.info("Health check", _.cloneDeep(mergedStartupStatus)); // mergedStartupStatus is mutated inside logger.info, so cloned
+        }
         return mergedStartupStatus;
       })
       .catch(err => {
-        logger.error(`Error on startup check: ${JSON.stringify(err)}`);
+        logger.error(`Error on startup check,`, err);
         return <StartupStatus>{ status: STARTUP_STATUS.FAIL, message: err.message };
       });
   }

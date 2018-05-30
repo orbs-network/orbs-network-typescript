@@ -82,7 +82,7 @@ export class StateStorage implements StartupCheck {
     }
     catch (err) {
       if (err instanceof ReferenceError) {
-        logger.warn(`Could not get blocks while polling, last height: ${this.lastBlockHeight}, ${err}`);
+        logger.warn(`Could not get blocks while polling, last height: ${this.lastBlockHeight},`, err);
       }
       else {
         throw err;
