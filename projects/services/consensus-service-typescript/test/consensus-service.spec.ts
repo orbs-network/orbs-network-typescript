@@ -20,7 +20,7 @@ logger.configure({ level: "debug" });
 
 chai.use(chaiAsPromised);
 
-describe("raft consensus service tests", function() {
+describe("benchmark consensus service tests", function() {
     let server: GRPCServerBuilder;
     let client: ConsensusClient;
 
@@ -71,7 +71,7 @@ describe("raft consensus service tests", function() {
     it("should be able to later stop the service", async () => {
         const gossipPayload: GossipListenerInput = {
             broadcastGroup: "consensus",
-            messageType: "RaftMessage",
+            messageType: "BenchmarkConsensusMessage",
             buffer: new Buffer(JSON.stringify({ from: 1, data: { to: 1 }})),
             fromAddress: "invalid address"
         };

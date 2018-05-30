@@ -5,7 +5,7 @@ export interface ElectionTimeoutConfig {
   max: number;
 }
 
-export interface RaftConsensusConfig {
+export interface BaseConsensusConfig {
   nodeName: string;
   clusterSize: number;
   electionTimeout: ElectionTimeoutConfig;

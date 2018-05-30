@@ -1,6 +1,6 @@
 export * from "./common-library";
 export { BlockStorage, BlockStorageSync } from "./block-storage";
-export { Consensus, RaftConsensusConfig, ElectionTimeoutConfig } from "./consensus";
+export { Consensus, BaseConsensusConfig, ElectionTimeoutConfig } from "./consensus";
 export { Gossip } from "./gossip";
 export { PublicApi, TransactionHandler } from "./public-api";
 export { SidechainConnector, SidechainConnectorOptions } from "./sidechain-connector";

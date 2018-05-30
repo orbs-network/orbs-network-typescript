@@ -1,7 +1,7 @@
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import BlockBuilder from "./block-builder";
-import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
+import { BaseConsensusConfig, BaseConsensus } from "./base-consensus";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
@@ -12,7 +12,7 @@ export class StubConsensus extends BaseConsensus {
   private blockBuilder: BlockBuilder;
   private gossip: types.GossipClient;
   private blockStorage: types.BlockStorageClient;
-  private config: RaftConsensusConfig;
+  private config: BaseConsensusConfig;
   private lastBlockHeightByNodeName: Map<string, number> = new Map();
   private pollInterval: NodeJS.Timer;
 
@@ -25,7 +25,7 @@ export class StubConsensus extends BaseConsensus {
   }
 
   public constructor(
-    config: RaftConsensusConfig,
+    config: BaseConsensusConfig,
     gossip: types.GossipClient,
     blockStorage: types.BlockStorageClient,
     transactionPool: types.TransactionPoolClient,
