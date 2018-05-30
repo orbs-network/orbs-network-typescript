@@ -4,7 +4,7 @@ import * as crypto from "crypto";
 import * as bluebird from "bluebird";
 import * as redis from "redis";
 import * as express from "express";
-import * as bodyParser from "body-parser";
+import * as _ from "lodash";
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 
@@ -27,7 +27,16 @@ const config = {
   timeout: Number(TRANSACTION_TIMEOUT) || 2000
 };
 
-const redisClient: any = redis.createClient(REDIS_URL);
+let redisClient: any;
+
+function getRedis() {
+  if (!redisClient) {
+    redisClient = redis.createClient(REDIS_URL);
+    redisClient.on("error", console.error);
+  }
+
+  return redisClient;
+}
 
 function generateAddress(): [Address, ED25519Key] {
   const keyPair = new ED25519Key();
@@ -58,21 +67,25 @@ async function getAccount(username: string, config: Config): Promise<Account> {
 }
 
 async function saveAccount(username: any, keyPair: any) {
-  return redisClient.hmsetAsync(username, { publicKey: keyPair.publicKey, privateKey: keyPair.getPrivateKeyUnsafe() });
+  return getRedis().hmsetAsync(username, { publicKey: keyPair.publicKey, privateKey: keyPair.getPrivateKeyUnsafe() }).timeout(config.timeout);
 }
 
 async function loadAccount(address: any) {
-  return redisClient.hgetallAsync(address);
+  return getRedis().hgetallAsync(address).timeout(config.timeout);
 }
 
 const app = express();
-// FIXME: check if we need body parser
-app.use(bodyParser());
 
 app.use("/", async (req: express.Request, res: express.Response) => {
-  if (!req.body) {
-    // FIXME: check redis ping just in case
-    return res.status(200).json({ status: "HEALTHCHECK" });
+  if (_.isEmpty(req.query)) {
+    try {
+      await getRedis().pingAsync().timeout(config.timeout);
+    } catch (e) {
+      console.log(e);
+      return res.status(503).json({ status: "TEMPORARY_UNAVAILABLE" });
+    }
+
+    return res.status(200).json({ status: "HEALTHY" });
   }
 
   const { user_id } = req.query;

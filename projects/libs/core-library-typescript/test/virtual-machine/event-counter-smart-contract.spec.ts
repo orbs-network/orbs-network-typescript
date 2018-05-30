@@ -36,7 +36,7 @@ let adapter: BaseContractStateAccessor;
 let aliceContract: BaseSmartContract;
 let bobContract: BaseSmartContract;
 
-describe.only("event counter contract ", () => {
+describe("event counter contract ", () => {
   beforeEach(() => {
     adapter = new ContractStateMemCacheAccessor(CONTRACT_ADDRESS, new StateCache());
     aliceContract = new EventCounterContract(ALICE_ADDRESS, adapter);
