@@ -166,10 +166,10 @@ export class Gossip implements StartupCheck {
 
   public async startupCheck(): Promise<StartupStatus> {
 
-    const badClients = _.filter(this.clients || [], (client: WebSocket) => { return !client.readyState || client.readyState !== WebSocket.OPEN; });
+    const goodClients = _.filter(this.clients || [], (client: WebSocket) => { return client.readyState && client.readyState === WebSocket.OPEN; });
 
-    if (badClients.length > 0) {
-      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `Found ${badClients.length} bad clients` };
+    if (goodClients.length === 0) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `No working clients` };
     }
     return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
   }
