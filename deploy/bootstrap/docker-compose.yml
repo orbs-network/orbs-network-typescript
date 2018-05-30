@@ -31,7 +31,7 @@ services:
     environment:
       SERVICE_NAME: consensus
       CONSENSUS_SIGN_BLOCKS: 'true'
-      ETHEREUM_CONTRACT_ADDRESS: '0x0836C6b91e68A6Ca30086d196e998f75346c2c72'
+      ETHEREUM_CONTRACT_ADDRESS: '0x8e0384985e86454d0a444173ad21D5b9158a298C'
       BLOCK_BUILDER_POLL_INTERVAL: 500
       MIN_ELECTION_TIMEOUT: 10000
       MAX_ELECTION_TIMEOUT: 20000
@@ -40,8 +40,9 @@ services:
       MSG_LIMIT: 4000000
       BLOCK_SIZE_LIMIT: 2000
       VERIFY_TRANSACTION_SIGNATURES: 'true'
-      VERIFY_SUBSCRIPTION: 'false'
+      VERIFY_SUBSCRIPTION: 'true'
       CONSENSUS_ALGORITHM: 'stub'
+      SUBSCRIPTION_PROFILES: '{"ALPHA":[{"rate":1}]}'
       CONSENSUS_LEADER_NODE_NAME: 'orbs-global-506367651493-staging-ap-northeast-1'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
