@@ -21,6 +21,8 @@ The test case is a transfer of 1 BAR token from one account to another.
 
 The test script connects to a Public API Service of one of the nodes through a `public-network` docker network.
 
+> The default memory configuration of the Docker app on your Mac is insufficient to run e2e tests. Open the Docker `Preferences --> Advanced --> Memory` and set it to 4.0 GiB and 3 CPUs or more. Leaving the default 2.0 GiB may result in Docker containers getting stuck during the e2e run on your machine.
+
 ## How to build it
 
 ### Node build (Node=Server)
