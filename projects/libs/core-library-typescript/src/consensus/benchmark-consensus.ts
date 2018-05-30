@@ -4,7 +4,7 @@ import { EventEmitter } from "events";
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import BlockBuilder from "./block-builder";
-import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
+import { BaseConsensusConfig, BaseConsensus } from "./base-consensus";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
@@ -41,12 +41,12 @@ class RPCConnector extends EventEmitter {
   public broadcast(data: any): void {
     if (this.debug) {
       const size = new Buffer(JSON.stringify(data)).length;
-      logger.debug(`Raft broadcast message (${size} bytes): ${JSON.stringify(data)}`);
+      logger.debug(`benchmark broadcast message (${size} bytes): ${JSON.stringify(data)}`);
     }
 
     this.gossip.broadcastMessage({
       broadcastGroup: "consensus",
-      messageType: "RaftMessage",
+      messageType: "BenchmarkConsensusMessage",
       buffer: new Buffer(JSON.stringify(data)),
       immediate: true
     });
@@ -55,13 +55,13 @@ class RPCConnector extends EventEmitter {
   public send(nodeId: string, data: any): void {
     if (this.debug) {
       const size = new Buffer(JSON.stringify(data)).length;
-      logger.debug(`Raft unicast message (${size} bytes): ${JSON.stringify(data)}`);
+      logger.debug(`benchmark unicast message (${size} bytes): ${JSON.stringify(data)}`);
     }
 
     this.gossip.unicastMessage({
       recipient: nodeId,
       broadcastGroup: "consensus",
-      messageType: "RaftMessage",
+      messageType: "BenchmarkConsensusMessage",
       buffer: new Buffer(JSON.stringify(data)),
       immediate: true
     });
@@ -73,13 +73,13 @@ export interface ElectionTimeoutConfig {
   max: number;
 }
 
-export class RaftConsensus extends BaseConsensus {
+export class BenchmarkConsensus extends BaseConsensus {
   private transactionPool: types.TransactionPoolClient;
   private blockBuilder: BlockBuilder;
 
   private connector: RPCConnector;
   private node: any;
-  private raftIndex: number; // maintain consistency between gaggle log and storage
+  private benchmarkIndex: number; // maintain consistency between gaggle log and storage
   private leaderIntervalMs: number;
   private leaderInterval: NodeJS.Timer;
 
@@ -95,14 +95,14 @@ export class RaftConsensus extends BaseConsensus {
   }
 
   public constructor(
-    config: RaftConsensusConfig,
+    config: BaseConsensusConfig,
     gossip: types.GossipClient,
     blockStorage: types.BlockStorageClient,
     transactionPool: types.TransactionPoolClient,
     virtualMachine: types.VirtualMachineClient
   ) {
     super();
-    logger.info(`Starting raft consensus with configuration: ${JSON.stringify(config, this.configSanitation)}`);
+    logger.info(`Starting benchmark consensus with configuration: ${JSON.stringify(config, this.configSanitation)}`);
 
     this.pollIntervalMs = 3000;
     this.transactionPool = transactionPool;
@@ -119,7 +119,7 @@ export class RaftConsensus extends BaseConsensus {
       }
     });
     this.blockBuilder.stop();
-    this.raftIndex = -1;
+    this.benchmarkIndex = -1;
     this.leaderIntervalMs = config.leaderIntervalMs;
     this.node = gaggle({
       id: config.nodeName,
@@ -150,21 +150,21 @@ export class RaftConsensus extends BaseConsensus {
     this.node.on("leaderElected", async () => this.onLeaderElected());
 
     this.node.inSync = function() {
-      return this.raftIndex == this.node.getCommitIndex();
+      return this.benchmarkIndex == this.node.getCommitIndex();
     };
 
   }
 
 
-  // onCommitted triggered by raft consensus
+  // onCommitted triggered by benchmark consensus
   // The node is responsible to PULL the diff
   // Note: current implementation will commit invalid blocks - which will not be appended to block chain storage
   private async onCommitted() {
-    const raftCommitIndex: number = this.node.getCommitIndex();
+    const benchmarkCommitIndex: number = this.node.getCommitIndex();
     let block: types.Block = undefined;
     let blockHash = "";
-    if (this.raftIndex < raftCommitIndex) {
-      const entries: any[] = await this.node.getBlocks(this.raftIndex, raftCommitIndex + 1);
+    if (this.benchmarkIndex < benchmarkCommitIndex) {
+      const entries: any[] = await this.node.getBlocks(this.benchmarkIndex, benchmarkCommitIndex + 1);
       for (let i = 0; i < entries.length; i++) {
         try {
             const msg: types.ConsensusMessage = entries[i].data;
@@ -177,7 +177,7 @@ export class RaftConsensus extends BaseConsensus {
 
             blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-            logger.debug(`onCommitted ${this.node.id}: New block with height ${block.header.height} and hash ${blockHash} is about to be committed (RAFT index ${this.raftIndex + i})`);
+            logger.debug(`onCommitted ${this.node.id}: New block with height ${block.header.height} and hash ${blockHash} is about to be committed (benchmark index ${this.benchmarkIndex + i})`);
 
             logger.info(`Finished deserializing block with height ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
 
@@ -186,8 +186,8 @@ export class RaftConsensus extends BaseConsensus {
 
             await this.blockBuilder.commitBlock(block);
 
-            logger.info(`${this.node.id}: Successfully committed block with height ${block.header.height} and hash ${blockHash}, raftIndex ${this.raftIndex + i}`);
-            const raftLog: any[] = this.node.getLog();
+            logger.info(`${this.node.id}: Successfully committed block with height ${block.header.height} and hash ${blockHash}, benchmarkIndex ${this.benchmarkIndex + i}`);
+            const benchmarkLog: any[] = this.node.getLog();
             const b = { blocks: await this.blockBuilder.getBlocks(0) };
             if (b.blocks != undefined) {
               let blockChainStr = "Node " + this.node.id + " Current block chain: ";
@@ -200,26 +200,26 @@ export class RaftConsensus extends BaseConsensus {
 
               }
               logger.info(blockChainStr);
-              let rafLogStr = "Node " + this.node.id + "Current raft log: ";
-              // logger.info(`Node ${this.node.id} Current raft log: `);
-              for (let i = 0; i < raftLog.length; i++) {
-                const blockHash = raftLog[i].term;
-                // BlockUtils.calculateBlockHash(raftLog[i]).toString("hex");
-                rafLogStr += "Height " + i + ":  term:" + raftLog[i].term + " data: " + raftLog[i].data + "\n";
+              let rafLogStr = "Node " + this.node.id + "Current benchmark log: ";
+              // logger.info(`Node ${this.node.id} Current benchmark log: `);
+              for (let i = 0; i < benchmarkLog.length; i++) {
+                const blockHash = benchmarkLog[i].term;
+                // BlockUtils.calculateBlockHash(benchmarkLog[i]).toString("hex");
+                rafLogStr += "Height " + i + ":  term:" + benchmarkLog[i].term + " data: " + benchmarkLog[i].data + "\n";
                 // logger.info(`Height ${i}:  ${blockHash}`);
               }
               logger.info(rafLogStr);
             }
         } catch (err) {
-            // note: we maintain a sync routine with the raft log to update the storage state...
-            // invalid blocks which are committed on raft are acceptable
+            // note: we maintain a sync routine with the benchmark log to update the storage state...
+            // invalid blocks which are committed on benchmark are acceptable
             if (block != undefined)
                 logger.error(`${this.node.id}: Failed to commit block with height ${block.header.height} and hash ${blockHash},`, err);
             // if (this.node.isLeader())
             //     this.node.stepDown(); // -leader steps down (election time out will occur)
         }
       }
-      this.raftIndex = raftCommitIndex;
+      this.benchmarkIndex = benchmarkCommitIndex;
       this.onLeaderElected();
     }
   }
@@ -237,9 +237,9 @@ export class RaftConsensus extends BaseConsensus {
     }
 
     if (this.node.isLeader()) {
-      const raftCommitIndex: number = this.node.getCommitIndex();
-      if (this.raftIndex >= raftCommitIndex) {  // Important: Assume Gaggle commit index is initialized to -1 !!
-        logger.info(`Node ${this.node.id} was elected as a new leader! after update to blockchain ${this.raftIndex}:${raftCommitIndex}; local:remote`);
+      const benchmarkCommitIndex: number = this.node.getCommitIndex();
+      if (this.benchmarkIndex >= benchmarkCommitIndex) {  // Important: Assume Gaggle commit index is initialized to -1 !!
+        logger.info(`Node ${this.node.id} was elected as a new leader! after update to blockchain ${this.benchmarkIndex}:${benchmarkCommitIndex}; local:remote`);
         this.blockBuilder.appendNextBlock();
       }
       else {
@@ -258,7 +258,7 @@ export class RaftConsensus extends BaseConsensus {
 
   async onMessageReceived(fromAddress: string, messageType: string, message: any): Promise<any> {
     switch (messageType) {
-      case "RaftMessage": {
+      case "BenchmarkConsensusMessage": {
         this.connector.received(message.from, message.data);
       }
     }
@@ -270,7 +270,7 @@ export class RaftConsensus extends BaseConsensus {
 
         const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
-        logger.debug(`onNewBlockBuilds ${this.node.id}:  New block with height ${block.header.height} and hash ${blockHash} is about to be appended to RAFT log`);
+        logger.debug(`onNewBlockBuilds ${this.node.id}:  New block with height ${block.header.height} and hash ${blockHash} is about to be appended to benchmark log`);
 
         this.node.append(appendMessage);
     }

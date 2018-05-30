@@ -1,6 +1,6 @@
 import { logger, types, StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
-import { Consensus, RaftConsensusConfig } from "orbs-core-library";
+import { Consensus, BaseConsensusConfig } from "orbs-core-library";
 import { Gossip, KeyManager } from "orbs-core-library";
 import { StartupCheck, StartupCheckRunner } from "orbs-core-library";
 import * as _ from "lodash";
