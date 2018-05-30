@@ -1,6 +1,6 @@
 import * as WebSocket from "ws";
 
-import { logger, types } from "../common-library";
+import { logger, types, StartupCheck, StartupStatus, STARTUP_STATUS } from "../common-library";
 import { KeyManager } from "../common-library";
 import * as stringify from "json-stable-stringify";
 import * as _ from "lodash";
@@ -13,7 +13,8 @@ function handleWSError(address: string, url: string) {
   };
 }
 
-export class Gossip {
+export class Gossip implements StartupCheck {
+  public readonly SERVICE_NAME = "gossip";
   localAddress: string;
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
@@ -161,5 +162,15 @@ export class Gossip {
 
   public activePeers() {
     return this.clients.keys();
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+
+    const badClients = _.filter(this.clients || [], (client: WebSocket) => { return !client.readyState || client.readyState !== WebSocket.OPEN; });
+
+    if (badClients.length > 0) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `Found ${badClients.length} bad clients` };
+    }
+    return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
   }
 }
