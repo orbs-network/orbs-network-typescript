@@ -45,8 +45,6 @@ export class Consensus implements StartupCheck {
     }
 
     return { name: this.COMPONENT_NAME, status: STARTUP_STATUS.OK };
-
-    // return this.consensus.startupCheck();
   }
 
 }
