@@ -71,7 +71,7 @@ You don't have to rebuild your base images most of the time unless something cha
 
 This build will generate all the docker images required to run the orbs-network blockchain. there are two options to run e2e tests.
 
-Please refer to [documentation](e2e/README.md) in `e2e` folder to learn more about end to end testing.
+Please refer to [e2e documentation](e2e/README.md) in `e2e` folder to learn more about end to end testing and the docker configuration we use.
 
 ### Run from host
 
