@@ -4,9 +4,11 @@ import { types, logger, JsonBuffer } from "orbs-core-library";
 
 import { Service, ServiceConfig, TransactionHelper } from "orbs-core-library";
 import { PendingTransactionPool, CommittedTransactionPool } from "orbs-core-library";
+import { StartupCheck, StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import { TransactionStatus, Transaction } from "orbs-interfaces";
 
-export default class TransactionPoolService extends Service {
+export default class TransactionPoolService extends Service implements StartupCheck {
+  private SERVICE_NAME = "transaction-pool";
   private pendingTransactionPool: PendingTransactionPool;
   private committedTransactionPool: CommittedTransactionPool;
   private monitorPollTimer: NodeJS.Timer;
@@ -100,4 +102,15 @@ export default class TransactionPoolService extends Service {
       }
     }
   }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    if (!this.pendingTransactionPool) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing pendingTransactionPool" };
+    }
+    if (!this.committedTransactionPool) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing committedTransactionPool" };
+    }
+    return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
+  }
+
 }
