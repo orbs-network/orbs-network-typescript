@@ -119,6 +119,12 @@ describe("gossip server test", function () {
     expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
   });
 
+  it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME} management port (with peers)`, async () => {
+    // Wait for it to connect to peers
+    await bluebird.delay(200);
+    return testStartupCheckHappyPath(SERVER_IP_ADDRESS, gossipManagementPort, COMPONENT_NAME, ["gossip"]);
+  });
+
   afterEach(() => {
     return Promise.all([serverA.stop(), serverB.stop()]);
   });
@@ -184,10 +190,6 @@ describe("testing gossip with no peers", function () {
     await gossipAClient.broadcastMessage({ broadcastGroup: "consensus", messageType: "TEST_MESSAGE", buffer, immediate: true });
     await bluebird.delay(200);
     expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("0");
-  });
-
-  it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME} management port`, async () => {
-    return testStartupCheckHappyPath(SERVER_IP_ADDRESS, gossipManagementPort, COMPONENT_NAME, ["gossip"]);
   });
 
   afterEach(() => {

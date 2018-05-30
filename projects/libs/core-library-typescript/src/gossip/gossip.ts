@@ -65,7 +65,7 @@ export class Gossip implements StartupCheck {
         // 'hello' message
         remoteAddress = sender;
         this.clients.set(sender, ws);
-        logger.info("Registering connection", this.localAddress, "->", sender);
+        logger.info("Registering connection", this.localAddress, "->", sender, " #clients:", this.clients.size);
         return;
       }
 
@@ -165,8 +165,7 @@ export class Gossip implements StartupCheck {
   }
 
   public async startupCheck(): Promise<StartupStatus> {
-
-    const goodClients = _.filter(this.clients || [], (client: WebSocket) => { return client.readyState && client.readyState === WebSocket.OPEN; });
+    const goodClients = _.filter(Array.from(this.clients.values()) || [], (client: WebSocket) => { return client.readyState && client.readyState === WebSocket.OPEN; });
 
     if (goodClients.length === 0) {
       return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `No working clients` };
