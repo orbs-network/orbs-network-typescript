@@ -13,7 +13,7 @@ interface Config {
   timeout: number;
 }
 
-const VIRTUAL_CHAIN_ID = "640ed3";
+const VIRTUAL_CHAIN_ID = "6c696e";
 
 const {
   ORBS_API_ENDPOINT,
