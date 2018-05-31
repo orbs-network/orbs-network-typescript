@@ -89,7 +89,7 @@ Please refer to [documentation](deploy/README.md) in `deploy` folder.
 
 Since this is a monorepo, the build process is configured into three main groups: `server`, `sdk` and `e2e`.
 
-Each group different modules and build order are defined in the `config/projects.[name].json`. `PROJECT_TYPE` variable is responsible for building a certain part of the system: `server`, `sdk` or `e2e`.
+Each group modules and build order are defined in the `config/projects.[name].json`. `PROJECT_TYPE` variable is responsible for building a certain part of the system: `server`, `sdk` or `e2e`.
 
 There are shortcut scripts that are tailored for a specific type of build.
 
