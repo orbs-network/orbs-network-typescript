@@ -29,10 +29,16 @@
     "type": "library",
     "path": "client/examples/python-example-app"
   },
+  "event-proxy-app": {
+    "runtime": "typescript",
+    "type": "library",
+    "path": "client/examples/event-proxy-app"
+  },
   "order": [
     "architecture",
     "crypto-sdk",
     "client-sdk-javascript",
+    "event-proxy-app",
     "example-slack-bot",
     "crypto-sdk-python",
     "example-python-app"
