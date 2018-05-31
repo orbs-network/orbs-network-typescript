@@ -36,7 +36,6 @@ export class StateStorage implements StartupCheck {
   private startPolling() {
     if (this.engineRunning) {
       this.pollInterval = setInterval(() => this.pollBlockStorage(), this.pollIntervalMs);
-      logger.debug(`Polling started, interval is ${this.pollIntervalMs}`);
     }
   }
 
@@ -44,7 +43,6 @@ export class StateStorage implements StartupCheck {
     if (this.pollInterval) {
       clearInterval(this.pollInterval);
       this.pollInterval = undefined;
-      logger.debug("Polling stopped");
     }
   }
 

@@ -73,15 +73,11 @@ export class BlockStorage implements StartupCheck {
   // NOTE: this method should be only called serially.
   public async addBlock(block: types.Block) {
     const start = new Date().getTime();
-
     const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
 
     logger.info(`Adding new block with block height ${block.header.height} and hash ${blockHash}`);
 
     await this.verifyNewBlock(block);
-
-    logger.info(`Verified new block with block height ${block.header.height} and hash ${blockHash}`);
-
     await this.db.put<number>(BlockStorage.LAST_BLOCK_HEIGHT_KEY, block.header.height);
     await this.putBlock(block);
     await this.reportBlockTransactionToPool(block);
@@ -89,7 +85,6 @@ export class BlockStorage implements StartupCheck {
     this.lastBlock = block;
 
     const end = new Date().getTime();
-
     logger.info(`Added new block with block height: ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
   }
 

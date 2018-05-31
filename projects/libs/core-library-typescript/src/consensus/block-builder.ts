@@ -57,11 +57,8 @@ export default class BlockBuilder {
     }
   }
 
-
-
   private async buildBlockFromPendingTransactions(lastBlock: types.Block): Promise<types.Block> {
     const { transactionEntries } = await this.transactionPool.getAllPendingTransactions({});
-    // FIXME: refactor getAllPendingTransaction to getPendingTransactions with a limit
     const transactionEntriesCap: types.TransactionEntry[] = transactionEntries.slice(0, this.blockSizeLimit);
 
     if (transactionEntriesCap.length == 0) {
@@ -86,12 +83,10 @@ export default class BlockBuilder {
 
   public start() {
     this.pollForPendingTransactions();
-    logger.debug("blockBuilder starting..");
   }
 
   public stop() {
     this.stopPolling();
-    logger.debug("blockBuilder stopping..");
   }
 
   // Returns an array of blocks, starting from a specific block ID and up to the last block.
@@ -121,8 +116,6 @@ export default class BlockBuilder {
   // Append a new block to log. Only called on leader elected or after committed.
   // while pool is empty retry every time interval
   public async appendNextBlock(): Promise<types.Block> {
-    logger.debug("Node in appendNextBlock");
-
     this.stop();
     try {
       const lastBlock = await this.getOrFetchLastBlock();
@@ -141,7 +134,6 @@ export default class BlockBuilder {
       throw e;
     }
   }
-
 
   async initialize() {
   }
