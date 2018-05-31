@@ -80,7 +80,6 @@ export default class TransactionPoolService extends Service implements StartupCh
   public async getAllPendingTransactions(rpc: types.GetAllPendingTransactionsContext) {
     const transactionEntries = this.pendingTransactionPool.getAllPendingTransactions();
     rpc.res = { transactionEntries };
-    logger.debug(`getAllPendingTransactions() . returns ${JSON.stringify(rpc.res)}`);
   }
 
   @Service.RPCMethod
