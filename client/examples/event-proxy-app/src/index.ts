@@ -1,4 +1,3 @@
-import { Account } from "./account";
 import { OrbsClient, OrbsContract, Address, ED25519Key } from "orbs-client-sdk";
 import * as crypto from "crypto";
 import * as bluebird from "bluebird";
@@ -13,7 +12,7 @@ interface Config {
   timeout: number;
 }
 
-const VIRTUAL_CHAIN_ID = "6c696e";
+const VIRTUAL_CHAIN_ID = "640ed3";
 
 const {
   ORBS_API_ENDPOINT,
@@ -45,14 +44,14 @@ function generateAddress(): [Address, ED25519Key] {
   return [address, keyPair];
 }
 
-async function getAccount(username: string, config: Config): Promise<Account> {
+async function getContract(username: string, config: Config): Promise<OrbsContract> {
   const data = await loadAccount(username);
 
   let address: Address;
   let keyPair;
 
   if (data) {
-    address = new Address(data.publicKey, VIRTUAL_CHAIN_ID, Address.TEST_NETWORK_ID);
+    address = new Address(data.publicKey, VIRTUAL_CHAIN_ID, NETWORK_ID || Address.TEST_NETWORK_ID);
     keyPair = new ED25519Key(data.publicKey, data.privateKey);
   } else {
     [address, keyPair] = generateAddress();
@@ -61,9 +60,8 @@ async function getAccount(username: string, config: Config): Promise<Account> {
 
   const orbsClient = new OrbsClient(ORBS_API_ENDPOINT, address, keyPair, config.timeout);
   const contract = new OrbsContract(orbsClient, "event-counter");
-  const account = new Account(username, address.toString(), contract);
 
-  return Promise.resolve(account);
+  return Promise.resolve(contract);
 }
 
 async function saveAccount(username: any, keyPair: any) {
@@ -100,8 +98,8 @@ app.use("/", async (req: express.Request, res: express.Response) => {
   }
 
   try {
-    const account = await getAccount(user_id, config);
-    const receipt = await account.reportEvent(event_id);
+    const contract = await getContract(user_id, config);
+    const receipt = await contract.sendTransaction("reportEvent", [event_id.toString()]);
 
     return res.json({ status: "OK", receipt });
   } catch (e) {

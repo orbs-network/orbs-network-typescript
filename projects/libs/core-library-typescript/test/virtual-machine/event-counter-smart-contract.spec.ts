@@ -1,13 +1,17 @@
 import { expect } from "chai";
 import "mocha";
+import * as chai from "chai";
+import * as chaiAsPromised from "chai-as-promised";
 
 import { StateCache } from "../../src/virtual-machine/state-cache";
 import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-state-accessor";
-import EventCounterContract from "../../src/virtual-machine/hard-coded-contracts/registry/event-counter-contract";
+import EventCounterContract from "../../src/virtual-machine/hard-coded-contracts/registry/event-counter-smart-contract";
 import BaseSmartContract from "../../src/virtual-machine/hard-coded-contracts/base-smart-contact";
 import { types } from "../../src";
 import { Address } from "../../src/common-library/address";
 import { createHash } from "crypto";
+
+chai.use(chaiAsPromised);
 
 export default class ContractStateMemCacheAccessor extends BaseContractStateAccessor {
   lastBlockId: number;
@@ -58,5 +62,11 @@ describe("event counter contract ", () => {
 
   it("returns 0 for accounts that have no records", async () => {
     await expect(await aliceContract.getCounter("hello")).to.be.eql(0);
+  });
+
+  it("throws validation error if argument is not a string", async () => {
+    await aliceContract.reportEvent("hello");
+
+    return expect(aliceContract.reportEvent(1)).to.be.rejectedWith("Argument event must be a string");
   });
 });
