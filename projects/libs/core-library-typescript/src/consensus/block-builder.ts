@@ -42,7 +42,6 @@ export default class BlockBuilder {
     }
     this.pollInterval = setInterval(async () => {
       try {
-        logger.debug("blockBuilder tick");
         await this.appendNextBlock();
       } catch (err) {
         logger.error(`Error in appendNextBlock,`, err);
