@@ -11,6 +11,7 @@ import { GossipClient } from "orbs-interfaces";
 import GossipService from "../src/service";
 import gossipServer from "../src/server";
 import ConsensusService from "../../consensus-service-typescript/src/consensus-service";
+import { STARTUP_STATUS, StartupStatus, testStartupCheckHappyPath } from "orbs-core-library";
 
 const { expect } = chai;
 
@@ -20,22 +21,27 @@ logger.configure({ level: "debug" });
 
 chai.use(chaiAsPromised);
 
+const SERVER_IP_ADDRESS = "127.0.0.1";
+const COMPONENT_NAME = "gossip-service";
+
 describe("gossip server test", function () {
   this.timeout(10000);
   let serverA: GRPCServerBuilder;
   let serverB: GRPCServerBuilder;
   let gossipAClient: GossipClient;
   let consensusStub: ConsensusService;
+  let gossipManagementPort: number, anotherGossipManagementPort: number;
+
 
   beforeEach(async () => {
     // note about gossip connections: the grpc needs one endpoint,
     // and then the gossip port must be different as its websocket based unrelated to the grpc server/service
     const gossipPort = await getPort();
     const anotherGossipPort = await getPort();
-    const gossipManagementPort = await getPort();
-    const anotherGossipManagementPort = await getPort();
-    const endpoint = `127.0.0.1:${await getPort()}`;
-    const anotherEndpoint = `127.0.0.1:${await getPort()}`;
+    gossipManagementPort = await getPort();
+    anotherGossipManagementPort = await getPort();
+    const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
+    const anotherEndpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
 
     const topology = {
       peers: [
@@ -49,7 +55,7 @@ describe("gossip server test", function () {
         },
       ],
       gossipPort: gossipPort,
-      gossipPeers: [`ws://127.0.0.1:${anotherGossipPort}`]
+      gossipPeers: [`ws://${SERVER_IP_ADDRESS}:${anotherGossipPort}`]
     };
 
     const anotherTopology = {
@@ -64,7 +70,7 @@ describe("gossip server test", function () {
         },
       ],
       gossipPort: anotherGossipPort,
-      gossipPeers: [`ws://127.0.0.1:${gossipPort}`]
+      gossipPeers: [`ws://${SERVER_IP_ADDRESS}:${gossipPort}`]
     };
 
     let NODE_NAME = "testerA";
@@ -113,6 +119,12 @@ describe("gossip server test", function () {
     expect((<sinon.SinonStub>consensusStub.gossipMessageReceived).callCount.toString()).to.equal("1");
   });
 
+  it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME} management port (with peers)`, async () => {
+    // Wait for it to connect to peers
+    await bluebird.delay(200);
+    return testStartupCheckHappyPath(SERVER_IP_ADDRESS, gossipManagementPort, COMPONENT_NAME, ["gossip"]);
+  });
+
   afterEach(() => {
     return Promise.all([serverA.stop(), serverB.stop()]);
   });
@@ -124,12 +136,14 @@ describe("testing gossip with no peers", function () {
   let gossipAClient: GossipClient;
   let consensusStub: ConsensusService;
 
+  let gossipManagementPort: number;
+
   beforeEach(async () => {
     // note about gossip connections: the grpc needs one endpoint,
     // and then the gossip port must be different as its websocket based unrelated to the grpc server/service
     const gossipPort = await getPort();
-    const gossipManagementPort = await getPort();
-    const endpoint = `127.0.0.1:${await getPort()}`;
+    gossipManagementPort = await getPort();
+    const endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
 
     const topology = {
       peers: [

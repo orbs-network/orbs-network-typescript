@@ -1,7 +1,8 @@
-import { logger, types } from "orbs-core-library";
+import { logger, types, StartupStatus, STARTUP_STATUS } from "orbs-core-library";
 import { Service, ServiceConfig } from "orbs-core-library";
 import { Consensus, BaseConsensusConfig } from "orbs-core-library";
 import { Gossip, KeyManager } from "orbs-core-library";
+import { StartupCheck, StartupCheckRunner } from "orbs-core-library";
 import * as _ from "lodash";
 
 export interface GossipServiceConfig extends ServiceConfig {
@@ -13,7 +14,8 @@ export interface GossipServiceConfig extends ServiceConfig {
   peerPollInterval: number;
 }
 
-export default class GossipService extends Service {
+export default class GossipService extends Service implements StartupCheck {
+  private SERVICE_NAME = "gossip-service";
   private gossip: Gossip;
   private peerPollInterval: any;
   private previousActivePeers: String[];
@@ -102,4 +104,15 @@ export default class GossipService extends Service {
 
     rpc.res = {};
   }
+
+  public async startupCheck(): Promise<StartupStatus> {
+
+    if (!this.peerPollInterval) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: "Missing peerPollInterval" };
+
+    }
+
+    return this.gossip.startupCheck();
+  }
+
 }
