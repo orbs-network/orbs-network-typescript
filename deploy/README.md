@@ -6,7 +6,22 @@ Create new EC2 pair of keys named `orbs-network-staging-key`.
 
 Please fisrt make sure you have admin credentials on AWS.
 
+### Credentials
+
+You can use your credentials stored in CSV, try
+
+```bash
+node dist/multi-account.js --aws-credentials-path=path/to/csv
+```
+
+To export your credentials as environment variables:
+
+```bash
+$(node dist/multi-account.js --aws-credentials-path=path/to/csv --aws-credentials-export)
+```
+
 ## Deploying with a single script
+
 
 ```bash
 export AWS_ACCESS_KEY_ID=
