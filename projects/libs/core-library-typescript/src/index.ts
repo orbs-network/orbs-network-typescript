@@ -1,6 +1,6 @@
 export * from "./common-library";
 export { BlockStorage, BlockStorageSync } from "./block-storage";
-export { Consensus, RaftConsensusConfig, ElectionTimeoutConfig } from "./consensus";
+export { Consensus, BaseConsensusConfig, ElectionTimeoutConfig } from "./consensus";
 export { Gossip } from "./gossip";
 export { PublicApi, TransactionHandler } from "./public-api";
 export { SidechainConnector, SidechainConnectorOptions } from "./sidechain-connector";
@@ -9,5 +9,6 @@ export { SubscriptionManager, SubscriptionManagerConfiguration, SubscriptionProf
 export { PendingTransactionPool, CommittedTransactionPool, TransactionValidator } from "./transaction-pool";
 export { VirtualMachine } from "./virtual-machine";
 export { Service, ServiceRunner, ServiceConfig } from "./base-service";
-export { StartupStatus, StartupCheck, StartupCheckRunner, STARTUP_STATUS } from "./common-library";
+export { StartupStatus, StartupCheck, StartupCheckRunner, STARTUP_STATUS, StartupCheckRunnerDefault } from "./common-library";
 export { FakeGossipClient, generateServiceInProcessClient } from "./test-kit";
+export { testStartupCheckHappyPath } from "./test-kit";

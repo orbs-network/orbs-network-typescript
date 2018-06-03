@@ -5,6 +5,8 @@ public class Address implements AutoCloseable {
     private long selfPtr;
     public final String virtualChainId;
     public final String networkId;
+    public static final String TEST_NETWORK_ID = "T";
+    public static final String MAIN_NETWORK_ID = "M";
 
     public Address(String publicKey, String virtualChainId, String networkId) {
         this.virtualChainId = virtualChainId;

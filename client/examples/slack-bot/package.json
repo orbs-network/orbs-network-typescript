@@ -1,5 +1,5 @@
 {
-  "name": "orbs-typescript-sdk",
+  "name": "slack-bot",
   "version": "0.1.0",
   "description": "Orbs Magic Money Bot",
   "repository": {
@@ -22,7 +22,6 @@
   "dependencies": {
     "@slack/client": "^4.0.0",
     "bluebird": "^3.5.1",
-    "grpc-caller": "https://github.com/electricmonk/grpc-caller",
     "lodash": "^4.14.98",
     "orbs-client-sdk": "file:../../client-sdk-javascript",
     "redis": "^2.8.0"

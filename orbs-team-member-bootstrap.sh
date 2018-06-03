@@ -165,7 +165,6 @@ install_android()
 
 run_build()
 {
-  ./install.sh
   ./build.sh
   # This presently doesn't work, see https://orbs.leankit.com/card/667381910
   #./build-sdk.sh

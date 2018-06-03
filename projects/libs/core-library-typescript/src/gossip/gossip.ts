@@ -1,6 +1,6 @@
 import * as WebSocket from "ws";
 
-import { logger, types } from "../common-library";
+import { logger, types, StartupCheck, StartupStatus, STARTUP_STATUS } from "../common-library";
 import { KeyManager } from "../common-library";
 import * as stringify from "json-stable-stringify";
 import * as _ from "lodash";
@@ -8,12 +8,13 @@ import * as _ from "lodash";
 function handleWSError(address: string, url: string) {
   return (err: Error) => {
     if (err) {
-      logger.error(`Error sending unicast message to ${address} (${url}), WS Error: ${JSON.stringify(err)}`);
+      logger.error(`Error sending unicast message to ${address} (${url}),`, err);
     }
   };
 }
 
-export class Gossip {
+export class Gossip implements StartupCheck {
+  public readonly SERVICE_NAME = "gossip";
   localAddress: string;
   server: WebSocket.Server;
   clients: Map<string, WebSocket> = new Map();
@@ -64,7 +65,7 @@ export class Gossip {
         // 'hello' message
         remoteAddress = sender;
         this.clients.set(sender, ws);
-        logger.info("Registering connection", this.localAddress, "->", sender);
+        logger.info("Registering connection", this.localAddress, "->", sender, " #clients:", this.clients.size);
         return;
       }
 
@@ -161,5 +162,14 @@ export class Gossip {
 
   public activePeers() {
     return this.clients.keys();
+  }
+
+  public async startupCheck(): Promise<StartupStatus> {
+    const goodClients = _.filter(Array.from(this.clients.values()) || [], (client: WebSocket) => { return client.readyState && client.readyState === WebSocket.OPEN; });
+
+    if (goodClients.length === 0) {
+      return { name: this.SERVICE_NAME, status: STARTUP_STATUS.FAIL, message: `No working clients` };
+    }
+    return { name: this.SERVICE_NAME, status: STARTUP_STATUS.OK };
   }
 }

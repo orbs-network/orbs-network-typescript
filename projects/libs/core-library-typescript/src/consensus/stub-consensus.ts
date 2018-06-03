@@ -1,7 +1,7 @@
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
 import BlockBuilder from "./block-builder";
-import { RaftConsensusConfig, BaseConsensus } from "./base-consensus";
+import { BaseConsensusConfig, BaseConsensus } from "./base-consensus";
 
 import { Gossip } from "../gossip";
 import { Block } from "web3/types";
@@ -12,7 +12,7 @@ export class StubConsensus extends BaseConsensus {
   private blockBuilder: BlockBuilder;
   private gossip: types.GossipClient;
   private blockStorage: types.BlockStorageClient;
-  private config: RaftConsensusConfig;
+  private config: BaseConsensusConfig;
   private lastBlockHeightByNodeName: Map<string, number> = new Map();
   private pollInterval: NodeJS.Timer;
 
@@ -25,7 +25,7 @@ export class StubConsensus extends BaseConsensus {
   }
 
   public constructor(
-    config: RaftConsensusConfig,
+    config: BaseConsensusConfig,
     gossip: types.GossipClient,
     blockStorage: types.BlockStorageClient,
     transactionPool: types.TransactionPoolClient,
@@ -73,20 +73,25 @@ export class StubConsensus extends BaseConsensus {
       logger.debug(`Stub consensus leader heartbeat - my last block is ${JSON.stringify(myLastCommittedBlock)}`);
 
       // check if all other nodes are synchronized with me
-      let areAllOtherNodesSyncedWithMe = true;
-      if (this.lastBlockHeightByNodeName.size != this.config.clusterSize - 1) {
+      let areEnoughNodesSyncedWithMe = true;
+      if (this.lastBlockHeightByNodeName.size < this.config.clusterSize - this.config.acceptableUnsyncedNodes - 1) {
         logger.debug(`Stub consensus leader heartbeat - missing some other nodes since we just see ${this.lastBlockHeightByNodeName.size}`);
-        areAllOtherNodesSyncedWithMe = false;
+        areEnoughNodesSyncedWithMe = false;
       } else {
+        let howManyNodesAreNotSynced = 0;
         for (const [nodeName, lastBlockHeight] of this.lastBlockHeightByNodeName) {
           if (lastBlockHeight != myLastCommittedBlockHeight) {
             logger.debug(`Stub consensus leader heartbeat - last block of ${nodeName} is ${lastBlockHeight} while mine is ${myLastCommittedBlockHeight}`);
-            areAllOtherNodesSyncedWithMe = false;
+            howManyNodesAreNotSynced++;
+          }
+          if (howManyNodesAreNotSynced > this.config.acceptableUnsyncedNodes) {
+            logger.debug(`Stub consensus leader heartbeat - There are ${howManyNodesAreNotSynced} out of sync.`);
+            areEnoughNodesSyncedWithMe = false;
           }
         }
       }
 
-      if (areAllOtherNodesSyncedWithMe) {
+      if (areEnoughNodesSyncedWithMe) {
         // they are synchronized, let's create a new block
         logger.debug(`Stub consensus leader heartbeat - everybody is synchronized, next block please`);
         this.blockBuilder.start();
@@ -97,7 +102,7 @@ export class StubConsensus extends BaseConsensus {
       }
 
     } catch (err) {
-      logger.error(`Stub consensus leader heartbeat - error: ${JSON.stringify(err)}`);
+      logger.error(`Stub consensus leader heartbeat,`, err);
     }
   }
 
@@ -107,7 +112,7 @@ export class StubConsensus extends BaseConsensus {
     try {
       await this.blockBuilder.commitBlock(block);
     } catch (err) {
-      logger.error(`Failed to commit block with height ${block.header.height}, error: ${JSON.stringify(err)}`);
+      logger.error(`Failed to commit block with height ${block.header.height},`, err);
     }
   }
 
@@ -150,7 +155,7 @@ export class StubConsensus extends BaseConsensus {
         try {
           await this.onCommitted(data);
         } catch (err) {
-          logger.error(`Failed to commit a block: ${JSON.stringify(err)}`);
+          logger.error(`Failed to commit a`, err);
         }
         this.reportMyLastBlock(fromAddress);
         break;

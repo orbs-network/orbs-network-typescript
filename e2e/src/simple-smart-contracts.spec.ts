@@ -7,8 +7,12 @@ import { FooBarAccount } from "./foobar-contract";
 import { TextMessageAccount } from "./text-message-contract";
 import { loadDefaultTestConfig } from "./test-config";
 import ChaiBarsPlugin from "./chai-bars-plugin";
+import { runDockerHealthCheck } from "./docker-health-checks";
+
 
 const expect = chai.expect;
+const DOCKER_HEALTH_CHECK_MAX_RETRIES = 20;
+const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 5;
 
 chai.should();
 chai.use(ChaiBarsPlugin);
@@ -43,17 +47,24 @@ async function aTextMessageAccount(networkId: string) {
   return account;
 }
 
-describe("simple token transfer", async function () {
+describe("transfer tokens and messages between accounts", async function () {
+
   this.timeout(800000);
 
   before(async () => {
     if (testConfig.testEnvironment) {
       console.log("starting test environment...");
       await testConfig.testEnvironment.start();
+      try {
+        await runDockerHealthCheck(DOCKER_HEALTH_CHECK_MAX_RETRIES, DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC);
+      } catch (e) {
+        console.log(`Error in Docker health check, not all docker containers are not healthy and all retry attempts exhaused`);
+        throw e;
+      }
     }
   });
 
-  it("transfers 1 bar token from one account to another", async () => {
+  it("should transfer 1 bar token from one account to another", async () => {
     console.log("initing account1 with 2 bars");
     const account1 = await aFooBarAccountWith({ amountOfBars: 2, networkId: testConfig.networkId });
     await account1.should.have.bars(2);
@@ -66,20 +77,8 @@ describe("simple token transfer", async function () {
     await account1.should.to.have.bars(1);
     await account2.should.have.bars(1);
   });
-});
 
-describe("simple message", async function () {
-  this.timeout(800000);
-
-  before(async () => {
-    if (testConfig.testEnvironment) {
-      console.log("starting test environment...");
-      await testConfig.testEnvironment.start();
-    }
-  });
-
-
-  it("sends text messages between accounts", async () => {
+  it("should send text message from one account to another", async () => {
     console.log("Initiating account for Alice");
     const alice = await aTextMessageAccount(testConfig.networkId);
 
@@ -103,11 +102,10 @@ describe("simple message", async function () {
     expect(aliceMessages[0].message).to.equal("is anybody in here?");
   });
 
-
-
   after(async () => {
     if (testConfig.testEnvironment) {
       await testConfig.testEnvironment.stop();
     }
   });
+
 });

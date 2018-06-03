@@ -13,4 +13,5 @@ export * from "./address";
 export * from "./startup-status";
 export * from "./startup-check";
 export * from "./startup-check-runner";
+export * from "./startup-check-runner-default";
 

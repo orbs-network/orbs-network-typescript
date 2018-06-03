@@ -6,14 +6,13 @@ import * as os from "os";
 import * as getPort from "get-port";
 import * as chaiAsPromised from "chai-as-promised";
 import { stubInterface } from "ts-sinon";
-import * as request from "supertest";
 import * as _ from "lodash";
 import { types, BlockUtils, ErrorHandler, GRPCServerBuilder, grpc, logger, Address } from "orbs-core-library";
 import { BlockStorageClient, StateStorageClient } from "orbs-interfaces";
 import storageServer from "../src/server";
 import GossipService from "../../gossip-service-typescript/src/service";
 import TransactionPoolService from "../../consensus-service-typescript/src/transaction-pool-service";
-import { STARTUP_STATUS, StartupStatus } from "../../../libs/core-library-typescript/src/common-library/startup-status";
+import { STARTUP_STATUS, StartupStatus, testStartupCheckHappyPath } from "orbs-core-library";
 
 const { expect } = chai;
 
@@ -54,10 +53,12 @@ function generateBigBrokenBlock(): types.Block {
 let endpoint: string;
 
 describe("BlockStorage service", function () {
+  const COMPONENT_NAME = "storage";
   let server: GRPCServerBuilder;
   let blockClient: BlockStorageClient;
   let stateClient: StateStorageClient;
   let managementPort: number;
+
   beforeEach(async () => {
     endpoint = `${SERVER_IP_ADDRESS}:${await getPort()}`;
     const topology = {
@@ -129,20 +130,8 @@ describe("BlockStorage service", function () {
     return expect(state).to.have.deep.property("values", {});
   });
 
-  it("should return HTTP 200 and status ok when calling GET /admin/startupCheck on storage service (happy path)", async () => {
-
-    const expected: StartupStatus = {
-      name: "storage",
-      status: STARTUP_STATUS.OK,
-      services: [
-        { name: "block-storage", status: STARTUP_STATUS.OK },
-        { name: "state-storage", status: STARTUP_STATUS.OK }
-      ]
-    };
-
-    return request(`http://${SERVER_IP_ADDRESS}:${managementPort}`)
-      .get("/admin/startupCheck")
-      .expect(200, expected);
+  it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME} ${SERVER_IP_ADDRESS}:${managementPort}`, async () => {
+    return testStartupCheckHappyPath(SERVER_IP_ADDRESS, managementPort, COMPONENT_NAME, ["block-storage", "state-storage"]);
   });
 
   // Here we are aiming to eliminate specific GRPC error;
