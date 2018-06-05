@@ -12,13 +12,14 @@ interface Config {
     timeout: number;
 }
 
-const VIRTUAL_CHAIN_ID = "640ed3";
+const DEFAULT_VIRTUAL_CHAIN = "640ed3";
 
 const {
     ORBS_API_ENDPOINT,
     TRANSACTION_TIMEOUT,
     NETWORK_ID,
-    REDIS_URL
+    REDIS_URL,
+    VIRTUAL_CHAIN_ID
 } = process.env;
 
 const config = {
@@ -39,7 +40,7 @@ function getRedis() {
 
 function generateAddress(): [Address, ED25519Key] {
     const keyPair = new ED25519Key();
-    const address = new Address(keyPair.publicKey, VIRTUAL_CHAIN_ID, NETWORK_ID || Address.TEST_NETWORK_ID);
+    const address = new Address(keyPair.publicKey, VIRTUAL_CHAIN_ID || DEFAULT_VIRTUAL_CHAIN, NETWORK_ID || Address.TEST_NETWORK_ID);
 
     return [address, keyPair];
 }
@@ -51,7 +52,7 @@ async function getContract(username: string, config: Config): Promise<OrbsContra
     let keyPair;
 
     if (data) {
-        address = new Address(data.publicKey, VIRTUAL_CHAIN_ID, NETWORK_ID || Address.TEST_NETWORK_ID);
+        address = new Address(data.publicKey, VIRTUAL_CHAIN_ID || DEFAULT_VIRTUAL_CHAIN, NETWORK_ID || Address.TEST_NETWORK_ID);
         keyPair = new ED25519Key(data.publicKey, data.privateKey);
     } else {
         [address, keyPair] = generateAddress();
