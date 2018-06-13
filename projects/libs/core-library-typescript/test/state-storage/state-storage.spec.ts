@@ -32,7 +32,7 @@ function anInitialBlockChain(numOfBlocks: number, stateDiff: types.ModifiedState
 
 
 
-describe.only("the state storage", () => {
+describe("the state storage", () => {
   let blockStorage: types.BlockStorageClient;
   let stateStorage: StateStorage;
   const contractAddress = Address.createContractAddress("dummyContract").toBuffer();
@@ -70,7 +70,7 @@ describe.only("the state storage", () => {
   });
 });
 
-describe.only("the state storage", function () {
+describe("the state storage", function () {
   let blockStorage: types.BlockStorageClient;
   let stateStorage: StateStorage;
   const contractAddress = Address.createContractAddress("dummyContract").toBuffer();
