@@ -114,20 +114,32 @@ describe("BlockStorage service", function () {
       .that.has.property("height", 0);
   });
 
+  it("state storage can return keys from genesis block", async () => {
+    const lastBlock = await blockClient.getLastBlock({});
+    // this should take around 200 ms waiting for the polling
+
+    const contractAddress = Address.createContractAddress("does-not-exist").toBuffer();
+    const state = await stateClient.readKeys({ contractAddress, keys: [] });
+    return expect(state).to.have.deep.property("values", {});
+  });
+
   it("state storage can return keys", async () => {
     // adding another block as currently the state storage polling will never return when the database has only the genesis block
+    const contractAddress = Address.createContractAddress("some-contract").toBuffer();
+
     const lastBlock = await blockClient.getLastBlock({});
     const nextBlock = BlockUtils.buildNextBlock({
       transactions: [],
       transactionReceipts: [],
-      stateDiff: []
+      stateDiff: [
+        { contractAddress, key: "iconic-game-series", value: "Dark Souls" }
+      ]
     }, lastBlock.block);
     await blockClient.addBlock({ block: nextBlock });
 
     // this should take around 200 ms waiting for the polling
-    const contractAddress = Address.createContractAddress("does-not-exist").toBuffer();
-    const state = await stateClient.readKeys({ contractAddress, keys: [] });
-    return expect(state).to.have.deep.property("values", {});
+    const state = await stateClient.readKeys({ contractAddress, keys: ["iconic-game-series"] });
+    return expect(state).to.have.deep.property("values", { "iconic-game-series": "Dark Souls" });
   });
 
   it(`should return HTTP 200 and status ok when when calling GET /admin/startupCheck on ${COMPONENT_NAME} ${SERVER_IP_ADDRESS}:${managementPort}`, async () => {

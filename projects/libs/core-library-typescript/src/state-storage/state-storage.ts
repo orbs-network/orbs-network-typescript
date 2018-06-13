@@ -14,7 +14,7 @@ export class StateStorage implements StartupCheck {
   private blockStorage: types.BlockStorageClient;
 
   private kvstore = new InMemoryKVStore();
-  private lastBlockHeight: number;
+  private lastBlockHeight = 0;
   private pollInterval: NodeJS.Timer;
   private pollIntervalMs: number;
   private engineRunning: boolean;
@@ -92,7 +92,7 @@ export class StateStorage implements StartupCheck {
   }
 
   private async syncNextBlock(block: types.Block) {
-    if ((this.lastBlockHeight == undefined) || (block.header.height == this.lastBlockHeight + 1)) {
+    if (block.header.height == this.lastBlockHeight + 1) {
       logger.debug("Processing block:", block.header.height);
 
       for (const { contractAddress, key, value } of block.body.stateDiff) {
