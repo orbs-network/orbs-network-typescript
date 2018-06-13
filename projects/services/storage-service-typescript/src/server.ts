@@ -8,7 +8,7 @@ import { StartupCheckRunner } from "orbs-core-library/dist/common-library/startu
 import * as _ from "lodash";
 
 export default function (nodeTopology: any, env: any) {
-  const { NODE_NAME, NODE_ENV, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH, BLOCK_STORAGE_VERIFY_SIGNATURES, STATE_STORAGE_POLL_INTERVAL } = env;
+  const { NODE_NAME, NODE_ENV, BLOCK_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_DB_PATH, BLOCK_STORAGE_VERIFY_SIGNATURES, STATE_STORAGE_POLL_INTERVAL, BLOCK_STORAGE_BATCH_SIZE, BlOCK_STORAGE_BATCHES_PER_INTERVAL } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -27,6 +27,8 @@ export default function (nodeTopology: any, env: any) {
     nodeName: NODE_NAME,
     dbPath: blockStorageDBPath,
     pollInterval: Number(BLOCK_STORAGE_POLL_INTERVAL) || 5000,
+    batchSize: Number(BLOCK_STORAGE_BATCH_SIZE) || 1000,
+    batchesPerInterval: Number(BlOCK_STORAGE_BATCHES_PER_INTERVAL) || 20,
     verifySignature,
     keyManager
   };
