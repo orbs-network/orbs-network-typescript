@@ -84,7 +84,7 @@ function waitForStacks(cloudFormation: any, region: any, condition: any) {
 
 function uploadBootstrap(options: any) {
   const { s3Path, localPath } = options.parity ? { s3Path: "parity", localPath: "parity" } : { s3Path: "v1", localPath: "bootstrap" };
-  const bootstrapPath = options.bootstrap ? options.bootstrap : "${__dirname}/../${localPath}";
+  const bootstrapPath = options.bootstrap ? options.bootstrap : `${__dirname}/../${localPath}`;
   shell.exec(`${getAWSCredentialsAsEnvVars(options)} aws s3 sync ${bootstrapPath}/ s3://${options.bucketName}-${options.NODE_ENV}-${options.region}/${s3Path}/`);
 }
 
