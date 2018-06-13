@@ -25,7 +25,9 @@ export class NodeLoader {
       nodeName,
       pollInterval: 100,
       dbPath: this.levelDbPath,
-      verifySignature: false
+      verifySignature: false,
+      batchSize: 5,
+      batchesPerInterval: 5
     });
   }
 

@@ -1,19 +1,16 @@
 import * as _ from "lodash";
 import * as path from "path";
 
-import { logger, types, JsonBuffer, KeyManager } from "orbs-core-library";
-import { BlockStorage, BlockStorageSync } from "orbs-core-library";
-import { Service, ServiceConfig } from "orbs-core-library";
-import { StartupCheck } from "orbs-core-library/dist/common-library/startup-check";
-import { StartupStatus } from "orbs-core-library/dist/common-library/startup-status";
-
-
+import { logger, types, JsonBuffer, KeyManager, BlockStorage, BlockStorageSync, Service, ServiceConfig, StartupCheck, StartupStatus } from "orbs-core-library";
+import { chunk } from "lodash";
 
 export interface BlockStorageServiceConfig extends ServiceConfig {
   dbPath: string;
   pollInterval: number;
   verifySignature: boolean;
   keyManager?: KeyManager;
+  batchSize: number;
+  batchesPerInterval: number;
 }
 
 export default class BlockStorageService extends Service implements StartupCheck {
@@ -170,25 +167,32 @@ export default class BlockStorageService extends Service implements StartupCheck
   }
 
   async onSendNewBlocks(fromAddress: string, payload: any) {
-    logger.info(`Block storage ${this.config.nodeName} received request for new blocks from ${fromAddress}`);
+    logger.info(`Block storage ${this.config.nodeName} received a request for new blocks from ${fromAddress}`);
 
     const blocks = await this.blockStorage.getBlocks(payload.blockHeight);
 
-    blocks.forEach(async (block) => {
+    const blockStorageConfig = <BlockStorageServiceConfig>this.config;
+    const batches = chunk(blocks, blockStorageConfig.batchSize).slice(0, blockStorageConfig.batchesPerInterval);
+
+    logger.info(`Block storage is sending ${batches.length} batches of blocks to ${fromAddress}`);
+
+    batches.forEach(async (blocks) => {
       this.gossip.unicastMessage({
         recipient: fromAddress,
         broadcastGroup: "blockStorage",
         messageType: "SendNewBlocksResponse",
-        buffer: new Buffer(JSON.stringify({ block })),
+        buffer: new Buffer(JSON.stringify({ blocks })),
         immediate: true,
       });
     });
   }
 
   async onSendNewBlocksResponse(fromAddress: string, payload: any) {
-    logger.info(`Block storage ${this.config.nodeName} received a new block via sync`);
+    logger.info(`Block storage ${this.config.nodeName} received a new batch of blocks via sync`);
 
-    this.sync.onReceiveBlock(payload.block);
+    payload.blocks.forEach((block: types.Block) => {
+      this.sync.onReceiveBlock(block);
+    });
   }
 
   public isSyncing(): boolean {
