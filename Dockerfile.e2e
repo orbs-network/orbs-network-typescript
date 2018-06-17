@@ -2,6 +2,10 @@ FROM orbs:base-sdk
 
 ENV PROJECT_TYPE=e2e
 
+ARG AWS_ACCESS_KEY_ID
+
+ARG AWS_SECRET_ACCESS_KEY
+
 ADD docker/bootstrap-e2e.sh /opt/orbs/
 
 RUN ./bootstrap-e2e.sh
