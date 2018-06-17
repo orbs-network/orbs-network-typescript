@@ -23,7 +23,7 @@
     "@slack/client": "^4.0.0",
     "bluebird": "^3.5.1",
     "lodash": "^4.14.98",
-    "orbs-client-sdk": "file:../../client-sdk-javascript",
+    "orbs-client-sdk": "https://github.com/orbs-network/orbs-client-sdk-javascript#a2fb9d328dbda9018987a787ab86d4bc9f827591",
     "redis": "^2.8.0"
   },
   "devDependencies": {

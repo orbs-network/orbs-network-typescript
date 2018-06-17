@@ -19,15 +19,14 @@
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
-    "@types/shelljs": "^0.7.7",
     "bluebird": "^3.5.1",
     "ganache-core": "^2.0.2",
     "nconf": "^0.10.0",
-    "orbs-client-sdk": "file:../client/client-sdk-javascript",
-    "orbs-interfaces": "file:../projects/architecture",
+    "orbs-client-sdk": "https://github.com/orbs-network/orbs-client-sdk-javascript#a2fb9d328dbda9018987a787ab86d4bc9f827591",
     "solc": "0.4.18",
     "underscore": "^1.8.3",
-    "web3": "1.0.0-beta.29"
+    "web3": "1.0.0-beta.29",
+    "shelljs": "^0.8.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.20",
@@ -39,9 +38,9 @@
     "@types/node": "^9.4.4",
     "@types/supertest": "^2.0.4",
     "@types/underscore": "^1.8.7",
+    "@types/shelljs": "^0.7.7",
     "chai": "^4.1.2",
     "mocha": "^5.0.0",
-    "shelljs": "^0.8.1",
     "supertest": "^3.0.0",
     "tslint": "^5.9.1",
     "typescript": "^2.7.1"
