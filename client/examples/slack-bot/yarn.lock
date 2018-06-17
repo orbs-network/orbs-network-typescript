@@ -805,9 +805,9 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
-"orbs-client-sdk@https://github.com/orbs-network/orbs-client-sdk-javascript#a2fb9d328dbda9018987a787ab86d4bc9f827591":
+"orbs-client-sdk@https://github.com/orbs-network/orbs-client-sdk-javascript#6c04ff9a80986d588fba1db1a6a120bb7beb8480":
   version "0.1.0"
-  resolved "https://github.com/orbs-network/orbs-client-sdk-javascript#a2fb9d328dbda9018987a787ab86d4bc9f827591"
+  resolved "https://github.com/orbs-network/orbs-client-sdk-javascript#6c04ff9a80986d588fba1db1a6a120bb7beb8480"
   dependencies:
     "@types/json-stable-stringify" "^1.0.32"
     "@types/request-promise" "^4.1.41"

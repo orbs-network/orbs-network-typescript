@@ -22,7 +22,7 @@
     "bluebird": "^3.5.1",
     "ganache-core": "^2.0.2",
     "nconf": "^0.10.0",
-    "orbs-client-sdk": "https://github.com/orbs-network/orbs-client-sdk-javascript#a2fb9d328dbda9018987a787ab86d4bc9f827591",
+    "orbs-client-sdk": "https://github.com/orbs-network/orbs-client-sdk-javascript#6c04ff9a80986d588fba1db1a6a120bb7beb8480",
     "solc": "0.4.18",
     "underscore": "^1.8.3",
     "web3": "1.0.0-beta.29",
