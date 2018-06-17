@@ -1,17 +1,12 @@
 import { types } from "../../common-library/types";
 import { logger } from "../../common-library";
-import { StateCache, StateCacheKey } from "../state-cache";
-import {
-  BaseContractStateAccessor,
-  ContractStateReadOnlyAccessor,
-  ContractStateReadWriteAccessor
-} from "../contract-state-accessor";
+import { StateCache } from "../state-cache";
+import { BaseContractStateAccessor, ContractStateReadOnlyAccessor, ContractStateReadWriteAccessor } from "../contract-state-accessor";
 
-import BaseSmartContract from "./base-smart-contact";
 import { HardCodedSmartContractRegistry } from "./hard-coded-smart-contract-registry";
 import { bs58EncodeRawAddress } from "../..";
+import EthereumConnectedSmartContract from "./ethereum-connected-smart-contract";
 
-// TODO: move to types and force the CallRequest to have that kind of payload?
 export interface CallPayload {
   method: string;
   args: [number | string] | any[];
@@ -25,12 +20,13 @@ export interface CallRequest {
 
 export default class HardCodedSmartContractProcessor {
   stateStorageClient: types.StateStorageClient;
-
   registry: HardCodedSmartContractRegistry;
+  ethereumEndpoint: string;
 
-  constructor(stateStorageClient: types.StateStorageClient, registry: HardCodedSmartContractRegistry) {
+  constructor(stateStorageClient: types.StateStorageClient, registry: HardCodedSmartContractRegistry, ethereumEndpoint?: string) {
     this.stateStorageClient = stateStorageClient;
     this.registry = registry;
+    this.ethereumEndpoint = ethereumEndpoint;
   }
 
   public async processTransaction(request: CallRequest, stateCache: StateCache) {
@@ -64,8 +60,8 @@ export default class HardCodedSmartContractProcessor {
   }
 
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
-    const Contract = this.registry.getContractByRawAddress(request.contractAddress);
-    if (Contract == undefined) {
+    const contractClass = this.registry.getContractByRawAddress(request.contractAddress);
+    if (contractClass == undefined) {
       throw new Error(`contract with address ${bs58EncodeRawAddress(request.contractAddress)} not registered`);
     }
 
@@ -73,8 +69,13 @@ export default class HardCodedSmartContractProcessor {
     if (args == undefined) {
       throw new Error("Method arguments parsing falied, unable to proceed with method execution");
     }
+    let contract: any;
 
-    const contract = new Contract.default(bs58EncodeRawAddress(request.sender), stateAdapter);
+    if (contractClass instanceof EthereumConnectedSmartContract) {
+      contract = new contractClass.default(bs58EncodeRawAddress(request.sender), stateAdapter, this.ethereumEndpoint);
+    } else {
+      contract = new contractClass.default(bs58EncodeRawAddress(request.sender), stateAdapter);
+    }
 
     logger.debug(`Executing method ${method} with args ${JSON.stringify(args)} on contract with address ${bs58EncodeRawAddress(request.contractAddress)}`);
     return contract[method](...args);
