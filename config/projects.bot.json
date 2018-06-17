@@ -1,24 +1,4 @@
 {
-  "architecture": {
-    "runtime": "protobuf",
-    "type": "static",
-    "path": "projects/architecture"
-  },
-  "crypto-sdk": {
-    "runtime": "c++",
-    "type": "library",
-    "path": "client/crypto-sdk"
-  },
-  "client-sdk-javascript": {
-    "runtime": "typescript",
-    "type": "library",
-    "path": "client/client-sdk-javascript"
-  },
-  "crypto-sdk-python": {
-    "runtime": "c++",
-    "type": "library",
-    "path": "client/crypto-sdk-python"
-  },
   "example-slack-bot": {
     "runtime": "typescript",
     "type": "library",
@@ -35,12 +15,8 @@
     "path": "client/examples/event-proxy-app"
   },
   "order": [
-    "architecture",
-    "crypto-sdk",
-    "client-sdk-javascript",
     "event-proxy-app",
     "example-slack-bot",
-    "crypto-sdk-python",
     "example-python-app"
   ]
 }
