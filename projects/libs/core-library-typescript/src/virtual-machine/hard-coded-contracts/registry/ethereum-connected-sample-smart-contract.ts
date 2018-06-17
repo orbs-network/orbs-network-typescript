@@ -17,7 +17,7 @@ export default class EthereumConnectedSampleSmartContract extends EthereumConnec
       fromEth = this.callFromEthereum(ethereumContractAddress, ethInterface, []);
     }
     catch (e) {
-      throw this.validationError("failed getting data from ethereum");
+      throw this.validationError(`Failed getting data from ethereum with error ${e.toString()}`);
     }
     await this.setInt(recipient, fromEth["intValue"]);
     return fromEth["intValue"];

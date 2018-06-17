@@ -92,6 +92,10 @@ describe("test virtual machine", () => {
     virtualMachine = new VirtualMachine(contractRegistryConfig, stateStorage);
   });
 
+  it("runs a ethereum enabled smart contract", async () => {
+    expect(1).to.be.equal(2);
+  });
+
   it("rejects a transaction with a non-positive amount", async () => {
     const transaction = aTransactionEntry({ from: ACCOUNT1, to: ACCOUNT2, amount: 0 });
 
