@@ -16,7 +16,6 @@
   },
   "order": [
     "event-proxy-app",
-    "example-slack-bot",
-    "example-python-app"
+    "example-slack-bot"
   ]
 }
