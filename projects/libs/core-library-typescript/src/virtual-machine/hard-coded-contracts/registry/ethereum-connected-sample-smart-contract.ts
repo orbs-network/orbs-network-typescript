@@ -1,5 +1,6 @@
 import EthereumConnectedSmartContract from "../ethereum-connected-smart-contract";
 import { EthereumFunctionInterface } from "orbs-interfaces";
+import { logger } from "../../..";
 
 export default class EthereumConnectedSampleSmartContract extends EthereumConnectedSmartContract {
 
@@ -14,13 +15,14 @@ export default class EthereumConnectedSampleSmartContract extends EthereumConnec
     };
     let fromEth: any;
     try {
-      fromEth = this.callFromEthereum(ethereumContractAddress, ethInterface, []);
+      fromEth = await this.callFromEthereum(ethereumContractAddress, ethInterface, []);
+      logger.info(JSON.stringify(fromEth));
     }
     catch (e) {
       throw this.validationError(`Failed getting data from ethereum with error ${e.toString()}`);
     }
-    await this.setInt(recipient, fromEth["intValue"]);
-    return fromEth["intValue"];
+    await this.setInt(recipient, fromEth);
+    return fromEth;
   }
 
   public async getInt(account: string) {
