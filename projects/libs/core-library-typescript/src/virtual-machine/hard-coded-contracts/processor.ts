@@ -62,7 +62,7 @@ export default class HardCodedSmartContractProcessor {
   private async processMethod(request: CallRequest, stateAdapter: BaseContractStateAccessor) {
     const contractClass = this.registry.getContractByRawAddress(request.contractAddress);
     if (contractClass == undefined) {
-      throw new Error(`contract with address ${bs58EncodeRawAddress(request.contractAddress)} not registered`);
+      throw new Error(`Contract with address ${bs58EncodeRawAddress(request.contractAddress)} not registered`);
     }
 
     const { method, args } = this.parsePayload(request.payload);
@@ -71,7 +71,7 @@ export default class HardCodedSmartContractProcessor {
     }
     let contract: any;
 
-    if (contractClass instanceof EthereumConnectedSmartContract) {
+    if (contractClass.default.type == "ethereum") {
       contract = new contractClass.default(bs58EncodeRawAddress(request.sender), stateAdapter, this.ethereumEndpoint);
     } else {
       contract = new contractClass.default(bs58EncodeRawAddress(request.sender), stateAdapter);
@@ -81,3 +81,5 @@ export default class HardCodedSmartContractProcessor {
     return contract[method](...args);
   }
 }
+
+

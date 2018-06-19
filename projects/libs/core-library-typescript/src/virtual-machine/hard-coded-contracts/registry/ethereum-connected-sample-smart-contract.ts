@@ -1,6 +1,5 @@
 import EthereumConnectedSmartContract from "../ethereum-connected-smart-contract";
 import { EthereumFunctionInterface } from "orbs-interfaces";
-import { logger } from "../../..";
 
 export default class EthereumConnectedSampleSmartContract extends EthereumConnectedSmartContract {
 
@@ -16,7 +15,6 @@ export default class EthereumConnectedSampleSmartContract extends EthereumConnec
     let fromEth: any;
     try {
       fromEth = await this.callFromEthereum(ethereumContractAddress, ethInterface, []);
-      logger.info(JSON.stringify(fromEth));
     }
     catch (e) {
       throw this.validationError(`Failed getting data from ethereum with error ${e.toString()}`);

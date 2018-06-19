@@ -6,6 +6,7 @@ import { logger } from "../..";
 
 export default abstract class EthereumConnectedSmartContract extends BaseSmartContract {
   readonly sidechainConnector: SidechainConnector;
+  static readonly type: string = "ethereum";
 
   constructor(senderAddressBase58: string, state: BaseContractStateAccessor, ethereumEndpoint: string) {
     super(senderAddressBase58, state);
@@ -14,7 +15,6 @@ export default abstract class EthereumConnectedSmartContract extends BaseSmartCo
 
   protected async callFromEthereum(contractAddress: string, functionInterface: EthereumFunctionInterface, parameters: string[]) {
     const fromEth = await this.sidechainConnector.callEthereumContract({ contractAddress, functionInterface, parameters });
-    logger.info(JSON.stringify(fromEth));
     return fromEth.result;
   }
 }

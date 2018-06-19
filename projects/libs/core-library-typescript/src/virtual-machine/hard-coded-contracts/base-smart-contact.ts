@@ -5,6 +5,7 @@ export default abstract class BaseSmartContract {
 
   readonly state: BaseContractStateAccessor;
   readonly senderAddressBase58: string;
+  static readonly type: string = "base";
 
   constructor(senderAddressBase58: string, state: BaseContractStateAccessor) {
     this.senderAddressBase58 = senderAddressBase58;
