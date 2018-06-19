@@ -13,7 +13,7 @@ function parseContractList(smartContractsToLoad: string) {
 }
 
 export default function (nodeTopology: any, env: any) {
-  const { NODE_NAME, SMART_CONTRACTS_TO_LOAD } = env;
+  const { NODE_NAME, SMART_CONTRACTS_TO_LOAD, ETHEREUM_NODE_HTTP_ADDRESS } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -26,7 +26,7 @@ export default function (nodeTopology: any, env: any) {
     contracts: parseContractList(SMART_CONTRACTS_TO_LOAD)
   };
 
-  const virtualMachine = new VirtualMachine(contractRegistryConfig, peers.stateStorage);
+  const virtualMachine = new VirtualMachine(contractRegistryConfig, peers.stateStorage, ETHEREUM_NODE_HTTP_ADDRESS);
   const virtualMachineService = new VirtualMachineService(virtualMachine, nodeConfig);
   const startupCheckRunner = new StartupCheckRunner("virtual-machine-service", [virtualMachineService]);
   return grpcServer.builder()
