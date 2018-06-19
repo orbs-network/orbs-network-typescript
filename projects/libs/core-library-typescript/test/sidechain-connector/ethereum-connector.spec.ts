@@ -1,7 +1,7 @@
+import "mocha";
 import { expect } from "chai";
 const Web3 = require("web3");
 import * as ganache from "ganache-core";
-import * as path from "path";
 import * as solc from "solc";
 
 import { Contract } from "web3/types";
@@ -94,7 +94,7 @@ describe("Ethereum connector", () => {
       });
       it("should return a valid block with a recent timestamp", () => {
         expect(res).to.ownProperty("block");
-        expect(res.block).to.ownProperty("timestamp");
+        expect(res.block).to.have.property("timestamp");
         const now = Date.now() / 1000;
         expect(res.block.timestamp).to.be.gt(now - 600);
         expect(res.block.timestamp).to.be.lt(now + 10);
