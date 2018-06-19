@@ -1,13 +1,10 @@
 
-import * as mocha from "mocha";
+import "mocha";
 import * as chai from "chai";
 import { VirtualMachine } from "../../src/virtual-machine";
 import { types, TransactionHelper, STARTUP_STATUS } from "../../src/common-library";
-import * as _ from "lodash";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
-import * as path from "path";
-import HardCodedSmartContractProcessor from "../../src/virtual-machine/hard-coded-contracts/processor";
 import { HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
 import { Address } from "../../src/common-library/address";
 import { createHash } from "crypto";
@@ -108,7 +105,7 @@ describe("test virtual machine", () => {
   it("explodes on an unexpected error (due to call to an unregistered contract)", async () => {
     const transaction = aTransactionEntry({ from: ACCOUNT1, to: ACCOUNT2, amount: 0 }, Buffer.from("zagzag"));
 
-    return chai.expect(virtualMachine.processTransactionSet({ orderedTransactions: [transaction] })).to.be.rejected;
+    return expect(virtualMachine.processTransactionSet({ orderedTransactions: [transaction] })).to.eventually.be.rejected;
   });
 
   it("#processTransactionSet - ordered transfers between 3 accounts", async () => {
