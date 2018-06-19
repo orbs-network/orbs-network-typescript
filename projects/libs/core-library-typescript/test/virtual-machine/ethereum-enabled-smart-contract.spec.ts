@@ -4,13 +4,13 @@ import * as chaiAsPromised from "chai-as-promised";
 import "mocha";
 import * as getPort from "get-port";
 
-import { EthereumSimulator, EthereumFunctionInterface } from "ethereum-simulator";
+import { EthereumFunctionInterface } from "ethereum-simulator";
 import { StateCache } from "../../src/virtual-machine/state-cache";
 import { BaseContractStateAccessor } from "../../src/virtual-machine/contract-state-accessor";
 import EthereumConnectedSampleSmartContract from "../../src/virtual-machine/hard-coded-contracts/registry/ethereum-connected-sample-smart-contract";
 import { Address } from "../../src/common-library/address";
 import { createHash } from "crypto";
-import { logger } from "../../src";
+import { EthereumDriver, SimpleStorageContract } from "../../src/test-kit";
 
 chai.use(chaiAsPromised);
 
@@ -36,44 +36,13 @@ export default class ContractStateMemCacheAccessor extends BaseContractStateAcce
 
 const CONTRACT_ADDRESS = Address.createContractAddress("ethereum-sample").toBuffer();
 const ACCOUNT_ADDRESS = new Address(createHash("sha256").update("some-account").digest()).toBase58();
-const ETH_CONTRACT = `pragma solidity ^0.4.0;
-contract SimpleStorage {
-    struct Item {
-        uint256 intValue;
-        string stringValue;
-    }
-    Item item;
-
-    constructor(uint256 _intValue, string _stringValue) public {
-        set(_intValue, _stringValue);
-    }
-
-    function set(uint256 _intValue, string _stringValue) private {
-        item.intValue = _intValue;
-        item.stringValue = _stringValue;
-    }
-
-    function getInt() view public returns (uint256) {
-        return item.intValue;
-    }
-
-    function getString() view public returns (string) {
-        return item.stringValue;
-    }
-
-    function getValues() public view returns (uint256 intValue, string stringValue) {
-        intValue = item.intValue;
-        stringValue = item.stringValue;
-    }
-}`;
-
 
 describe("ethereum connected contract simple example", function () {
   this.timeout(10000);
   let adapter: ContractStateMemCacheAccessor;
   let accountContract: EthereumConnectedSampleSmartContract;
   let ethIntValue: number;
-  let ethSim: EthereumSimulator;
+  let ethSim: EthereumDriver;
   let contractAddress: string;
 
   beforeEach(async () => {
@@ -81,12 +50,10 @@ describe("ethereum connected contract simple example", function () {
 
     // start ethereum
     const ethereumSimPort = await getPort();
-    ethSim = new EthereumSimulator();
-    ethSim.listen(ethereumSimPort);
-    ethSim.addContract(ETH_CONTRACT);
-    ethSim.setArguments(ethIntValue, "dont-care");
-    contractAddress = await ethSim.compileAndDeployContractOnGanache();
-    logger.info(`from eth address is: ${contractAddress}`);
+    const args = [ethIntValue, "dont-care"];
+    ethSim = new EthereumDriver();
+    await ethSim.start(ethereumSimPort, SimpleStorageContract, args);
+    contractAddress = ethSim.contractAddress;
 
     const ETHEREUM_NODE_HTTP_ADDRESS = `http://127.0.0.1:${ethereumSimPort}`;
 
@@ -95,7 +62,7 @@ describe("ethereum connected contract simple example", function () {
   });
 
   afterEach(async () => {
-    return ethSim.close();
+    return ethSim.stop();
   });
 
   it("validates ethereum-sim used correctly", async () => {
@@ -106,7 +73,7 @@ describe("ethereum connected contract simple example", function () {
         { name: "intValue", type: "uint256" }
       ]
     };
-    const fromEth = await ethSim.callDataFromSimulator(contractAddress, ethInterface);
+    const fromEth = await ethSim.ethSim.callDataFromSimulator(contractAddress, ethInterface);
     return expect(fromEth.result).to.be.equal(ethIntValue.toString());
   });
 
