@@ -5,7 +5,6 @@ import { BaseContractStateAccessor, ContractStateReadOnlyAccessor, ContractState
 
 import { HardCodedSmartContractRegistry } from "./hard-coded-smart-contract-registry";
 import { bs58EncodeRawAddress } from "../..";
-import EthereumConnectedSmartContract from "./ethereum-connected-smart-contract";
 
 export interface CallPayload {
   method: string;
