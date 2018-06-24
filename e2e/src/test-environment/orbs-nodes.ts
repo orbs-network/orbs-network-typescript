@@ -94,6 +94,7 @@ export class OrbsNode implements TestComponent {
                 rate: this.config.subscriptionConfig.minTokensForSubscription
               }]
             }),
+            VIRTUAL_MACHINE_ETHEREUM_NODE_HTTP_ADDRESS: this.config.ethereumNodeHttpAddress,
             VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD: JSON.stringify(TEST_SMART_CONTRACTS),
             DEBUG_PORT: this.config.debugPort,
             ENV_FILE: this.config.envFile
