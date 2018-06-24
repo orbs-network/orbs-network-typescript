@@ -90,6 +90,7 @@ services:
     working_dir: /opt/orbs/projects/services/virtual-machine-service-typescript/
     environment:
       - SMART_CONTRACTS_TO_LOAD=${VIRTUAL_MACHINE_SMART_CONTRACTS_TO_LOAD}
+      - ETHEREUM_NODE_HTTP_ADDRESS=${VIRTUAL_MACHINE_ETHEREUM_NODE_HTTP_ADDRESS}
     command: node --inspect=0.0.0.0:9229 dist/index.js ${NODE_CONFIG_PATH}/virtual-machine.js
     restart: always
     volumes_from:
