@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -t orbs:e2e -f Dockerfile.e2e .
+docker build -t orbs:e2e -f Dockerfile.e2e .

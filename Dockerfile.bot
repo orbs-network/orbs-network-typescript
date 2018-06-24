@@ -1,9 +1,5 @@
 FROM orbs:base-sdk
 
-ARG AWS_ACCESS_KEY_ID
-
-ARG AWS_SECRET_ACCESS_KEY
-
 ADD . /opt/orbs
 
 RUN ./build-bot.sh && yarn cache clean
