@@ -12,6 +12,8 @@ For more information, please check [https://orbs.com](https://orbs.com).
 
 This repository contains server implementation only. Client SDKs can be found here: [orbs-client-sdk-javascript](https://github.com/orbs-network/orbs-client-sdk-javascript), [orbs-client-sdk-android](https://github.com/orbs-network/orbs-client-sdk-android), [orbs-client-sdk-python](https://github.com/orbs-network/orbs-client-sdk-python), all based on underlying C++ [crypto-sdk](https://github.com/orbs-network/crypto-sdk).
 
+Example apps for the SDKs can be found here: [orbs-client-sdk-examples](https://github.com/orbs-network/orbs-client-sdk-examples)
+
 ## Preparing your system
 You are encouraged to run the script `orbs-team-member-bootstrap.sh`, it will install all necessary software on your MacOS and then run the full build.
 
