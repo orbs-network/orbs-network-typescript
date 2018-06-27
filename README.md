@@ -10,7 +10,7 @@ It’s an Infrastructure as a Service solution that makes it possible to launch 
 
 For more information, please check [https://orbs.com](https://orbs.com).
 
-This repository contains all Orbs projects, including both server implementation and client SDK.
+This repository contains server implementation only. Client SDKs can be found here: [orbs-client-sdk-javascript](https://github.com/orbs-network/orbs-client-sdk-javascript), [orbs-client-sdk-android](https://github.com/orbs-network/orbs-client-sdk-android), [orbs-client-sdk-python](https://github.com/orbs-network/orbs-client-sdk-python), all based on underlying C++ [crypto-sdk](https://github.com/orbs-network/crypto-sdk).
 
 ## Preparing your system
 You are encouraged to run the script `orbs-team-member-bootstrap.sh`, it will install all necessary software on your MacOS and then run the full build.
@@ -63,7 +63,6 @@ Please refer to [documentation](deploy/bootstrap/README.md) in `deploy/bootstrap
 Build process is divided into 3 parts:
 
 * build server: `./docker/build-server-base.sh && ./docker-build.sh`
-* build sdk: `./docker/build-sdk-base.sh && ./docker/build-sdk.sh`
 * build e2e: `./docker/build-sdk-base.sh && ./docker/build-e2e.sh`
 
 You don't have to rebuild your base images most of the time unless something changed in `docker` folder or one of the docker files.
@@ -87,9 +86,9 @@ Please refer to [documentation](deploy/README.md) in `deploy` folder.
 
 ## Development
 
-Since this is a monorepo, the build process is configured into three main groups: `server`, `sdk` and `e2e`.
+Since this is a monorepo, the build process is configured into three main groups: `server`, and `e2e`.
 
-Each group modules and build order are defined in the `config/projects.[name].json`. `PROJECT_TYPE` variable is responsible for building a certain part of the system: `server`, `sdk` or `e2e`.
+Each group modules and build order are defined in the `config/projects.[name].json`. `PROJECT_TYPE` variable is responsible for building a certain part of the system: `server`, or `e2e`.
 
 There are shortcut scripts that are tailored for a specific type of build.
 
