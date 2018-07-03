@@ -35,7 +35,7 @@ async function main() {
 
   const regions = config.get("region").split(",");
 
-  const privateKeysPath = nconf.get("private-keys") ? nconf.get("private-keys") : "${__dirname}/../temp-keys/private-keys";
+  const privateKeysPath = nconf.get("private-keys") ? nconf.get("private-keys") : `${__dirname}/../temp-keys/private-keys`;
 
   for (const region of regions) {
     const baseConfig = getBaseConfig();
