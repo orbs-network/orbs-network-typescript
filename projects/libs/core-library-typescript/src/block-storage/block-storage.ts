@@ -94,7 +94,7 @@ export class BlockStorage implements StartupCheck {
   }
 
   // Returns an array of blocks, starting from a specific block ID and up to the last block.
-  public async getBlocks(fromLastBlockHeight: number): Promise<types.Block[]> {
+  public async getBlocks(fromLastBlockHeight: number, limit: number): Promise<types.Block[]> {
     const blocks: types.Block[] = [];
 
     // lastBlock is undefined when the service did not initialize the logic/load() did not run yet
@@ -102,7 +102,9 @@ export class BlockStorage implements StartupCheck {
       throw new ReferenceError("Block Storage not initiailized");
     }
 
-    for (let i = fromLastBlockHeight; i < this.lastBlock.header.height; ++i) {
+    const lastBlockHeight = fromLastBlockHeight + limit >= this.lastBlock.header.height ? this.lastBlock.header.height : fromLastBlockHeight + limit;
+
+    for (let i = fromLastBlockHeight; i < lastBlockHeight; ++i) {
       blocks.push(await this.getBlock(i + 1));
     }
 

@@ -88,17 +88,6 @@ export default class BlockBuilder {
     this.stopPolling();
   }
 
-  // Returns an array of blocks, starting from a specific block ID and up to the last block.
-  public async getBlocks(fromLastBlockHeight: number): Promise<types.Block[]> {
-    try {
-      const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: fromLastBlockHeight });
-      return blocks;
-    }
-    catch (err) {
-     return undefined;
-    }
-  }
-
   public async commitBlock(block: types.Block) {
     await this.blockStorage.addBlock({ block });
     this.lastBlock = block;

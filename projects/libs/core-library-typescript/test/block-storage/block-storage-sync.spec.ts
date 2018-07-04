@@ -79,8 +79,8 @@ describe("Block storage sync", () => {
       await blockStorageSync.appendBlocks();
       blockStorageSync.getQueueSize().should.eql(0);
 
-      await blockStorage.getBlocks(0).should.eventually.eql(blocks);
-      await blockStorage.getBlocks(4).should.eventually.be.empty;
+      await blockStorage.getBlocks(0, 100000).should.eventually.eql(blocks);
+      await blockStorage.getBlocks(4, 100000).should.eventually.be.empty;
     });
 
     it("does not care about duplicate blocks", async () => {
@@ -97,8 +97,8 @@ describe("Block storage sync", () => {
       await blockStorageSync.appendBlocks();
       blockStorageSync.getQueueSize().should.be.eql(0);
 
-      await blockStorage.getBlocks(0).should.eventually.be.eql(blocks);
-      await blockStorage.getBlocks(4).should.eventually.be.empty;
+      await blockStorage.getBlocks(0, 100000).should.eventually.be.eql(blocks);
+      await blockStorage.getBlocks(4, 100000).should.eventually.be.empty;
     });
 
     it("does not return blocks back to the queue in case something happens", async () => {
@@ -117,8 +117,8 @@ describe("Block storage sync", () => {
 
       await blockStorageSync.appendBlocks();
 
-      await blockStorage.getBlocks(blocks[0].header.height - 1).should.eventually.eql(blocks.slice(0, 4));
-      await blockStorage.getBlocks(blocks[4].header.height - 1).should.eventually.be.empty;
+      await blockStorage.getBlocks(blocks[0].header.height - 1, 100000).should.eventually.eql(blocks.slice(0, 4));
+      await blockStorage.getBlocks(blocks[4].header.height - 1, 100000).should.eventually.be.empty;
     });
   });
 });

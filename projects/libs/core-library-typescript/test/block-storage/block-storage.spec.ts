@@ -135,7 +135,7 @@ describe("Block storage", () => {
 
       await blockStorage.addBlock(exampleBlock);
 
-      await expect(blockStorage.getBlocks(lastBlock.header.height)).to.eventually.be.eql([exampleBlock]);
+      await expect(blockStorage.getBlocks(lastBlock.header.height, 100000)).to.eventually.be.eql([exampleBlock]);
     });
   });
 

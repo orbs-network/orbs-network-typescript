@@ -21,6 +21,7 @@ message AddBlockOutput {
 
 message GetBlocksInput {
   uint32 lastBlockHeight = 1;
+  uint32 limit = 2;
 }
 
 message GetBlocksOutput {

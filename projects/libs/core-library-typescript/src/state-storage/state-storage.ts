@@ -2,6 +2,7 @@ import * as _ from "lodash";
 
 import { logger } from "../common-library/logger";
 import { types } from "../common-library/types";
+import { BlockUtils } from "../common-library/block-utils";
 
 import { InMemoryKVStore } from "./kvstore";
 
@@ -18,6 +19,7 @@ export class StateStorage implements StartupCheck {
   private pollInterval: NodeJS.Timer;
   private pollIntervalMs: number;
   private engineRunning: boolean;
+  private reportInterval: NodeJS.Timer;
 
   public constructor(blockStorage: types.BlockStorageClient, pollInterval: number) {
     this.blockStorage = blockStorage;
@@ -69,14 +71,10 @@ export class StateStorage implements StartupCheck {
     this.stopPolling();
 
     try {
-      const { blocks } = await this.blockStorage.getBlocks({ lastBlockHeight: this.lastBlockHeight });
-
-      if (blocks != undefined) {
-        // Assuming an ordered list of blocks.
-        for (const block of blocks) {
-          await this.syncNextBlock(block);
-        }
-      }
+      logger.info(`Polling block storage`);
+      await BlockUtils.mapOverBlocks(this.blockStorage, this.lastBlockHeight, async (block: types.Block) => {
+        await this.syncNextBlock(block);
+      }, 500);
     }
     catch (err) {
       if (err instanceof ReferenceError) {
