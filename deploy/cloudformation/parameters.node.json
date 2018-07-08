@@ -5,7 +5,7 @@
     },
     {
         "ParameterKey": "InstanceType",
-        "ParameterValue": "t2.small"
+        "ParameterValue": "m5.large"
     },
     {
         "ParameterKey": "SecurityIngressFromPort",
