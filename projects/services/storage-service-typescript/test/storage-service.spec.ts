@@ -155,6 +155,39 @@ describe("BlockStorage service", function () {
     return expect(blockClient.addBlock({ block })).to.be.eventually.rejectedWith(`Got response [2 UNKNOWN: Invalid block height of block: {"version":0,"prevBlockHash":{"type":"Buffer","data":[]},"height":0}! Should have been 1] trying to call method [addBlock] service [BlockStorage] at endpoint [${endpoint}]`);
   });
 
+  describe("BlockUtils#mapOverBlocks", () => {
+    it("streams array of blocks", async () => {
+      const contractAddress = Address.createContractAddress("some-contract").toBuffer();
+
+      const lastBlock = await blockClient.getLastBlock({});
+      const nextBlock = BlockUtils.buildNextBlock({
+        transactions: [],
+        transactionReceipts: [],
+        stateDiff: [
+          { contractAddress, key: "iconic-game-series", value: "Dark Souls" }
+        ]
+      }, lastBlock.block);
+      await blockClient.addBlock({ block: nextBlock });
+
+      const blockAfterThat = BlockUtils.buildNextBlock({
+        transactions: [],
+        transactionReceipts: [],
+        stateDiff: [
+          { contractAddress, key: "iconic-musician", value: "David Bowie" }
+        ]
+      }, nextBlock);
+      await blockClient.addBlock({ block: blockAfterThat });
+
+      const values: string[] = [];
+
+      await BlockUtils.mapOverBlocks(blockClient, 0, async (block: types.Block) => {
+        values.push(block.body.stateDiff[0].value);
+      }, 1);
+
+      return expect(values).to.be.eql(["Dark Souls", "David Bowie"]);
+    });
+  });
+
   afterEach(() => {
     logger.debug(`Stopping Storage Service`);
     return server.stop();

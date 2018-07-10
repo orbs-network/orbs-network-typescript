@@ -80,7 +80,7 @@ export default class BlockStorageService extends Service implements StartupCheck
 
   @Service.RPCMethod
   public async getBlocks(rpc: types.GetBlocksContext) {
-    rpc.res = { blocks: await this.blockStorage.getBlocks(rpc.req.lastBlockHeight) };
+    rpc.res = { blocks: await this.blockStorage.getBlocks(rpc.req.lastBlockHeight, rpc.req.limit) };
   }
 
   async pollForNewBlocks() {
@@ -169,9 +169,9 @@ export default class BlockStorageService extends Service implements StartupCheck
   async onSendNewBlocks(fromAddress: string, payload: any) {
     logger.info(`Block storage ${this.config.nodeName} received a request for new blocks from ${fromAddress}`);
 
-    const blocks = await this.blockStorage.getBlocks(payload.blockHeight);
-
     const blockStorageConfig = <BlockStorageServiceConfig>this.config;
+    const blocks = await this.blockStorage.getBlocks(payload.blockHeight, blockStorageConfig.batchSize * blockStorageConfig.batchSize);
+
     const batches = chunk(blocks, blockStorageConfig.batchSize).slice(0, blockStorageConfig.batchesPerInterval);
 
     logger.info(`Block storage is sending ${batches.length} batches of blocks to ${fromAddress}`);

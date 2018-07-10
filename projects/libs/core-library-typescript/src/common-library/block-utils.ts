@@ -2,6 +2,7 @@
 import { types, logger, KeyManager } from ".";
 import { createHash } from "crypto";
 import * as stringify from "json-stable-stringify";
+import { isEmpty } from "lodash";
 
 export namespace BlockUtils {
   // TODO: add method parseBlockFromJSON
@@ -57,5 +58,23 @@ export namespace BlockUtils {
     const publicKeyName = block.signatureData.signatory;
 
     return keyManager.verify(BlockUtils.calculateBlockHash(block), signature, publicKeyName);
+  }
+
+  export async function mapOverBlocks(blockStorage: types.BlockStorageClient, lastBlockHeight: number, mapFunction: (block: types.Block) => Promise<void>, limit?: number) {
+    const SCROLL_LIMIT = limit || 5000;
+    let blockHeight: number = lastBlockHeight;
+    let blocks: types.Block[];
+
+    while ((blocks = (await blockStorage.getBlocks({
+        lastBlockHeight: blockHeight,
+        limit: SCROLL_LIMIT
+      })).blocks) && !isEmpty(blocks)) {
+
+      for (const block of blocks) {
+        await mapFunction(block);
+      }
+
+      blockHeight += SCROLL_LIMIT;
+    }
   }
 }

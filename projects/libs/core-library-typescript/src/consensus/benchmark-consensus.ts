@@ -187,29 +187,32 @@ export class BenchmarkConsensus extends BaseConsensus {
             await this.blockBuilder.commitBlock(block);
 
             logger.info(`${this.node.id}: Successfully committed block with height ${block.header.height} and hash ${blockHash}, benchmarkIndex ${this.benchmarkIndex + i}`);
-            const benchmarkLog: any[] = this.node.getLog();
-            const b = { blocks: await this.blockBuilder.getBlocks(0) };
-            if (b.blocks != undefined) {
-              let blockChainStr = "Node " + this.node.id + " Current block chain: ";
 
-              // logger.info();
-              for (let i = 0; i < b.blocks.length; i++) {
-                const blockHash = BlockUtils.calculateBlockHash(b.blocks[i]).toString("hex");
-                blockChainStr += "Height " + i + ":  " + blockHash +  "\n";
-                // logger.info(`Height ${i}:  ${blockHash}`);
+            // Commented out debug log because we don't want to output all the blocks into stdout on every round
 
-              }
-              logger.info(blockChainStr);
-              let rafLogStr = "Node " + this.node.id + "Current benchmark log: ";
-              // logger.info(`Node ${this.node.id} Current benchmark log: `);
-              for (let i = 0; i < benchmarkLog.length; i++) {
-                const blockHash = benchmarkLog[i].term;
-                // BlockUtils.calculateBlockHash(benchmarkLog[i]).toString("hex");
-                rafLogStr += "Height " + i + ":  term:" + benchmarkLog[i].term + " data: " + benchmarkLog[i].data + "\n";
-                // logger.info(`Height ${i}:  ${blockHash}`);
-              }
-              logger.info(rafLogStr);
-            }
+            // const benchmarkLog: any[] = this.node.getLog();
+            // const b = { blocks: await this.blockBuilder.getBlocks(0) };
+            // if (b.blocks != undefined) {
+            //   let blockChainStr = "Node " + this.node.id + " Current block chain: ";
+
+            //   // logger.info();
+            //   for (let i = 0; i < b.blocks.length; i++) {
+            //     const blockHash = BlockUtils.calculateBlockHash(b.blocks[i]).toString("hex");
+            //     blockChainStr += "Height " + i + ":  " + blockHash +  "\n";
+            //     // logger.info(`Height ${i}:  ${blockHash}`);
+
+            //   }
+            //   logger.info(blockChainStr);
+            //   let rafLogStr = "Node " + this.node.id + "Current benchmark log: ";
+            //   // logger.info(`Node ${this.node.id} Current benchmark log: `);
+            //   for (let i = 0; i < benchmarkLog.length; i++) {
+            //     const blockHash = benchmarkLog[i].term;
+            //     // BlockUtils.calculateBlockHash(benchmarkLog[i]).toString("hex");
+            //     rafLogStr += "Height " + i + ":  term:" + benchmarkLog[i].term + " data: " + benchmarkLog[i].data + "\n";
+            //     // logger.info(`Height ${i}:  ${blockHash}`);
+            //   }
+            //   logger.info(rafLogStr);
+            // }
         } catch (err) {
             // note: we maintain a sync routine with the benchmark log to update the storage state...
             // invalid blocks which are committed on benchmark are acceptable
