@@ -187,6 +187,9 @@ export class BenchmarkConsensus extends BaseConsensus {
             await this.blockBuilder.commitBlock(block);
 
             logger.info(`${this.node.id}: Successfully committed block with height ${block.header.height} and hash ${blockHash}, benchmarkIndex ${this.benchmarkIndex + i}`);
+
+            // Commented out debug log because we don't want to output all the blocks into stdout on every round
+
             // const benchmarkLog: any[] = this.node.getLog();
             // const b = { blocks: await this.blockBuilder.getBlocks(0) };
             // if (b.blocks != undefined) {
