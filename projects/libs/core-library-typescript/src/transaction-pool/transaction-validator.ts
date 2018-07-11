@@ -23,14 +23,14 @@ export class TransactionValidator {
     }
 
     // deserializes addresses and validate checksums
-    const senderAddress = Address.fromBuffer(tx.header.sender, undefined, true);
+    const senderAddress = Address.fromBuffer(tx.header.sender, tx.signatureData.publicKey, true);
     if (senderAddress == undefined) {
-      logger.info(`Address validation ${tx.header.sender} failed on deserialization (fromBuffer())`);
+      logger.info(`Sender address validation ${tx.header.sender.toJSON().data} failed on deserialization (fromBuffer())`);
       return false;
     }
     const contractAddress = Address.fromBuffer(tx.header.contractAddress, undefined, true);
     if (contractAddress == undefined) {
-      logger.info(`Address validation ${tx.header.contractAddress} failed on deserialization (fromBuffer())`);
+      logger.info(`Contract address validation ${tx.header.contractAddress.toJSON().data} failed on deserialization (fromBuffer())`);
       return false;
     }
 
