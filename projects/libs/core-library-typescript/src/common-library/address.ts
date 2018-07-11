@@ -77,7 +77,7 @@ export class Address {
       // if public key for given, we validate that it's mapped to the right account ID
       address = new Address(publicKey, vchainId, networkId);
       if (!address.accountId.equals(accountId)) {
-        logger.info(`accountId in address and accountId derived by publicKey don't match ${accountId} != ${address.accountId}`);
+        logger.info(`accountId in address and accountId derived by publicKey don't match ${accountId.toJSON().data} != ${address.accountId.toJSON().data}`);
         return undefined;
       }
     } else {
