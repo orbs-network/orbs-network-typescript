@@ -11,27 +11,6 @@ jobs:
       - store_artifacts:
           path: logs
 
-  build-sdk:
-    machine: true
-    steps:
-      - checkout
-      - run: ./.circleci/setup-rngd.sh
-      - run: ./docker/build-sdk-base.sh
-      - run: ./docker/build-sdk.sh
-      - store_artifacts:
-          path: logs
-
-  build-bot:
-    machine: true
-    steps:
-      - checkout
-      - run: ./.circleci/setup-rngd.sh
-      - run: $(aws ecr get-login --no-include-email --region us-west-2)
-      - run: export NO_ANDROID=true && ./docker/build-sdk-base.sh
-      - run: ./docker/build-bot.sh
-      - run: export DOCKER_TAG=$(./docker-tag.sh) && docker tag orbs:bot ${DOCKER_IMAGE_BOT}:${DOCKER_TAG}
-      - run: docker push ${DOCKER_IMAGE_BOT}
-
   deploy:
     machine: true
     steps:
@@ -71,9 +50,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - build-sdk
       - build-server
-      - build-bot
       - e2e:
           requires:
             - build-server

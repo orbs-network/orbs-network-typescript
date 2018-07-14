@@ -20,9 +20,6 @@
     "path": "e2e"
   },
   "order": [
-    "architecture",
-    "crypto-sdk",
-    "client-sdk-javascript",
     "e2e"
   ]
 }
