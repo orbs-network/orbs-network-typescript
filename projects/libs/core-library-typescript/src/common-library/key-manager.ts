@@ -2,6 +2,7 @@ import * as crypto from "crypto";
 import * as stringify from "json-stable-stringify";
 import * as fs from "fs";
 import * as _ from "lodash";
+import { logger } from "../common-library";
 
 export interface KeyManagerConfig {
   publicKeysPath?: string;
@@ -13,7 +14,8 @@ export class KeyManager {
   SIGNATURE_ENCODING: crypto.HexBase64Latin1Encoding = "base64";
   HASH_TYPE = "sha256";
 
-  private publicKeys = new Map<string, string>();
+  private publicKeys = new Map<string, string>(); // keyName => publicKey
+  private keyNames = new Map<string, string>(); // publicKey => keyName
   private privateKey: string;
 
   public constructor(signaturesConfig: KeyManagerConfig) {
@@ -23,21 +25,26 @@ export class KeyManager {
       throw new Error(`Neither private key nor public keys are provided!`);
     }
 
-    this.readPrivateKey();
     this.readPublicKeys();
+    this.readPrivateKey();
+
+
   }
 
   private readPrivateKey() {
     if (this.config.privateKeyPath) {
+      logger.debug("readPrivateKey");
       this.privateKey = fs.readFileSync(this.config.privateKeyPath).toString();
     }
   }
 
   private readPublicKeys() {
     if (this.config.publicKeysPath) {
+      logger.debug(`readPublicKeys`);
       fs.readdirSync(this.config.publicKeysPath).forEach((keyName) => {
-        const contents = fs.readFileSync(`${this.config.publicKeysPath}/${keyName}`).toString();
-        this.publicKeys.set(keyName, contents);
+        const publicKey = fs.readFileSync(`${this.config.publicKeysPath}/${keyName}`).toString();
+        this.publicKeys.set(keyName, publicKey);
+        this.keyNames.set(publicKey, keyName);
       });
     }
   }
@@ -79,4 +86,22 @@ export class KeyManager {
 
     return this.publicKeys.get(publicKeyName);
   }
+
+  public getPublicKeys(): string[] {
+    // return Array.from(this.publicKeys.values());
+    return Array.from(this.publicKeys.keys());
+  }
+
+
+  public getPublicKeyName(publicKey: string) {
+    if (!this.keyNames.has(publicKey)) {
+      throw new Error(`No publicKeyName found for: ${publicKey}`);
+    }
+    return this.keyNames.get(publicKey);
+  }
+
+  public hasPublicKey(publicKey: string): boolean {
+    return this.keyNames.has(publicKey);
+  }
+
 }

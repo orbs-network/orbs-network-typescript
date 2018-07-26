@@ -319,4 +319,6 @@ export class BenchmarkConsensus extends BaseConsensus {
   private stopReporting() {
     clearInterval(this.pollInterval);
   }
+
+
 }

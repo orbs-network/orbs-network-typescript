@@ -13,14 +13,14 @@ services:
       - ETHEREUM_CONTRACT_ADDRESS=${SUBSCRIPTION_MANAGER_ETHEREUM_CONTRACT_ADDRESS}
       - SUBSCRIPTION_PROFILES=${SUBSCRIPTION_PROFILES}
       - BLOCK_BUILDER_POLL_INTERVAL=500
-      - MIN_ELECTION_TIMEOUT=2000
-      - MAX_ELECTION_TIMEOUT=4000
+      - MIN_ELECTION_TIMEOUT=20000000
+      - MAX_ELECTION_TIMEOUT=40000000
       - HEARBEAT_INTERVAL=100
       - TRANSACTION_EXPIRATION_TIMEOUT=240000
       - MSG_LIMIT=4000000
       - BLOCK_SIZE_LIMIT=2000
       - LEADER_SYNC_INTERVAL=100
-      - CONSENSUS_ALGORITHM=stub
+      - CONSENSUS_ALGORITHM=pbft
       - CONSENSUS_LEADER_NODE_NAME=node2
       - VERIFY_SUBSCRIPTION=true
     ports:
@@ -30,6 +30,9 @@ services:
         ipv4_address: ${PRIVATE_NETWORK}.15
     volumes_from:
       - shared_volumes
+    volumes:
+      - ./public-keys/consensus:/opt/orbs/public-keys/consensus
+      - ./private-keys/consensus:/opt/orbs/private-keys/consensus
     extra_hosts:
       - consensus:${PRIVATE_NETWORK}.15
       - public-api:${PRIVATE_NETWORK}.16

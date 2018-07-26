@@ -83,6 +83,12 @@ export default class BlockStorageService extends Service implements StartupCheck
     rpc.res = { blocks: await this.blockStorage.getBlocks(rpc.req.lastBlockHeight, rpc.req.limit) };
   }
 
+  @Service.RPCMethod
+  public async getBlock(rpc: types.GetBlockContext) {
+    rpc.res = { block: await this.blockStorage.getBlock(rpc.req.atHeight) };
+  }
+
+
   async pollForNewBlocks() {
     // TODO: find a better way to do sync timeout
     this.sync.off();

@@ -11,8 +11,8 @@ import { runDockerHealthCheck } from "./docker-health-checks";
 
 
 const expect = chai.expect;
-const DOCKER_HEALTH_CHECK_MAX_RETRIES = 20;
-const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 5;
+const DOCKER_HEALTH_CHECK_MAX_RETRIES = 10;
+const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 10;
 
 chai.should();
 chai.use(ChaiBarsPlugin);
@@ -49,7 +49,7 @@ async function aTextMessageAccount(networkId: string) {
 
 describe("transfer tokens and messages between accounts", async function () {
 
-  this.timeout(800000);
+  this.timeout(800000000);
 
   before(async () => {
     if (testConfig.testEnvironment) {

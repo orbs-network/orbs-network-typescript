@@ -3,6 +3,8 @@ import { grpcServer, types, topologyPeers, logger, BaseConsensusConfig, Election
 import ConsensusService from "./consensus-service";
 import SubscriptionManagerService from "./subscription-manager-service";
 import TransactionPoolService from "./transaction-pool-service";
+// import * as shell from "shelljs";
+import * as path from "path";
 
 class DefaultConsensusConfig implements BaseConsensusConfig {
   electionTimeout: ElectionTimeoutConfig;
@@ -12,6 +14,7 @@ class DefaultConsensusConfig implements BaseConsensusConfig {
   clusterSize: number;
   signBlocks: boolean;
   keyManager?: KeyManager;
+  consensusKeyManager: KeyManager;
   algorithm: string;
   leaderNodeName?: string;
   blockBuilderPollInterval?: number;
@@ -79,6 +82,30 @@ export default function (nodeTopology: any, env: any) {
   consensusConfig.keyManager = consensusConfig.signBlocks ? new KeyManager({
     privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
   }) : undefined;
+
+  // shell.exec(`
+  //   rm -rf
+  //   rm -rf /opt/orbs/private-keys/consensus
+  //   rm -rf /opt/orbs/public-keys/consensus
+  //   mkdir -p ${__dirname}/test-private-keys
+
+  //   rm -rf ${__dirname}/test-public-keys
+  //   mkdir -p ${__dirname}/test-public-keys
+
+  //   ssh-keygen -t rsa -b 4096 -N "" -f ${__dirname}/test-private-keys/secret-message-key
+  //   ssh-keygen -f ${__dirname}/test-private-keys/secret-message-key.pub -e -m pem > ${__dirname}/test-public-keys/secret-message-key
+  // `);
+
+  //   return {
+  //     privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`,
+  //     publicKeysPath: `${__dirname}/test-public-keys`
+  //   };
+
+  consensusConfig.consensusKeyManager = new KeyManager({
+    privateKeyPath: path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
+    publicKeysPath: "/opt/orbs/public-keys/consensus"
+  });
+
   consensusConfig.blockBuilderPollInterval = Number(BLOCK_BUILDER_POLL_INTERVAL) || 500;
   consensusConfig.msgLimit = Number(MSG_LIMIT) || 4000000;
   consensusConfig.blockSizeLimit = Number(BLOCK_SIZE_LIMIT) || Math.floor(consensusConfig.msgLimit / (2 * 250));

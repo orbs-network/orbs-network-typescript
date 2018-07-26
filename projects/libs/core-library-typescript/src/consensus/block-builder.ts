@@ -18,6 +18,7 @@ export default class BlockBuilder {
   private blockStorage: types.BlockStorageClient;
   private onNewBlockBuild: (block: types.Block) => void;
   private config: BlockBuilderConfig;
+  private testing: number;
 
   constructor(input: {
     virtualMachine: types.VirtualMachineClient,
@@ -34,6 +35,7 @@ export default class BlockBuilder {
       this.config = input.config;
       this.pollIntervalMs = input.config.pollIntervalMs || 500;
       this.blockSizeLimit = input.config.blockSizeLimit || 2000;
+      this.testing = 0;
   }
 
   private pollForPendingTransactions() {
@@ -129,4 +131,36 @@ export default class BlockBuilder {
   async shutdown() {
     this.stopPolling();
   }
+
+
+    // ###################################### Changes pre -v1  ######################################
+
+
+    public getPollingInterval(): number {
+      return this.pollIntervalMs;
+    }
+
+    public async generateNewBlock(height: number): Promise<types.Block> {
+      try {
+        const { block } = await this.blockStorage.getBlock({ atHeight: (height - 1)});
+        if (!block) {
+          throw new Error(`generateNewBlock Failed to getBlock at height: ${height}`);
+        }
+        const newBlock: types.Block = await this.buildBlockFromPendingTransactions(block); // TODO: work on blockHeaders
+        // if ( newBlock ) {
+        //   if (height == 5 || height == 7) {
+        //     if (this.testing < 2) {
+        //       this.testing++;
+        //       throw new Error(`generateNewBlock Failed to getBlock at height: ${height} testing: ${this.testing}`);
+        //     }
+        //     this.testing = 0;
+        //   }
+        // }
+        return newBlock;
+      }
+      catch (err) {
+        logger.debug(`generateNewBlock Error: ${err}`);
+      }
+      return undefined;
+    }
 }
