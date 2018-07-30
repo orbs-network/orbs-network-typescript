@@ -83,24 +83,6 @@ export default function (nodeTopology: any, env: any) {
     privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
   }) : undefined;
 
-  // shell.exec(`
-  //   rm -rf
-  //   rm -rf /opt/orbs/private-keys/consensus
-  //   rm -rf /opt/orbs/public-keys/consensus
-  //   mkdir -p ${__dirname}/test-private-keys
-
-  //   rm -rf ${__dirname}/test-public-keys
-  //   mkdir -p ${__dirname}/test-public-keys
-
-  //   ssh-keygen -t rsa -b 4096 -N "" -f ${__dirname}/test-private-keys/secret-message-key
-  //   ssh-keygen -f ${__dirname}/test-private-keys/secret-message-key.pub -e -m pem > ${__dirname}/test-public-keys/secret-message-key
-  // `);
-
-  //   return {
-  //     privateKeyPath: `${__dirname}/test-private-keys/secret-message-key`,
-  //     publicKeysPath: `${__dirname}/test-public-keys`
-  //   };
-
   consensusConfig.consensusKeyManager = new KeyManager({
     privateKeyPath: path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
     publicKeysPath: "/opt/orbs/public-keys/consensus"

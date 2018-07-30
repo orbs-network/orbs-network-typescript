@@ -82,14 +82,8 @@ export class PBFTConsensus extends BaseConsensus {
     await this.blockBuilder.initialize();
     this.pbft = new PBFT(this.pbftConfig);
     this.pbft.registerOnCommitted((block: types.Block) => this.onCommitted(block));
-    // const services: PBFTServices = { blockStorage: this.getLastBlock };
-    // const lastBlock: Block = await this.ensureServicesUp();
-    // this.lastBlock = await this.ensureServicesUp(services, this.config.heartbeatInterval);
-    // this.lastBlock =
-    // await
     await this.ensureServicesUp(this.blockBuilder.getPollingInterval());
     logger.debug(`PBFT Consensus init on lastBlock - height: ${this.lastBlock.header.height}`);
-    // (this.pbftConfig.blockUtils as PBFTBlockUtils).setLastBlock(lastBlock);
     this.pbft.start(this.lastBlock.header.height + 1);
     // this.syncPolling(this.config.heartbeatInterval * 20);
   }
@@ -112,27 +106,6 @@ export class PBFTConsensus extends BaseConsensus {
   }
 
 
-  // private async ensureServicesUp(services: PBFTServices, pollingInterval: number): Promise<types.Block> {
-  //   return new Promise<types.Block>(async resolve => {
-  //     let pollingTime: number = -pollingInterval;
-  //     const intervalId = setInterval(async () => {
-  //         try {
-  //           pollingTime += pollingInterval;
-  //           logger.debug(`Wait for services ${pollingTime} `);
-  //           const { block } = await services.blockStorage.getLastBlock({});
-  //           if (block) { //  && valid) { // && tempBlock !== undefined) {
-  //             logger.debug(`PBFT Consensus Service can now start ${pollingTime} `);
-  //             clearInterval(intervalId);
-  //             resolve(block);
-  //           }
-  //         }
-  //         catch (err) {
-  //           logger.debug(`Wait for services - Thrown ${pollingTime} ${err}`);
-  //         }
-  //     }, pollingInterval);
-  //   });
-  // }
-
   async shutdown(): Promise<any> {
     this.pbft.dispose();
     this.pbftNet.dispose();
@@ -143,7 +116,7 @@ export class PBFTConsensus extends BaseConsensus {
 
 
   private async onCommitted(committedBlock: types.Block) {
-    logger.debug(`New block to be committed ${JSON.stringify(committedBlock)}, blockSize approx ${JSON.stringify(committedBlock).length * 2 }`);
+    logger.debug(`New block to be committed ${JSON.stringify(committedBlock)}, blockSize approx ${Buffer.byteLength(JSON.stringify(committedBlock), "utf8")}`);
     try {
       // this.blockUtils.setLastBlock(committedBlock);
       this.lastBlock = committedBlock;

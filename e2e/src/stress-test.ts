@@ -8,16 +8,16 @@ import * as _ from "lodash";
 import * as crypto from "crypto";
 import { delay } from "bluebird";
 import { runDockerHealthCheck } from "./docker-health-checks";
-
+const shell = require("shelljs");
 
 const expect = chai.expect;
 const DOCKER_HEALTH_CHECK_MAX_RETRIES = 10;
 const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 10;
-const numberOfAccounts: number = 200;
+const numberOfAccounts: number = 10;
 const baseAmount: number = 1000;
 
 let accounts: FooBarAccount[];
-
+process.setMaxListeners(0);
 chai.use(ChaiBarsPlugin);
 
 const testConfig = loadDefaultTestConfig();
@@ -27,6 +27,8 @@ const generateAddress = (keyPair: ED25519Key): Address => {
 
   return address;
 };
+
+
 
 async function aFooBarAccountWith(input: { amountOfBars: number }) {
   const prebuiltKeyPair = new ED25519Key();
@@ -59,16 +61,12 @@ async function stress(accounts: FooBarAccount[], attempt: number) {
     const amount = num + 1;
 
     console.log(`Sending ${amount} bar from ${account.address} to ${recipient.address}`);
-    await account.transfer({ to: recipient.address, amountOfBars: amount });
-    await account.transfer({ to: recipient.address, amountOfBars: amount });
-    await account.transfer({ to: recipient.address, amountOfBars: amount });
-    await account.transfer({ to: recipient.address, amountOfBars: amount });
     return account.transfer({ to: recipient.address, amountOfBars: amount });
   }));
 
   return Promise.all(accounts.map(async (account, num) => {
     const isFirst = num === 0;
-    const amount = baseAmount + (isFirst ? accounts.length * 5 * (attempt + 1) : num)  - 1  * (attempt + 1) * 5;
+    const amount = baseAmount + (isFirst ? accounts.length * (attempt + 1) : num)  - 1  * (attempt + 1);
 
     console.log(`Account ${account.address} has balance ${await account.getBalance()} (supposed to be ${amount})`);
     return expect(account).to.have.bars(amount);
@@ -83,11 +81,6 @@ describe("test multiple transactions", async function () {
       await testConfig.testEnvironment.start();
       try {
         await runDockerHealthCheck(DOCKER_HEALTH_CHECK_MAX_RETRIES, DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC);
-        console.log(`Creating ${numberOfAccounts} accounts...`);
-        await delay(5000);
-        accounts = await createAccounts({ seed: 0, numberOfAccounts: numberOfAccounts });
-        await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(baseAmount + num)));
-        console.log("Created accounts");
       } catch (e) {
         console.log(`Error in Docker health check, not all docker containers are not healthy and all retry attempts exhaused`);
         throw e;
@@ -96,6 +89,11 @@ describe("test multiple transactions", async function () {
   });
 
   it("transfers tokens between accounts", async function () {
+    console.log(`Creating ${numberOfAccounts} accounts...`);
+    await delay(5000);
+    accounts = await createAccounts({ seed: 0, numberOfAccounts: numberOfAccounts });
+    await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(baseAmount + num)));
+    console.log("Created accounts");
     for (const i of _.range(0, Number(process.env.NUM_OF_ATTEMPTS) || 1)) {
       console.log(`Attempt #${i}`);
       await delay(1000);
