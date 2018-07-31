@@ -59,7 +59,8 @@ function parseSubscriptionProfiles(subscriptionProfileJson: string) {
 
 export default function (nodeTopology: any, env: any) {
   const { NODE_NAME, NUM_OF_NODES, ETHEREUM_CONTRACT_ADDRESS, BLOCK_BUILDER_POLL_INTERVAL, MSG_LIMIT, BLOCK_SIZE_LIMIT, LEADER_SYNC_INTERVAL,
-    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME, CONSENSUS_SIGN_BLOCKS, DEBUG_BENCHMARK, VERIFY_TRANSACTION_SIGNATURES, VERIFY_SUBSCRIPTION, SUBSCRIPTION_PROFILES } = env;
+    MIN_ELECTION_TIMEOUT, MAX_ELECTION_TIMEOUT, HEARBEAT_INTERVAL, TRANSACTION_EXPIRATION_TIMEOUT, CONSENSUS_ALGORITHM, CONSENSUS_LEADER_NODE_NAME,
+    CONSENSUS_SIGN_BLOCKS, DEBUG_BENCHMARK, VERIFY_TRANSACTION_SIGNATURES, VERIFY_SUBSCRIPTION, SUBSCRIPTION_PROFILES, GENERATE_KEYS } = env;
 
   if (!NODE_NAME) {
     throw new Error("NODE_NAME can't be empty!");
@@ -83,11 +84,6 @@ export default function (nodeTopology: any, env: any) {
     privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
   }) : undefined;
 
-  consensusConfig.consensusKeyManager = new KeyManager({
-    privateKeyPath: path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
-    publicKeysPath: "/opt/orbs/public-keys/consensus"
-  });
-
   consensusConfig.blockBuilderPollInterval = Number(BLOCK_BUILDER_POLL_INTERVAL) || 500;
   consensusConfig.msgLimit = Number(MSG_LIMIT) || 4000000;
   consensusConfig.blockSizeLimit = Number(BLOCK_SIZE_LIMIT) || Math.floor(consensusConfig.msgLimit / (2 * 250));
@@ -105,6 +101,13 @@ export default function (nodeTopology: any, env: any) {
     consensusConfig.leaderNodeName = CONSENSUS_LEADER_NODE_NAME;
     consensusConfig.heartbeatInterval = 1000; // this is the block interval
     consensusConfig.acceptableUnsyncedNodes = 1; // this is the number of nodes that can be out of sync before stopping the consensus
+  }
+
+  if (GENERATE_KEYS) {
+    consensusConfig.consensusKeyManager = new KeyManager({
+      privateKeyPath: path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
+      publicKeysPath: "/opt/orbs/public-keys/consensus"
+    });
   }
 
   const nodeConfig = { nodeName: NODE_NAME };
