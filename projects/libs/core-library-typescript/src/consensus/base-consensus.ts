@@ -17,6 +17,7 @@ export interface BaseConsensusConfig {
   blockBuilderPollInterval?: number;
   msgLimit?: number;
   blockSizeLimit?: number;
+  blockSizeMin?: number;
   debug?: boolean;
   signBlocks: boolean;
   keyManager?: KeyManager;

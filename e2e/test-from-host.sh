@@ -4,7 +4,8 @@ export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
 export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
 export TEST=${TEST-test}
 
-if ${GENERATE_KEYS}
+
+if [ "$GENERATE_KEYS" = true ] ;
 then
     echo 'Generating Keys'
     END=${NUM_OF_NODES} ./generate-nodes-keys.sh

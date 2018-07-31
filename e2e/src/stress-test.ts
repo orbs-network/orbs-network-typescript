@@ -13,7 +13,6 @@ const shell = require("shelljs");
 const expect = chai.expect;
 const DOCKER_HEALTH_CHECK_MAX_RETRIES = 10;
 const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 10;
-const numberOfAccounts: number = 10;
 const baseAmount: number = 1000;
 
 let accounts: FooBarAccount[];
@@ -89,9 +88,9 @@ describe("test multiple transactions", async function () {
   });
 
   it("transfers tokens between accounts", async function () {
-    console.log(`Creating ${numberOfAccounts} accounts...`);
+    console.log(`Creating ${testConfig.stressTest.accounts} accounts...`);
     await delay(5000);
-    accounts = await createAccounts({ seed: 0, numberOfAccounts: numberOfAccounts });
+    accounts = await createAccounts({ seed: 0, numberOfAccounts: testConfig.stressTest.accounts });
     await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(baseAmount + num)));
     console.log("Created accounts");
     for (const i of _.range(0, Number(process.env.NUM_OF_ATTEMPTS) || 1)) {
@@ -99,7 +98,7 @@ describe("test multiple transactions", async function () {
       await delay(1000);
       try {
         await stress(accounts, i);
-        console.log(`Successufully processed transactions between ${numberOfAccounts} accounts`);
+        console.log(`Successufully processed transactions between ${testConfig.stressTest.accounts} accounts`);
       } catch (e) {
         console.log(`Failed with error ${e}`);
       }

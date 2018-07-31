@@ -11,9 +11,6 @@ import { waitUntil } from "./pbft/wait-until";
 
 
 
-// interface PBFTServices {
-//   getLastBlock: types.BlockStorageClient;
-// }
 
 export class PBFTConsensus extends BaseConsensus {
   private pbft: PBFT;
