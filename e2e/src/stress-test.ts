@@ -65,7 +65,7 @@ async function stress(accounts: FooBarAccount[], attempt: number) {
 
   return Promise.all(accounts.map(async (account, num) => {
     const isFirst = num === 0;
-    const amount = baseAmount + (isFirst ? accounts.length * (attempt + 1) : num)  - 1  * (attempt + 1);
+    const amount = baseAmount - 1  * (attempt + 1) + (isFirst ? accounts.length * (attempt + 1) : 0);
 
     console.log(`Account ${account.address} has balance ${await account.getBalance()} (supposed to be ${amount})`);
     return expect(account).to.have.bars(amount);
