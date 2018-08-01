@@ -12,7 +12,7 @@ docker network create public-network --subnet 172.2.2.0/24 || true
 docker run -ti --rm --privileged  \
 --network=public-network --ip 172.2.2.15 \
 -e PREEXISTING_PUBLIC_SUBNET=172.2.2 -e CONNECT_FROM_HOST=false \
--e CONSENSUS_ALGORITHM=stub \
+-e CONSENSUS_ALGORITHM=pbft \
 -e DOCKER_IMAGE=$DOCKER_IMAGE -e DOCKER_TAG=$DOCKER_TAG \
 -e TEST=$TEST -e GENERATE_KEYS=$GENERATE_KEYS -e NUM_OF_NODES=$NUM_OF_NODES \
 -v /var/run/docker.sock:/var/run/docker.sock \
