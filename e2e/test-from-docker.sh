@@ -19,4 +19,4 @@ docker run -ti --rm --privileged  \
 -v $ROOT_DIR/logs:/opt/orbs/logs \
 -v $ROOT_DIR/e2e/config/docker/private-keys/consensus/$NODE_NAME:/opt/orbs/private-keys/consensus/$NODE_NAME \
 orbs:e2e  \
-bash -c "/opt/orbs/e2e/generate-nodes-keys.sh && yarn stress-test"
+bash -c "/opt/orbs/e2e/generate-nodes-keys.sh && yarn test"
