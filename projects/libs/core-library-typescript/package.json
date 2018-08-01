@@ -41,7 +41,7 @@
     "memory-cache": "^0.2.0",
     "mkdirp": "^0.5.1",
     "orbs-interfaces": "file:../../architecture",
-    "pbft-typescript": "0.0.45",
+    "pbft-typescript": "0.0.46",
     "protobufjs": "^6.8.6",
     "solc": "0.4.18",
     "source-map-support": "^0.5.3",

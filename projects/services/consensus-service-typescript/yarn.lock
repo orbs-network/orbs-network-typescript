@@ -729,6 +729,10 @@ crypto-browserify@3.12.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
+crypto@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/crypto/-/crypto-1.0.1.tgz#2af1b7cad8175d24c8a1b0778255794a21803037"
+
 cycle@1.0.x:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/cycle/-/cycle-1.0.3.tgz#21e80b2be8580f98b468f379430662b046c34ad2"
@@ -2130,7 +2134,7 @@ optjs@~3.2.2:
     memory-cache "^0.2.0"
     mkdirp "^0.5.1"
     orbs-interfaces "file:../../../../../../../usr/local/share/.cache/yarn/v1/architecture"
-    pbft-typescript "0.0.21"
+    pbft-typescript "0.0.46"
     protobufjs "^6.8.6"
     solc "0.4.18"
     source-map-support "^0.5.3"
@@ -2263,17 +2267,17 @@ pathval@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.0.tgz#b942e6d4bde653005ef6b71361def8727d0645e0"
 
-pbft-typescript@0.0.21:
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/pbft-typescript/-/pbft-typescript-0.0.21.tgz#b4f8a3df870717f77777d53eab754e7d14bff5ff"
+pbft-typescript@0.0.46:
+  version "0.0.46"
+  resolved "https://registry.yarnpkg.com/pbft-typescript/-/pbft-typescript-0.0.46.tgz#9bccc0b7c81dc203daf5eb4e14176cd4dae560b4"
   dependencies:
     "@types/chai" "^4.1.3"
-    "@types/json-stable-stringify" "^1.0.32"
     "@types/mocha" "^5.2.0"
     "@types/node" "^10.0.4"
     "@types/sinon" "^4.3.1"
     "@types/sinon-chai" "^2.7.29"
     chai "^4.1.2"
+    crypto "^1.0.1"
     json-stable-stringify "^1.0.1"
     mocha "^5.1.1"
     sinon "^5.0.6"
