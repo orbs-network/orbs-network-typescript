@@ -105,8 +105,8 @@ export default function (nodeTopology: any, env: any) {
     consensusConfig.acceptableUnsyncedNodes = 1; // this is the number of nodes that can be out of sync before stopping the consensus
   }
 
-  // if (consensusConfig.algorithm.toLowerCase() === "pbft") {
-  if (GENERATE_KEYS) {
+  if (consensusConfig.algorithm.toLowerCase() === "pbft") {
+  // if (GENERATE_KEYS) {
     consensusConfig.consensusKeyManager = new KeyManager({
       nodeName: NODE_NAME,
       privateKeyPath: "/opt/orbs/private-keys/consensus", // path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
