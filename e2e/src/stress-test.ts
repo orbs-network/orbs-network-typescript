@@ -13,7 +13,7 @@ const shell = require("shelljs");
 const expect = chai.expect;
 const DOCKER_HEALTH_CHECK_MAX_RETRIES = 10;
 const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 10;
-const NUM_OF_TRANSFERS = 2;
+const NUM_OF_TRANSFERS = 1;
 const BASE_AMOUNT: number = 10000;
 
 let accounts: FooBarAccount[];
