@@ -4,7 +4,7 @@ export AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID-506367651493}
 export REGIONS=${REGIONS-us-east-1,eu-central-1,ap-northeast-1,ap-northeast-2,ap-southeast-2,ca-central-1}
 export KEY_TYPE=${KEY_TYPE-consensus}
 export NODE_ENV=${NODE_ENV-staging}
-export NUM_OF_NODES=${NUM_OF_NODES}
+export NUM_OF_NODES=${NUM_OF_NODES-6}
 export ROOT_DIR=$(cd "$(dirname "$0")/.."; pwd)
 echo $NODE_NAME
 rm -rf temp-keys
