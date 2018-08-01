@@ -81,7 +81,7 @@ export default function (nodeTopology: any, env: any) {
   consensusConfig.nodeName = NODE_NAME;
   consensusConfig.clusterSize = Number(NUM_OF_NODES);
   consensusConfig.signBlocks = toLower(CONSENSUS_SIGN_BLOCKS) === "true";
-  consensusConfig.keyManager = consensusConfig.signBlocks ? new KeyManager({
+  consensusConfig.signBlocks ? new KeyManager({
     privateKeyPath: "/opt/orbs/private-keys/block/secret-key"
   }) : undefined;
 
@@ -105,9 +105,11 @@ export default function (nodeTopology: any, env: any) {
     consensusConfig.acceptableUnsyncedNodes = 1; // this is the number of nodes that can be out of sync before stopping the consensus
   }
 
+  // if (consensusConfig.algorithm.toLowerCase() === "pbft") {
   if (GENERATE_KEYS) {
     consensusConfig.consensusKeyManager = new KeyManager({
-      privateKeyPath: path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
+      nodeName: NODE_NAME,
+      privateKeyPath: "/opt/orbs/private-keys/consensus", // path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
       publicKeysPath: "/opt/orbs/public-keys/consensus"
     });
   }

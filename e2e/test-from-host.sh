@@ -4,6 +4,8 @@ export DOCKER_IMAGE=${DOCKER_IMAGE-orbs}
 export DOCKER_TAG=${DOCKER_TAG-$(git rev-parse --abbrev-ref HEAD | sed -e 's/\//-/g')}
 export TEST=${TEST-test}
 
+yarn install
+yarn run build
 
 if [ "$GENERATE_KEYS" = true ] ;
 then
@@ -11,5 +13,4 @@ then
     END=${NUM_OF_NODES} ./generate-nodes-keys.sh
 fi
 
-yarn run build
 CONNECT_FROM_HOST=true yarn run $TEST

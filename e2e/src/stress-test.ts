@@ -13,7 +13,8 @@ const shell = require("shelljs");
 const expect = chai.expect;
 const DOCKER_HEALTH_CHECK_MAX_RETRIES = 10;
 const DOCKER_HEALTH_CHECK_RETRY_INTERVAL_SEC = 10;
-const baseAmount: number = 1000;
+const NUM_OF_TRANSFERS = 2;
+const BASE_AMOUNT: number = 10000;
 
 let accounts: FooBarAccount[];
 process.setMaxListeners(0);
@@ -45,7 +46,7 @@ async function aFooBarAccountWith(input: { amountOfBars: number }) {
 
 async function createAccounts(input: { seed: number, numberOfAccounts: number }): Promise<FooBarAccount[]> {
   return Promise.all(_.range(input.numberOfAccounts).map((num) => {
-    const amountOfBars = num + baseAmount;
+    const amountOfBars = num + BASE_AMOUNT;
 
     return aFooBarAccountWith({ amountOfBars });
   }));
@@ -58,16 +59,19 @@ async function stress(accounts: FooBarAccount[], attempt: number) {
     const isLast = num + 1 === accounts.length;
     const recipient = accounts[isLast ? 0 : num + 1];
     const amount = num + 1;
-
+    const promises = [];
+    for (const t of _.range(0, NUM_OF_TRANSFERS)) {
+      promises.push(account.transfer({ to: recipient.address, amountOfBars: amount }));
+    }
     console.log(`Sending ${amount} bar from ${account.address} to ${recipient.address}`);
-    return account.transfer({ to: recipient.address, amountOfBars: amount });
+    return Promise.all(promises);
   }));
 
   return Promise.all(accounts.map(async (account, num) => {
     const isFirst = num === 0;
-    const amount = baseAmount - 1  * (attempt + 1) + (isFirst ? accounts.length * (attempt + 1) : 0);
+    const amount = BASE_AMOUNT + num - 1 * (attempt + 1) * NUM_OF_TRANSFERS + (isFirst ? accounts.length * (attempt + 1) * NUM_OF_TRANSFERS : 0);
 
-    console.log(`Account ${account.address} has balance ${await account.getBalance()} (supposed to be ${amount})`);
+    console.log(`Account ${account.address} has balance ${await account.getBalance()} ${accounts.length} (supposed to be ${amount})`);
     return expect(account).to.have.bars(amount);
   }));
 }
@@ -91,7 +95,7 @@ describe("test multiple transactions", async function () {
     console.log(`Creating ${testConfig.stressTest.accounts} accounts...`);
     await delay(5000);
     accounts = await createAccounts({ seed: 0, numberOfAccounts: testConfig.stressTest.accounts });
-    await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(baseAmount + num)));
+    await Promise.all(accounts.map((account, num) => expect(account).to.have.bars(BASE_AMOUNT + num)));
     console.log("Created accounts");
     for (const i of _.range(0, Number(process.env.NUM_OF_ATTEMPTS) || 1)) {
       console.log(`Attempt #${i}`);

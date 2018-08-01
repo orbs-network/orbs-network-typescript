@@ -7,6 +7,7 @@ import { logger } from "../common-library";
 export interface KeyManagerConfig {
   publicKeysPath?: string;
   privateKeyPath?: string;
+  nodeName?: string;
 }
 
 export class KeyManager {
@@ -34,7 +35,16 @@ export class KeyManager {
   private readPrivateKey() {
     if (this.config.privateKeyPath) {
       logger.debug("readPrivateKey");
-      this.privateKey = fs.readFileSync(this.config.privateKeyPath).toString();
+      if (this.config.nodeName) {
+        fs.readdirSync(this.config.privateKeyPath).forEach((keyName) => {
+          if (keyName === this.config.nodeName) {
+            this.privateKey = fs.readFileSync(`${this.config.privateKeyPath}/${keyName}`).toString();
+          }
+        });
+      }
+      else {
+        this.privateKey = fs.readFileSync(this.config.privateKeyPath).toString();
+      }
     }
   }
 

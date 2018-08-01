@@ -8,6 +8,8 @@ VOLUME [ "/opt/orbs/logs", "/opt/orbs/db", "/opt/orbs/public-keys/consensus", "/
 
 ADD package.json yarn.lock .yarnrc docker/bootstrap-server.sh /opt/orbs/
 
+ADD ./e2e/config/docker/private-keys/consensus/$NODE_NAME /opt/orbs/private-keys/consensus/$NODE_NAME
+
 WORKDIR /opt/orbs
 
 RUN ./bootstrap-server.sh

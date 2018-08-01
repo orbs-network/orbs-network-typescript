@@ -152,6 +152,7 @@ export default class BlockBuilder {
         const newBlock: types.Block = await this.buildBlockFromPendingTransactions(block); // TODO: work on blockHeaders
         // const blockSize: number = Buffer.byteLength(JSON.stringify(newBlock), "utf8");
         const blockSize: number = newBlock.body.transactions.length;
+        console.log(`Block size min: ${this.blockSizeMin}`);
         if (blockSize < this.blockSizeMin) {
           throw new Error(`generateNewBlock waiting for block size of at least ${this.blockSizeMin} at height: ${height}`);
         }
