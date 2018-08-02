@@ -20,8 +20,8 @@ docker run -ti --rm --privileged  \
 -e TEST=$TEST -e GENERATE_KEYS=$GENERATE_KEYS -e NUM_OF_NODES=$NUM_OF_NODES \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $ROOT_DIR/logs:/opt/orbs/logs \
--v /opt/orbs/e2e/config/docker/private-keys/consensus/$NODE_NAME:/opt/orbs/private-keys/consensus/$NODE_NAME \
--v /opt/orbs/e2e/config/docker/public-keys/consensus:/opt/orbs/public-keys/consensus \
+-v /opt/orbs/e2e/config/docker/private-keys/consensus/$NODE_NAME:/opt/orbs/e2e/config/docker/private-keys/consensus/$NODE_NAME \
+-v /opt/orbs/e2e/config/docker/public-keys/consensus:/opt/orbs/e2e/config/docker/public-keys/consensus \
 orbs:e2e \
 bash -c "/opt/orbs/e2e/generate-nodes-keys.sh && yarn stress-test"
 
