@@ -6,8 +6,8 @@ services:
     command: node dist/index.js ${NODE_CONFIG_PATH}
     volumes:
       - ../../../logs:/opt/orbs/logs
-      - ./public-keys/consensus:/opt/orbs/public-keys/consensus
-      - ./private-keys/consensus:/opt/orbs/private-keys/consensus
+      - ./public-keys/consensus:/opt/orbs/e2e/config/docker/public-keys/consensus
+      - ./private-keys/consensus:/opt/orbs/e2e/config/docker/private-keys/consensus
     environment:
       NODE_NAME: ${NODE_NAME}
       NODE_ENV: test

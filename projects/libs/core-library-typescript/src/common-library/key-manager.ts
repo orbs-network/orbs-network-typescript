@@ -34,7 +34,6 @@ export class KeyManager {
 
   private readPrivateKey() {
     if (this.config.privateKeyPath) {
-      logger.debug("readPrivateKey");
       if (this.config.nodeName) {
         fs.readdirSync(this.config.privateKeyPath).forEach((keyName) => {
           if (keyName === this.config.nodeName) {
@@ -45,17 +44,20 @@ export class KeyManager {
       else {
         this.privateKey = fs.readFileSync(this.config.privateKeyPath).toString();
       }
+      logger.debug(`readPrivateKey: ${this.privateKey}`);
     }
   }
 
   private readPublicKeys() {
     if (this.config.publicKeysPath) {
-      logger.debug(`readPublicKeys`);
+      const keys: string[] = [];
       fs.readdirSync(this.config.publicKeysPath).forEach((keyName) => {
         const publicKey = fs.readFileSync(`${this.config.publicKeysPath}/${keyName}`).toString();
         this.publicKeys.set(keyName, publicKey);
         this.keyNames.set(publicKey, keyName);
+        keys.push(publicKey);
       });
+      logger.debug(`readPublicKeys ${JSON.stringify(keys)}`);
     }
   }
 
@@ -93,7 +95,6 @@ export class KeyManager {
     if (!this.publicKeys.has(publicKeyName)) {
       throw new Error(`No public key found: ${publicKeyName}`);
     }
-
     return this.publicKeys.get(publicKeyName);
   }
 

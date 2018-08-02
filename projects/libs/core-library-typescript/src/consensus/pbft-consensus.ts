@@ -80,7 +80,7 @@ export class PBFTConsensus extends BaseConsensus {
     this.pbft = new PBFT(this.pbftConfig);
     this.pbft.registerOnCommitted((block: types.Block) => this.onCommitted(block));
     await this.ensureServicesUp(this.blockBuilder.getPollingInterval());
-    logger.debug(`PBFT Consensus init on lastBlock - height: ${this.lastBlock.header.height}`);
+    logger.debug(`PBFT Consensus init on lastBlock - height: ${this.lastBlock.header.height} and my key: ${this.keyManager.getMyPublicKey()}`);
     this.pbft.start(this.lastBlock.header.height + 1);
     // this.syncPolling(this.config.heartbeatInterval * 20);
   }

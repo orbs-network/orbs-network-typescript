@@ -105,12 +105,11 @@ export default function (nodeTopology: any, env: any) {
     consensusConfig.acceptableUnsyncedNodes = 1; // this is the number of nodes that can be out of sync before stopping the consensus
   }
 
-  // if (consensusConfig.algorithm.toLowerCase() === "pbft") {
   if (GENERATE_KEYS) {
     consensusConfig.consensusKeyManager = new KeyManager({
       nodeName: NODE_NAME,
-      privateKeyPath: "/opt/orbs/private-keys/consensus", // path.join("/opt/orbs/private-keys/consensus", NODE_NAME),
-      publicKeysPath: "/opt/orbs/public-keys/consensus"
+      privateKeyPath: "/opt/orbs/e2e/config/docker/private-keys/consensus",
+      publicKeysPath: "/opt/orbs/e2e/config/docker/public-keys/consensus",
     });
   }
 
