@@ -7,6 +7,8 @@ export GENERATE_KEYS=${GENERATE_KEYS-true}
 export NUM_OF_NODES=${NUM_OF_NODES-4}
 
 export ROOT_DIR=$(cd "$(dirname "$0")/.."; pwd)
+echo $ROOT_DIR
+echo pwd
 
 docker network create public-network --subnet 172.2.2.0/24 || true
 docker run -ti --rm --privileged  \
