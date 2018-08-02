@@ -38,15 +38,18 @@ services:
       HEARBEAT_INTERVAL: 100
       TRANSACTION_EXPIRATION_TIMEOUT: 240000
       MSG_LIMIT: 4000000
+      BLOCK_SIZE_MIN: 0
       BLOCK_SIZE_LIMIT: 2000
       VERIFY_TRANSACTION_SIGNATURES: 'true'
       VERIFY_SUBSCRIPTION: 'true'
-      CONSENSUS_ALGORITHM: 'stub'
+      CONSENSUS_ALGORITHM: 'pbft'
       SUBSCRIPTION_PROFILES: '{"ALPHA":[{"rate":1}]}'
       CONSENSUS_LEADER_NODE_NAME: 'orbs-global-506367651493-staging-ap-northeast-1'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
+      - /opt/orbs/public-keys/consensus:/opt/orbs/public-keys/consensus
+      - /opt/orbs/private-keys/consensus:/opt/orbs/private-keys/consensus
     networks:
       default:
 
