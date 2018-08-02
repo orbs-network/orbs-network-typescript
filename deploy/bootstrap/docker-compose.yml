@@ -12,7 +12,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: gossip
-      SIGN_MESSAGES: 'true'
+      SIGN_MESSAGES: 'false'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/public-keys/message:/opt/orbs/public-keys/message
@@ -30,7 +30,7 @@ services:
       - .env-secrets
     environment:
       SERVICE_NAME: consensus
-      CONSENSUS_SIGN_BLOCKS: 'true'
+      CONSENSUS_SIGN_BLOCKS: 'false'
       ETHEREUM_CONTRACT_ADDRESS: '0x835C2552F6F10A758b7E79D1169F7156e08dd0bF'
       BLOCK_BUILDER_POLL_INTERVAL: 500
       MIN_ELECTION_TIMEOUT: 10000
@@ -40,11 +40,12 @@ services:
       MSG_LIMIT: 4000000
       BLOCK_SIZE_MIN: 0
       BLOCK_SIZE_LIMIT: 2000
-      VERIFY_TRANSACTION_SIGNATURES: 'true'
+      VERIFY_TRANSACTION_SIGNATURES: 'false'
       VERIFY_SUBSCRIPTION: 'true'
       CONSENSUS_ALGORITHM: 'pbft'
       SUBSCRIPTION_PROFILES: '{"ALPHA":[{"rate":1}]}'
       CONSENSUS_LEADER_NODE_NAME: 'orbs-global-506367651493-staging-ap-northeast-1'
+      GENERATE_KEYS: 'true'
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
@@ -79,7 +80,7 @@ services:
     environment:
       SERVICE_NAME: storage
       BLOCK_STORAGE_DB_PATH: /opt/orbs/db
-      BLOCK_STORAGE_VERIFY_SIGNATURES: 'true'
+      BLOCK_STORAGE_VERIFY_SIGNATURES: 'false'
     volumes:
       - /opt/orbs/public-keys/block:/opt/orbs/public-keys/block
       - /mnt/data/db:/opt/orbs/db
