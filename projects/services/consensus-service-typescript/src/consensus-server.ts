@@ -108,8 +108,8 @@ export default function (nodeTopology: any, env: any) {
   if (GENERATE_KEYS) {
     consensusConfig.consensusKeyManager = new KeyManager({
       nodeName: NODE_NAME,
-      privateKeyPath: "/opt/orbs/e2e/config/docker/private-keys/consensus",
-      publicKeysPath: "/opt/orbs/e2e/config/docker/public-keys/consensus",
+      privateKeyPath: "/opt/orbs/private-keys/consensus/secret-key",
+      publicKeysPath: "/opt/orbs/public-keys/consensus",
     });
   }
 

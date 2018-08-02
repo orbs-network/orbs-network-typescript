@@ -48,8 +48,8 @@ services:
     volumes:
       - /mnt/data/logs:/opt/orbs/logs
       - /opt/orbs/private-keys/block:/opt/orbs/private-keys/block
-      - /opt/orbs/public-keys/consensus:/opt/orbs/public-keys/consensus
-      - /opt/orbs/private-keys/consensus:/opt/orbs/private-keys/consensus
+      - /opt/orbs/public-keys/block:/opt/orbs/public-keys/consensus
+      - /opt/orbs/private-keys/block:/opt/orbs/private-keys/consensus
     networks:
       default:
 
