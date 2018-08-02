@@ -108,7 +108,7 @@ export default function (nodeTopology: any, env: any) {
   if (GENERATE_KEYS) {
     consensusConfig.consensusKeyManager = new KeyManager({
       nodeName: NODE_NAME,
-      privateKeyPath: "/opt/orbs/private-keys/consensus/secret-key",
+      privateKeyPath: "/opt/orbs/private-keys/consensus",
       publicKeysPath: "/opt/orbs/public-keys/consensus",
     });
   }
