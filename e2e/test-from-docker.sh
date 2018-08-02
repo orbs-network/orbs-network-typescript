@@ -6,6 +6,7 @@ export TEST=${TEST-test}
 export GENERATE_KEYS=${GENERATE_KEYS-true}
 export NUM_OF_NODES=${NUM_OF_NODES-4}
 
+
 export ROOT_DIR=$(cd "$(dirname "$0")/.."; pwd)
 echo $ROOT_DIR
 echo pwd
