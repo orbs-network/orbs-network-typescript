@@ -5,6 +5,7 @@ import { Gossip } from "../gossip";
 
 import { BaseConsensusConfig, BaseConsensus } from "./base-consensus";
 import { BenchmarkConsensus } from "./benchmark-consensus";
+import { PBFTConsensus } from "./pbft-consensus";
 import { StubConsensus } from "./stub-consensus";
 import { StartupCheck } from "../common-library/startup-check";
 import { StartupStatus, STARTUP_STATUS } from "../common-library/startup-status";
@@ -22,6 +23,8 @@ export class Consensus implements StartupCheck {
 
     if (config.algorithm.toLowerCase() === "stub") {
       this.actualConsensus = new StubConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
+    } else if (config.algorithm.toLowerCase() === "pbft") {
+      this.actualConsensus = new PBFTConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
     } else {
       this.actualConsensus = new BenchmarkConsensus(config, gossip, blockStorage, transactionPool, virtualMachine);
     }

@@ -11,11 +11,12 @@ export interface BlockStorageConfig {
   keyManager?: KeyManager;
 }
 
-
+// export type onBlockAdded = (block: types.Block) => void;
 export class BlockStorage implements StartupCheck {
 
   public readonly SERVICE_NAME = "block-storage";
   public static readonly LAST_BLOCK_HEIGHT_KEY: string = "last";
+  // private readonly onBlockAddedListeners: onBlockAdded[];
 
   private lastBlock: types.Block;
   private db: LevelDBDriver;
@@ -73,7 +74,7 @@ export class BlockStorage implements StartupCheck {
   // NOTE: this method should be only called serially.
   public async addBlock(block: types.Block) {
     const start = new Date().getTime();
-    const blockHash = BlockUtils.calculateBlockHash(block).toString("hex");
+    const blockHash = BlockUtils.calculateBlockHash(block).toString("base64"); // .toString("hex");
 
     logger.info(`Adding new block with block height ${block.header.height} and hash ${blockHash}`);
 
@@ -87,6 +88,15 @@ export class BlockStorage implements StartupCheck {
     const end = new Date().getTime();
     logger.info(`Added new block with block height: ${block.header.height} and hash ${blockHash} in ${end - start} ms`);
   }
+
+
+//   private notifyBlockAdded(block: types.Block): void {
+//     this.onBlockAddedListeners.map(cb => cb(block));
+//   }
+
+//   public registerOnBlockAdded(bc: onBlockAdded): void {
+//     this.onBlockAddedListeners.push(bc);
+// }
 
   private async reportBlockTransactionToPool(block: types.Block) {
     const transactionReceipts = block.body.transactionReceipts;

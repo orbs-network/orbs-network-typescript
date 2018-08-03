@@ -4,7 +4,7 @@ ARG CI
 ENV CI=$CI
 ENV PROJECT_TYPE="server"
 
-VOLUME [ "/opt/orbs/logs", "/opt/orbs/db" ]
+VOLUME [ "/opt/orbs/logs", "/opt/orbs/db", "/opt/orbs/public-keys/consensus", "/opt/orbs/private-keys/consensus" ]
 
 ADD package.json yarn.lock .yarnrc docker/bootstrap-server.sh /opt/orbs/
 

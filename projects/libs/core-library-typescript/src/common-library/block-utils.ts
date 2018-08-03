@@ -17,6 +17,7 @@ export namespace BlockUtils {
     return hash.digest();
   }
 
+
   export function buildBlock(blockComponents: {header: types.BlockHeader, body: types.BlockBody}): types.Block {
     const block: types.Block = {
       header: blockComponents.header,
@@ -33,6 +34,7 @@ export namespace BlockUtils {
   export function buildNextBlock(body: types.BlockBody, prevBlock?: types.Block): types.Block {
     return buildBlock({
       header: {
+        // bodyHash: calculateHash(body),
         version: 0,
         prevBlockHash: prevBlock ? calculateBlockHash(prevBlock) : new Buffer(""),
         height: prevBlock ? prevBlock.header.height + 1 : 0

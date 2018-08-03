@@ -17,10 +17,9 @@ node dist/multi-account.js \
     --account-id $AWS_ACCOUNT_ID \
     --network $NETWORK \
     --s3-bucket-name $S3_BUCKET_NAME \
+    --docker-image ${DOCKER_IMAGE} \
     --docker-tag ${DOCKER_TAG} \
     --step $DEPLOY_STEP \
     --ethereum-node-ip $ETHEREUM_NODE_IP \
-    --tag-docker-image \
-    --push-docker-image \
     --remove-node \
     --deploy-node

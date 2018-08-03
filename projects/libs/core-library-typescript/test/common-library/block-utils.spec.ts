@@ -17,6 +17,7 @@ describe("Block utils", () => {
       height: 0,
       prevBlockHash: new Buffer(""),
       version: 0
+      // bodyHash: new Buffer("")
     };
 
     const body: BlockBody = {
