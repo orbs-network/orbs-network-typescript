@@ -1,5 +1,3 @@
-[![CircleCI](https://circleci.com/gh/orbs-network/orbs-network/tree/master.svg?style=shield)](https://circleci.com/gh/orbs-network/orbs-network/tree/master)
-
 # Orbs
 
 Orbs is a public blockchain built for the needs of apps with millions of users, from SLAs to adjustable fee models to on-demand capacity.
