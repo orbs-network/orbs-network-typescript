@@ -1,5 +1,8 @@
 # Orbs
 
+## Note: This repo is not fully compatible with V1 of the Orbs protocol, contributions are welcomed.
+
+
 Orbs is a public blockchain built for the needs of apps with millions of users, from SLAs to adjustable fee models to on-demand capacity.
 
 The Orbs platform is designed with the input of consumer applications such as Kik, and inspired by existing best practices, like those of leading cloud computing platforms.
