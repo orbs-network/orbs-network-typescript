@@ -20,9 +20,9 @@ export class VirtualMachine implements StartupCheck {
   private stateStorage: types.StateStorageClient;
   private processor: HardCodedSmartContractProcessor;
 
-  public constructor(contractRegistryConfig: HardCodedSmartContractRegistryConfig, stateStorage: types.StateStorageClient) {
+  public constructor(contractRegistryConfig: HardCodedSmartContractRegistryConfig, stateStorage: types.StateStorageClient, ethereumEndpoint?: string) {
     this.stateStorage = stateStorage;
-    this.processor = new HardCodedSmartContractProcessor(this.stateStorage, new HardCodedSmartContractRegistry(contractRegistryConfig));
+    this.processor = new HardCodedSmartContractProcessor(this.stateStorage, new HardCodedSmartContractRegistry(contractRegistryConfig), ethereumEndpoint);
   }
 
   public async processTransactionSet(input: types.ProcessTransactionSetInput): Promise<types.ProcessTransactionSetOutput> {

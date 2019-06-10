@@ -10,13 +10,15 @@
 import "mocha";
 import * as chai from "chai";
 import { VirtualMachine } from "../../src/virtual-machine";
-import { types, TransactionHelper, STARTUP_STATUS } from "../../src/common-library";
+import { types, TransactionHelper, STARTUP_STATUS, logger } from "../../src/common-library";
 import * as cap from "chai-as-promised";
 import chaiSubset = require("chai-subset");
 import { HardCodedSmartContractRegistryConfig } from "../../src/virtual-machine/hard-coded-contracts/hard-coded-smart-contract-registry";
 import { Address } from "../../src/common-library/address";
 import { createHash } from "crypto";
 import { stubInterface } from "ts-sinon";
+import { EthereumDriver, SimpleStorageContract } from "../../src/test-kit";
+import * as getPort from "get-port";
 
 chai.use(cap);
 chai.use(chaiSubset);
@@ -154,11 +156,6 @@ describe("test virtual machine", () => {
   });
 
   it("calls a smart contract", async () => {
-    const validPayload = JSON.stringify({
-      method: "getMyBalance",
-      args: []
-    });
-
     const result = await virtualMachine.callContract(buildCallRequest(ACCOUNT1, SMART_CONTRACT_ADDRESS));
 
     expect(result).to.equal(10);
@@ -181,11 +178,9 @@ describe("test virtual machine", () => {
     const startupStatus = await virtualMachine.startupCheck();
     return expect(startupStatus).to.deep.equal({ name: "virtual-machine", status: STARTUP_STATUS.OK });
   });
-
 });
 
 describe("Virtual machine - Bad setup", () => {
-
   let virtualMachine: VirtualMachine;
   const stateStorage = stubInterface<types.StateStorageClient>();
 
@@ -206,7 +201,88 @@ describe("Virtual machine - Bad setup", () => {
     virtualMachine = new VirtualMachine(contractRegistryConfig, undefined);
     const startupStatus = await virtualMachine.startupCheck();
     return expect(startupStatus).to.deep.include({ name: "virtual-machine", status: STARTUP_STATUS.FAIL });
+  });
+});
 
+function getIntKey(account: Address) {
+  return `fromEth.intValue.${account.toBase58()}`;
+}
+
+describe("test virtual machine with ethereum connected contract", function () {
+  this.timeout(10000);
+  let ethSim: EthereumDriver;
+  let virtualMachine: VirtualMachine;
+
+  const ETH_CONTRACT_VCHAIN = "101010";
+  const ETH_CONTRACT_NAME = "eth";
+  const ETH_CONTRACT_FILENAME = "ethereum-connected-sample-smart-contract";
+  const ETH_ORBS_CONTRACT_ADDRESS = Address.createContractAddress(ETH_CONTRACT_NAME, ETH_CONTRACT_VCHAIN);
+
+  beforeEach(async () => {
+    const ethSimPort = await getPort();
+    ethSim = new EthereumDriver();
+    await ethSim.start(ethSimPort, SimpleStorageContract, [2, "a"]);
+
+    const stateStorage = stubInterface<types.StateStorageClient>();
+
+    (<sinon.SinonStub>stateStorage.readKeys).returns({
+      values: {
+        [getIntKey(ACCOUNT1)]: "10"
+      }
+    });
+
+
+    const contractRegistryConfig: HardCodedSmartContractRegistryConfig = {
+      contracts: [
+        { vchainId: ETH_CONTRACT_VCHAIN, name: ETH_CONTRACT_NAME, filename: ETH_CONTRACT_FILENAME, networkId: Address.TEST_NETWORK_ID }
+      ]
+    };
+
+    virtualMachine = new VirtualMachine(contractRegistryConfig, stateStorage, `http://localhost:${ethSimPort}`);
   });
 
+  afterEach(async () => {
+    ethSim.stop();
+  });
+
+  it("should be able to create and use a ethereum-based contract", async () => {
+    const validPayload = JSON.stringify({
+      method: "getInt",
+      args: [ACCOUNT1.toBase58()]
+    });
+
+    const res = await virtualMachine.callContract({ contractAddress: ETH_ORBS_CONTRACT_ADDRESS.toBuffer(), payload: validPayload, sender: ACCOUNT1.toBuffer() });
+    return expect(res).to.be.equal(10);
+  });
+
+  it("should be able to process a transaction that uses ethereum", async () => {
+    const transaction: types.Transaction = {
+      header: {
+        version: 1,
+        sender: Buffer.from(ACCOUNT1.toBuffer()),
+        timestamp: Date.now().toString(),
+        contractAddress: ETH_ORBS_CONTRACT_ADDRESS.toBuffer()
+      },
+      payload: JSON.stringify({
+        method: "getMyIntFromEth",
+        args: [ACCOUNT1.toBase58(), ethSim.contractAddress]
+      }),
+      signatureData: undefined
+    };
+    const txHash = new TransactionHelper(transaction).calculateHash();
+
+
+    const { transactionReceipts, stateDiff } = await virtualMachine.processTransactionSet({
+      orderedTransactions: [{transaction, txHash}]
+    });
+
+    expect(transactionReceipts).to.have.lengthOf(1);
+    expect(transactionReceipts[0].success).to.be.true;
+
+    stateDiff.forEach(item => expect(item).to.have.property("contractAddress").deep.equal(ETH_ORBS_CONTRACT_ADDRESS.toBuffer()));
+
+    return expect(stateDiff).to
+      .have.lengthOf(1)
+      .and.containSubset([{ key: getIntKey(ACCOUNT1), value: "\"2\"" }]);
+  });
 });

@@ -7,9 +7,7 @@
  */
 
 
-import * as _ from "lodash";
-
-import { logger, types } from "orbs-core-library";
+import { types } from "orbs-core-library";
 
 import { Service, ServiceConfig, StartupCheck, StartupStatus } from "orbs-core-library";
 import { VirtualMachine } from "orbs-core-library";
